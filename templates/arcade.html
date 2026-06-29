@@ -284,13 +284,15 @@ var Engine=(function(){
   var last=0;
   function loop(now){ var dt=Math.min(0.05,(now-(last||now))/1000); last=now;
     try{
+      if(E.running&&E.game){ E.game.update(dt); }
+      updateFX(dt);
       ctx.setTransform(E.DPR,0,0,E.DPR,0,0); ctx.clearRect(0,0,E.W,E.H);
       ctx.save(); if(E.shake>0){ctx.translate((Math.random()-0.5)*E.shake*E.H*0.02,(Math.random()-0.5)*E.shake*E.H*0.02);}
       drawBG();
-      if(E.running&&E.game){ E.game.update(dt); E.game.draw(ctx); }
+      if(E.running&&E.game){ E.game.draw(ctx); }
       drawFX();
       ctx.restore();
-      if(E.flash>0){ ctx.fillStyle='rgba(255,77,109,'+(E.flash*0.26)+')'; ctx.fillRect(0,0,E.W,E.H); }
+      if(E.flash>0){ ctx.fillStyle='rgba(255,77,109,'+(E.flash*0.22)+')'; ctx.fillRect(0,0,E.W,E.H); }
     }catch(e){ if(window.console&&console.error)console.error(e); }
     requestAnimationFrame(loop);
   }
@@ -475,8 +477,8 @@ var WhackGame={ id:'whack', name:'Соққы', emoji:'🔨', desc:'Дұрыс ж
   mk:function(E){
     var W,H,bannerH,mw,mh,holes,moles,cur,waveT,gapT,D;
     var COL=['#ff6b6b','#ffce4a','#9be870','#21d4fd','#a06bff','#ff9f43'];
-    function geom(){ bannerH=H*0.16; mw=W*0.26; mh=H*0.10;
-      var cx=[W*0.26,W*0.5,W*0.74], cy=[bannerH+(H-bannerH)*0.30,bannerH+(H-bannerH)*0.62,bannerH+(H-bannerH)*0.90];
+    function geom(){ bannerH=H*0.15; mw=W*0.28; mh=H*0.115;
+      var cx=[W*0.25,W*0.5,W*0.75], cy=[bannerH+(H-bannerH)*0.26,bannerH+(H-bannerH)*0.55,bannerH+(H-bannerH)*0.84];
       holes=[]; for(var r=0;r<3;r++)for(var c=0;c<3;c++)holes.push({x:cx[c],y:cy[r]}); }
     function wave(){ var q=E.buildQuestion(E.rndItem(),D.opts); cur=q;
       E.setPrompt(q.promptEmoji||q.promptText, !!q.promptEmoji);
@@ -487,20 +489,27 @@ var WhackGame={ id:'whack', name:'Соққы', emoji:'🔨', desc:'Дұрыс ж
       resize:function(){ W=E.W;H=E.H;geom(); },
       start:function(d){ D=d; this.resize(); wave(); },
       down:function(x,y){ for(var i=0;i<moles.length;i++){ var m=moles[i]; if(m.gone||m.up<0.4)continue; var h=holes[m.hole];
-          if(Math.abs(x-h.x)<=mw/2 && Math.abs(y-(h.y-mh*0.5))<=mh*0.8){
+          if(Math.abs(x-h.x)<=mw*0.55 && Math.abs(y-h.y)<=mh*0.7){
             if(m.correct){ E.correct(cur.learn,h.x,h.y); E.speak(cur.learn.split(' ')[0]); E.pop('+1',h.x,h.y-mh,'#9be870'); E.burst(h.x,h.y,m.col,12); gapT=0.25; setNext(); } else { m.gone=true; E.wrong(h.x,h.y); } return; } } },
       update:function(dt){ if(gapT>0){ gapT-=dt; if(gapT<=0&&E.running)wave(); return; }
         for(var i=0;i<moles.length;i++){ var m=moles[i]; if(m.gone){ m.up=Math.max(0,m.up-dt*5); continue; } m.up=Math.min(1,m.up+dt*5); }
         waveT-=dt; if(waveT<=0){ var hitCorrect=false; for(var k=0;k<moles.length;k++)if(moles[k].correct&&moles[k].gone)hitCorrect=true; if(!hitCorrect)E.wrong(W/2,H*0.6); gapT=0.25; setNext(); }
       },
-      draw:function(ctx){ for(var i=0;i<holes.length;i++){ var h=holes[i];
-          ctx.fillStyle='rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(h.x,h.y,mw*0.55,mh*0.4,0,0,7); ctx.fill(); }
-        for(var j=0;j<moles.length;j++){ var m=moles[j]; if(m.up<=0.01)continue; var h=holes[m.hole]; var off=(1-m.up)*mh; var y=h.y-mh*0.5+off;
-          ctx.save(); ctx.beginPath(); ctx.ellipse(h.x,h.y,mw*0.55,mh*0.42,0,0,7); ctx.clip();
-          ctx.fillStyle=m.col; rr(ctx,h.x-mw*0.42,y-mh*0.5,mw*0.84,mh*1.2,mw*0.3); ctx.fill();
-          ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font='800 '+Math.round(mh*0.34)+'px Inter,Arial';
-          var lbl=m.label.length>9?m.label.slice(0,8)+'…':m.label; ctx.fillText(lbl,h.x,y);
-          ctx.restore();
+      draw:function(ctx){
+        for(var i=0;i<holes.length;i++){ var h=holes[i];
+          ctx.fillStyle='rgba(0,0,0,.32)'; ctx.beginPath(); ctx.ellipse(h.x,h.y+mh*0.52,mw*0.5,mh*0.30,0,0,7); ctx.fill(); }
+        for(var j=0;j<moles.length;j++){ var m=moles[j]; if(m.up<=0.02)continue; var h=holes[m.hole];
+          var sc=Math.min(1,m.up); ctx.globalAlpha=Math.min(1,m.up*1.4);
+          var bw=mw*0.96, bh=mh*0.96*(0.6+0.4*sc), cy=h.y;
+          // body (full card, NO clip — мәтін толық көрінеді)
+          ctx.fillStyle=m.col; rr(ctx,h.x-bw/2,cy-bh/2,bw,bh,bh*0.30); ctx.fill();
+          ctx.fillStyle='rgba(255,255,255,.16)'; rr(ctx,h.x-bw/2,cy-bh/2,bw,bh*0.42,bh*0.30); ctx.fill();
+          // label — авто-сыйғызу (қыспай, кеспей)
+          ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle';
+          var fs=Math.round(bh*0.36); ctx.font='800 '+fs+'px Inter,Arial';
+          while(fs>9 && ctx.measureText(m.label).width>bw*0.9){ fs--; ctx.font='800 '+fs+'px Inter,Arial'; }
+          ctx.fillText(m.label,h.x,cy);
+          ctx.globalAlpha=1;
         }
       }
     };
@@ -603,7 +612,58 @@ var MemoryGame={ id:'memory', name:'Жұп Тап', emoji:'🧠', desc:'Ағыл
   }
 };
 
-var GAMES=[RunnerGame,CatchGame,NinjaGame,WhackGame,BubbleGame,MemoryGame];
+/* ---- 7. FLAPPY (Flappy) — дұрыс саңылаудан ұш ---- */
+var FlappyGame={ id:'flappy', name:'Flappy', emoji:'🐤', desc:'Дұрыс саңылаудан ұшып өт', bpm:128,
+  how:'Экранды басып құсты ұшыр. Қабырғада 2 саңылау — ДҰРЫС жауап жазылған саңылаудан ұшып өт.',
+  diffs:{ easy:{spd:0.32,grav:2.3,flap:0.60,gap:0.20}, medium:{spd:0.44,grav:2.8,flap:0.64,gap:0.17}, hard:{spd:0.58,grav:3.3,flap:0.68,gap:0.15} },
+  mk:function(E){
+    var W,H,birdX,birdY,vy,wall,D,highC,lowC,gapH,run=0;
+    function ask(){ var q=E.buildQuestion(E.rndItem(),2); var top=Math.random()<0.5;
+      E.setPrompt(q.promptEmoji||q.promptText,!!q.promptEmoji);
+      var corr=q.correct, wr=q.options.filter(function(o){return o!==corr;})[0]||'—';
+      wall={x:W*1.14, highL:top?corr:wr, lowL:top?wr:corr, correctHigh:top, learn:q.learn, done:false}; }
+    return { diffKey:'',diff:null,
+      resize:function(){ W=E.W;H=E.H; birdX=W*0.28; highC=H*0.33; lowC=H*0.70; gapH=(D?D.gap:0.17)*H; if(birdY==null)birdY=H*0.5; },
+      start:function(d){ D=d; this.resize(); birdY=H*0.5; vy=0; ask(); },
+      down:function(){ vy=-D.flap*H; Sound.jump(); },
+      key:function(c){ if(c==='Space'||c==='ArrowUp')this.down(); },
+      update:function(dt){ run+=dt; vy+=D.grav*H*dt; birdY+=vy*dt;
+        if(birdY<H*0.14){birdY=H*0.14;vy=0;} if(birdY>H*0.97){birdY=H*0.97;vy=0;}
+        if(!wall)return; wall.x-=D.spd*W*dt;
+        if(!wall.done && wall.x<=birdX){ wall.done=true;
+          var inHigh=Math.abs(birdY-highC)<=gapH/2, inLow=Math.abs(birdY-lowC)<=gapH/2;
+          var ok=false; if(inHigh)ok=wall.correctHigh; else if(inLow)ok=!wall.correctHigh;
+          if(ok){ E.correct(wall.learn,birdX,birdY); E.speak(wall.learn.split(' ')[0]); E.pop('+1',birdX,birdY-H*0.04,'#9be870'); }
+          else { E.wrong(birdX,birdY); }
+        }
+        if(wall.x<-W*0.2){ if(E.running)ask(); }
+      },
+      draw:function(ctx){
+        if(wall){ var pw=W*0.26, x=wall.x, top=H*0.12, gnd=H*0.99;
+          var hT=highC-gapH/2, hB=highC+gapH/2, lT=lowC-gapH/2, lB=lowC+gapH/2;
+          ctx.fillStyle='#2e7d32'; seg(ctx,x,pw,top,hT); seg(ctx,x,pw,hB,lT); seg(ctx,x,pw,lB,gnd);
+          gapLbl(ctx,x,highC,pw,wall.highL); gapLbl(ctx,x,lowC,pw,wall.lowL);
+        }
+        var s=H*0.038, tilt=Math.max(-0.5,Math.min(0.9,vy/(H*1.2)));
+        ctx.save(); ctx.translate(birdX,birdY); ctx.rotate(tilt);
+        ctx.fillStyle='#ffce4a'; ctx.beginPath(); ctx.arc(0,0,s,0,7); ctx.fill();
+        ctx.fillStyle='#ff9f43'; rr(ctx,-s*0.2,s*0.1,s*0.7,s*0.5,3); ctx.fill();
+        ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(s*0.35,-s*0.25,s*0.32,0,7); ctx.fill();
+        ctx.fillStyle='#0b1330'; ctx.beginPath(); ctx.arc(s*0.45,-s*0.25,s*0.14,0,7); ctx.fill();
+        ctx.fillStyle='#ff6b6b'; rr(ctx,s*0.7,-s*0.06,s*0.5,s*0.2,2); ctx.fill();
+        ctx.restore();
+      }
+    };
+    function seg(ctx,x,pw,y0,y1){ if(y1<=y0)return; ctx.fillStyle='#2e7d32'; rr(ctx,x-pw/2,y0,pw,y1-y0,8); ctx.fill();
+      ctx.fillStyle='#256528'; rr(ctx,x-pw/2,y1-9,pw,9,4); ctx.fill(); }
+    function gapLbl(ctx,x,y,pw,label){ var fs=Math.round(pw*0.22); ctx.font='800 '+fs+'px Inter,Arial';
+      while(fs>10 && ctx.measureText(label).width>pw*1.6){ fs--; ctx.font='800 '+fs+'px Inter,Arial'; }
+      var w=ctx.measureText(label).width+18; ctx.fillStyle='#eafff0'; rr(ctx,x-w/2,y-fs*0.85,w,fs*1.7,7); ctx.fill();
+      ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(label,x,y); }
+  }
+};
+
+var GAMES=[RunnerGame,FlappyGame,CatchGame,NinjaGame,WhackGame,BubbleGame,MemoryGame];
 
 /* =================== UI =================== */
 var UI=(function(){
