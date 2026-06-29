@@ -238,30 +238,70 @@
       stickers:["https://optim.tildacdn.pro/tild3965-3665-4561-b763-346164343666/-/format/webp/2.jpg.webp","https://optim.tildacdn.pro/tild3363-6537-4931-b134-643935663861/-/format/webp/1.jpg.webp","https://optim.tildacdn.pro/tild6534-3866-4364-b966-363266363666/-/format/webp/3.jpg.webp","https://optim.tildacdn.pro/tild3961-6530-4034-b134-366638353536/-/format/webp/4.jpg.webp"]
     }
   };
-  /* ===== СҰРАҚТАР БАЗАСЫ — воркфлоу осы WORDS массивін ауыстырады.
-     Қанша сұрақ берсең — сонша болады. Екі түрі: грамматика {q,o,a,kk} немесе сөздік {en,kk,e}. ===== */
+  /* ===== СҰРАҚТАР БАЗАСЫ — воркфлоу осы массивті ауыстырады (жалғыз «var WORDS» болуы керек).
+     Қанша сұрақ берсең — сонша болады. ИИ әр сұрақтың ТҮРІН материалға қарап өзі таңдайды.
+     Қолдайтын түрлер (бәрі іске қосылған):
+       • грамматика/MCQ  : {q, o:[...], a, kk?}                    — 4 нұсқадан таңдау
+       • сөздік          : {en, kk, e?}                           — аударманы таңдау (нұсқаларды өзі құрады)
+       • тыңдау (таңдау) : {type:"listen", audio, q, o:[...], a}   — тыңдап, дұрысын таңдау
+       • тыңдау (жазу)   : {type:"listen_type", audio, q, a, hint?}— тыңдап, жазу
+       • сөйлем құрау    : {type:"order", a:"full sentence"}       — сөздерді ретімен қою
+       • бос орын (жазу) : {type:"gap", q:"He ___ home", a:"goes"} — сөзді жазу
+       • оқылым          : {type:"reading", passage, q, o:[...], a}— мәтін + сұрақ (бір мәтінге бірнеше сұрақ — passage қайталанады)
+     d (1..4 = A1,A2,B1,B2) қаласаң ғана. ===== */
   var WORDS=[
     {q:"She ___ to school every day",o:["goes","go","going"],a:"goes",kk:"he/she + s"},
-    {q:"I ___ playing football now",o:["am","is","do"],a:"am",kk:"Present Continuous"},
-    {q:"The meeting is ___ 9 o'clock",o:["at","on","in"],a:"at",kk:"сағатпен → at"},
-    {q:"See you ___ Monday",o:["on","at","in"],a:"on",kk:"күнмен → on"},
-    {q:"He ___ like coffee",o:["doesn't","don't","isn't"],a:"doesn't",kk:"he → doesn't"},
-    {q:"This is ___ apple",o:["an","a","the"],a:"an",kk:"дауыстыдан бұрын → an"},
-    {en:"beautiful",kk:"әдемі",e:""},
-    {en:"water",kk:"су",e:"💧"}
+    {en:"water",kk:"су",e:"💧"},
+    {type:"listen",audio:"My brother works in a hospital.",q:"Тыңда: ағасы қайда жұмыс істейді?",o:["ауруханада","мектепте","дүкенде"],a:"ауруханада"},
+    {type:"listen_type",audio:"I am playing football now",q:"Тыңда да, ЕКІНШІ сөзді жаз:",a:"am",hint:"(I ___ …)"},
+    {type:"order",a:"I have two brothers"},
+    {type:"gap",q:"He ___ like coffee",a:"doesn't",kk:"he → doesn't"},
+    {type:"reading",passage:"Aisha is 15. Last summer she went to London for an English course.",q:"Where did Aisha go last summer?",o:["London","Astana","Paris"],a:"London"}
   ];
+  function shuf4(arr,ans){ var o=arr.slice(); var a=String(ans); if(o.indexOf(a)<0)o.unshift(a); o=o.slice(0,4); if(o.indexOf(a)<0)o[0]=a; o.sort(function(){return Math.random()-0.5;}); return {o:o,c:o.indexOf(a)}; }
+  function dband(x,def){ x=parseInt(x,10); return (x>=1&&x<=4)?x:def; }
   function toItem(w){
-    if(w && w.en){
+    if(!w || typeof w!=='object') return {d:1,sk:'vocab',type:'mcq',q:'?',o:['?'],c:0};
+    var t=(w.type||'').toLowerCase();
+    // тыңдау
+    if(t==='listen'||t==='listening'){
+      if(w.o && w.o.length){ var L=shuf4(w.o,w.a); return {d:dband(w.d,3),sk:'listening',type:'mcq',audio:String(w.audio||w.a||''),q:String(w.q||'Тыңда да, дұрыс жауапты таңда:'),o:L.o,c:L.c}; }
+      return {d:dband(w.d,3),sk:'listening',type:'type',audio:String(w.audio||w.a||''),q:String(w.q||'Тыңда да, естігеніңді жаз:'),hint:String(w.hint||''),a:String(w.a||'')};
+    }
+    if(t==='listen_type'){
+      return {d:dband(w.d,3),sk:'listening',type:'type',audio:String(w.audio||w.a||''),q:String(w.q||'Тыңда да, естігеніңді жаз:'),hint:String(w.hint||''),a:String(w.a||'')};
+    }
+    // сөйлем құрау
+    if(t==='order'||t==='build'||t==='assemble'){
+      var sent=String(w.a||w.sentence||(w.words?w.words.join(' '):'')||'');
+      var words=(w.words&&w.words.length)?w.words.slice():sent.split(/\s+/).filter(Boolean);
+      if(words.length<2) words=sent.split(/\s+/).filter(Boolean);
+      return {d:dband(w.d,3),sk:'grammar',type:'build',q:String(w.q||'Сөйлемді дұрыс ретпен құра:'),words:words,a:sent};
+    }
+    // бос орын / жазу
+    if(t==='gap'||t==='fill'||t==='type'||t==='write'){
+      return {d:dband(w.d,2),sk:'grammar',type:'type',q:String(w.q||'Бос орынды толтыр:'),a:String(w.a||''),hint:String(w.hint||''),display:String(w.display||'')};
+    }
+    // оқылым
+    if(t==='reading'||w.passage){
+      var R=shuf4(w.o||[],w.a); return {d:dband(w.d,3),sk:'reading',type:'mcq',passage:String(w.passage||''),q:String(w.q||'Мәтін бойынша:'),o:R.o,c:R.c};
+    }
+    // тікелей MCQ (o+a берілген)
+    if((t==='mcq'||t==='mistake'||t==='') && w.o && w.a!==undefined && !w.en){
+      var M=shuf4(w.o,w.a); return {d:dband(w.d,2),sk:String(w.sk||'grammar'),type:(t==='mistake'?'mistake':'mcq'),big:String(w.e||w.big||''),q:String(w.q||'Дұрыс жауапты таңда:'),o:M.o,c:M.c};
+    }
+    // ескі грамматика {q,o,a}
+    if(w.q && w.o){
+      var G=shuf4(w.o,w.a); return {d:dband(w.d,3),sk:'grammar',type:'mcq',q:String(w.q),o:G.o,c:G.c};
+    }
+    // ескі сөздік {en,kk,e} — нұсқаларды өзі құрады (+ қор сөздер, жетпей қалмауы үшін)
+    if(w.en){
       var pool=WORDS.filter(function(x){return x&&x.en&&x.en!==w.en;});
       pool.sort(function(){return Math.random()-0.5;});
       var o=[w.en]; for(var k=0;k<pool.length&&o.length<4;k++){if(o.indexOf(pool[k].en)<0)o.push(pool[k].en);}
+      if(o.length<3){ var fill=['water','house','school','friend','book','city','happy','work','apple','road']; for(var f=0;f<fill.length&&o.length<4;f++){ if(o.indexOf(fill[f])<0&&fill[f]!==w.en)o.push(fill[f]); } }
       o.sort(function(){return Math.random()-0.5;});
-      return {d:2,sk:'vocab',type:'mcq',big:(w.e||''),q:(w.kk?('«'+w.kk+'» — ағылшынша қалай?'):'Аудармасын таңда:'),o:o,c:o.indexOf(w.en)};
-    }
-    if(w && w.q){
-      var oo=(w.o||[]).slice(); var a=String(w.a); if(oo.indexOf(a)<0)oo.unshift(a); oo=oo.slice(0,4); if(oo.indexOf(a)<0)oo[0]=a;
-      oo.sort(function(){return Math.random()-0.5;});
-      return {d:3,sk:'grammar',type:'mcq',q:String(w.q),o:oo,c:oo.indexOf(a)};
+      return {d:dband(w.d,2),sk:'vocab',type:'mcq',big:String(w.e||''),q:(w.kk?('«'+w.kk+'» — ағылшынша қалай?'):'Аудармасын таңда:'),o:o,c:o.indexOf(w.en)};
     }
     return {d:1,sk:'vocab',type:'mcq',q:'?',o:['?'],c:0};
   }
