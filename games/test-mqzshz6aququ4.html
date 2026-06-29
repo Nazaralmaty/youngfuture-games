@@ -1,0 +1,636 @@
+<!-- ==========================================================================
+     YoungFuture — Ағылшын ОЙЫН-ТЕСТ (эталондық дизайн, бренд: YoungFuture)
+     • Сұрақтар базасы ИНЪЕКЦИЯЛАНАДЫ: WORDS массивін воркфлоу ауыстырады.
+       Қанша сұрақ берсең — сонша болады (seq from WORDS).
+     • НИКОГДА не показываем правильность ученику. Дофамин: XP, комбо, vibe, маскот, звук.
+     • Звук беззвучта да жұмыс істейді (iOS unlock) · жоғарыдағы 🔊 батырмамен басқарылады.
+     ========================================================================== -->
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>YoungFuture · Ағылшын тесті 🦉</title>
+</head>
+<body>
+<div id="ev">
+<style>
+  #ev{--navy:#0f2a55;--navy2:#1b4a8f;--crimson:#e0214c;--crimson2:#ff3d6e;--gold:#ffc23c;--lime:#27e0a0;
+      --bg:#0b1a33;--card:#fff;--text:#0f2140;--muted:#6b7794;--line:#e3e9f3;--radius:22px;
+      --shadow:0 18px 50px rgba(7,18,40,.45);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+  #ev *{box-sizing:border-box;margin:0;padding:0}
+  #ev .wrap{max-width:720px;margin:0 auto;padding:16px;position:relative;z-index:1}
+  #ev{background:radial-gradient(1200px 600px at 50% -10%,#16315f,transparent),linear-gradient(180deg,#0b1a33,#0e2247);min-height:100%;padding:2px}
+  #ev .screen{display:none;animation:evf .4s ease} #ev .screen.active{display:block}
+  @keyframes evf{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  @keyframes evpop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+  @keyframes evfly{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-70px) scale(1.3);opacity:0}}
+  @keyframes evpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+  @keyframes evglitch{0%{clip-path:inset(0 0 0 0)}20%{clip-path:inset(20% 0 30% 0);transform:translateX(-3px)}40%{clip-path:inset(50% 0 20% 0);transform:translateX(3px)}60%{clip-path:inset(10% 0 60% 0)}100%{clip-path:inset(0 0 0 0);transform:none}}
+  @keyframes evfall{to{transform:translateY(110vh) rotate(540deg);opacity:0}}
+  @keyframes evbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+  #ev .brand{display:flex;align-items:center;gap:10px;justify-content:center;margin:4px 0 8px}
+  #ev .brand b{font-size:18px;color:#fff;font-weight:800} #ev .brand b span{color:var(--gold)}
+  #ev .brand .lg{width:42px;height:42px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+  #ev .brand .lg svg{width:26px;height:26px}
+
+  /* LANDING — bento 2026 */
+  #ev .hero{border-radius:26px;overflow:hidden;position:relative;background:#0e2247;border:1px solid #1d3a6b;box-shadow:var(--shadow)}
+  #ev .heroimg{height:200px;background:linear-gradient(135deg,#16315f,#0e2247);background-size:cover;background-position:center;position:relative;display:flex;align-items:flex-end;padding:16px}
+  #ev .heroimg .mas{position:absolute;right:12px;bottom:-6px;font-size:84px;animation:evbob 3s ease-in-out infinite;filter:drop-shadow(0 8px 12px rgba(0,0,0,.4))}
+  #ev .heroimg img.mas{width:120px;height:120px;font-size:0;bottom:-8px}
+  #ev .heroimg.hasvid{height:300px;justify-content:center;align-items:center;background:#06101f}
+  #ev .introvid{height:100%;aspect-ratio:9/16;border:none;border-radius:14px;box-shadow:0 8px 26px rgba(0,0,0,.5);position:relative;z-index:1}
+  #ev video.introvid{object-fit:cover}
+  #ev .heroimg.hasvid .mas{right:6px;bottom:2px;z-index:2;width:80px;height:80px;font-size:48px}
+  #ev .heroimg.hasvid .schooltag{z-index:3}
+  #ev .schooltag{position:absolute;top:14px;left:14px;background:var(--gold);color:var(--navy);padding:6px 13px;border-radius:999px;font-size:12px;font-weight:900;z-index:2}
+  #ev .herobody{padding:20px 20px 22px;color:#fff}
+  #ev .kick{display:inline-block;background:rgba(224,33,76,.2);border:1px solid var(--crimson);color:#ffd0db;font-weight:800;font-size:12px;padding:6px 13px;border-radius:999px;margin-bottom:10px}
+  #ev .hero h1{font-size:30px;line-height:1.1;font-weight:900;letter-spacing:-.5px;margin-bottom:8px}
+  #ev .hero h1 em{font-style:normal;color:var(--gold)}
+  #ev .hero p{font-size:15px;opacity:.92;line-height:1.5}
+  #ev .bento{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+  #ev .bt{background:#0e2247;border:1px solid #1d3a6b;border-radius:16px;padding:14px 10px;text-align:center;color:#fff}
+  #ev .bt .e{font-size:24px} #ev .bt b{display:block;font-size:14px;margin-top:4px} #ev .bt small{color:#9fb2d6;font-size:11px}
+  #ev .joke{margin-top:12px;background:#0e2247;border:1px dashed #2a4a82;border-radius:16px;padding:12px 14px;color:#cdd9f2;font-size:13.5px;display:flex;gap:10px;align-items:center}
+  #ev .joke .e{font-size:26px}
+
+  #ev .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:900;font-size:18px;color:#fff;background:linear-gradient(135deg,var(--crimson),var(--crimson2));padding:18px 24px;border-radius:16px;box-shadow:0 14px 30px rgba(224,33,76,.4);transition:transform .15s,box-shadow .15s;margin-top:14px;letter-spacing:.3px}
+  #ev .btn:hover{transform:translateY(-2px)} #ev .btn:active{transform:translateY(0)} #ev .btn[disabled]{opacity:.5;cursor:not-allowed}
+  #ev .btn.sm{width:auto;font-size:15px;padding:13px 24px;margin-top:0}
+  #ev .btn.dark{background:linear-gradient(135deg,#16315f,#1b4a8f)}
+  #ev .hintw{font-size:12.5px;color:#9fb2d6;text-align:center;margin-top:12px}
+
+  #ev .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 22px;margin-top:14px}
+  #ev .field{margin-bottom:14px}
+  #ev .field label{display:block;font-size:14px;font-weight:700;margin-bottom:6px;color:var(--navy)}
+  #ev .field label .req{color:var(--crimson)}
+  #ev .field input{width:100%;border:2px solid var(--line);border-radius:13px;padding:14px 16px;font-size:16px;font-family:inherit;color:var(--text)}
+  #ev .field input:focus{outline:none;border-color:var(--navy2);box-shadow:0 0 0 4px rgba(27,74,143,.14)}
+  #ev .field .err{color:var(--crimson);font-size:13px;margin-top:5px;display:none}
+  #ev .field.invalid input{border-color:var(--crimson)} #ev .field.invalid .err{display:block}
+  #ev .privacy{font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px}
+  #ev .stepdots{display:flex;gap:6px;justify-content:center;margin-bottom:18px}
+  #ev .stepdots i{width:8px;height:8px;border-radius:50%;background:var(--line);transition:.2s}
+  #ev .stepdots i.on{background:var(--crimson);width:22px;border-radius:4px}
+  #ev .stepdots i.done{background:var(--lime)}
+  #ev .stepq{font-size:21px;font-weight:900;color:var(--navy);text-align:center;margin-bottom:4px}
+  #ev .stepq .em{font-size:34px;display:block;margin-bottom:6px}
+  #ev .stepsub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px}
+  #ev .stepin{width:100%;border:2px solid var(--line);border-radius:14px;padding:16px;font-size:18px;text-align:center;font-family:inherit;color:var(--text)}
+  #ev .stepin:focus{outline:none;border-color:var(--navy2);box-shadow:0 0 0 4px rgba(27,74,143,.14)}
+  #ev .steperr{color:var(--crimson);font-size:13px;text-align:center;min-height:18px;margin-top:6px}
+  #ev .choices{display:grid;gap:10px}
+  #ev .choice{border:2px solid var(--line);border-radius:14px;padding:15px 16px;font-size:16px;font-weight:700;color:var(--navy);background:#fff;cursor:pointer;font-family:inherit;text-align:left;transition:.12s}
+  #ev .choice:hover{border-color:var(--crimson);background:#fff0f4;transform:translateX(2px)}
+
+  /* HUD */
+  #ev .hud{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+  #ev .pill{display:inline-flex;align-items:center;gap:5px;background:#0e2247;border:1px solid #1d3a6b;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:900;color:#fff}
+  #ev .pill.xp{color:var(--gold)} #ev .pill.combo{color:var(--crimson2)} #ev .pill.combo.hot{animation:evpulse .4s}
+  #ev .mute{margin-left:auto;background:#0e2247;border:1px solid #1d3a6b;color:#fff;border-radius:999px;width:34px;height:34px;cursor:pointer;font-size:15px}
+  #ev .vibewrap{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  #ev .vibe{flex:1;height:10px;border-radius:999px;background:#0e2247;border:1px solid #1d3a6b;overflow:hidden}
+  #ev .vibe i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--lime),var(--gold),var(--crimson2));transition:width .35s}
+  #ev .vibe.full i{animation:evpulse .5s}
+  #ev .vlabel{font-size:11px;color:#9fb2d6;font-weight:800}
+  #ev .progress{height:8px;border-radius:999px;background:#0e2247;border:1px solid #1d3a6b;overflow:hidden;margin-bottom:4px}
+  #ev .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--navy2),var(--crimson));transition:width .4s}
+  #ev .speedbar{height:6px;border-radius:999px;background:#3a1020;overflow:hidden;margin:6px 0 0;display:none}
+  #ev .speedbar.on{display:block} #ev .speedbar i{display:block;height:100%;background:var(--crimson2);width:100%}
+
+  #ev .qcard{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 18px;margin-top:6px;position:relative;overflow:hidden}
+  #ev .qcard.glitch{animation:evglitch .35s}
+  #ev .qtag{display:inline-block;font-size:11px;font-weight:900;color:var(--navy);background:#eaf0fb;border-radius:999px;padding:5px 11px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+  #ev .qtag.speed{color:#fff;background:var(--crimson)}
+  #ev .qmas{position:absolute;right:12px;top:10px;font-size:30px} #ev .qmas img{width:46px;height:46px;border-radius:12px;background:#0e2247;padding:3px;box-shadow:0 4px 10px rgba(0,0,0,.2)}
+  #ev .ovl .em img{border-radius:18px;background:#0e2247;padding:6px}
+  #ev .medal img{border-radius:18px;background:#0b1a33;padding:4px}
+  #ev .qimg{width:100%;max-height:170px;object-fit:cover;border-radius:14px;margin-bottom:12px;display:none}
+  #ev .qbig{font-size:46px;text-align:center;margin:2px 0 8px}
+  #ev .passage{background:#f0f5fc;border-left:4px solid var(--navy2);border-radius:12px;padding:14px 15px;font-size:14.5px;line-height:1.65;margin-bottom:14px;color:#243a5e}
+  #ev .qtext{font-size:20px;font-weight:800;line-height:1.32;color:var(--navy);margin-bottom:6px}
+  #ev .qsub{font-size:13.5px;color:var(--muted);margin-bottom:14px}
+  #ev .scaffold{font-size:28px;font-weight:900;letter-spacing:7px;text-align:center;color:var(--navy);margin:4px 0 12px}
+  #ev .opts{display:grid;gap:10px}
+  #ev .opt{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:14px;padding:14px 16px;font-size:17px;font-weight:600;cursor:pointer;background:#fff;transition:.12s;text-align:left}
+  #ev .opt:hover{border-color:var(--navy2);background:#f7faff;transform:translateX(2px)}
+  #ev .opt .key{flex:0 0 26px;height:26px;border-radius:8px;background:#eaf0fb;color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px}
+  #ev .opt.pick{border-color:var(--gold);background:#fff7e0} #ev .opt.pick .key{background:var(--gold);color:var(--navy)}
+  #ev .opt.lock{pointer-events:none;opacity:.92}
+  #ev .tin{width:100%;border:2px solid var(--line);border-radius:14px;padding:15px;font-size:20px;text-align:center;font-weight:800;letter-spacing:1px;font-family:inherit;color:var(--text)}
+  #ev .tin:focus{outline:none;border-color:var(--navy2);box-shadow:0 0 0 4px rgba(27,74,143,.14)}
+  #ev .answerline{min-height:52px;border:2px dashed var(--line);border-radius:14px;padding:9px;display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px;background:#fafbff}
+  #ev .bank{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px}
+  #ev .chip{background:#fff;border:2px solid var(--navy2);color:var(--navy);border-radius:11px;padding:9px 13px;font-size:16px;font-weight:800;cursor:pointer;user-select:none}
+  #ev .chip:hover{background:#eef3fb} #ev .chip.used{opacity:.3;pointer-events:none} #ev .chip.inline{background:#eef3fb}
+  #ev .match{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  #ev .mcol{display:grid;gap:9px}
+  #ev .mbtn{border:2px solid var(--line);border-radius:12px;padding:13px;font-size:15px;font-weight:800;background:#fff;cursor:pointer;font-family:inherit;color:var(--navy)}
+  #ev .mbtn.sel{border-color:var(--crimson);background:#fff0f4}
+  #ev .mbtn.paired{border-color:var(--gold);background:#fff7e0;color:var(--navy);pointer-events:none;opacity:.95}
+  #ev .listenbtn{display:inline-flex;align-items:center;gap:9px;background:var(--navy);color:#fff;border:none;border-radius:14px;padding:15px 24px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;margin:0 auto 14px}
+  #ev .center{text-align:center}
+
+  #ev .xpfly{position:fixed;font-size:22px;font-weight:900;color:var(--gold);pointer-events:none;z-index:80;animation:evfly 1s ease forwards;text-shadow:0 2px 6px rgba(0,0,0,.4)}
+  #ev .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120px);background:#0f2a55;color:#fff;padding:12px 20px;border-radius:14px;font-weight:900;font-size:15px;box-shadow:0 14px 30px rgba(0,0,0,.4);transition:transform .35s;z-index:70;border:1px solid #2a4a82}
+  #ev .toast.show{transform:translateX(-50%) translateY(0)}
+  #ev .ovl{position:fixed;inset:0;background:rgba(7,18,40,.7);display:none;align-items:center;justify-content:center;z-index:90;backdrop-filter:blur(4px)}
+  #ev .ovl.show{display:flex}
+  #ev .ovl .box{background:#fff;border-radius:24px;padding:28px 24px;text-align:center;max-width:330px;animation:evpop .4s}
+  #ev .ovl .em{font-size:60px;animation:evbob 2s infinite} #ev .ovl .em img{width:96px;height:96px}
+  #ev .ovl h3{color:var(--navy);font-size:22px;margin:6px 0 6px} #ev .ovl p{color:var(--muted);font-size:14px;margin-bottom:14px}
+
+  #ev .finish{text-align:center;padding:8px 4px;color:#fff}
+  #ev .fcard{background:#0e2247;border:1px solid #2a4a82;border-radius:24px;padding:26px 20px}
+  #ev .medal{font-size:64px;animation:evpop .5s} #ev .medal img{width:110px;height:110px}
+  #ev .finish h2{font-size:24px;margin:8px 0 6px}
+  #ev .xpbox{display:inline-flex;gap:16px;background:#0b1a33;border:1px solid #2a4a82;border-radius:16px;padding:13px 20px;margin:12px 0}
+  #ev .xpbox div b{display:block;font-size:24px;color:var(--gold)} #ev .xpbox div small{color:#9fb2d6;font-size:11px}
+  #ev .badge2{font-weight:900;font-size:18px;color:var(--gold)}
+  #ev .finish p{font-size:14.5px;color:#cdd9f2;line-height:1.55;max-width:420px;margin:6px auto}
+  #ev .foot{text-align:center;color:#7e8db0;font-size:12px;margin:18px 0 8px}
+  @media(max-width:560px){#ev .hero h1{font-size:24px}#ev .bento{grid-template-columns:1fr 1fr}#ev .qtext{font-size:18px}}
+</style>
+
+<div class="wrap">
+  <div class="brand"><div class="lg"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M24 28 L50 74 L76 28" fill="none" stroke="#0f2a55" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="26" r="9" fill="#e0214c"/></svg></div><b>Young<span>Future</span></b></div>
+
+  <!-- LANDING -->
+  <section class="screen active" id="ev-landing">
+    <div class="hero">
+      <div class="heroimg" id="heroImg">
+        <div class="schooltag" id="schoolTag" style="display:none"></div>
+        <div class="mas" id="heroMas">🦉</div>
+      </div>
+      <div class="herobody">
+        <span class="kick">🎯 АҒЫЛШЫН ТЕСТІ</span>
+        <h1>Ағылшын <em>деңгейіңді</em> тексер 🧠</h1>
+        <p>Ағылшыннан ойын-тест. Сұрақтарға жауап бер, XP жина, комбо жаса, vibe-ті толтыр. Дұрыс/бұрыс деп айтпаймыз 🤫 — тек ойна!</p>
+      </div>
+    </div>
+
+    <div class="bento">
+      <div class="bt"><div class="e">🎚️</div><b>Адаптив</b><small>саған бейімделеді</small></div>
+      <div class="bt"><div class="e">⚡</div><b>Speed</b><small>темп раунд</small></div>
+      <div class="bt"><div class="e">🎁</div><b>Сюрприз</b><small>сандықтар</small></div>
+    </div>
+    <div class="joke"><span class="e">😎</span><div id="jokeText">Дайын бол — кеттік! Әр сұрақ — жаңа XP. Асықпай ойла, барлығы саған бейім.</div></div>
+
+    <button class="btn" id="go-form">Тестті бастау 🚀</button>
+    <p class="hintw">Нәтиже мен деңгей мұғалім/ата-анаға жетеді. Саған — XP мен вайб 🔥</p>
+  </section>
+
+  <!-- FORM — бір сұрақ бір экранда -->
+  <section class="screen" id="ev-form">
+    <div class="card">
+      <div class="stepdots" id="stepDots"></div>
+      <div id="stepBox"></div>
+      <div class="privacy" style="margin-top:14px">🔒 Нәтиже тек оқу деңгейін талдау үшін</div>
+    </div>
+  </section>
+
+  <!-- TEST -->
+  <section class="screen" id="ev-test">
+    <div class="hud">
+      <span class="pill xp">⭐ <span id="h-xp">0</span></span>
+      <span class="pill combo" id="h-combopill">🔥 <span id="h-combo">0</span></span>
+      <span class="pill" id="h-prog">1/20</span>
+      <button class="mute" id="h-mute" title="Дыбыс">🔊</button>
+    </div>
+    <div class="vibewrap"><span class="vlabel">VIBE</span><div class="vibe" id="h-vibewrap"><i id="h-vibe"></i></div></div>
+    <div class="progress"><i id="h-bar"></i></div>
+    <div class="speedbar" id="h-speed"><i id="h-speedi"></i></div>
+    <div class="qcard" id="qcard"></div>
+  </section>
+
+  <!-- FINISH -->
+  <section class="screen" id="ev-finish">
+    <div class="finish"><div class="fcard">
+      <div class="medal" id="f-medal">🏆</div>
+      <h2>Бітті! Сен — легендасың 🎉</h2>
+      <div class="xpbox"><div><b id="f-xp">0</b><small>XP</small></div><div><b id="f-combo">0</b><small>макс комбо 🔥</small></div></div>
+      <p class="badge2" id="f-badge"></p>
+      <p>Жақсы ойнадың! Нәтижең сақталды 📨</p>
+      <p><b>Толық деңгейің мен жеке кеңес — YoungFuture-де.</b> Дамуыңды жалғастыр 😎📚</p>
+      <p style="color:#7e8db0;font-size:12px;margin-top:10px">YoungFuture · рахмет 💙</p>
+    </div></div>
+  </section>
+
+  <div class="foot">© YoungFuture · Ағылшын тесті</div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="ovl" id="ovl"><div class="box"><div class="em" id="ovlEm">🚀</div><h3 id="ovlT"></h3><p id="ovlP"></p><button class="btn sm dark" id="ovlGo" style="margin:0 auto">Жалғастыру →</button></div></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var CONFIG = {
+    APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyJ_VFra242y9M0oz9DcaWap1JLz8hDJsrddETBHzQwfePWqujuOvXkQQjSAYPgx8V8/exec",
+    SUBJECT: "English",
+    ASSETS: {
+      mascot:{normal:"https://optim.tildacdn.pro/tild3861-3534-4331-b033-653333353863/-/format/webp/file_0000000036a0722.png.webp",hype:"https://optim.tildacdn.pro/tild3831-3238-4532-b136-323232373266/-/format/webp/file_00000000bdfc71f.png.webp",think:"https://optim.tildacdn.pro/tild6435-3361-4937-a636-366362613934/-/format/webp/file_00000000838871f.png.webp",cool:"https://optim.tildacdn.pro/tild3164-6538-4363-b765-336466663861/-/format/webp/file_00000000fca0720.png.webp",dead:"https://optim.tildacdn.pro/tild6563-6332-4938-a563-366130373864/-/format/webp/file_000000001a24720.png.webp"},
+      hero:"https://optim.tildacdn.pro/tild3332-3432-4866-b333-663864356331/-/format/webp/file_00000000d3dc722.png.webp", intro_youtube:"", intro_mp4:"",
+      q:{school:"https://optim.tildacdn.pro/tild3437-3534-4131-b135-373737663636/-/format/webp/file_000000004428722.png.webp",travel:"https://optim.tildacdn.pro/tild3637-6461-4934-b562-343666343935/-/format/webp/file_000000008248722.png.webp",food:"https://optim.tildacdn.pro/tild3262-3561-4561-b030-346138653663/-/format/webp/file_00000000c928722.png.webp",sport:"https://optim.tildacdn.pro/tild3939-3331-4639-b661-386466663731/-/format/webp/file_000000005168722.png.webp",family:"https://optim.tildacdn.pro/tild3633-3439-4561-a361-613830656134/-/format/webp/file_00000000ba88720.png.webp",city:"https://optim.tildacdn.pro/tild3361-3634-4166-b135-633437383334/-/format/webp/file_000000002218720.png.webp",nature:"https://optim.tildacdn.pro/tild3130-3634-4663-a236-346566373537/-/format/webp/file_00000000ba5471f.png.webp",tech:""},
+      stickers:["https://optim.tildacdn.pro/tild3965-3665-4561-b763-346164343666/-/format/webp/2.jpg.webp","https://optim.tildacdn.pro/tild3363-6537-4931-b134-643935663861/-/format/webp/1.jpg.webp","https://optim.tildacdn.pro/tild6534-3866-4364-b966-363266363666/-/format/webp/3.jpg.webp","https://optim.tildacdn.pro/tild3961-6530-4034-b134-366638353536/-/format/webp/4.jpg.webp"]
+    }
+  };
+  /* ===== СҰРАҚТАР БАЗАСЫ — воркфлоу осы массивті ауыстырады (жалғыз «var WORDS» болуы керек).
+     Қанша сұрақ берсең — сонша болады. ИИ әр сұрақтың ТҮРІН материалға қарап өзі таңдайды.
+     Қолдайтын түрлер (бәрі іске қосылған):
+       • грамматика/MCQ  : {q, o:[...], a, kk?}                    — 4 нұсқадан таңдау
+       • сөздік          : {en, kk, e?}                           — аударманы таңдау (нұсқаларды өзі құрады)
+       • тыңдау (таңдау) : {type:"listen", audio, q, o:[...], a}   — тыңдап, дұрысын таңдау
+       • тыңдау (жазу)   : {type:"listen_type", audio, q, a, hint?}— тыңдап, жазу
+       • сөйлем құрау    : {type:"order", a:"full sentence"}       — сөздерді ретімен қою
+       • бос орын (жазу) : {type:"gap", q:"He ___ home", a:"goes"} — сөзді жазу
+       • оқылым          : {type:"reading", passage, q, o:[...], a}— мәтін + сұрақ (бір мәтінге бірнеше сұрақ — passage қайталанады)
+     d (1..4 = A1,A2,B1,B2) қаласаң ғана. ===== */
+  var WORDS=[{"en":"journey","kk":"бір жерден екінші жерге ұзақ сапар","e":"🧳"},{"en":"passport","kk":"паспорт","e":"📘"},{"en":"check-in","kk":"тіркелу, тіркеуден өту","e":"✅"},{"en":"guide","kk":"гид, жол көрсетуші","e":"🧭"},{"en":"souvenir","kk":"естелік сыйлық","e":"🎁"},{"en":"delay","kk":"кешігу","e":"⏰"},{"en":"hotel","kk":"қонақ үй","e":"🏨"},{"en":"luggage","kk":"жүк, сөмкелер","e":"🧳"},{"en":"arrive","kk":"келу, жету","e":"🛬"},{"en":"explore","kk":"аралау, зерттеп көру","e":"🗺️"},{"en":"relax","kk":"демалу, тынығу","e":"😌"},{"en":"itinerary","kk":"сапар жоспары","e":"🗓️"},{"en":"destination","kk":"баратын жер, бағыт","e":"📍"},{"en":"customs","kk":"кеден","e":"🛃"},{"en":"gap","kk":"Сөйлемді толықтыр: Next summer I want to go on an exciting adventure because _____.","e":""}];
+  function shuf4(arr,ans){ var o=arr.slice(); var a=String(ans); if(o.indexOf(a)<0)o.unshift(a); o=o.slice(0,4); if(o.indexOf(a)<0)o[0]=a; o.sort(function(){return Math.random()-0.5;}); return {o:o,c:o.indexOf(a)}; }
+  function dband(x,def){ x=parseInt(x,10); return (x>=1&&x<=4)?x:def; }
+  function toItem(w){
+    if(!w || typeof w!=='object') return {d:1,sk:'vocab',type:'mcq',q:'?',o:['?'],c:0};
+    var t=(w.type||'').toLowerCase();
+    // тыңдау
+    if(t==='listen'||t==='listening'){
+      if(w.o && w.o.length){ var L=shuf4(w.o,w.a); return {d:dband(w.d,3),sk:'listening',type:'mcq',audio:String(w.audio||w.a||''),q:String(w.q||'Тыңда да, дұрыс жауапты таңда:'),o:L.o,c:L.c}; }
+      return {d:dband(w.d,3),sk:'listening',type:'type',audio:String(w.audio||w.a||''),q:String(w.q||'Тыңда да, естігеніңді жаз:'),hint:String(w.hint||''),a:String(w.a||'')};
+    }
+    if(t==='listen_type'){
+      return {d:dband(w.d,3),sk:'listening',type:'type',audio:String(w.audio||w.a||''),q:String(w.q||'Тыңда да, естігеніңді жаз:'),hint:String(w.hint||''),a:String(w.a||'')};
+    }
+    // сөйлем құрау
+    if(t==='order'||t==='build'||t==='assemble'){
+      var sent=String(w.a||w.sentence||(w.words?w.words.join(' '):'')||'');
+      var words=(w.words&&w.words.length)?w.words.slice():sent.split(/\s+/).filter(Boolean);
+      if(words.length<2) words=sent.split(/\s+/).filter(Boolean);
+      return {d:dband(w.d,3),sk:'grammar',type:'build',q:String(w.q||'Сөйлемді дұрыс ретпен құра:'),words:words,a:sent};
+    }
+    // бос орын / жазу
+    if(t==='gap'||t==='fill'||t==='type'||t==='write'){
+      return {d:dband(w.d,2),sk:'grammar',type:'type',q:String(w.q||'Бос орынды толтыр:'),a:String(w.a||''),hint:String(w.hint||''),display:String(w.display||'')};
+    }
+    // оқылым
+    if(t==='reading'||w.passage){
+      var R=shuf4(w.o||[],w.a); return {d:dband(w.d,3),sk:'reading',type:'mcq',passage:String(w.passage||''),q:String(w.q||'Мәтін бойынша:'),o:R.o,c:R.c};
+    }
+    // тікелей MCQ (o+a берілген)
+    if((t==='mcq'||t==='mistake'||t==='') && w.o && w.a!==undefined && !w.en){
+      var M=shuf4(w.o,w.a); return {d:dband(w.d,2),sk:String(w.sk||'grammar'),type:(t==='mistake'?'mistake':'mcq'),big:String(w.e||w.big||''),q:String(w.q||'Дұрыс жауапты таңда:'),o:M.o,c:M.c};
+    }
+    // ескі грамматика {q,o,a}
+    if(w.q && w.o){
+      var G=shuf4(w.o,w.a); return {d:dband(w.d,3),sk:'grammar',type:'mcq',q:String(w.q),o:G.o,c:G.c};
+    }
+    // ескі сөздік {en,kk,e} — нұсқаларды өзі құрады (+ қор сөздер, жетпей қалмауы үшін)
+    if(w.en){
+      var pool=WORDS.filter(function(x){return x&&x.en&&x.en!==w.en;});
+      pool.sort(function(){return Math.random()-0.5;});
+      var o=[w.en]; for(var k=0;k<pool.length&&o.length<4;k++){if(o.indexOf(pool[k].en)<0)o.push(pool[k].en);}
+      if(o.length<3){ var fill=['water','house','school','friend','book','city','happy','work','apple','road']; for(var f=0;f<fill.length&&o.length<4;f++){ if(o.indexOf(fill[f])<0&&fill[f]!==w.en)o.push(fill[f]); } }
+      o.sort(function(){return Math.random()-0.5;});
+      return {d:dband(w.d,2),sk:'vocab',type:'mcq',big:String(w.e||''),q:(w.kk?('«'+w.kk+'» — ағылшынша қалай?'):'Аудармасын таңда:'),o:o,c:o.indexOf(w.en)};
+    }
+    return {d:1,sk:'vocab',type:'mcq',q:'?',o:['?'],c:0};
+  }
+  var TTS=('speechSynthesis' in window);
+  var P=new URLSearchParams(location.search), SCHOOL=P.get('school')||'';
+  var $=function(id){return document.getElementById(id);};
+  // ассеты-фоллбэк
+  var EMO={normal:'🦉',hype:'🤩',think:'🤔',cool:'😎',dead:'💀'};
+  function mascotHTML(e){var u=CONFIG.ASSETS.mascot[e];return u?'<img class="mas" src="'+u+'" alt="">':EMO[e];}
+  function parseYT(u){ if(!u) return ''; var m=String(u).match(/(?:shorts\/|watch\?v=|youtu\.be\/|embed\/|v\/)([A-Za-z0-9_-]{6,})/); return m?m[1]:(/^[A-Za-z0-9_-]{6,}$/.test(u)?u:''); }
+  function setIntro(){
+    var box=$('heroImg'), mp4=CONFIG.ASSETS.intro_mp4, yt=parseYT(CONFIG.ASSETS.intro_youtube), vid='';
+    if(mp4){ vid='<video class="introvid" autoplay muted loop playsinline src="'+mp4+'"></video>'; }
+    else if(yt){ vid='<iframe class="introvid" src="https://www.youtube.com/embed/'+yt+'?autoplay=1&mute=1&loop=1&playlist='+yt+'&controls=0&playsinline=1&modestbranding=1&rel=0" allow="autoplay; encrypted-media" frameborder="0"></iframe>'; }
+    if(vid){ box.classList.add('hasvid'); box.insertAdjacentHTML('afterbegin', vid); }
+  }
+  function setHeroAssets(){
+    if(CONFIG.ASSETS.hero) $('heroImg').style.backgroundImage='url('+CONFIG.ASSETS.hero+')';
+    var u=CONFIG.ASSETS.mascot.cool||CONFIG.ASSETS.mascot.normal;
+    $('heroMas').innerHTML = u?'<img class="mas" src="'+u+'" alt="">':'😎';
+    var jd=CONFIG.ASSETS.mascot.dead, je=document.querySelector('#ev .joke .e');
+    if(jd && je) je.innerHTML='<img src="'+jd+'" alt="" style="width:46px;height:46px;vertical-align:middle">';
+    if(SCHOOL){var s=$('schoolTag');s.style.display='inline-block';s.textContent='🏫 '+SCHOOL;}
+    setIntro();
+  }
+  setHeroAssets();
+
+  /* ===== БАНК (d: 1=A1,2=A2,3=B1,4=B2) ===== */
+  // routing: жеңілден B1-ге
+  var M1=[
+    {d:1,sk:'vocab',type:'mcq',big:'🍎',q:'Мынау ағылшынша?',o:['Apple','Orange','Banana','Grape'],c:0},
+    {d:1,sk:'grammar',type:'mcq',q:'I ___ a student.',o:['am','is','are','be'],c:0},
+    {d:1,sk:'vocab',type:'match',q:'Жұбын тап (қалай ойласаң):',pairs:[['Dog','Ит'],['Book','Кітап'],['Water','Су'],['Red','Қызыл']]},
+    {d:2,sk:'grammar',type:'mcq',q:'She ___ to school every day.',o:['go','goes','going','went'],c:1},
+    {d:2,sk:'spelling',type:'type',q:'«Қате / ошибка» ағылшынша жаз:',a:'mistake'},
+    {d:2,sk:'vocab',type:'mcq',img:'food',q:"«delicious» дегеніміз не?",o:['өте дәмді','ащы','суық','қатты'],c:0},
+    {d:3,sk:'grammar',type:'mcq',q:'Yesterday I ___ to the cinema.',o:['go','goes','went','gone'],c:2},
+    {d:2,sk:'grammar',type:'build',q:'Сөйлем құра:',words:['I','have','two','brothers'],a:'I have two brothers'},
+    {d:1,sk:'vocab',type:'mcq',img:'nature',q:'Which animal says «meow»?',o:['Cat','Dog','Cow','Horse'],c:0},
+    {d:2,sk:'grammar',type:'mcq',q:'There ___ many people at the party.',o:['was','were','is','be'],c:1},
+    {d:3,sk:'vocab',type:'mcq',img:'city',q:'«Excuse me, how do I ___ to the station?»',o:['get','go','make','do'],c:0},
+    {d:3,sk:'grammar',type:'mcq',q:'I have lived here ___ 2019.',o:['since','for','from','at'],c:0}
+  ];
+  var SPEED=[
+    {d:2,sk:'vocab',type:'mcq',speed:true,q:'Synonym of «happy»?',o:['glad','sad','angry','tired'],c:0},
+    {d:3,sk:'grammar',type:'mcq',speed:true,q:'Past of «buy»?',o:['buyed','bought','buded','buy'],c:1},
+    {d:3,sk:'grammar',type:'mcq',speed:true,q:'She is interested ___ music.',o:['in','on','at','to'],c:0},
+    {d:2,sk:'vocab',type:'mcq',speed:true,q:'Opposite of «expensive»?',o:['cheap','rich','cost','buy'],c:0}
+  ];
+  // EASY (A1-A2)
+  var M2E=[
+    {d:1,sk:'vocab',type:'mcq',img:'school',q:'«Pen» — бұл не?',o:['қалам','кітап','парта','тақта'],c:0},
+    {d:1,sk:'spelling',type:'type',q:'«Мектеп» ағылшынша жаз:',a:'school'},
+    {d:2,sk:'grammar',type:'mcq',q:'There ___ a book on the table.',o:['is','are','am','be'],c:0},
+    {d:1,sk:'vocab',type:'match',q:'Жұбын тап:',pairs:[['Cat','Мысық'],['Sun','Күн'],['Apple','Алма'],['House','Үй']]},
+    {d:2,sk:'spelling',type:'type',q:'Сөзді толық жаз:',display:'f r i e _ d',a:'friend'},
+    {d:2,sk:'grammar',type:'mcq',q:'He ___ football on Sundays.',o:['play','plays','playing','played'],c:1},
+    {d:2,sk:'vocab',type:'mcq',img:'family',q:'«My mother\'s son» — that is my ___.',o:['brother','sister','father','uncle'],c:0},
+    {d:1,sk:'vocab',type:'mcq',img:'city',q:'Where do you buy bread?',o:['shop','school','park','river'],c:0},
+    {d:2,sk:'grammar',type:'mcq',q:'___ is your name?',o:['What','Who','Where','How'],c:0}
+  ];
+  // CORE (A2-B1)
+  var M2C=[
+    {d:2,sk:'grammar',type:'mcq',q:'An elephant is ___ than a cat.',o:['big','bigger','biggest','more big'],c:1},
+    {d:3,sk:'grammar',type:'mistake',q:'Қай сөйлем ҚАТЕ?',o:['She doesn\'t like tea','He don\'t play tennis','They are happy','I have a cat'],c:1},
+    {d:3,sk:'grammar',type:'build',q:'Сұрақ құра:',words:['where','do','you','live'],a:'where do you live'},
+    {d:3,sk:'grammar',type:'mcq',q:'If it rains tomorrow, we ___ at home.',o:['stay','stays','will stay','stayed'],c:2},
+    {d:2,sk:'listening',type:'type',audio:'She is reading a book in the library.',q:'Тыңда да, ЕКІНШІ сөзді жаз:',hint:'(she ___ …)',a:'is'},
+    {d:3,sk:'listening',type:'mcq',audio:'My brother works in a hospital. He is a doctor.',q:'Тыңда: ағасы кім?',o:['дәрігер','мұғалім','жүргізуші','аспаз'],c:0},
+    {d:3,sk:'vocab',type:'mcq',img:'travel',q:'«I am looking forward ___ the trip.»',o:['to','for','at','on'],c:0},
+    {d:3,sk:'grammar',type:'type',q:'Сөйлемді дұрыста: «He go to school.»',q2:'Дұрыс жаз',a:'He goes to school'},
+    {d:3,sk:'grammar',type:'mcq',q:'I have known her ___ we were children.',o:['since','for','during','while'],c:0},
+    {d:2,sk:'vocab',type:'mcq',img:'nature',q:'A baby dog is a ___.',o:['puppy','kitten','calf','foal'],c:0}
+  ];
+  // HARD (B1-B2)
+  var M2H=[
+    {d:3,sk:'grammar',type:'mistake',q:'Қай сөйлем ҚАТЕ?',o:['I have been to London','She has finished','He have a new car','We were late'],c:2},
+    {d:4,sk:'vocab',type:'mcq',q:'«It\'s raining cats and dogs» means:',o:['it is raining heavily','there are animals','it is sunny','it is cold'],c:0},
+    {d:4,sk:'grammar',type:'mcq',q:'I wish I ___ more time yesterday.',o:['had had','have','will have','have had'],c:0},
+    {d:4,sk:'vocab',type:'mcq',q:'Choose the collocation: «to ___ a decision».',o:['make','do','take','put'],c:0},
+    {d:4,sk:'wordform',type:'type',q:'Word formation: «He is very ___.» (CARE)',q2:'Дұрыс форманы жаз',a:'careful'},
+    {d:4,sk:'grammar',type:'mcq',q:'By next year, she ___ here for a decade.',o:['will have worked','works','worked','is working'],c:0},
+    {d:4,sk:'listening',type:'mcq',audio:'Although it was raining, they decided to go hiking in the mountains.',q:'Тыңда: олар не шешті?',o:['таулармен жорыққа шығу','үйде қалу','кино көру','ұйықтау'],c:0},
+    {d:4,sk:'grammar',type:'type',q:'Transform: «They built this house in 1990.» → «This house ___ in 1990.» (passive)',q2:'Аяқта',a:'was built'},
+    {d:4,sk:'grammar',type:'mcq',q:'Never before ___ such a beautiful sunset.',o:['have I seen','I have seen','I saw','did I saw'],c:0},
+    {d:4,sk:'grammar',type:'mcq',q:'She said that she ___ the report the day before.',o:['had finished','finished','has finished','finishes'],c:0},
+    {d:4,sk:'vocab',type:'mcq',q:'Phrasal verb: «I can\'t ___ with his behaviour any more.»',o:['put up','put on','put off','put down'],c:0},
+    {d:4,sk:'vocab',type:'mcq',q:'«to break the ice» means:',o:['to start a conversation','to feel cold','to win a game','to make a mistake'],c:0},
+    {d:4,sk:'grammar',type:'mcq',q:'If I ___ known earlier, I would have helped you.',o:['had','have','would have','did'],c:0},
+    {d:4,sk:'listening',type:'mcq',audio:'I would rather you didn\'t tell anyone about this just yet.',q:'Тыңда: спикер нені қалайды?',o:['ешкімге айтпауын','бәріне айтуын','тез кетуін','қайталауын'],c:0},
+    {d:4,sk:'vocab',type:'mcq',q:'Choose the best word: «The new policy had a profound ___ on the economy.»',o:['effect','affect','effort','offer'],c:0},
+    {d:4,sk:'grammar',type:'type',q:'Reported: «I am tired,» she said. → She said that she ___ tired.',q2:'Бір сөзбен аяқта',a:'was'}
+  ];
+  // CONFIRM (по ветке) — длинный reading + listening + печать
+  var P_READ="Maxat is a 14-year-old student from Shymkent. He has always been curious about how things work, so he spends his weekends building small robots from old parts. Last year he entered a national science competition and, although he didn't win, the judges praised his creativity. Now he dreams of studying engineering abroad, but he knows he must improve his English first.";
+  var M3E=[
+    {d:2,sk:'reading',passage:'Aisha is 15. She lives in Astana. Last summer she went to London for an English course. She loves animals.',type:'mcq',q:'Where did Aisha go last summer?',o:['London','Astana','Almaty','Paris'],c:0},
+    {d:2,sk:'vocab',type:'mcq',img:'sport',q:'«We ___ football every Sunday.»',o:['play','plays','playing','played'],c:0},
+    {d:2,sk:'vocab',type:'mcq',img:'travel',q:'You sleep in a ___ when you travel.',o:['hotel','school','hospital','kitchen'],c:0},
+    {d:2,sk:'spelling',type:'type',q:'«Әдемі / красивый» ағылшынша жаз:',a:'beautiful'}
+  ];
+  var M3C=[
+    {d:3,sk:'reading',passage:P_READ,type:'mcq',q:'Why didn\'t the judges give Maxat the first place but still praised him?',o:['They liked his creativity','He was too young','He cheated','He didn\'t finish'],c:0},
+    {d:3,sk:'reading',passage:P_READ,type:'mcq',q:'What must Maxat do to study abroad?',o:['Improve his English','Win the competition','Move to Astana','Build more robots'],c:0},
+    {d:3,sk:'reading',passage:P_READ,type:'mcq',q:'How does Maxat spend his weekends?',o:['Building small robots','Playing football','Sleeping','Travelling'],c:0},
+    {d:3,sk:'writing',type:'type',q:'Write a short answer: «What is your favourite hobby and why?» (1 sentence)',q2:'Ағылшынша 1 сөйлем',open:true}
+  ];
+  var M3H=[
+    {d:4,sk:'reading',passage:P_READ,type:'mcq',q:'Which statement is an INFERENCE (not directly stated)?',o:['Maxat is persistent and self-driven','Maxat lives in Shymkent','Maxat built robots','Maxat entered a competition'],c:0},
+    {d:4,sk:'listening',type:'type',audio:'Despite the difficulties, she managed to complete the project on time.',q:'Тыңда да, СОҢҒЫ үш сөзді жаз:',hint:'(… on ___ ___)',a:'on time'},
+    {d:4,sk:'reading',passage:P_READ,type:'mcq',q:'In the text, «praised» is closest in meaning to:',o:['admired','criticised','ignored','paid'],c:0},
+    {d:4,sk:'writing',type:'type',q:'Write 1-2 sentences: «Describe a challenge you overcame.»',q2:'Ағылшынша',open:true}
+  ];
+
+  /* ===== КҮЙ ===== */
+  var lead={id:null,name:'',cls:'',phone:''};
+  var seq=[],i=0,branchDone=false,branch='';
+  var xp=0,combo=0,comboMax=0,vibe=0,startedAt=null,locked=false,muted=false,speedT=null;
+  var band={1:{c:0,t:0},2:{c:0,t:0},3:{c:0,t:0},4:{c:0,t:0}};
+  var answers=[];
+  var BNAME={1:'a1',2:'a2',3:'b1',4:'b2'};
+  function show(n){var s=document.querySelectorAll('#ev .screen');for(var k=0;k<s.length;k++)s[k].classList.remove('active');$('ev-'+n).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+  function toast(t){var e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(function(){e.classList.remove('show');},1300);}
+  function normPhone(r){var d=(r||'').replace(/\D/g,'');if(d.length===11&&d.charAt(0)==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d;}
+  function phoneOk(r){var d=normPhone(r);return d.length===11&&d.charAt(0)==='7';}
+  /* test_id = осы тест файлының аты (URL-ден). Әр тестке жеке. Нәтиже сол id-ге кетеді — Apps Script сол вкладканы автоматты жасайды. */
+  var TEST_ID=(function(){try{return (location.pathname.split('/').pop()||'test').replace(/\.html$/i,'')||'test';}catch(e){return 'test';}})();
+  function send(p){ if(!CONFIG.APPS_SCRIPT_URL || CONFIG.APPS_SCRIPT_URL.indexOf('ВСТАВЬ')===0) return; try{ p.testId=TEST_ID; fetch(CONFIG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});}catch(e){} }
+  function norm(s){return (s||'').toString().toLowerCase().replace(/[.,!?'’]/g,'').replace(/\s+/g,' ').trim();}
+  function speak(t){if(!TTS||muted)return;try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.92;window.speechSynthesis.speak(u);}catch(e){}}
+  if(!TTS){[M1,SPEED,M2E,M2C,M2H,M3E,M3C,M3H].forEach(function(arr){for(var k=arr.length-1;k>=0;k--)if(arr[k].audio)arr.splice(k,1);});}
+
+  /* ===== ЗВУК (Web Audio, файлсыз) ===== */
+  var AC=null;
+  /* iOS «беззвучный» Web Audio-ды үнсіз қылады — кішкентай үнсіз <audio> сессияны playback-ке ауыстырады */
+  var __sEl=null, __SILENT='data:audio/wav;base64,UklGRuQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YcADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA=';
+  function iosUnlock(){ try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(e){}
+    try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended')AC.resume(); }catch(e){}
+    if(!__sEl){ try{ __sEl=document.createElement('audio'); __sEl.setAttribute('playsinline',''); __sEl.loop=true; __sEl.volume=0.02; __sEl.src=__SILENT; }catch(e){} }
+    if(__sEl){ try{ var p=__sEl.play(); if(p&&p.catch)p.catch(function(){}); }catch(e){} } }
+  function tone(f,d,type){if(muted)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.value=f;o.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(.12,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.start();o.stop(AC.currentTime+d);}catch(e){}}
+  function sPop(){tone(420,.12,'triangle');} function sDing(){tone(680,.18);setTimeout(function(){tone(900,.18);},90);} function sHype(){[523,659,784,1046].forEach(function(f,k){setTimeout(function(){tone(f,.2,'square');},k*70);});}
+  $('h-mute').addEventListener('click',function(){muted=!muted;this.textContent=muted?'🔇':'🔊';});
+
+  /* ===== LANDING → ПОШАГОВАЯ ФОРМА (бір сұрақ — бір экран) ===== */
+  $('go-form').addEventListener('click',function(){iosUnlock();show('form');stepIdx=0;renderStep();});
+  var STEPS=[
+    {key:'phone',type:'tel',em:'📱',q:'Ата-анаңның WhatsApp нөмірі',sub:'Нәтижені оған жібереміз',ph:'+7 700 000 00 00',val:phoneOk,err:'Нөмірді толық әрі дұрыс жаз'},
+    {key:'name',type:'text',em:'🙂',q:'Атың кім?',ph:'Алихан',val:function(v){return v.trim().length>=1;},err:'Атыңды жаз'},
+    {key:'cls',type:'text',em:'🎓',q:'Сыныбың қандай?',sub:'Мысалы: 6А',ph:'6А',val:function(v){return v.trim().length>=1;},err:'Сыныбыңды жаз'},
+    {key:'goal',type:'choice',em:'🎯',q:'Ағылшынды не үшін үйренесің?',options:['Мектеп бағдарламасы','Емтиханға дайындық','Еркін сөйлегім келеді','Негізден бастаймын','Басқа мақсат']}
+  ];
+  var stepIdx=0, fdata={};
+  function dots(){var h='';for(var k=0;k<STEPS.length;k++)h+='<i class="'+(k<stepIdx?'done':(k===stepIdx?'on':''))+'"></i>';$('stepDots').innerHTML=h;}
+  function renderStep(){
+    dots();var s=STEPS[stepIdx],box=$('stepBox'),h='';
+    h+='<div class="stepq"><span class="em">'+s.em+'</span>'+s.q+'</div>';
+    h+='<div class="stepsub">'+(s.sub||'')+'</div>';
+    if(s.type==='choice'){
+      h+='<div class="choices">';s.options.forEach(function(o){h+='<button class="choice" data-v="'+o+'">'+o+'</button>';});h+='</div>';
+      box.innerHTML=h;box.querySelectorAll('.choice').forEach(function(b){b.addEventListener('click',function(){fdata[s.key]=b.dataset.v;advanceStep();});});
+    } else {
+      h+='<input class="stepin" id="stepin" type="'+(s.type==='tel'?'tel':'text')+'" '+(s.type==='tel'?'inputmode="tel"':'')+' placeholder="'+s.ph+'" autocomplete="off">';
+      h+='<div class="steperr" id="steperr"></div><button class="btn" id="stepnext">Әрі қарай →</button>';
+      box.innerHTML=h;var inp=$('stepin');inp.value=fdata[s.key]||'';try{inp.focus();}catch(e){}
+      function go(){var v=inp.value.trim();if(!s.val(v)){$('steperr').textContent=s.err;return;}fdata[s.key]=v;advanceStep();}
+      $('stepnext').addEventListener('click',go);
+      inp.addEventListener('keydown',function(e){if(e.key==='Enter')go();});
+      inp.addEventListener('input',function(){$('steperr').textContent='';});
+    }
+  }
+  function advanceStep(){stepIdx++;if(stepIdx>=STEPS.length)finishForm();else renderStep();}
+  function finishForm(){
+    lead.id='ev_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+    lead.name=fdata.name||'';lead.cls=fdata.cls||'';lead.phone=normPhone(fdata.phone||'');lead.goal=fdata.goal||'';
+    startedAt=new Date().toISOString();
+    send({action:'lead',leadId:lead.id,school:SCHOOL,subject:CONFIG.SUBJECT,name:lead.name,class:lead.cls,goal:lead.goal,parentPhone:lead.phone,startedAt:startedAt,testUrl:location.href});
+    startTest();
+  }
+
+  /* ===== ОЙЫН ===== */
+  function startTest(){seq=WORDS.map(toItem);i=0;branchDone=true;branch='';xp=0;combo=0;comboMax=0;vibe=0;answers=[];band={1:{c:0,t:0},2:{c:0,t:0},3:{c:0,t:0},4:{c:0,t:0}};show('test');render();}
+  function estTotal(){return seq.length;}
+  function updHud(){$('h-xp').textContent=xp;$('h-combo').textContent=combo;$('h-prog').textContent=(i+1)+'/'+estTotal();$('h-bar').style.width=(i/estTotal()*100)+'%';$('h-vibe').style.width=vibe+'%';}
+
+  function routeAfterM1(){
+    // скрытый балл по M1 (взвешенно по сложности), консервативно
+    var pts=0,maxp=0,hard=0,hardT=0;
+    M1.forEach(function(it,k){var a=answers[k];maxp+=it.d;if(a&&a.ok)pts+=it.d;if(it.d>=3){hardT++;if(a&&a.ok)hard++;}});
+    var ratio=maxp?pts/maxp:0;
+    if(ratio>=0.72 && hard>=Math.max(1,hardT-1)) branch='hard';
+    else if(ratio>=0.42) branch='core';
+    else branch='easy';
+    var M2=branch==='hard'?M2H:branch==='core'?M2C:M2E;
+    var M3=branch==='hard'?M3H:branch==='core'?M3C:M3E;
+    seq=M1.concat(SPEED,M2,M3);branchDone=true;
+  }
+
+  function addXP(base,tag){var luck=Math.random()<0.12?(5+Math.floor(Math.random()*16)):0;var cb=combo>=6?10:combo>=3?5:0;var g=base+cb+luck;xp+=g;flyXP('+'+g+(luck?' 🍀':''));if(luck)toast('🍀 LUCKY +'+luck);else if(tag)toast(tag);return g;}
+  function flyXP(t){var e=document.createElement('div');e.className='xpfly';e.textContent=t;e.style.left=(window.innerWidth/2-20)+'px';e.style.top='42%';document.body.appendChild(e);setTimeout(function(){e.remove();},1000);}
+  function bumpCombo(){combo++;if(combo>comboMax)comboMax=combo;var p=$('h-combopill');p.classList.add('hot');setTimeout(function(){p.classList.remove('hot');},400);if(combo>0&&combo%3===0){sDing();flySticker();toast('🔥 '+combo+' КОМБО!');}}
+  function addVibe(){vibe+=13;if(vibe>=100){vibe=0;hype();}}
+  function hype(){sHype();confetti();flySticker();overlay('hype','🔥 VIBE MAX!','Қызып кеттің! Бонус XP 🎁',function(){});xp+=30;flyXP('+30 🔥');}
+  function flySticker(){var a=CONFIG.ASSETS.stickers;if(!a||!a.length)return;var u=a[Math.floor(Math.random()*a.length)];var s=document.createElement('div');s.style.cssText='position:fixed;left:50%;top:36%;transform:translate(-50%,-50%);z-index:86;pointer-events:none;animation:evpop .35s ease';s.innerHTML='<img src="'+u+'" alt="" style="width:130px;height:130px;border-radius:16px;filter:drop-shadow(0 10px 22px rgba(0,0,0,.55))">';document.body.appendChild(s);setTimeout(function(){s.style.transition='opacity .4s,transform .4s';s.style.opacity='0';s.style.transform='translate(-50%,-62%)';},750);setTimeout(function(){s.remove();},1250);}
+  function confetti(){var em=['🎉','✨','🔥','⭐','💥','🎊'];for(var k=0;k<18;k++){(function(){var s=document.createElement('div');s.textContent=em[k%em.length];s.style.cssText='position:fixed;top:-20px;left:'+(Math.random()*100)+'vw;font-size:'+(16+Math.random()*16)+'px;z-index:85;pointer-events:none;animation:evfall '+(1.2+Math.random()*1.2)+'s linear forwards';document.body.appendChild(s);setTimeout(function(){s.remove();},2600);})();}}
+
+  function overlay(emo,t,p,cb){$('ovlEm').innerHTML=mascotEl(emo);$('ovlT').textContent=t;$('ovlP').textContent=p;$('ovl').classList.add('show');$('ovlGo').onclick=function(){$('ovl').classList.remove('show');if(cb)cb();};}
+  function mascotEl(emo){var map={hype:'hype',think:'think',cool:'cool',dead:'dead',normal:'normal'};var key=map[emo]||'normal';var u=CONFIG.ASSETS.mascot[key];return u?'<img src="'+u+'" alt="">':EMO[key];}
+
+  function maybeLevelUp(it,cb){ cb(); }
+
+  var KEYS=['A','B','C','D'];
+  function render(){
+    locked=false;$('h-speed').classList.remove('on');if(speedT){clearInterval(speedT);speedT=null;}
+    if(!branchDone && i>=M1.length){routeAfterM1();}
+    if(i>=seq.length){finish();return;}
+    var it=seq[i];
+    maybeLevelUp(it,function(){ draw(it); });
+  }
+  function draw(it){
+    updHud();var c=$('qcard'),h='';c.classList.remove('glitch');void c.offsetWidth;c.classList.add('glitch');
+    var qm=it.speed?'⚡':(['hype','think','cool','dead','normal'][i%5]);
+    h+='<span class="qtag'+(it.speed?' speed':'')+'">'+(it.speed?'SPEED ⚡':(BNAME[it.d].toUpperCase()+' · '+it.sk))+'</span>';
+    h+='<span class="qmas">'+mascotEl(qm)+'</span>';
+    var img=it.img&&CONFIG.ASSETS.q[it.img];
+    h+='<img class="qimg" id="qimg" style="'+(img?'display:block':'')+'" src="'+(img||'')+'" alt="">';
+    if(it.passage)h+='<div class="passage">'+it.passage+'</div>';
+    if(it.big)h+='<div class="qbig">'+it.big+'</div>';
+    h+='<div class="qtext">'+it.q+'</div>';
+    if(it.q2)h+='<div class="qsub">'+it.q2+'</div>';
+    if(it.hint)h+='<div class="qsub">'+it.hint+'</div>';
+    if(it.display)h+='<div class="scaffold">'+it.display+'</div>';
+
+    if(it.type==='mcq'||it.type==='mistake'){
+      h+='<div class="opts">';it.o.forEach(function(t,k){h+='<button class="opt" data-k="'+k+'"><span class="key">'+KEYS[k]+'</span><span>'+t+'</span></button>';});h+='</div>';
+      c.innerHTML=h;
+      c.querySelectorAll('.opt').forEach(function(b){b.addEventListener('click',function(){pickOpt(it,parseInt(b.dataset.k,10),b);});});
+      if(it.audio){var lb=document.createElement('button');} // mcq with audio handled below
+      if(it.audio){addAudioBtn(it);}
+      if(it.speed)startSpeed(it);
+    }
+    else if(it.type==='type'){
+      if(it.audio)h+='<div class="center"><button class="listenbtn" id="lbtn">🔊 Тыңда</button></div>';
+      h+='<input class="tin" id="tin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="...">';
+      h+='<div style="margin-top:12px"><button class="btn sm dark" id="tdone" disabled>Дайын →</button></div>';
+      c.innerHTML=h;
+      if(it.audio){$('lbtn').addEventListener('click',function(){speak(it.audio);});setTimeout(function(){speak(it.audio);},300);}
+      var ti=$('tin');ti.addEventListener('input',function(){$('tdone').disabled=ti.value.trim().length<1;});
+      ti.addEventListener('keydown',function(e){if(e.key==='Enter'&&!$('tdone').disabled)pickType(it,ti.value);});
+      $('tdone').addEventListener('click',function(){if(locked)return;pickType(it,ti.value);});
+    }
+    else if(it.type==='build'){
+      var sh=it.words.slice().sort(function(){return Math.random()-.5;});
+      h+='<div class="answerline" id="aline"></div><div class="bank" id="bank">';
+      sh.forEach(function(w,k){h+='<div class="chip" data-w="'+w+'" data-id="'+k+'">'+w+'</div>';});
+      h+='</div><button class="btn sm dark" id="bdone" disabled>Дайын →</button>';c.innerHTML=h;var picked=[];
+      function rd(){var al=$('aline');al.innerHTML='';picked.forEach(function(p,idx){var s=document.createElement('div');s.className='chip inline';s.textContent=p.w;s.addEventListener('click',function(){var b=document.querySelector('#bank .chip[data-id="'+p.id+'"]');if(b)b.classList.remove('used');picked.splice(idx,1);rd();});al.appendChild(s);});$('bdone').disabled=picked.length!==it.words.length;}
+      c.querySelectorAll('#bank .chip').forEach(function(ch){ch.addEventListener('click',function(){if(ch.classList.contains('used'))return;ch.classList.add('used');picked.push({w:ch.dataset.w,id:ch.dataset.id});rd();});});
+      $('bdone').addEventListener('click',function(){if(locked)return;var got=picked.map(function(p){return p.w;}).join(' ');record(it,norm(got)===norm(it.a),got);});
+    }
+    else if(it.type==='match'){
+      var L=it.pairs.map(function(p,idx){return {t:p[0],id:idx};}).sort(function(){return Math.random()-.5;});
+      var R=it.pairs.map(function(p,idx){return {t:p[1],id:idx};}).sort(function(){return Math.random()-.5;});
+      h+='<div class="match"><div class="mcol" id="mL"></div><div class="mcol" id="mR"></div></div>';c.innerHTML=h;
+      var cL=$('mL'),cR=$('mR');
+      L.forEach(function(o){var b=document.createElement('button');b.className='mbtn';b.textContent=o.t;b.dataset.id=o.id;b.dataset.s='L';cL.appendChild(b);});
+      R.forEach(function(o){var b=document.createElement('button');b.className='mbtn';b.textContent=o.t;b.dataset.id=o.id;b.dataset.s='R';cR.appendChild(b);});
+      var selL=null,pairedCount=0,correctPairs=0;
+      c.querySelectorAll('.mbtn').forEach(function(b){b.addEventListener('click',function(){
+        if(b.classList.contains('paired'))return;
+        if(b.dataset.s==='L'){c.querySelectorAll('#mL .mbtn').forEach(function(x){x.classList.remove('sel');});b.classList.add('sel');selL=b;return;}
+        if(!selL)return;
+        // спариваем НЕЙТРАЛЬНО (не показываем верно/неверно)
+        if(selL.dataset.id===b.dataset.id)correctPairs++;
+        selL.classList.remove('sel');selL.classList.add('paired');b.classList.add('paired');selL=null;pairedCount++;sPop();
+        if(pairedCount===it.pairs.length){record(it,correctPairs===it.pairs.length,'match('+correctPairs+'/'+it.pairs.length+')');}
+      });});
+    }
+  }
+  function addAudioBtn(it){var box=$('qcard');var d=document.createElement('div');d.className='center';d.style.marginBottom='12px';d.innerHTML='<button class="listenbtn" id="lbtn">🔊 Тыңда</button>';box.querySelector('.qtext').insertAdjacentElement('afterend',d);$('lbtn').addEventListener('click',function(){speak(it.audio);});setTimeout(function(){speak(it.audio);},300);}
+
+  function startSpeed(it){var dur=9000,t0=Date.now();$('h-speed').classList.add('on');$('h-speedi').style.width='100%';
+    speedT=setInterval(function(){var left=Math.max(0,dur-(Date.now()-t0));$('h-speedi').style.width=(left/dur*100)+'%';if(left<=0){clearInterval(speedT);speedT=null;if(!locked){record(it,false,'(уақыт бітті)',true);}}},80);}
+
+  /* ===== ЖАУАПТЫ ТІРКЕУ (правильность СКРЫТА) ===== */
+  function pickOpt(it,k,btn){
+    if(locked)return;locked=true;if(speedT){clearInterval(speedT);speedT=null;}
+    $('qcard').querySelectorAll('.opt').forEach(function(o){o.classList.add('lock');});btn.classList.add('pick');
+    var chosen=it.o?it.o[k]:k; var ok=(k===it.c);
+    record(it,ok,chosen);
+  }
+  function pickType(it,val){
+    locked=true;var ok=it.open?true:(norm(val)===norm(it.a)); // open — всегда «принято», оценит ИИ
+    var bd=$('tdone');if(bd)bd.disabled=true;var ti=$('tin');if(ti)ti.disabled=true;
+    record(it,it.open?null:ok,val);
+  }
+  function record(it,ok,chosen,timeout){
+    locked=true;
+    band[it.d].t++; if(ok===true)band[it.d].c++;
+    answers.push({n:answers.length+1,d:it.d,cefr:BNAME[it.d],sk:it.sk,type:it.type,q:it.q,chosen:chosen,ok:ok,open:!!it.open});
+    // дофамин — за УЧАСТИЕ, не за правильность
+    if(!timeout){bumpCombo();addVibe();var base=it.speed?14:(8+it.d*2);addXP(base, neutralMsg());sPop();}
+    else{combo=0;updHud();toast('⏰ Уақыт!');}
+    setTimeout(next, timeout?650:780);
+  }
+  function neutralMsg(){var m=['Қабылданды! ⚡','Келесі 🔥','Жақсы темп!','Кеттік! 🚀','Сен machine екенсің 🤖','Vibe up! ✨'];return m[Math.floor(Math.random()*m.length)];}
+  function next(){i++;render();}
+
+  /* ===== КОНСЕРВАТИВТІ ДЕҢГЕЙ (фоллбэк) ===== */
+  function pct(b){return b.t?Math.round(b.c/b.t*100):0;}
+  function levelOf(a1,a2,b1,b2){
+    if(a1<60)return 'Beginner'; if(a2<60)return 'Beginner';
+    if(b1<60)return 'Elementary'; if(b1<80)return 'Pre-Intermediate';
+    if(b2<55)return 'Intermediate'; return 'Upper-Intermediate';
+  }
+  function finish(){
+    if(speedT){clearInterval(speedT);speedT=null;}$('h-bar').style.width='100%';
+    var a1=pct(band[1]),a2=pct(band[2]),b1=pct(band[3]),b2=pct(band[4]);
+    var correct=band[1].c+band[2].c+band[3].c+band[4].c, total=band[1].t+band[2].t+band[3].t+band[4].t;
+    var op=total?Math.round(correct/total*100):0;
+    var lvl=op<35?'Beginner':op<55?'Elementary':op<72?'Pre-Intermediate':op<88?'Intermediate':'Upper-Intermediate';
+    var summary=answers.map(function(x){return x.n+'. ['+x.cefr.toUpperCase()+'/'+x.sk+'] '+x.chosen+(x.open?' [ОТКР]':(x.ok?' ✓':' ✗'));}).join('\n');
+    var openA=answers.filter(function(x){return x.open;}).map(function(x){return {q:x.q,answer:x.chosen};});
+    send({action:'result',leadId:lead.id,school:SCHOOL,subject:CONFIG.SUBJECT,name:lead.name,class:lead.cls,goal:lead.goal,parentPhone:lead.phone,
+      startedAt:startedAt,finishedAt:new Date().toISOString(),branch:branch,
+      score:correct,total:total,a1_pct:a1,a2_pct:a2,b1_pct:b1,b2_pct:b2,
+      a1:band[1].c+'/'+band[1].t,a2:band[2].c+'/'+band[2].t,b1:band[3].c+'/'+band[3].t,b2:band[4].c+'/'+band[4].t,
+      provisionalLevel:lvl,pct:op,xp:xp,comboMax:comboMax,
+      answersSummary:summary,openAnswers:JSON.stringify(openA),answersJson:JSON.stringify(answers),testUrl:location.href});
+    // финиш — без уровня/правильности
+    $('f-xp').textContent=xp;$('f-combo').textContent=comboMax;
+    var badge=xp>=420?'🏆 ЛЕГЕНДА':xp>=300?'🥇 PRO ойыншы':xp>=190?'🥈 Күшті':'🥉 Жарайсың';
+    $('f-medal').innerHTML=(xp>=300&&CONFIG.ASSETS.mascot.hype)?'<img src="'+CONFIG.ASSETS.mascot.hype+'">':(xp>=420?'🏆':xp>=300?'🥇':'🏅');
+    $('f-badge').textContent=badge+' · '+xp+' XP';
+    confetti();sHype();show('finish');
+  }
+})();
+</script>
+</body>
+</html>
