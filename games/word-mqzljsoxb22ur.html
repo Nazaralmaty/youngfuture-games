@@ -137,7 +137,35 @@ var Sound=(function(){
 /* ============ GAME ============ */
 (function(){
   "use strict";
-  var WORDS=[{"en":"ambiguous","kk":"анық емес","e":""},{"en":"mitigate","kk":"жеңілдету","e":""},{"en":"profound","kk":"терең","e":""},{"en":"superfluous","kk":"артық","e":""},{"en":"coherent","kk":"жүйелі","e":""},{"en":"obsolete","kk":"ескірген","e":""},{"en":"meticulous","kk":"ұқыпты","e":""},{"en":"sporadic","kk":"сирек кездесетін","e":""},{"en":"eloquent","kk":"шешен","e":""},{"en":"ephemeral","kk":"қысқа мерзімді","e":""},{"en":"resilient","kk":"төзімді","e":""},{"en":"pragmatic","kk":"прагматикалық","e":""},{"en":"ambivalent","kk":"қарама-қайшы","e":""},{"en":"prolific","kk":"өнімді","e":""},{"en":"candid","kk":"адал","e":""},{"en":"inevitable","kk":"болмай қоймайтын","e":""},{"en":"lukewarm","kk":"жылы суық","e":""},{"en":"unprecedented","kk":"бұрын-соңды болмаған","e":""},{"en":"tenacious","kk":"тұтқыр","e":""},{"en":"ubiquitous","kk":"барлық жерде кездесетін","e":""}];
+  var WORDS=[
+    {en:"apple",kk:"алма",e:"🍎"},{en:"bread",kk:"нан",e:"🍞"},{en:"water",kk:"су",e:"💧"},
+    {en:"milk",kk:"сүт",e:"🥛"},{en:"egg",kk:"жұмыртқа",e:"🥚"},{en:"fish",kk:"балық",e:"🐟"},
+    {en:"meat",kk:"ет",e:"🍖"},{en:"tea",kk:"шай",e:"🍵"},{en:"dog",kk:"ит",e:"🐶"},
+    {en:"cat",kk:"мысық",e:"🐱"},{en:"bird",kk:"құс",e:"🐦"},{en:"horse",kk:"жылқы",e:"🐴"},
+    {en:"cow",kk:"сиыр",e:"🐮"},{en:"sheep",kk:"қой",e:"🐑"},{en:"wolf",kk:"қасқыр",e:"🐺"},
+    {en:"bear",kk:"аю",e:"🐻"},{en:"fox",kk:"түлкі",e:"🦊"},{en:"lion",kk:"арыстан",e:"🦁"},
+    {en:"camel",kk:"түйе",e:"🐫"},{en:"hand",kk:"қол",e:"✋"},{en:"eye",kk:"көз",e:"👁️"},
+    {en:"ear",kk:"құлақ",e:"👂"},{en:"nose",kk:"мұрын",e:"👃"},{en:"foot",kk:"аяқ",e:"🦶"},
+    {en:"tooth",kk:"тіс",e:"🦷"},{en:"heart",kk:"жүрек",e:"❤️"},{en:"house",kk:"үй",e:"🏠"},
+    {en:"door",kk:"есік",e:"🚪"},{en:"window",kk:"терезе",e:"🪟"},{en:"chair",kk:"орындық",e:"🪑"},
+    {en:"bed",kk:"төсек",e:"🛏️"},{en:"key",kk:"кілт",e:"🔑"},{en:"book",kk:"кітап",e:"📖"},
+    {en:"pen",kk:"қалам",e:"🖊️"},{en:"pencil",kk:"қарындаш",e:"✏️"},{en:"school",kk:"мектеп",e:"🏫"},
+    {en:"bag",kk:"сөмке",e:"🎒"},{en:"ball",kk:"доп",e:"⚽"},{en:"phone",kk:"телефон",e:"📱"},
+    {en:"shoe",kk:"аяқ киім",e:"👟"},{en:"hat",kk:"бас киім",e:"🎩"},{en:"shirt",kk:"көйлек",e:"👕"},
+    {en:"sun",kk:"күн",e:"☀️"},{en:"moon",kk:"ай",e:"🌙"},{en:"star",kk:"жұлдыз",e:"⭐"},
+    {en:"tree",kk:"ағаш",e:"🌳"},{en:"flower",kk:"гүл",e:"🌸"},{en:"mountain",kk:"тау",e:"⛰️"},
+    {en:"rain",kk:"жаңбыр",e:"🌧️"},{en:"snow",kk:"қар",e:"❄️"},{en:"fire",kk:"от",e:"🔥"},
+    {en:"stone",kk:"тас",e:"🪨"},{en:"car",kk:"көлік",e:"🚗"},{en:"clock",kk:"сағат",e:"🕐"},
+    {en:"money",kk:"ақша",e:"💰"},{en:"mother",kk:"ана",e:"👩"},{en:"father",kk:"әке",e:"👨"},
+    {en:"child",kk:"бала",e:"🧒"},
+    {en:"red",kk:"қызыл",e:""},{en:"blue",kk:"көк",e:""},{en:"green",kk:"жасыл",e:""},
+    {en:"yellow",kk:"сары",e:""},{en:"big",kk:"үлкен",e:""},{en:"small",kk:"кіші",e:""},
+    {en:"hot",kk:"ыстық",e:""},{en:"cold",kk:"суық",e:""},{en:"run",kk:"жүгіру",e:""},
+    {en:"jump",kk:"секіру",e:""},{en:"eat",kk:"жеу",e:""},{en:"drink",kk:"ішу",e:""},
+    {en:"sleep",kk:"ұйықтау",e:""},{en:"read",kk:"оқу",e:""},{en:"write",kk:"жазу",e:""},
+    {en:"good",kk:"жақсы",e:""},{en:"bad",kk:"жаман",e:""},{en:"friend",kk:"дос",e:""},
+    {en:"road",kk:"жол",e:""}
+  ];
   var PICW=WORDS.filter(function(w){return w.e;});
 
   var DIFFS={
@@ -173,24 +201,33 @@ var Sound=(function(){
   }
   function newWave(){
     items=[]; level=1+Math.floor(score/5);
-    var modes=['word2pic','pic2word','word2word','kk2word'];
+    if(!WORDS.length){ cur={en:'?',kk:'',promptDisp:'?',promptIsPic:false}; return; }
+    // Режимдер сөздер жиынына байланысты таңдалады (эмодзи жоқ болса — мәтін режимдері ғана)
+    var hasPic = PICW.length>=1;          // эмодзи сұрақ ретінде көрсетуге болады
+    var hasPicAns = PICW.length>=3;       // эмодзи жауап нұсқалары үшін жеткілікті
+    var modes=['word2word','kk2word'];    // әрқашан қауіпсіз (мәтін жауаптар)
+    if(hasPic) modes.push('pic2word');
+    if(hasPicAns) modes.push('word2pic');
     var mode=modes[Math.floor(Math.random()*modes.length)];
     var usePic=(mode==='word2pic'||mode==='pic2word');
-    var target= usePic ? PICW[Math.floor(Math.random()*PICW.length)] : WORDS[Math.floor(Math.random()*WORDS.length)];
+    var pool = usePic ? PICW : WORDS;
+    var target = pool[Math.floor(Math.random()*pool.length)] || WORDS[0] || {en:'?',kk:'?',e:''};
     var promptDisp, promptIsPic=false, ansKind, correctVal;
     if(mode==='word2pic'){ promptDisp=target.en; ansKind='emoji'; correctVal=target.e; }
     else if(mode==='pic2word'){ promptDisp=target.e; promptIsPic=true; ansKind='text'; correctVal=target.en; }
     else if(mode==='word2word'){ promptDisp=target.en; ansKind='text'; correctVal=target.kk; }
     else { promptDisp=target.kk; ansKind='text'; correctVal=target.en; }
-    var nDist=DIFF.dist + Math.min(1,Math.floor(score/12));
-    var labels=[correctVal], used={}; used[correctVal]=1; var guard=0;
-    while(labels.length<1+nDist && guard<400){ guard++;
-      var src;
-      if(ansKind==='emoji') src=PICW[Math.floor(Math.random()*PICW.length)].e;
-      else if(mode==='word2word') src=WORDS[Math.floor(Math.random()*WORDS.length)].kk;
-      else src=WORDS[Math.floor(Math.random()*WORDS.length)].en;
-      if(src && !used[src]){ used[src]=1; labels.push(src); }
-    }
+    if(!correctVal){ correctVal = target.en || target.kk || '?'; }
+    // Дистракторларды қауіпсіз жинаймыз (ешқашан құламайды, мөлшері шектеулі)
+    var srcPool;
+    if(ansKind==='emoji') srcPool=PICW.map(function(w){return w.e;});
+    else if(mode==='word2word') srcPool=WORDS.map(function(w){return w.kk;});
+    else srcPool=WORDS.map(function(w){return w.en;});
+    var distract=[], seen={}; seen[correctVal]=1;
+    for(var s=0;s<srcPool.length;s++){ var v=srcPool[s]; if(v && !seen[v]){ seen[v]=1; distract.push(v); } }
+    for(var z=distract.length-1;z>0;z--){ var jj=Math.floor(Math.random()*(z+1)); var tt=distract[z]; distract[z]=distract[jj]; distract[jj]=tt; }
+    var nDist=Math.min(DIFF.dist + Math.min(1,Math.floor(score/12)), distract.length);
+    var labels=[correctVal].concat(distract.slice(0,nDist));
     var picks=labels.map(function(l){return {label:l,correct:(l===correctVal)};});
     picks.sort(function(){return Math.random()-0.5;});
     var slots=picks.length, sp=(W*0.78)/slots;
