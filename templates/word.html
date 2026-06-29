@@ -201,24 +201,33 @@ var Sound=(function(){
   }
   function newWave(){
     items=[]; level=1+Math.floor(score/5);
-    var modes=['word2pic','pic2word','word2word','kk2word'];
+    if(!WORDS.length){ cur={en:'?',kk:'',promptDisp:'?',promptIsPic:false}; return; }
+    // Режимдер сөздер жиынына байланысты таңдалады (эмодзи жоқ болса — мәтін режимдері ғана)
+    var hasPic = PICW.length>=1;          // эмодзи сұрақ ретінде көрсетуге болады
+    var hasPicAns = PICW.length>=3;       // эмодзи жауап нұсқалары үшін жеткілікті
+    var modes=['word2word','kk2word'];    // әрқашан қауіпсіз (мәтін жауаптар)
+    if(hasPic) modes.push('pic2word');
+    if(hasPicAns) modes.push('word2pic');
     var mode=modes[Math.floor(Math.random()*modes.length)];
     var usePic=(mode==='word2pic'||mode==='pic2word');
-    var target= usePic ? PICW[Math.floor(Math.random()*PICW.length)] : WORDS[Math.floor(Math.random()*WORDS.length)];
+    var pool = usePic ? PICW : WORDS;
+    var target = pool[Math.floor(Math.random()*pool.length)] || WORDS[0] || {en:'?',kk:'?',e:''};
     var promptDisp, promptIsPic=false, ansKind, correctVal;
     if(mode==='word2pic'){ promptDisp=target.en; ansKind='emoji'; correctVal=target.e; }
     else if(mode==='pic2word'){ promptDisp=target.e; promptIsPic=true; ansKind='text'; correctVal=target.en; }
     else if(mode==='word2word'){ promptDisp=target.en; ansKind='text'; correctVal=target.kk; }
     else { promptDisp=target.kk; ansKind='text'; correctVal=target.en; }
-    var nDist=DIFF.dist + Math.min(1,Math.floor(score/12));
-    var labels=[correctVal], used={}; used[correctVal]=1; var guard=0;
-    while(labels.length<1+nDist && guard<400){ guard++;
-      var src;
-      if(ansKind==='emoji') src=PICW[Math.floor(Math.random()*PICW.length)].e;
-      else if(mode==='word2word') src=WORDS[Math.floor(Math.random()*WORDS.length)].kk;
-      else src=WORDS[Math.floor(Math.random()*WORDS.length)].en;
-      if(src && !used[src]){ used[src]=1; labels.push(src); }
-    }
+    if(!correctVal){ correctVal = target.en || target.kk || '?'; }
+    // Дистракторларды қауіпсіз жинаймыз (ешқашан құламайды, мөлшері шектеулі)
+    var srcPool;
+    if(ansKind==='emoji') srcPool=PICW.map(function(w){return w.e;});
+    else if(mode==='word2word') srcPool=WORDS.map(function(w){return w.kk;});
+    else srcPool=WORDS.map(function(w){return w.en;});
+    var distract=[], seen={}; seen[correctVal]=1;
+    for(var s=0;s<srcPool.length;s++){ var v=srcPool[s]; if(v && !seen[v]){ seen[v]=1; distract.push(v); } }
+    for(var z=distract.length-1;z>0;z--){ var jj=Math.floor(Math.random()*(z+1)); var tt=distract[z]; distract[z]=distract[jj]; distract[jj]=tt; }
+    var nDist=Math.min(DIFF.dist + Math.min(1,Math.floor(score/12)), distract.length);
+    var labels=[correctVal].concat(distract.slice(0,nDist));
     var picks=labels.map(function(l){return {label:l,correct:(l===correctVal)};});
     picks.sort(function(){return Math.random()-0.5;});
     var slots=picks.length, sp=(W*0.78)/slots;
