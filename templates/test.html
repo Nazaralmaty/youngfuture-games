@@ -229,11 +229,11 @@
 (function(){
   "use strict";
   var CONFIG = {
-    APPS_SCRIPT_URL: "",
+    APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyJ_VFra242y9M0oz9DcaWap1JLz8hDJsrddETBHzQwfePWqujuOvXkQQjSAYPgx8V8/exec",
     SUBJECT: "English",
     ASSETS: {
       mascot:{normal:"https://optim.tildacdn.pro/tild3861-3534-4331-b033-653333353863/-/format/webp/file_0000000036a0722.png.webp",hype:"https://optim.tildacdn.pro/tild3831-3238-4532-b136-323232373266/-/format/webp/file_00000000bdfc71f.png.webp",think:"https://optim.tildacdn.pro/tild6435-3361-4937-a636-366362613934/-/format/webp/file_00000000838871f.png.webp",cool:"https://optim.tildacdn.pro/tild3164-6538-4363-b765-336466663861/-/format/webp/file_00000000fca0720.png.webp",dead:"https://optim.tildacdn.pro/tild6563-6332-4938-a563-366130373864/-/format/webp/file_000000001a24720.png.webp"},
-      hero:"https://optim.tildacdn.pro/tild3332-3432-4866-b333-663864356331/-/format/webp/file_00000000d3dc722.png.webp", intro_youtube:"", intro_mp4:"",
+      hero:"https://optim.tildacdn.pro/tild3332-3432-4866-b333-663864356331/-/format/webp/file_00000000d3dc722.png.webp", intro_youtube:"https://youtube.com/shorts/0yM2siMccEs", intro_mp4:"",
       q:{school:"https://optim.tildacdn.pro/tild3437-3534-4131-b135-373737663636/-/format/webp/file_000000004428722.png.webp",travel:"https://optim.tildacdn.pro/tild3637-6461-4934-b562-343666343935/-/format/webp/file_000000008248722.png.webp",food:"https://optim.tildacdn.pro/tild3262-3561-4561-b030-346138653663/-/format/webp/file_00000000c928722.png.webp",sport:"https://optim.tildacdn.pro/tild3939-3331-4639-b661-386466663731/-/format/webp/file_000000005168722.png.webp",family:"https://optim.tildacdn.pro/tild3633-3439-4561-a361-613830656134/-/format/webp/file_00000000ba88720.png.webp",city:"https://optim.tildacdn.pro/tild3361-3634-4166-b135-633437383334/-/format/webp/file_000000002218720.png.webp",nature:"https://optim.tildacdn.pro/tild3130-3634-4663-a236-346566373537/-/format/webp/file_00000000ba5471f.png.webp",tech:""},
       stickers:["https://optim.tildacdn.pro/tild3965-3665-4561-b763-346164343666/-/format/webp/2.jpg.webp","https://optim.tildacdn.pro/tild3363-6537-4931-b134-643935663861/-/format/webp/1.jpg.webp","https://optim.tildacdn.pro/tild6534-3866-4364-b966-363266363666/-/format/webp/3.jpg.webp","https://optim.tildacdn.pro/tild3961-6530-4034-b134-366638353536/-/format/webp/4.jpg.webp"]
     }
@@ -387,7 +387,9 @@
   function toast(t){var e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(function(){e.classList.remove('show');},1300);}
   function normPhone(r){var d=(r||'').replace(/\D/g,'');if(d.length===11&&d.charAt(0)==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d;}
   function phoneOk(r){var d=normPhone(r);return d.length===11&&d.charAt(0)==='7';}
-  function send(p){try{fetch(CONFIG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});}catch(e){}}
+  /* test_id = осы тест файлының аты (URL-ден). Әр тестке жеке. Нәтиже сол id-ге кетеді — Apps Script сол вкладканы автоматты жасайды. */
+  var TEST_ID=(function(){try{return (location.pathname.split('/').pop()||'test').replace(/\.html$/i,'')||'test';}catch(e){return 'test';}})();
+  function send(p){ if(!CONFIG.APPS_SCRIPT_URL || CONFIG.APPS_SCRIPT_URL.indexOf('ВСТАВЬ')===0) return; try{ p.testId=TEST_ID; fetch(CONFIG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});}catch(e){} }
   function norm(s){return (s||'').toString().toLowerCase().replace(/[.,!?'’]/g,'').replace(/\s+/g,' ').trim();}
   function speak(t){if(!TTS||muted)return;try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.92;window.speechSynthesis.speak(u);}catch(e){}}
   if(!TTS){[M1,SPEED,M2E,M2C,M2H,M3E,M3C,M3H].forEach(function(arr){for(var k=arr.length-1;k>=0;k--)if(arr[k].audio)arr.splice(k,1);});}
@@ -578,15 +580,16 @@
   function finish(){
     if(speedT){clearInterval(speedT);speedT=null;}$('h-bar').style.width='100%';
     var a1=pct(band[1]),a2=pct(band[2]),b1=pct(band[3]),b2=pct(band[4]);
-    var lvl=levelOf(a1,a2,b1,b2);
     var correct=band[1].c+band[2].c+band[3].c+band[4].c, total=band[1].t+band[2].t+band[3].t+band[4].t;
+    var op=total?Math.round(correct/total*100):0;
+    var lvl=op<35?'Beginner':op<55?'Elementary':op<72?'Pre-Intermediate':op<88?'Intermediate':'Upper-Intermediate';
     var summary=answers.map(function(x){return x.n+'. ['+x.cefr.toUpperCase()+'/'+x.sk+'] '+x.chosen+(x.open?' [ОТКР]':(x.ok?' ✓':' ✗'));}).join('\n');
     var openA=answers.filter(function(x){return x.open;}).map(function(x){return {q:x.q,answer:x.chosen};});
     send({action:'result',leadId:lead.id,school:SCHOOL,subject:CONFIG.SUBJECT,name:lead.name,class:lead.cls,goal:lead.goal,parentPhone:lead.phone,
       startedAt:startedAt,finishedAt:new Date().toISOString(),branch:branch,
       score:correct,total:total,a1_pct:a1,a2_pct:a2,b1_pct:b1,b2_pct:b2,
       a1:band[1].c+'/'+band[1].t,a2:band[2].c+'/'+band[2].t,b1:band[3].c+'/'+band[3].t,b2:band[4].c+'/'+band[4].t,
-      provisionalLevel:lvl,xp:xp,comboMax:comboMax,
+      provisionalLevel:lvl,pct:op,xp:xp,comboMax:comboMax,
       answersSummary:summary,openAnswers:JSON.stringify(openA),answersJson:JSON.stringify(answers),testUrl:location.href});
     // финиш — без уровня/правильности
     $('f-xp').textContent=xp;$('f-combo').textContent=comboMax;
