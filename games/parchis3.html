@@ -21,7 +21,7 @@
   #boardWrap{flex:1;display:flex;align-items:center;justify-content:center;padding:8px}
   #board{position:relative;width:100%;aspect-ratio:1/1;max-height:100%;background:linear-gradient(135deg,var(--wood2),var(--wood));
     border-radius:16px;display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);gap:2px;padding:6px;box-shadow:inset 0 0 40px rgba(0,0,0,.4)}
-  .cell{position:relative;border-radius:6px;background:linear-gradient(160deg,#fdf6e9,#f1e2c6);display:flex;align-items:center;justify-content:center;font-size:min(2.6vw,13px);color:#5a3d1e;font-weight:800}
+  .cell{position:relative;border-radius:6px;background:linear-gradient(160deg,rgba(253,246,233,.5),rgba(241,226,198,.5));display:flex;align-items:center;justify-content:center;font-size:min(2.6vw,13px);color:#4a3216;font-weight:800}
   .cell.trap{background:linear-gradient(160deg,#ffd9df,#ff9fac);color:#7a1020}
   .cell.start0{background:linear-gradient(160deg,#bff0ff,#7fdcff)}
   .cell.start1{background:linear-gradient(160deg,#ffd0d8,#ff9aa8)}
@@ -234,7 +234,7 @@ var boardEl=$('board');
 var RING=40, LANE=4, HOME=RING+LANE; // step: -1 база, 0..39 сақина, 40..43 финиш, 44 үй
 var STARTS=[0,20];
 var TRAPS={7:1,17:1,27:1,37:1}; // тұзақ ұялары
-var HORSE={5:5, 25:-5}; // қанатты жылқы: дұрыс жауапта алға/артқа секіру
+var HORSE={5:6, 14:-6, 25:6, 33:-6}; // қанатты жылқы (4): дұрыс жауапта алға (+) не артқа (-) секіру
 var BOARD_IMG='https://i.ibb.co/YBDB96Jr/61f92abc-c969-4b20-a561-cfbc46d2579c.jpg';
 // сақина индексі -> (row,col) 11x11 сыртқы жиек, сағат тілімен, сол жоғарыдан
 function ringRC(i){ i=((i%RING)+RING)%RING;
@@ -246,7 +246,7 @@ function ringRC(i){ i=((i%RING)+RING)%RING;
 var ringCells=[]; // DOM
 function buildBoard(){
   boardEl.innerHTML=''; ringCells=[];
-  try{ boardEl.style.background="linear-gradient(135deg,var(--wood2),var(--wood))"; }catch(e){} /* нативная доска: без внешнего фото (совпадает + мгновенно) */
+  try{ boardEl.style.background="url('"+BOARD_IMG+"') center/cover, linear-gradient(135deg,var(--wood2),var(--wood))"; }catch(e){}
   // 40 сақина ұясы
   for(var i=0;i<RING;i++){ var rc=ringRC(i); var el=document.createElement('div'); el.className='cell';
     el.style.gridRow=(rc.r+1); el.style.gridColumn=(rc.c+1);
@@ -470,6 +470,7 @@ $('mute').addEventListener('click',function(){ var on=Sound.toggle(); this.textC
 function toast(t){ var e=$('toast'); e.textContent=t; e.classList.add('show'); setTimeout(function(){e.classList.remove('show');},1600); }
 
 /* test hook */
+(function(){ try{ var _pi=new Image(); _pi.src=BOARD_IMG; }catch(e){} })();
 window.__P__={ get players(){return players;}, get dice(){return dice;}, get turn(){return turn;}, RING:RING,LANE:LANE,HOME:HOME,STARTS:STARTS,TRAPS:TRAPS,BANK:BANK,
   start:startGame, roll:rollDice, canMoveTok:canMoveTok, tokAbs:tokAbs, setTok:function(pi,k,step,fr){players[pi].toks[k].step=step;players[pi].toks[k].frozen=!!fr;} };
 </script>
