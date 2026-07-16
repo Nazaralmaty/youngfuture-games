@@ -27,7 +27,7 @@
   .cell.start1{background:linear-gradient(160deg,#ffd0d8,#ff9aa8)}
   .cell.horse{background:linear-gradient(160deg,#e9ddff,#c3a8ff);color:#3a1e7a}
   .cell.mv{outline:3px solid var(--gold);outline-offset:-2px;cursor:pointer;box-shadow:0 0 12px rgba(255,206,74,.7);z-index:3}
-  .center{grid-area:5/5/8/8;border-radius:12px;background:radial-gradient(circle at 50% 50%,rgba(40,48,110,.5),rgba(16,28,63,.5));display:flex;align-items:center;justify-content:center;font-size:min(6vw,30px);color:#fff;position:relative;z-index:2}
+  .center{grid-area:5/5/8/8;border-radius:12px;background:radial-gradient(circle at 50% 50%,#2a3470,#111c40);border:2px solid rgba(255,206,74,.4);display:flex;align-items:center;justify-content:center;font-size:min(6vw,30px);color:#fff;position:relative;z-index:2}
   .base{border-radius:10px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;padding:4px;z-index:2}
   .base.b0{grid-area:2/2/4/4;background:rgba(33,212,253,.28);border:2px solid var(--p0)}
   .base.b1{grid-area:9/9/11/11;background:rgba(255,77,109,.28);border:2px solid var(--p1)}
@@ -246,7 +246,7 @@ function ringRC(i){ i=((i%RING)+RING)%RING;
 var ringCells=[]; // DOM
 function buildBoard(){
   boardEl.innerHTML=''; ringCells=[];
-  try{ boardEl.style.background="url('"+BOARD_IMG+"') center/cover, linear-gradient(135deg,var(--wood2),var(--wood))"; }catch(e){}
+  try{ boardEl.style.background="linear-gradient(135deg,var(--wood2),var(--wood))"; }catch(e){} /* нативная доска: без внешнего фото (совпадает + мгновенно) */
   // 40 сақина ұясы
   for(var i=0;i<RING;i++){ var rc=ringRC(i); var el=document.createElement('div'); el.className='cell';
     el.style.gridRow=(rc.r+1); el.style.gridColumn=(rc.c+1);
@@ -375,10 +375,19 @@ function useDie(i){
   var pi=turn,k=sel.k,t=players[pi].toks[k];
   if(!canMoveTok(pi,k,d.v)){ toast('Бұл санмен болмайды'); return; }
   d.used=true;
-  if(t.step===-1){ t.step=0; t.frozen=false; Sound.step(); afterMove(pi,k,true); return; }
+  if(t.step===-1){ t.step=0; t.frozen=false; Sound.step(); renderTokens(); afterMove(pi,k,true); return; }
   if(t.frozen && d.v===5){ t.frozen=false; } // разморозка
-  t.step+=d.v; Sound.step();
-  afterMove(pi,k,false);
+  animateMove(pi,k,d.v,function(){ afterMove(pi,k,false); });
+}
+function animateMove(pi,k,steps,done){
+  busy=true; var t=players[pi].toks[k], left=steps;
+  (function hop(){
+    if(left<=0){ busy=false; done(); return; }
+    t.step++; left--; renderTokens();
+    if(t.step<RING){ var el=ringCells[tokAbs(pi,t)]; if(el){ el.classList.add('mv'); setTimeout(function(){ el.classList.remove('mv'); },250); } }
+    Sound.step();
+    setTimeout(hop,300);
+  })();
 }
 function afterMove(pi,k,fromBase){
   var t=players[pi].toks[k];
