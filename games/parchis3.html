@@ -231,11 +231,11 @@ var TIME_BY_D={1:15,2:24,3:34};
 /* ===== BOARD (11x11 сыртқы сақина = 40 ұя) ===== */
 var $=function(id){return document.getElementById(id);};
 var boardEl=$('board');
-var BOARD_IMG='https://i.ibb.co.com/YBDB96Jr/61f92abc-c969-4b20-a561-cfbc46d2579c.jpg';
 var RING=40, LANE=4, HOME=RING+LANE; // step: -1 база, 0..39 сақина, 40..43 финиш, 44 үй
 var STARTS=[0,20];
 var TRAPS={7:1,17:1,27:1,37:1}; // тұзақ ұялары
 var HORSE={5:5, 25:-5}; // қанатты жылқы: дұрыс жауапта алға/артқа секіру
+var BOARD_IMG='https://i.ibb.co/YBDB96Jr/61f92abc-c969-4b20-a561-cfbc46d2579c.jpg';
 // сақина индексі -> (row,col) 11x11 сыртқы жиек, сағат тілімен, сол жоғарыдан
 function ringRC(i){ i=((i%RING)+RING)%RING;
   if(i<=10) return {r:0,c:i};            // жоғарғы жол солдан оңға (0..10)
