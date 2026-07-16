@@ -81,6 +81,61 @@
 </style>
 </head>
 <body>
+
+<style>
+#yfAcc{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(7,11,30,.92);backdrop-filter:blur(6px);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif}
+#yfAcc .yfBox{width:100%;max-width:340px;background:linear-gradient(160deg,#0e2247,#0b1a33);border:1px solid #22305f;border-radius:22px;padding:24px 20px;color:#eaf0ff;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#yfAcc .yfLogo{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#6d4bff,#21d4fd);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+#yfAcc .yfLogo svg{width:27px;height:27px}
+#yfAcc .yfT{font-size:22px;font-weight:900;margin-bottom:4px}
+#yfAcc .yfS{font-size:13px;color:#9fb0d8;margin-bottom:16px}
+#yfAcc input{width:100%;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;padding:13px 15px;font-size:16px;font-family:inherit;margin-bottom:10px;outline:none}
+#yfAcc input:focus{border-color:#8a6bff}
+#yfAcc #yfErr{color:#ff6b6b;font-size:13px;min-height:16px;margin-bottom:4px}
+#yfAcc #yfGo{width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:900;font-size:17px;color:#0b1330;background:linear-gradient(135deg,#9be870,#d6ff8a);border-radius:14px;padding:14px}
+#yfAcc .yfHint{font-size:11.5px;color:#7e8db0;margin-top:10px}
+</style>
+<div id="yfAcc"><div class="yfBox">
+  <div class="yfLogo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div>
+  <div class="yfT">Ойынға кіру 🎮</div>
+  <div class="yfS">Атыңды жаз — прогресің сақталады.</div>
+  <input id="yfName" placeholder="Атың" autocomplete="off">
+  <input id="yfClass" placeholder="Сыныбың (мыс. 7А)" autocomplete="off">
+  <input id="yfPhone" type="tel" inputmode="tel" placeholder="Нөмірің (міндетті емес)" autocomplete="off">
+  <div id="yfErr"></div>
+  <button id="yfGo">Кіру ▶</button>
+  <div class="yfHint">Бір рет кіресің — келесіде автоматты 🔒</div>
+</div></div>
+<script>
+var YF_ACCOUNT=(function(){
+  var KEY='yf_user_v5';
+  var GAME_NAME='arcade'; var ENDPOINT='https://script.google.com/macros/s/AKfycbxSGdD65Qzmr8LQhOClkc-mnwxSI1EpS2XSA4mtVp-KKN0EgDPxDj_rE11BVGF3xKQGug/exec'; /* Google Sheets Apps Script (аккаунттар). Бос болса — тек құрылғыда сақталады. */
+  var user=null;
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+  function save(u){ try{ localStorage.setItem(KEY, JSON.stringify(u)); }catch(e){} }
+  function normPhone(r){ var d=(r||'').replace(/\D/g,''); if(d.length===11&&d.charAt(0)==='8')d='7'+d.slice(1); if(d.length===10)d='7'+d; return d; }
+  function post(u,ev){ if(!ENDPOINT||ENDPOINT.indexOf('ВСТАВ')===0)return; try{ fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:ev||'account',brand:'youngfuture',game:GAME_NAME,id:u.id,name:u.name,'class':u.cls||'',phone:u.phone||'',ts:new Date().toISOString(),progress:u.progress||{}})}).catch(function(){}); }catch(e){} }
+  function el(id){return document.getElementById(id);}
+  function hide(){ var o=el('yfAcc'); if(o)o.style.display='none'; }
+  user=load();
+  if(user){ hide(); }
+  else {
+    el('yfGo').addEventListener('click',function(){
+      var name=el('yfName').value.trim(), cls=el('yfClass').value.trim(), ph=el('yfPhone').value.trim();
+      if(name.length<1){ el('yfErr').textContent='Атыңды жаз'; return; }
+      user={ id:'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), name:name, cls:cls, phone:normPhone(ph), created:new Date().toISOString(), progress:{} };
+      save(user); post(user,'account'); hide();
+    });
+    el('yfName').addEventListener('keydown',function(e){ if(e.key==='Enter')el('yfGo').click(); });
+  }
+  return {
+    get user(){return user;},
+    saveProgress:function(data){ if(!user)return; user.progress=Object.assign(user.progress||{},data||{}); save(user); post(user,'progress'); },
+    logout:function(){ try{localStorage.removeItem(KEY);}catch(e){} location.reload(); }
+  };
+})();
+</script>
+
 <div id="wrap">
   <canvas id="cv"></canvas>
 
@@ -99,6 +154,20 @@
     <div class="htitle">Ағылшын <em>Аркада</em> 🎮</div>
     <div class="hsub">Ойнап жүріп ағылшын үйрен. Ойынды таңда, қиындықты таңда — кеттік!</div>
     <div class="grid" id="gameGrid"></div>
+  </div>
+
+  <!-- LEAD FORM (опционально, LEAD.on) -->
+  <div class="screen" id="sLead">
+    <div class="brand"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Young<span>Future</span></b></div>
+    <div class="htitle" id="leadTitle">Ойнамас бұрын танысайық 👋</div>
+    <div class="hsub" id="leadSub">Нәтиже мен деңгей ата-анаға жетеді.</div>
+    <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;margin-top:6px">
+      <input id="leadName" placeholder="Атың" autocomplete="off" style="width:100%;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;padding:14px 16px;font-size:16px;font-family:inherit">
+      <input id="leadClass" placeholder="Сыныбың (мыс. 6А)" autocomplete="off" style="width:100%;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;padding:14px 16px;font-size:16px;font-family:inherit">
+      <input id="leadPhone" type="tel" inputmode="tel" placeholder="Ата-ана нөмірі +7 700 000 00 00" autocomplete="off" style="width:100%;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;padding:14px 16px;font-size:16px;font-family:inherit">
+      <div id="leadErr" style="color:var(--red);font-size:13px;min-height:16px;text-align:center"></div>
+      <button class="btn big" id="leadGo" style="width:100%">Бастау ▶</button>
+    </div>
   </div>
 
   <!-- DIFFICULTY -->
@@ -198,6 +267,18 @@ var Sound=(function(){
     toggle:function(){this.setEnabled(!enabled);return enabled;}
   };
 })();
+
+/* =================== ЛИД-ФОРМА / WHITE-LABEL КОНФИГ ===================
+   Опционально. Включи on:true, чтобы перед игрой собирать заявки (для центра).
+   endpoint — URL Apps Script (тот же приёмник, что и у тестов), данные падают в Google Sheets.
+   Пусто/off — форма не показывается, игра работает как обычно. */
+var LEAD = {
+  on: false,                 // true = показать форму-заявку перед меню
+  endpoint: "",              // "https://script.google.com/macros/s/.../exec"
+  title: "Ойнамас бұрын танысайық 👋",
+  sub: "Нәтиже мен деңгей ата-анаға жетеді.",
+  brand: "youngfuture"       // white-label: под каждый центр можно поменять
+};
 
 /* =================== СӨЗ БАЗАСЫ — воркфлоу осы массивті ауыстырады (жалғыз var WORDS) =================== */
 var WORDS=[
@@ -319,66 +400,7 @@ var Engine=(function(){
 
 /* =================== GAMES =================== */
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
-
-/* ---- 1. RUNNER (Жүгіруші) — дұрыс қақпадан өт ---- */
-var RunnerGame={ id:'runner', name:'Жүгіруші', emoji:'🦖', desc:'Дұрыс қақпадан секіріп өт', bpm:124, neww:true,
-  how:'Жоғарыда — мақсат сөз. Жақындаған 2 қақпаның дұрысын таңда: дұрыс жауап ЖОҒАРЫДА болса — басып секір, ТӨМЕНДЕ болса — баспа.',
-  diffs:{ easy:{spd:0.34,gap:0.30}, medium:{spd:0.46,gap:0.26}, hard:{spd:0.60,gap:0.22} },
-  mk:function(E){
-    var H,W,groundY,dinoX,dinoY,vy,dinoH,onG,gate,spd,run=0;
-    function ask(){ var q=E.buildQuestion(E.rndItem(),2); var top=Math.random()<0.5;
-      E.setPrompt(q.promptEmoji||q.promptText, !!q.promptEmoji);
-      var corr=q.correct, wrongLbl=q.options.filter(function(o){return o!==corr;})[0]||'—';
-      gate={ x:W*1.12, topL: top?corr:wrongLbl, botL: top?wrongLbl:corr, correctTop:top, learn:q.learn, done:false }; }
-    return { diffKey:'',diff:null,
-      resize:function(){ W=E.W;H=E.H; groundY=H*0.80; dinoX=W*0.24; dinoH=H*0.085; },
-      start:function(d){ this.resize(); spd=d.spd; dinoY=groundY; vy=0; onG=true; ask(); },
-      down:function(){ if(onG){ vy=-H*1.55; onG=false; Sound.jump(); } },
-      key:function(c){ if(c==='Space'||c==='ArrowUp')this.down(); },
-      update:function(dt){ run+=dt*spd*8;
-        vy+=H*4.2*dt; dinoY+=vy*dt; if(dinoY>=groundY){dinoY=groundY;vy=0;onG=true;}
-        if(!gate)return;
-        gate.x-=spd*W*dt;
-        if(!gate.done && gate.x<=dinoX){ gate.done=true;
-          var up = dinoY < groundY - H*0.13;
-          var ok = (up===gate.correctTop);
-          if(ok){ E.correct(gate.learn, dinoX, dinoY-dinoH*0.5); E.pop('+1',dinoX,groundY-H*0.2,'#9be870'); }
-          else { E.wrong(dinoX,dinoY); }
-        }
-        if(gate.x < -W*0.2){ if(E.running) ask(); }
-      },
-      draw:function(ctx){
-        // ground
-        ctx.fillStyle='#0b1330'; ctx.fillRect(0,groundY+dinoH*0.5,W,H);
-        ctx.strokeStyle='rgba(255,255,255,.18)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(0,groundY+dinoH*0.5); ctx.lineTo(W,groundY+dinoH*0.5); ctx.stroke();
-        for(var i=0;i<6;i++){ var gx=((i*W/5)-(run*40)%(W+60)+W+60)%(W+60)-30; ctx.fillStyle='rgba(255,255,255,.10)'; ctx.fillRect(gx,groundY+dinoH*0.5+H*0.04,16,3); }
-        // gate
-        if(gate){ var bw=W*0.30, bh=H*0.085;
-          drawBox(ctx, gate.x-bw/2, groundY-H*0.30-bh/2, bw, bh, gate.topL, '#6d4bff');
-          drawBox(ctx, gate.x-bw/2, groundY-bh/2,        bw, bh, gate.botL, '#161c47');
-        }
-        // dino
-        var dy=dinoY, s=dinoH;
-        ctx.fillStyle='#9be870';
-        rr(ctx, dinoX-s*0.5, dy-s, s, s, s*0.22); ctx.fill();         // body
-        rr(ctx, dinoX+s*0.05, dy-s*1.25, s*0.55, s*0.5, s*0.16); ctx.fill(); // head
-        ctx.fillStyle='#0b1330'; ctx.beginPath(); ctx.arc(dinoX+s*0.42,dy-s*1.05,s*0.06,0,7); ctx.fill(); // eye
-        ctx.fillStyle='#9be870';
-        var legSw=Math.sin(run*3)*s*0.12; if(!onG)legSw=0;
-        rr(ctx, dinoX-s*0.4, dy-s*0.05, s*0.18, s*0.28+legSw, 3); ctx.fill();
-        rr(ctx, dinoX-s*0.05, dy-s*0.05, s*0.18, s*0.28-legSw, 3); ctx.fill();
-      }
-    };
-    function drawBox(ctx,x,y,w,h,label,col){
-      ctx.fillStyle=col; rr(ctx,x,y,w,h,12); ctx.fill();
-      ctx.fillStyle='rgba(255,255,255,.10)'; rr(ctx,x,y,w,h*0.4,12); ctx.fill();
-      ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.font='800 '+Math.round(h*0.42)+'px Inter,Arial';
-      var lbl=label.length>12?label.slice(0,11)+'…':label;
-      ctx.fillText(lbl, x+w/2, y+h/2);
-    }
-  }
-};
+function fitFont(ctx,text,maxW,base,min){ var fs=base; ctx.font='800 '+fs+'px Inter,Arial'; while(fs>(min||8) && ctx.measureText(String(text)).width>maxW){ fs--; ctx.font='800 '+fs+'px Inter,Arial'; } return fs; }
 
 /* ---- 2. CATCH (Сөзді ұста) ---- */
 var CatchGame={ id:'catch', name:'Сөзді ұста', emoji:'🧺', desc:'Дұрыс жауапты себетке ұста', bpm:120,
@@ -460,8 +482,8 @@ var NinjaGame={ id:'ninja', name:'Сөз Нинзя', emoji:'🥷', desc:'Дұр
         for(var i=0;i<fruits.length;i++){ var f=fruits[i]; if(f.dead)continue;
           ctx.fillStyle=f.col; ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,7); ctx.fill();
           ctx.fillStyle='rgba(255,255,255,.25)'; ctx.beginPath(); ctx.arc(f.x-f.r*0.3,f.y-f.r*0.3,f.r*0.32,0,7); ctx.fill();
-          ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font='800 '+Math.round(f.r*0.5)+'px Inter,Arial';
-          var lbl=f.label.length>10?f.label.slice(0,9)+'…':f.label; ctx.fillText(lbl,f.x,f.y);
+          ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle';
+          fitFont(ctx,f.label,f.r*1.7,Math.round(f.r*0.55),9); ctx.fillText(String(f.label),f.x,f.y);
         }
         if(trail.length>1){ ctx.strokeStyle='rgba(33,212,253,.7)'; ctx.lineWidth=H*0.008; ctx.lineCap='round'; ctx.beginPath();
           ctx.moveTo(trail[0].x,trail[0].y); for(var t=1;t<trail.length;t++)ctx.lineTo(trail[t].x,trail[t].y); ctx.stroke(); }
@@ -548,8 +570,8 @@ var BubbleGame={ id:'bubble', name:'Көпіршік', emoji:'🫧', desc:'Дұ�
           ctx.fillStyle='rgba(255,255,255,.07)'; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,7); ctx.fill();
           ctx.strokeStyle=b.col; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,7); ctx.stroke();
           ctx.fillStyle='rgba(255,255,255,.5)'; ctx.beginPath(); ctx.arc(b.x-b.r*0.32,b.y-b.r*0.32,b.r*0.18,0,7); ctx.fill();
-          ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font='800 '+Math.round(b.r*0.46)+'px Inter,Arial';
-          var lbl=b.label.length>9?b.label.slice(0,8)+'…':b.label; ctx.fillText(lbl,b.x,b.y);
+          ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+          fitFont(ctx,b.label,b.r*1.7,Math.round(b.r*0.5),9); ctx.fillText(String(b.label),b.x,b.y);
         }
       }
     };
@@ -663,13 +685,13 @@ var FlappyGame={ id:'flappy', name:'Flappy', emoji:'🐤', desc:'Дұрыс са
   }
 };
 
-var GAMES=[RunnerGame,FlappyGame,CatchGame,NinjaGame,WhackGame,BubbleGame,MemoryGame];
+var GAMES=[FlappyGame,CatchGame,NinjaGame,WhackGame,BubbleGame,MemoryGame];
 
 /* =================== UI =================== */
 var UI=(function(){
   function $(id){return document.getElementById(id);}
   var chosen=null;
-  function screen(id){ ['sMenu','sDiff','sOver'].forEach(function(s){ $(s).classList.toggle('on', s===id); });
+  function screen(id){ ['sLead','sMenu','sDiff','sOver'].forEach(function(s){ $(s).classList.toggle('on', s===id); });
     var playing=(id===null); $('hud').classList.toggle('on',playing); }
   function buildGrid(){ var g=$('gameGrid'); g.innerHTML='';
     GAMES.forEach(function(def){ var d=document.createElement('div'); d.className='gcard';
@@ -685,6 +707,7 @@ var UI=(function(){
   }
   function showOver(){ $('hud').classList.remove('on'); $('prompt').classList.remove('on');
     $('oScore').textContent=Engine.score;
+    try{if(window.YF_ACCOUNT&&YF_ACCOUNT.user)YF_ACCOUNT.saveProgress({last:Engine.score});}catch(e){}
     var box=$('oLearned'), uniq=[],seen={}; Engine.learned.forEach(function(w){ if(!seen[w]){seen[w]=1;uniq.push(w);} });
     if(uniq.length){ var h='<div class="lt">ҮЙРЕНГЕН СӨЗДЕР: '+uniq.length+'</div>'; uniq.slice(0,24).forEach(function(w){ var p=w.split(' — '); h+='<span class="wchip">'+p[0]+(p[1]?(' — <b>'+p[1]+'</b>'):'')+'</span>'; }); box.innerHTML=h; }
     else box.innerHTML='';
@@ -699,6 +722,25 @@ var UI=(function(){
   $('muteBtn').addEventListener('click',function(){ var on=Sound.toggle(); this.textContent=on?'🔊':'🔇'; });
   // WhatsApp CTA
   $('ctaStart').href='https://wa.me/77077518715?text='+encodeURIComponent('Сәлеметсіз бе! YoungFuture-дің тегін ағылшын деңгей тесті туралы білгім келеді 🚀');
+
+  // LEAD FORM (опционально) — собирает заявки ДЛЯ центра в Google Sheets
+  function normPhone(r){ var d=(r||'').replace(/\D/g,''); if(d.length===11&&d.charAt(0)==='8')d='7'+d.slice(1); if(d.length===10)d='7'+d; return d; }
+  function phoneOk(r){ var d=normPhone(r); return d.length===11&&d.charAt(0)==='7'; }
+  if (typeof LEAD!=='undefined' && LEAD && LEAD.on){
+    if(LEAD.title)$('leadTitle').textContent=LEAD.title;
+    if(LEAD.sub)$('leadSub').textContent=LEAD.sub;
+    screen('sLead');
+    $('leadGo').addEventListener('click',function(){
+      var name=$('leadName').value.trim(), cls=$('leadClass').value.trim(), ph=$('leadPhone').value.trim();
+      if(!name){ $('leadErr').textContent='Атыңды жаз'; return; }
+      if(!phoneOk(ph)){ $('leadErr').textContent='Ата-ана нөмірін дұрыс жаз'; return; }
+      try{ if(LEAD.endpoint){ fetch(LEAD.endpoint,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({action:'lead',source:'arcade',brand:LEAD.brand||'',name:name,'class':cls,parentPhone:normPhone(ph),ts:new Date().toISOString()})}).catch(function(){}); } }catch(e){}
+      Sound.unlock(); Sound.click(); screen('sMenu');
+    });
+    $('leadName').addEventListener('input',function(){ $('leadErr').textContent=''; });
+    $('leadPhone').addEventListener('input',function(){ $('leadErr').textContent=''; });
+  }
 
   return { showOver:showOver };
 })();
