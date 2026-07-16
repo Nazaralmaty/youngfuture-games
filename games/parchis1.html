@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Дала Ойыны · Физика мен математика 🎲</title>
+<title>Дала Ойыны · Математика 🎲</title>
 <style>
   :root{--ink:#0b1437;--ink2:#161c47;--violet:#6d4bff;--violet2:#8a6bff;--cyan:#21d4fd;--lime:#9be870;--gold:#ffce4a;--red:#ff4d6d;--wood:#6d4326;--wood2:#8a5a34;}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -36,9 +36,9 @@
   .cell.start{background:linear-gradient(160deg,var(--lime),#d6ff8a);color:#0b1330}
   .cell.finish{background:linear-gradient(160deg,var(--gold),#ffe08a);color:#0b1330}
   .cell .cap{font-size:9px;font-weight:800;margin-top:1px;opacity:.8}
-  .token{position:absolute;width:30px;height:30px;border-radius:50%;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.6);z-index:8;
-    display:flex;align-items:center;justify-content:center;font-size:17px;
-    transition:left .3s cubic-bezier(.34,1.4,.5,1),top .3s cubic-bezier(.34,1.4,.5,1);pointer-events:none}
+  .token{position:absolute;transform:translate(-50%,-50%);width:min(8.5vw,34px);height:min(8.5vw,34px);border-radius:50%;border:3px solid #fff;
+    box-shadow:0 4px 12px rgba(0,0,0,.6);z-index:9;display:flex;align-items:center;justify-content:center;font-size:min(5.2vw,19px);pointer-events:none}
+  @keyframes tokpop{0%{transform:translate(-50%,-50%) scale(.5)}60%{transform:translate(-50%,-50%) scale(1.15)}100%{transform:translate(-50%,-50%) scale(1)}}
   .cell.cur{outline:3px solid var(--gold);outline-offset:-2px;box-shadow:0 0 16px rgba(255,206,74,.75);z-index:4}
   @keyframes glowp{0%,100%{box-shadow:0 0 0 rgba(255,206,74,0)}50%{box-shadow:0 0 20px 5px rgba(255,206,74,.95)}}
   .cell.glow{animation:glowp .55s ease 2}
@@ -123,12 +123,12 @@
 <script>
 var YF_ACCOUNT=(function(){
   var KEY='yf_user_v5';
-  var ENDPOINT='ВСТАВ_APPS_SCRIPT_URL'; /* Google Sheets Apps Script (аккаунттар). Бос болса — тек құрылғыда сақталады. */
+  var GAME_NAME='math_board'; var ENDPOINT='https://script.google.com/macros/s/AKfycbxSGdD65Qzmr8LQhOClkc-mnwxSI1EpS2XSA4mtVp-KKN0EgDPxDj_rE11BVGF3xKQGug/exec'; /* Google Sheets Apps Script (аккаунттар). Бос болса — тек құрылғыда сақталады. */
   var user=null;
   function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
   function save(u){ try{ localStorage.setItem(KEY, JSON.stringify(u)); }catch(e){} }
   function normPhone(r){ var d=(r||'').replace(/\D/g,''); if(d.length===11&&d.charAt(0)==='8')d='7'+d.slice(1); if(d.length===10)d='7'+d; return d; }
-  function post(u,ev){ if(!ENDPOINT||ENDPOINT.indexOf('ВСТАВ')===0)return; try{ fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:ev||'account',brand:'youngfuture',id:u.id,name:u.name,'class':u.cls||'',phone:u.phone||'',ts:new Date().toISOString(),progress:u.progress||{}})}).catch(function(){}); }catch(e){} }
+  function post(u,ev){ if(!ENDPOINT||ENDPOINT.indexOf('ВСТАВ')===0)return; try{ fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:ev||'account',brand:'youngfuture',game:GAME_NAME,id:u.id,name:u.name,'class':u.cls||'',phone:u.phone||'',ts:new Date().toISOString(),progress:u.progress||{}})}).catch(function(){}); }catch(e){} }
   function el(id){return document.getElementById(id);}
   function hide(){ var o=el('yfAcc'); if(o)o.style.display='none'; }
   user=load();
@@ -241,29 +241,6 @@ var Sound=(function(){
    Түр: {q:сұрақ, o:[нұсқалар], a:дұрыс, d:қиындық 1-3, sub:қосымша}
    d → уақыт: 1=15с (формула еске түсіру), 2=24с (қарапайым есеп), 3=34с (көп қадам). */
 var BANK=[
-  /* --- Физика: формулалар --- */
-  {q:"Тығыздық формуласы?",o:["ρ = m/V","ρ = V/m","ρ = m·V"],a:"ρ = m/V",d:1,sub:"Физика"},
-  {q:"Күш формуласы?",o:["F = m·a","F = m/a","F = a/m"],a:"F = m·a",d:1,sub:"Физика"},
-  {q:"Қысым формуласы?",o:["p = F/A","p = A/F","p = F·A"],a:"p = F/A",d:1,sub:"Физика"},
-  {q:"Механикалық жұмыс?",o:["W = F·d","W = F/d","W = F + d"],a:"W = F·d",d:1,sub:"Физика"},
-  {q:"Қуат формуласы?",o:["P = W/t","P = t/W","P = W·t"],a:"P = W/t",d:1,sub:"Физика"},
-  {q:"Кинетикалық энергия?",o:["Eₖ = ½·m·v²","Eₖ = m·g·h","Eₖ = m·v"],a:"Eₖ = ½·m·v²",d:1,sub:"Физика"},
-  {q:"Потенциалдық энергия?",o:["Eₚ = m·g·h","Eₚ = ½·m·v²","Eₚ = m/g"],a:"Eₚ = m·g·h",d:1,sub:"Физика"},
-  {q:"Архимед күші?",o:["Fₐ = ρ·g·V","Fₐ = m·g·h","Fₐ = m/V"],a:"Fₐ = ρ·g·V",d:1,sub:"Физика"},
-  {q:"Дене салмағы (P)?",o:["P = m·g","P = m/g","P = m·a"],a:"P = m·g",d:1,sub:"Физика"},
-  {q:"Серпімділік күші?",o:["Fₑ = k·x","Fₑ = μ·N","Fₑ = m·a"],a:"Fₑ = k·x",d:1,sub:"Физика"},
-  {q:"Үйкеліс күші?",o:["F = μ·N","F = k·x","F = ρ·g·V"],a:"F = μ·N",d:1,sub:"Физика"},
-  {q:"Күш өлшем бірлігі?",o:["Ньютон (Н)","Джоуль (Дж)","Паскаль (Па)"],a:"Ньютон (Н)",d:1,sub:"Физика · бірлік"},
-  {q:"Энергия өлшем бірлігі?",o:["Джоуль (Дж)","Ватт (Вт)","Ньютон (Н)"],a:"Джоуль (Дж)",d:1,sub:"Физика · бірлік"},
-  {q:"Қуат өлшем бірлігі?",o:["Ватт (Вт)","Джоуль (Дж)","Паскаль (Па)"],a:"Ватт (Вт)",d:1,sub:"Физика · бірлік"},
-  /* --- Физика: есептер --- */
-  {q:"m = 20 г, V = 50 см³. ρ = ?",o:["0,4 г/см³","2,5 г/см³","1000 г/см³"],a:"0,4 г/см³",d:2,sub:"ρ = m/V"},
-  {q:"m = 4 кг, a = 3 м/с². F = ?",o:["12 Н","1,3 Н","7 Н"],a:"12 Н",d:2,sub:"F = m·a"},
-  {q:"m = 3 кг, g = 10 м/с². Pсалмақ = ?",o:["30 Н","0,3 Н","13 Н"],a:"30 Н",d:2,sub:"P = m·g"},
-  {q:"m = 2 кг, v = 3 м/с. Eₖ = ?",o:["9 Дж","6 Дж","18 Дж"],a:"9 Дж",d:2,sub:"Eₖ = ½mv²"},
-  {q:"F = 2 Н, d = 2 м. W = ?",o:["4 Дж","1 Дж","0,5 Дж"],a:"4 Дж",d:2,sub:"W = F·d"},
-  {q:"W = 100 Дж, t = 5 с. P = ?",o:["20 Вт","500 Вт","0,05 Вт"],a:"20 Вт",d:2,sub:"P = W/t"},
-  /* --- Геометрия: аудандар --- */
   {q:"Ромб ауданы (диагональ)?",o:["S = d₁·d₂ / 2","S = 2πr","S = a + b"],a:"S = d₁·d₂ / 2",d:1,sub:"Геометрия"},
   {q:"Ромб ауданы (қабырға, бұрыш)?",o:["S = a²·sin α","S = a·b","S = π·r²"],a:"S = a²·sin α",d:1,sub:"Геометрия"},
   {q:"Параллелограмм ауданы?",o:["S = a·h","S = a + h","S = a/h"],a:"S = a·h",d:1,sub:"Геометрия"},
@@ -271,22 +248,20 @@ var BANK=[
   {q:"Тіктөртбұрыш ауданы?",o:["S = a·b","S = a + b","S = 2(a+b)"],a:"S = a·b",d:1,sub:"Геометрия"},
   {q:"Шеңбер ауданы?",o:["S = π·r²","S = 2π·r","S = π·d"],a:"S = π·r²",d:1,sub:"Геометрия"},
   {q:"Шеңбер ұзындығы?",o:["L = 2π·r","L = π·r²","L = r²"],a:"L = 2π·r",d:1,sub:"Геометрия"},
-  {q:"Ромб: a = 8, α = 30°. S = ? (a²·sin α)",o:["32","16","64"],a:"32",d:3,sub:"8²·sin30° = 64·0,5"},
-  {q:"Тіктөртбұрыш: a = 6, b = 4. S = ?",o:["24","10","20"],a:"24",d:2,sub:"S = a·b"},
-  /* --- Тригонометрия --- */
   {q:"sin 30° = ?",o:["1/2","√3/2","1"],a:"1/2",d:1,sub:"Тригонометрия"},
   {q:"cos 60° = ?",o:["1/2","√2/2","0"],a:"1/2",d:1,sub:"Тригонометрия"},
   {q:"sin 90° = ?",o:["1","0","1/2"],a:"1",d:1,sub:"Тригонометрия"},
   {q:"tg 45° = ?",o:["1","0","√3"],a:"1",d:1,sub:"Тригонометрия"},
-  {q:"sin²α + cos²α = ?",o:["1","0","2"],a:"1",d:2,sub:"Негізгі тепе-теңдік"},
-  /* --- Алгебра: квадрат теңдеу --- */
   {q:"Дискриминант D = ?",o:["b² − 4ac","2a","−b / 2a"],a:"b² − 4ac",d:1,sub:"Алгебра"},
+  {q:"sin²α + cos²α = ?",o:["1","0","2"],a:"1",d:2,sub:"Негізгі тепе-теңдік"},
+  {q:"Тіктөртбұрыш: a=6, b=4. S = ?",o:["24","10","20"],a:"24",d:2,sub:"S = a·b"},
   {q:"Квадрат теңдеу түбірі x = ?",o:["(−b ± √D) / 2a","b / 2a","−c / b"],a:"(−b ± √D) / 2a",d:2,sub:"Алгебра"},
   {q:"Виет: x₁ · x₂ = ?",o:["c / a","−b / a","a / c"],a:"c / a",d:2,sub:"Виет теоремасы"},
   {q:"Виет: x₁ + x₂ = ?",o:["−b / a","c / a","b / a"],a:"−b / a",d:2,sub:"Виет теоремасы"},
-  {q:"x² − 5x + 6 = 0. Түбірлері?",o:["2 және 3","1 және 6","−2 және −3"],a:"2 және 3",d:3,sub:"Виет: қосынды 5, көбейтінді 6"},
-  {q:"x² − 7x + 12 = 0. Түбірлері?",o:["3 және 4","2 және 6","−3 және −4"],a:"3 және 4",d:3,sub:"Виет: қосынды 7, көбейтінді 12"},
-  {q:"Катеттері 3 және 4. Гипотенуза?",o:["5","7","6"],a:"5",d:3,sub:"Пифагор: √(3² + 4²)"}
+  {q:"Ромб: a=8, α=30°. S = ? (a²·sin α)",o:["32","16","64"],a:"32",d:3,sub:"8²·sin30° = 64·0,5"},
+  {q:"x² − 5x + 6 = 0. Түбірлері?",o:["2 және 3","1 және 6","−2 және −3"],a:"2 және 3",d:3,sub:"Виет"},
+  {q:"x² − 7x + 12 = 0. Түбірлері?",o:["3 және 4","2 және 6","−3 және −4"],a:"3 және 4",d:3,sub:"Виет"},
+  {q:"Катеттері 3 және 4. Гипотенуза?",o:["5","7","6"],a:"5",d:3,sub:"Пифагор"}
 ];
 var TIME_BY_D={1:15,2:24,3:34};
 
@@ -330,15 +305,15 @@ function buildBoard(){
 /* ===== STATE ===== */
 var nPlayers=1, players=[], turn=0, busy=false, tokens=[];
 var COL=['var(--cyan)','var(--red)'];
-function mkToken(idx){ var t=document.createElement('div'); t.className='token'; t.style.background=COL[idx]; t.innerHTML=(idx===0?'🐎':'🦄'); boardEl.appendChild(t); return t; }
+function mkToken(idx){ var t=document.createElement('div'); t.className='token'; t.style.background=COL[idx]; t.innerHTML=(idx===0?'🐎':'🦄'); return t; }
 function highlightCur(){ for(var i=0;i<cellEls.length;i++)cellEls[i].classList.remove('cur'); var pos=players[turn]?players[turn].pos:0; if(cellEls[pos])cellEls[pos].classList.add('cur'); }
 function placeToken(idx){
-  var pos=players[idx].pos, cell=cellEls[pos];
-  if(!cell)return;
-  var bx=boardEl.clientWidth, by=boardEl.clientHeight;
-  var cx=cell.offsetLeft+cell.offsetWidth/2, cy=cell.offsetTop+cell.offsetHeight/2;
-  var off=(nPlayers>1)?(idx===0?-7:7):0;
-  tokens[idx].style.left=(cx+off-15)+'px'; tokens[idx].style.top=(cy-15)+'px';
+  var p=players[idx], cell=cellEls[p.pos]; if(!cell)return;
+  var t=tokens[idx];
+  if(t.parentNode!==cell) cell.appendChild(t);
+  var xy=(nPlayers>1)?[[34,62],[66,62],[34,34],[66,34]][idx]:[50,55];
+  t.style.left=xy[0]+'%'; t.style.top=xy[1]+'%';
+  t.style.animation='none'; void t.offsetWidth; t.style.animation='tokpop .3s ease';
 }
 function toast(t){ var e=$('toast'); e.textContent=t; e.classList.add('show'); setTimeout(function(){e.classList.remove('show');},1500); }
 function updHud(){
