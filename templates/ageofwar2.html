@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Сөз Соғысы ⚔️ — YoungFuture</title>
+<style>
+:root{
+  --ink:#0b1437;--ink2:#161c47;--violet:#6d4bff;--violet2:#8a6bff;
+  --cyan:#21d4fd;--lime:#9be870;--gold:#ffce4a;--red:#ff4d6d;
+  --era1:#8B4513;--era2:#CD853F;--era3:#DAA520;--era4:#4682B4;--era5:#00CED1;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html,body{height:100%}
+body{
+  background:#070b1e;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+  display:flex;align-items:center;justify-content:center;color:#fff;overflow:hidden
+}
+#wrap{
+  position:relative;width:100%;max-width:480px;height:100svh;max-height:920px;
+  overflow:hidden;background:#0a1330;user-select:none;box-shadow:0 0 80px rgba(0,0,0,.6)
+}
+.hide{display:none!important}
+
+/* ===== MUTE ===== */
+.mutebtn{
+  position:absolute;top:10px;left:10px;z-index:30;width:38px;height:38px;
+  border-radius:11px;border:1px solid rgba(255,255,255,.18);
+  background:rgba(11,19,48,.7);color:#fff;font-size:17px;cursor:pointer
+}
+
+/* ===== OVERLAYS ===== */
+.overlay{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:22px;z-index:25;
+  background:radial-gradient(circle at 50% 0%,#20296b 0%,#0b1437 60%,#070b1e 100%);
+  overflow-y:auto
+}
+.brand{display:flex;align-items:center;gap:9px;margin-bottom:10px;opacity:.85}
+.logo{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--violet),var(--cyan));display:flex;align-items:center;justify-content:center}
+.logo svg{width:18px;height:18px}
+.brand b{font-size:14px;font-weight:800}.brand b span{color:var(--cyan)}
+
+h1{font-size:32px;font-weight:900;letter-spacing:-.5px;line-height:1.05;margin:4px 0;text-shadow:0 4px 24px rgba(109,75,255,.5)}
+h1 em{font-style:normal;color:var(--gold)}
+.tagline{font-size:15px;font-weight:800;color:var(--cyan);margin-bottom:10px}
+.sub{font-size:14px;color:#c7cdf0;line-height:1.5;max-width:340px;margin-bottom:4px}
+.how{
+  font-size:13px;color:#dfe3f7;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+  border-radius:14px;padding:14px;margin:12px 0 4px;max-width:360px;line-height:1.7;text-align:left
+}
+.btn{border:none;cursor:pointer;font-family:inherit;font-weight:900;color:var(--ink);background:linear-gradient(135deg,var(--lime),#d6ff8a);border-radius:14px;box-shadow:0 10px 24px rgba(155,232,112,.3)}
+.btn.big{font-size:18px;padding:16px 32px;margin-top:12px}
+.btn.alt{background:linear-gradient(135deg,var(--violet),var(--violet2));color:#fff;font-size:14px;padding:11px 18px;box-shadow:0 10px 24px rgba(109,75,255,.35)}
+.btn.ghost{background:rgba(255,255,255,.08);color:#fff;font-size:13px;padding:10px 16px;box-shadow:none;border:1px solid rgba(255,255,255,.16)}
+.row2{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap;justify-content:center}
+
+/* ===== DIFFICULTY ===== */
+.difficultyRow{display:flex;gap:10px;margin:14px 0;flex-wrap:wrap;justify-content:center}
+.diffBtn{
+  background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.18);border-radius:14px;
+  padding:10px 14px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;
+  display:flex;flex-direction:column;align-items:center;gap:2px;min-width:90px
+}
+.diffBtn .diffLabel{font-size:10px;font-weight:600;opacity:.7}
+.diffBtn.on{background:linear-gradient(135deg,var(--violet),var(--violet2));border-color:var(--violet2);box-shadow:0 6px 18px rgba(109,75,255,.35)}
+.diffBtn.on .diffLabel{opacity:1;color:#fff}
+
+/* ===== GAME SCREEN ===== */
+#game{position:absolute;inset:0;display:flex;flex-direction:column;z-index:5}
+.warhud{padding:52px 12px 6px;display:flex;flex-direction:column;gap:6px}
+.eraRow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.eraDot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.22)}
+.eraDot.on{background:var(--gold)}
+.eraName{font-size:13px;font-weight:800;color:var(--gold);letter-spacing:.5px}
+.barsRow{display:flex;align-items:center;gap:8px}
+.hpWrap{flex:1}
+.hpLabel{font-size:10.5px;color:#9aa3d0;font-weight:800;display:flex;justify-content:space-between;margin-bottom:2px}
+.hpBar{height:9px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden}
+.hpFill{height:100%;border-radius:5px;transition:width .25s ease}
+.hpFill.p{background:linear-gradient(90deg,var(--lime),#d6ff8a)}
+.hpFill.e{background:linear-gradient(90deg,var(--red),#ff8aa0)}
+.energyChip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:800;color:var(--cyan);white-space:nowrap}
+
+.field{position:relative;margin:4px 10px;flex:1;min-height:0;border-radius:16px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.fieldGround{position:absolute;left:0;right:0;bottom:0;height:22%}
+.baseIcon{position:absolute;bottom:6%;width:15%;max-width:70px;transform:translateX(-50%)}
+.baseIcon.enemy{transform:translateX(-50%) scaleX(-1)}
+.unit{position:absolute;bottom:6%;transform:translate(-50%,0);text-align:center;z-index:10}
+.unit .body{display:block;font-size:28px;line-height:1}
+.unit.enemy .body{transform:scaleX(-1)}
+.unitHp{width:100%;height:4px;background:rgba(0,0,0,.4);border-radius:2px;overflow:hidden;margin-bottom:2px}
+.unitHp i{display:block;height:100%;background:var(--lime)}
+.unit.enemy .unitHp i{background:var(--red)}
+.field.shaking{animation:fShake .35s ease}
+@keyframes fShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+
+.eraFlash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:20}
+.eraFlash.go{animation:flashPulse 1.6s ease}
+@keyframes flashPulse{0%{opacity:0}12%{opacity:.9}30%{opacity:0}45%{opacity:.5}100%{opacity:0}}
+.eraCard{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%) scale(.6);z-index:21;text-align:center;opacity:0;pointer-events:none}
+.eraCard.go{animation:eraCardPop 1.6s ease}
+@keyframes eraCardPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}35%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+.eraCard b{display:block;font-size:22px;font-weight:900;color:var(--gold);text-shadow:0 4px 20px rgba(0,0,0,.6)}
+.eraCard span{font-size:13px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+
+.controls{padding:8px 10px 12px;display:flex;flex-direction:column;gap:8px}
+.unitBtns{display:flex;gap:7px}
+.ubtn{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:13px;padding:7px 4px;color:#fff;text-align:center;cursor:pointer;transition:all .15s}
+.ubtn .uicon{font-size:28px;display:block;margin:0 auto}
+.ubtn .uname{font-size:10px;font-weight:800;margin-top:2px;line-height:1.15}
+.ubtn .ucost{font-size:11px;font-weight:900;color:var(--gold)}
+.ubtn.disabled{opacity:.4}
+.ubtn:active{transform:scale(.95)}
+.specialRow{display:flex;align-items:center;gap:8px}
+.sbtn{flex:1;background:linear-gradient(135deg,var(--violet),var(--violet2));border:none;border-radius:13px;padding:9px 10px;color:#fff;font-weight:800;font-size:12.5px;cursor:pointer;position:relative;overflow:hidden}
+.sbtn.disabled{opacity:.45}
+.sbtn .cd{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900}
+
+/* ===== UPGRADE PANEL ===== */
+.upgradePanel{position:absolute;top:56px;right:8px;z-index:20;display:flex;flex-direction:column;gap:6px}
+.upgBtn{
+  width:46px;height:46px;border-radius:12px;background:rgba(11,19,48,.9);
+  border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;position:relative;transition:all .15s
+}
+.upgBtn:active{transform:scale(.9)}
+.upgBtn .upgLvl{position:absolute;bottom:-3px;right:-3px;background:var(--gold);color:var(--ink);font-size:9px;font-weight:900;padding:1px 5px;border-radius:5px}
+.upgBtn.max{opacity:.5;border-color:rgba(255,255,255,.1)}
+.upgCost{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;color:var(--cyan);white-space:nowrap}
+
+/* ===== LIVE RAIN ===== */
+.liveRain{position:absolute;inset:0;pointer-events:none;z-index:15;overflow:hidden}
+.liveRainItem{
+  position:absolute;font-size:30px;font-weight:900;cursor:pointer;pointer-events:auto;
+  animation:liveRainFall linear forwards;line-height:1;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.7));color:#fff;
+  text-stroke:1px rgba(0,0,0,.8);-webkit-text-stroke:1px rgba(0,0,0,.8)
+}
+.liveRainItem.caught{opacity:.3;transform:scale(.8);pointer-events:none}
+@keyframes liveRainFall{0%{transform:translateY(-50px)}100%{transform:translateY(calc(100% + 50px))}}
+
+/* ===== QUIZ ===== */
+.quizOverlay{position:absolute;inset:0;z-index:22;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(7,11,30,.9);backdrop-filter:blur(4px)}
+.quizCard{background:linear-gradient(135deg,var(--ink2),#28306e);border:1px solid #3a4488;border-radius:18px;padding:18px;max-width:360px;width:100%;text-align:center}
+.quizTag{font-size:11px;letter-spacing:1px;color:var(--gold);font-weight:800;margin-bottom:6px}
+.quizQ{font-size:16px;font-weight:800;margin-bottom:14px;line-height:1.4}
+.quizOpts{display:flex;flex-direction:column;gap:8px}
+.qopt{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
+.qopt:active{transform:scale(.98)}
+.qopt.correct{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+.qopt.wrong{background:var(--red);color:#fff;border-color:var(--red)}
+.qTimer{height:5px;border-radius:3px;background:rgba(255,255,255,.14);margin-top:12px;overflow:hidden}
+.qTimer i{display:block;height:100%;background:var(--cyan);width:100%}
+
+/* ===== FX ===== */
+#fx{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:15}
+.fx-text{position:absolute;font-weight:900;font-size:15px;color:var(--gold);text-shadow:0 3px 10px rgba(0,0,0,.5);animation:fxRise 1s ease-out forwards;white-space:nowrap;z-index:16}
+@keyframes fxRise{0%{transform:translate(-50%,0);opacity:1}100%{transform:translate(-50%,-42px);opacity:0}}
+
+/* ===== END SCREEN ===== */
+.score-big{font-size:36px;font-weight:900;color:var(--gold);margin:2px 0;text-shadow:0 4px 20px rgba(255,206,74,.4)}
+.ranktitle{font-size:15px;font-weight:800;color:var(--cyan);margin-bottom:6px}
+.summary{font-size:13px;color:#c7cdf0;margin-bottom:8px}
+.cta{margin-top:10px;background:linear-gradient(135deg,var(--ink2),#28306e);border:1px solid #3a4488;border-radius:16px;padding:14px 16px;max-width:340px}
+.cta b{font-size:14px}.cta p{font-size:12.5px;color:#c7cdf0;margin-top:5px;line-height:1.5}
+.cta .num{display:inline-block;margin-top:9px;background:var(--lime);color:var(--ink);font-weight:800;font-size:13.5px;padding:8px 13px;border-radius:10px}
+
+/* ===== ANIMATIONS ===== */
+.unit .anim{display:block;animation:idleBob 1s ease-in-out infinite;transform-origin:50% 100%}
+.unit.walking .anim{animation:walkBob .45s ease-in-out infinite}
+.unit.fighting .anim{animation:idleBob .5s ease-in-out infinite}
+.unit.swing .anim{animation:swingHit .22s ease}
+.unit.hurtFlash .anim{animation:hurtFlashAnim .28s ease}
+.unit.spawnIn{animation:spawnPop .32s cubic-bezier(.34,1.56,.64,1)}
+@keyframes idleBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes walkBob{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-3px) rotate(-3deg)}75%{transform:translateY(-3px) rotate(3deg)}}
+@keyframes swingHit{0%{transform:scale(1) rotate(0)}35%{transform:scale(1.16,.86) rotate(-9deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes hurtFlashAnim{0%{filter:brightness(2.4) saturate(.3)}100%{filter:brightness(1) saturate(1)}}
+@keyframes spawnPop{0%{transform:translateY(6px) scale(.25);opacity:0}55%{transform:translateY(-3px) scale(1.14);opacity:1}100%{transform:translateY(0) scale(1)}}
+.baseIcon .banim{display:block;animation:baseIdle 2.6s ease-in-out infinite}
+.baseIcon.hitFlash .banim{animation:baseHitAnim .32s ease}
+@keyframes baseIdle{0%,100%{filter:brightness(1)}50%{filter:brightness(1.07)}}
+@keyframes baseHitAnim{0%{filter:brightness(2.2) saturate(.2)}30%{transform:translateX(-3px)}60%{transform:translateX(2px)}100%{filter:brightness(1) saturate(1);transform:translateX(0)}}
+
+/* ===== RESPONSIVE ===== */
+@media (orientation: landscape) and (min-width: 768px){
+  #wrap{max-width:900px;max-height:520px;border-radius:16px}
+  .baseIcon{width:10%!important}
+  .unitBtns{flex-direction:row}
+  .upgradePanel{top:60px}
+}
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <button class="mutebtn" id="mute">🔊</button>
+
+  <!-- ===== MENU ===== -->
+  <div class="overlay" id="menu">
+    <div class="brand"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Young<span>Future</span></b></div>
+    <h1>Сөз <em>Соғысы</em> ⚔️</h1>
+    <div class="tagline">Дұрыс жауап — сенің қаруың 🔋</div>
+    <div class="sub">Базаңды қорға, әскер жаса, ағылшын сөздерін жина — дәуірден дәуірге өрле!</div>
+
+    <div class="difficultyRow" id="diffRow">
+      <button class="diffBtn on" data-d="easy">🌱 Оңай<span class="diffLabel">Жаңа ойыншы</span></button>
+      <button class="diffBtn" data-d="normal">⚔️ Орташа<span class="diffLabel">Тәжірибелі</span></button>
+      <button class="diffBtn" data-d="hard">🔥 Қиын<span class="diffLabel">Шынықтыру</span></button>
+    </div>
+
+    <div class="how">
+      ⚡ Дұрыс жауап = энергия. Энергияға әскер сатып ал.<br>
+      🪖 Әскерің жауға қарай жүреді, соғысады — жау базасын құрт!<br>
+      🧠 Жеткілікті жауды жеңсең — келесі дәуірге өт.<br>
+      🌧️ Аспаннан сөздер құлайды — әріптерді жинап, бонус ал!<br>
+      ⬆️ Әскеріңді күшейт (шабуыл/қорғаныс/қашықтық).<br>
+      🏳️ Жау базасын 0-ге түсірсең — жеңіс сенікі!
+    </div>
+    <button class="btn big" id="startBtn">Соғысты бастау ▶</button>
+  </div>
+
+  <!-- ===== GAME ===== -->
+  <div id="game" class="hide">
+    <div class="warhud">
+      <div class="eraRow" id="eraDots">
+        <div class="eraDot on" id="eraDot0"></div><div class="eraDot" id="eraDot1"></div><div class="eraDot" id="eraDot2"></div><div class="eraDot" id="eraDot3"></div><div class="eraDot" id="eraDot4"></div>
+        <span class="eraName" id="eraName">—</span>
+      </div>
+      <div class="barsRow">
+        <div class="hpWrap"><div class="hpLabel"><span>СЕН</span><span id="pHpNum">100</span></div><div class="hpBar"><div class="hpFill p" id="pHpFill" style="width:100%"></div></div></div>
+        <div class="energyChip">⚡ <span id="energyNum">0</span></div>
+        <div class="hpWrap"><div class="hpLabel"><span id="eHpNum">100</span><span>ЖАУ</span></div><div class="hpBar"><div class="hpFill e" id="eHpFill" style="width:100%"></div></div></div>
+      </div>
+    </div>
+
+    <div class="field" id="field">
+      <div class="fieldGround" id="fieldGround"></div>
+      <div class="baseIcon" id="pBaseIcon" style="left:6%"></div>
+      <div class="baseIcon enemy" id="eBaseIcon" style="left:94%"></div>
+      <div class="liveRain" id="liveRain"></div>
+      <div class="eraFlash" id="eraFlash"></div>
+      <div class="eraCard" id="eraCard"><b id="eraCardName"></b><span id="eraCardSub"></span></div>
+    </div>
+
+    <div class="upgradePanel" id="upgradePanel">
+      <button class="upgBtn" id="upgDmg" title="Шабуыл күші">⚔️<span class="upgLvl" id="upgDmgLvl">0</span><span class="upgCost" id="upgDmgCost">40</span></button>
+      <button class="upgBtn" id="upgDef" title="Қорғаныс">🛡️<span class="upgLvl" id="upgDefLvl">0</span><span class="upgCost" id="upgDefCost">40</span></button>
+      <button class="upgBtn" id="upgRange" title="Атқыштық">🎯<span class="upgLvl" id="upgRangeLvl">0</span><span class="upgCost" id="upgRangeCost">40</span></button>
+    </div>
+
+    <div class="controls">
+      <div class="unitBtns" id="unitBtns"></div>
+      <div class="specialRow">
+        <button class="sbtn" id="specialBtn">✨ <span id="specialName">—</span> · <span id="specialCost">0</span>⚡<div class="cd hide" id="specialCd"></div></button>
+      </div>
+    </div>
+
+    <div class="quizOverlay hide" id="quizOverlay">
+      <div class="quizCard">
+        <div class="quizTag" id="quizTag">⚡ БОНУС СҰРАҚ</div>
+        <div class="quizQ" id="quizQ">—</div>
+        <div class="quizOpts" id="quizOpts"></div>
+        <div class="qTimer"><i id="qTimerBar"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GAME OVER ===== -->
+  <div class="overlay hide" id="over">
+    <div class="brand"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Young<span>Future</span></b></div>
+    <div style="font-size:13px;letter-spacing:1px;color:#9aa3d0;font-weight:800" id="overTag">НӘТИЖЕ</div>
+    <div class="score-big" id="overTitle">—</div>
+    <div class="ranktitle" id="rankTitle"></div>
+    <div class="summary" id="summaryText"></div>
+    <div class="cta">
+      <b>Көрдің бе? Ағылшынды осылай — стратегия арқылы да үйренуге болады 🎮</b>
+      <p>Біз YoungFuture курстарында дәл осылай оқытамыз. Нақты деңгейіңді тегін білгің келе ме?</p>
+      <span class="num">«СТАРТ» деп жаз 👉 [НӨМІР]</span>
+    </div>
+    <div class="row2">
+      <button class="btn big" id="again1">Қайта соғысу ▶</button>
+      <button class="btn alt" id="shareBtn">Бөлісу 📤</button>
+      <button class="btn ghost" id="menu1">Мәзір</button>
+    </div>
+  </div>
+
+  <div id="fx"></div>
+</div>
+
+<script>
+/* ================================================================
+   СӨЗ СОҒЫСЫ ⚔️ — Mobile-first Age of War + English Learning
+   5 дәуір: Тас дәуірі → Сақтар → Алтын Орда → Қазақ хандығы → Болашақ
+   ================================================================ */
+
+/* ---------- AUDIO ENGINE (Web Audio API) ---------- */
+var AudioCtx = null;
+function ensureAudio(){ if(!AudioCtx) AudioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+function playTone(freq, type, duration, vol){
+  ensureAudio(); if(window.__muted) return;
+  var o=AudioCtx.createOscillator(), g=AudioCtx.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq, AudioCtx.currentTime);
+  g.gain.setValueAtTime(vol||0.1, AudioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, AudioCtx.currentTime+duration);
+  o.connect(g); g.connect(AudioCtx.destination); o.start(); o.stop(AudioCtx.currentTime+duration);
+}
+function sfx(name){
+  if(window.__muted) return;
+  ensureAudio();
+  var now = AudioCtx.currentTime;
+  if(name==='click'){ playTone(800,'sine',0.08,0.08); }
+  else if(name==='spawn'){ playTone(400,'square',0.1,0.05); playTone(600,'square',0.1,0.05); }
+  else if(name==='shoot'){ playTone(1200,'sawtooth',0.08,0.03); }
+  else if(name==='hit'){ playTone(150,'square',0.1,0.08); }
+  else if(name==='death'){ playTone(200,'sawtooth',0.25,0.06); playTone(100,'sawtooth',0.25,0.06); }
+  else if(name==='special'){ playTone(600,'sine',0.3,0.1); playTone(900,'sine',0.3,0.1); }
+  else if(name==='energy'){ playTone(880,'sine',0.15,0.08); playTone(1100,'sine',0.15,0.08); }
+  else if(name==='upgrade'){ playTone(523,'sine',0.1,0.08); playTone(659,'sine',0.1,0.08); playTone(784,'sine',0.15,0.08); }
+  else if(name==='era'){ playTone(440,'sine',0.4,0.1); playTone(554,'sine',0.4,0.1); playTone(659,'sine',0.5,0.1); }
+  else if(name==='win'){ [523,659,784,1047].forEach(function(f,i){ playTone(f,'sine',0.3,0.08); }); }
+  else if(name==='lose'){ [400,350,300,200].forEach(function(f,i){ playTone(f,'sawtooth',0.3,0.06); }); }
+  else if(name==='rain'){ playTone(2000,'sine',0.05,0.03); }
+}
+
+/* ---------- GAME DATA ---------- */
+var DIFFICULTY = 'normal';
+var UPGRADES = {dmg:0, def:0, range:0};
+var E_UPGRADES = {dmg:0, def:0, range:0};
+var UPGRADE_COSTS = [40,80,150,250,400];
+var MAX_UPG = 5;
+
+function getDiffMult(){
+  if(DIFFICULTY==='easy') return {eEnergy:0.6, eBuild:1.4, eHp:0.75, pEnergy:1.3, eDmg:0.8};
+  if(DIFFICULTY==='hard') return {eEnergy:1.7, eBuild:0.55, eHp:1.5, pEnergy:0.85, eDmg:1.25};
+  return {eEnergy:1.0, eBuild:1.0, eHp:1.0, pEnergy:1.0, eDmg:1.0};
+}
+
+var ERAS = [
+  {
+    name:'Тас дәуірі', sub:'Үңгір адамы vs Жабайы', icon:'🦣',
+    bg:'linear-gradient(180deg,#1a2a3a 0%,#2d4a3e 60%,#3e2723 100%)',
+    ground:'#5d4037',
+    baseP:'🏕️', baseE:'🦴',
+    turret:{name:'Тас лақтырғыш', cost:35, range:22, atk:3, hp:40, icon:'🪨'},
+    special:{name:'Мамонт шабуылы', cost:60, cd:12, aoe:true, baseDmg:18, icon:'🦣'},
+    units:[
+      {name:'Аңшы', cost:10, build:1.2, hp:35, atk:6, range:4, spd:22, icon:'🧍‍♂️'},
+      {name:'Тас лансер', cost:18, build:1.8, hp:55, atk:9, range:4.5, spd:18, icon:'🦴'},
+      {name:'Мамонтші', cost:30, build:2.8, hp:90, atk:14, range:5, spd:14, icon:'🦣'}
+    ],
+    words:[
+      {en:'hunt',kk:'аулау'},{en:'fire',kk:'от'},{en:'stone',kk:'тас'},{en:'cave',kk:'үңгір'},
+      {en:'spear',kk:'найза'},{en:'mammoth',kk:'мамонт'},{en:'wild',kk:'жабайы'},{en:'tribe',kk:'ру'}
+    ],
+    rain:['STONE','FIRE','HUNT','SPEAR','TRIBE','CAVES']
+  },
+  {
+    name:'Сақтар', sub:'Жеті атанның заманы', icon:'🏹',
+    bg:'linear-gradient(180deg,#2a1a3a 0%,#4a3a2e 60%,#5d4037 100%)',
+    ground:'#6d4c41',
+    baseP:'⛺', baseE:'🔥',
+    turret:{name:'Садақшы мұнара', cost:45, range:26, atk:5, hp:55, icon:'🏹'},
+    special:{name:'Атты шабуыл', cost:75, cd:14, aoe:true, baseDmg:24, icon:'🐎'},
+    units:[
+      {name:'Садақшы', cost:12, build:1.1, hp:30, atk:7, range:18, spd:20, icon:'🏹'},
+      {name:'Қылышбас', cost:20, build:1.6, hp:60, atk:10, range:4.5, spd:19, icon:'⚔️'},
+      {name:'Атты жауынгер', cost:35, build:2.4, hp:85, atk:13, range:5, spd:28, icon:'🐎'}
+    ],
+    words:[
+      {en:'arrow',kk:'жа'},{en:'horse',kk:'ат'},{en:'gold',kk:'алтын'},{en:'steppe',kk:'далалық'},
+      {en:'sword',kk:'қылыш'},{en:'armor',kk:'сайман'},{en:'eagle',kk:'беркіт'},{en:'nomad',kk:'көшпенді'}
+    ],
+    rain:['HORSE','ARROW','STEPPE','SWORD','EAGLE','NOMAD']
+  },
+  {
+    name:'Алтын Орда', sub:'Тарихтың алтын ғасыры', icon:'🛡️',
+    bg:'linear-gradient(180deg,#1a1a2e 0%,#3e2723 50%,#4e342e 100%)',
+    ground:'#5d4037',
+    baseP:'🏰', baseE:'⚔️',
+    turret:{name:'Баллиста', cost:55, range:28, atk:7, hp:70, icon:'🎯'},
+    special:{name:'Оқ ұшы', cost:90, cd:16, aoe:true, baseDmg:30, icon:'🔥'},
+    units:[
+      {name:'Садақшы лашкер', cost:14, build:1.0, hp:35, atk:8, range:20, spd:21, icon:'🏹'},
+      {name:'Сарбаз', cost:24, build:1.7, hp:75, atk:12, range:5, spd:17, icon:'🛡️'},
+      {name:'Тұлпаршы', cost:42, build:2.6, hp:110, atk:17, range:5.5, spd:30, icon:'🐴'}
+    ],
+    words:[
+      {en:'empire',kk:'империя'},{en:'khan',kk:'хан'},{en:'warrior',kk:'жауынгер'},{en:'shield',kk:'қалқан'},
+      {en:'castle',kk:'қамал'},{en:'iron',kk:'темір'},{en:'battle',kk:'шайқас'},{en:'victory',kk:'жеңіс'}
+    ],
+    rain:['KHAN','EMPIRE','SHIELD','BATTLE','KNIGHT','VICTORY']
+  },
+  {
+    name:'Қазақ хандығы', sub:'Қазақ елі — мықты ел!', icon:'☪️',
+    bg:'linear-gradient(180deg,#1a237e 0%,#283593 50%,#4e342e 100%)',
+    ground:'#5d4037',
+    baseP:'🎪', baseE:'🏴',
+    turret:{name:'Зеңбірек', cost:65, range:30, atk:9, hp:85, icon:'🔫'},
+    special:{name:'Жеті атан шабуылы', cost:110, cd:18, aoe:true, baseDmg:38, icon:'⚡'},
+    units:[
+      {name:'Садақшы', cost:15, build:0.9, hp:40, atk:9, range:22, spd:22, icon:'🏹'},
+      {name:'Батыр', cost:28, build:1.6, hp:90, atk:14, range:5, spd:19, icon:'🛡️'},
+      {name:'Дарқан', cost:48, build:2.5, hp:130, atk:20, range:6, spd:26, icon:'🐎'}
+    ],
+    words:[
+      {en:'freedom',kk:'бостандық'},{en:'unity',kk:'бірлік'},{en:'courage',kk:'батылдық'},{en:'wisdom',kk:'даналық'},
+      {en:'motherland',kk:'атамекен'},{en:'honor',kk:'намыс'},{en:'strength',kk:'күш'},{en:'legacy',kk:'мұра'}
+    ],
+    rain:['FREEDOM','UNITY','HONOR','WISDOM','LEGACY','COURAGE']
+  },
+  {
+    name:'Болашақ', sub:'2077: Роботтар дәуірі', icon:'🤖',
+    bg:'linear-gradient(180deg,#0d1b2a 0%,#1b263b 50%,#415a77 100%)',
+    ground:'#304050',
+    baseP:'🏙️', baseE:'👾',
+    turret:{name:'Лазер', cost:80, range:34, atk:12, hp:100, icon:'🔫'},
+    special:{name:'Ядролық соққы', cost:150, cd:22, aoe:true, baseDmg:50, icon:'☢️'},
+    units:[
+      {name:'Дрон', cost:18, build:0.7, hp:45, atk:11, range:24, spd:24, icon:'🛸'},
+      {name:'Киборг', cost:32, build:1.4, hp:100, atk:16, range:6, spd:21, icon:'🦾'},
+      {name:'Титан', cost:55, build:2.2, hp:160, atk:24, range:7, spd:18, icon:'🤖'}
+    ],
+    words:[
+      {en:'future',kk:'болашақ'},{en:'technology',kk:'технология'},{en:'robot',kk:'робот'},{en:'laser',kk:'лазер'},
+      {en:'cyber',kk:'кибер'},{en:'digital',kk:'цифрлық'},{en:'innovation',kk:'жаңашылдық'},{en:'galaxy',kk:'ғалам'}
+    ],
+    rain:['FUTURE','ROBOT','LASER','CYBER','DIGITAL','GALAXY']
+  }
+];
+
+/* ---------- STATE ---------- */
+var running=false, paused=false, gameEnded=false, eraIdx=0, era=null;
+var pBaseHp=100, eBaseHp=100, energy=0, aiEnergy=0;
+var units=[], turrets=[];
+var killsThisEra=0, totalKills=0, eraKillsNeeded=[5,7,9,11,999];
+var specialCdLeft=0, aiTimer=1, bonusTimerNext=10;
+var quizActive=false, quizMode='', quizQueue=[], quizCorrectCount=0;
+var lastFrame=0, rafId=0;
+var ATTACK_INTERVAL=1.0, ENERGY_CAP=150;
+
+/* ---------- LIVE RAIN ---------- */
+var liveRainActive=false, liveRainItems=[], liveRainWord=null, liveRainCollected=[];
+
+/* ---------- DOM ---------- */
+var menu=document.getElementById('menu'), gameEl=document.getElementById('game'), over=document.getElementById('over');
+var field=document.getElementById('field'), fieldGround=document.getElementById('fieldGround');
+var pBaseIcon=document.getElementById('pBaseIcon'), eBaseIcon=document.getElementById('eBaseIcon');
+var unitBtns=document.getElementById('unitBtns'), specialBtn=document.getElementById('specialBtn');
+var eraNameEl=document.getElementById('eraName'), eraCard=document.getElementById('eraCard');
+var eraCardName=document.getElementById('eraCardName'), eraCardSub=document.getElementById('eraCardSub');
+var eraFlash=document.getElementById('eraFlash');
+var pHpFill=document.getElementById('pHpFill'), eHpFill=document.getElementById('eHpFill');
+var pHpNum=document.getElementById('pHpNum'), eHpNum=document.getElementById('eHpNum');
+var energyNum=document.getElementById('energyNum'), specialCd=document.getElementById('specialCd');
+var specialName=document.getElementById('specialName'), specialCost=document.getElementById('specialCost');
+var quizOverlay=document.getElementById('quizOverlay'), quizTag=document.getElementById('quizTag');
+var quizQ=document.getElementById('quizQ'), quizOpts=document.getElementById('quizOpts');
+var qTimerBar=document.getElementById('qTimerBar');
+var fx=document.getElementById('fx');
+var liveRainEl=document.getElementById('liveRain');
+var upgradePanel=document.getElementById('upgradePanel');
+
+/* ---------- UTILS ---------- */
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function fmt(n){ return Math.floor(n).toString(); }
+
+function popText(xPct, text, color){
+  var el=document.createElement('div'); el.className='fx-text'; el.textContent=text; el.style.left=xPct+'%'; el.style.color=color||'var(--gold)';
+  fx.appendChild(el); setTimeout(function(){el.remove()},1000);
+}
+
+function pulse(el, cls){
+  el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+  setTimeout(function(){el.classList.remove(cls);},600);
+}
+
+/* ---------- UPGRADES ---------- */
+function getUpgradeCost(type){ return UPGRADE_COSTS[UPGRADES[type]] || 9999; }
+
+function tryUpgrade(type){
+  var lvl = UPGRADES[type];
+  if(lvl >= MAX_UPG) return;
+  var cost = UPGRADE_COSTS[lvl];
+  if(energy >= cost){
+    energy -= cost;
+    UPGRADES[type]++;
+    applyUpgrades();
+    updateHud();
+    sfx('upgrade');
+    popText(50, type==='dmg'?'⚔️ +1':type==='def'?'🛡️ +1':'🎯 +1', 'var(--cyan)');
+    updateUpgradeUI();
+  }
+}
+
+function applyUpgrades(){
+  units.forEach(function(u){
+    if(u.team==='p'){
+      u.atkMult = 1 + UPGRADES.dmg*0.15;
+      u.defMult = 1 + UPGRADES.def*0.12;
+      u.rangeMult = 1 + UPGRADES.range*0.10;
+    }
+  });
+}
+
+function updateUpgradeUI(){
+  ['dmg','def','range'].forEach(function(t){
+    var lvl = UPGRADES[t];
+    document.getElementById('upg'+t.charAt(0).toUpperCase()+t.slice(1)+'Lvl').textContent = lvl;
+    var costEl = document.getElementById('upg'+t.charAt(0).toUpperCase()+t.slice(1)+'Cost');
+    var btn = document.getElementById('upg'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(lvl >= MAX_UPG){ costEl.textContent='MAX'; btn.classList.add('max'); }
+    else { costEl.textContent = UPGRADE_COSTS[lvl]; btn.classList.remove('max'); }
+  });
+}
+
+/* ---------- LIVE RAIN ---------- */
+function startLiveRain(){
+  if(liveRainActive) return;
+  liveRainActive = true;
+  var pool = era.rain || [];
+  if(pool.length < 2) return;
+  liveRainWord = pick(pool);
+  liveRainCollected = [];
+  var letters = liveRainWord.split('');
+  liveRainEl.innerHTML = '';
+  liveRainItems = [];
+
+  letters.forEach(function(ch, i){
+    var el = document.createElement('div');
+    el.className = 'liveRainItem';
+    el.textContent = ch;
+    el.style.left = (12 + Math.random()*76) + '%';
+    el.style.animationDuration = (3.5 + Math.random()*3) + 's';
+    el.style.animationDelay = (i * 0.6) + 's';
+    el.dataset.letter = ch;
+    el.dataset.idx = i;
+    el.onclick = function(e){ catchRainLetter(el, ch, i); e.stopPropagation(); };
+    liveRainEl.appendChild(el);
+    liveRainItems.push(el);
+  });
+  setTimeout(function(){ endLiveRain(false); }, 10000);
+}
+
+function catchRainLetter(el, letter, idx){
+  if(!liveRainActive) return;
+  if(liveRainCollected.includes(idx)) return;
+  var word = liveRainWord;
+  var nextIdx = liveRainCollected.length;
+  if(word[nextIdx] === letter){
+    liveRainCollected.push(idx);
+    el.classList.add('caught');
+    sfx('rain');
+    popText(50, '+'+letter, 'var(--lime)');
+    if(liveRainCollected.length === word.length){
+      endLiveRain(true);
+    }
+  } else {
+    liveRainCollected = [];
+    liveRainItems.forEach(function(item){ item.classList.remove('caught'); });
+    popText(50, 'Қате!', 'var(--red)');
+    field.classList.add('shaking');
+    setTimeout(function(){ field.classList.remove('shaking'); }, 350);
+  }
+}
+
+function endLiveRain(success){
+  liveRainActive = false;
+  if(success){
+    var bonus = 20 + eraIdx*8;
+    energy += bonus;
+    sfx('energy');
+    popText(50, '+'+bonus+'⚡', 'var(--gold)');
+    // Bonus unit
+    if(Math.random() > 0.4){
+      trySpawn(0, 'p');
+      popText(20, 'Тегін '+era.units[0].name+'!', 'var(--cyan)');
+    }
+    updateHud();
+  }
+  setTimeout(function(){ liveRainEl.innerHTML=''; liveRainItems=[]; }, 500);
+}
+
+/* ---------- SPAWNING ---------- */
+function createUnitDiv(u){
+  var d=document.createElement('div'); d.className='unit spawnIn';
+  var b=document.createElement('span'); b.className='body anim'; b.textContent=u.icon; d.appendChild(b);
+  var hp=document.createElement('div'); hp.className='unitHp'; var hpi=document.createElement('i'); hp.appendChild(hpi); d.appendChild(hp);
+  u.el=d; u.hpFillEl=hpi;
+  field.appendChild(d);
+}
+
+function spawnUnit(typeIdx, team){
+  var template = era.units[typeIdx];
+  var mult = getDiffMult();
+  var isPlayer = team==='p';
+  var x = isPlayer ? 8 : 92;
+  var maxHp = template.hp * (isPlayer?1:mult.eHp);
+  var u = {
+    team:team, x:x, maxHp:maxHp, hp:maxHp,
+    atk:template.atk, range:template.range, spd:template.spd,
+    atkCd:0, state:'idle', el:null, hpFillEl:null,
+    atkMult:1, defMult:1, rangeMult:1,
+    icon:template.icon, typeIdx:typeIdx
+  };
+  if(isPlayer){
+    u.atkMult = 1 + UPGRADES.dmg*0.15;
+    u.defMult = 1 + UPGRADES.def*0.12;
+    u.rangeMult = 1 + UPGRADES.range*0.10;
+  } else {
+    u.atkMult = 1 + E_UPGRADES.dmg*0.15;
+    u.defMult = 1 + E_UPGRADES.def*0.12;
+    u.rangeMult = 1 + E_UPGRADES.range*0.10;
+  }
+  createUnitDiv(u);
+  units.push(u);
+  if(isPlayer) sfx('spawn');
+}
+
+function trySpawn(typeIdx, team){
+  var template = era.units[typeIdx];
+  var cost = template.cost;
+  if(team==='p'){
+    if(energy < cost) return false;
+    energy -= cost;
+  } else {
+    if(aiEnergy < cost) return false;
+    aiEnergy -= cost;
+  }
+  spawnUnit(typeIdx, team);
+  updateHud();
+  return true;
+}
+
+function buildTurret(team){
+  var template = era.turret;
+  var cost = template.cost;
+  if(team==='p'){
+    if(energy < cost) return;
+    energy -= cost;
+  } else {
+    if(aiEnergy < cost) return;
+    aiEnergy -= cost;
+  }
+  var isPlayer = team==='p';
+  var x = isPlayer ? 14 : 86;
+  var t = {
+    team:team, x:x, maxHp:template.hp*1.5, hp:template.hp*1.5,
+    atk:template.atk, range:template.range, atkCd:0,
+    el:null, hpFillEl:null, icon:template.icon
+  };
+  var d=document.createElement('div'); d.className='unit spawnIn';
+  var b=document.createElement('span'); b.className='body anim'; b.textContent=template.icon; d.appendChild(b);
+  var hp=document.createElement('div'); hp.className='unitHp'; var hpi=document.createElement('i'); hp.appendChild(hpi); d.appendChild(hp);
+  t.el=d; t.hpFillEl=hpi;
+  field.appendChild(d);
+  turrets.push(t);
+  if(isPlayer) sfx('spawn');
+  updateHud();
+}
+
+/* ---------- SETUP ---------- */
+function setupEra(idx, showAnim){
+  eraIdx=idx; era=ERAS[idx];
+  field.style.background = era.bg;
+  fieldGround.style.background = era.ground;
+  pBaseIcon.innerHTML = '<span class=\"banim\" style=\"font-size:42px\">'+era.baseP+'</span>';
+  eBaseIcon.innerHTML = '<span class=\"banim\" style=\"font-size:42px\">'+era.baseE+'</span>';
+  eraNameEl.textContent = era.icon + ' ' + era.name;
+
+  // dots
+  for(var i=0;i<5;i++) document.getElementById('eraDot'+i).classList.toggle('on', i<=idx);
+
+  // unit buttons
+  unitBtns.innerHTML = '';
+  era.units.forEach(function(u,i){
+    var b=document.createElement('div'); b.className='ubtn'; b.id='ubtn'+i;
+    b.innerHTML = '<span class=\"uicon\">'+u.icon+'</span><div class=\"uname\">'+u.name+'</div><div class=\"ucost\">'+u.cost+'⚡</div>';
+    b.addEventListener('pointerdown', function(ev){ ev.preventDefault(); trySpawn(i,'p'); });
+    unitBtns.appendChild(b);
+  });
+
+  specialName.textContent = era.special.name;
+  specialCost.textContent = era.special.cost;
+  updateHud();
+
+  if(showAnim){
+    eraCardName.textContent = era.icon + ' ' + era.name;
+    eraCardSub.textContent = era.sub;
+    eraCard.classList.remove('go'); void eraCard.offsetWidth; eraCard.classList.add('go');
+    eraFlash.classList.remove('go'); void eraFlash.offsetWidth; eraFlash.classList.add('go');
+    sfx('era');
+  }
+}
+
+/* ---------- QUIZ ---------- */
+function pickWord(pool){
+  var w = pick(pool);
+  var wrong = pool.filter(function(x){ return x.en !== w.en; });
+  var opts = [w.en];
+  while(opts.length < 4 && wrong.length){
+    var r = pick(wrong); wrong = wrong.filter(function(x){return x.en!==r.en;});
+    if(!opts.includes(r.en)) opts.push(r.en);
+  }
+  while(opts.length < 4) opts.push('???');
+  opts.sort(function(){return Math.random()-.5;});
+  return {q: w.kk + ' — ағылшынша?', correct: w.en, opts: opts};
+}
+
+function startQuiz(mode){
+  quizActive=true; paused=true; quizMode=mode; quizCorrectCount=0;
+  var n = mode==='era' ? 3 : 1;
+  quizQueue=[];
+  for(var i=0;i<n;i++) quizQueue.push(pickWord(era.words));
+  quizTag.textContent = mode==='era' ? '🧠 ДӘУІР СЫНАҒЫ ('+n+')' : '⚡ БОНУС СҰРАҚ';
+  quizOverlay.classList.remove('hide');
+  nextQuizQuestion();
+}
+
+var qCountdown=null, qTimeLeft=0;
+function nextQuizQuestion(){
+  if(!quizQueue.length){ finishQuiz(); return; }
+  var item=quizQueue.shift();
+  quizQ.textContent = item.q;
+  quizOpts.innerHTML = '';
+  item.opts.forEach(function(opt){
+    var b=document.createElement('div'); b.className='qopt'; b.textContent=opt;
+    b.addEventListener('pointerdown', function(ev){ ev.preventDefault(); answerQuiz(b, opt===item.correct); });
+    quizOpts.appendChild(b);
+  });
+  qTimeLeft = quizMode==='era' ? 8 : 5;
+  qTimerBar.style.transition='none'; qTimerBar.style.width='100%';
+  requestAnimationFrame(function(){ qTimerBar.style.transition='width '+qTimeLeft+'s linear'; qTimerBar.style.width='0%'; });
+  if(qCountdown) clearTimeout(qCountdown);
+  qCountdown=setTimeout(function(){ answerQuiz(null,false); }, qTimeLeft*1000);
+}
+
+function answerQuiz(btn, isCorrect){
+  if(qCountdown){ clearTimeout(qCountdown); qCountdown=null; }
+  Array.prototype.forEach.call(quizOpts.children, function(c){
+    c.style.pointerEvents='none';
+    if(c.textContent===quizQ.textContent.split('—')[0].trim()){ /* nothing */ }
+  });
+  if(isCorrect){
+    if(btn) btn.classList.add('correct');
+    quizCorrectCount++;
+    var gain = quizMode==='era' ? 25 : 15;
+    energy = Math.min(ENERGY_CAP, energy+gain);
+    sfx('energy');
+    popText(50, '+'+gain+'⚡', 'var(--lime)');
+  } else {
+    if(btn) btn.classList.add('wrong');
+    sfx('hit');
+    popText(50, 'Қате!', 'var(--red)');
+  }
+  updateHud();
+  setTimeout(nextQuizQuestion, 700);
+}
+
+function finishQuiz(){
+  quizOverlay.classList.add('hide'); quizActive=false; paused=false;
+  if(quizMode==='era'){
+    if(quizCorrectCount >= 2){
+      if(eraIdx < ERAS.length-1){
+        killsThisEra = 0;
+        // heal bases a bit
+        pBaseHp = Math.min(100, pBaseHp+15);
+        eBaseHp = Math.min(100, eBaseHp+10);
+        setupEra(eraIdx+1, true);
+      } else {
+        gameOver(true);
+      }
+    } else {
+      popText(50, '2/3 дұрыс жауап керек!', 'var(--red)');
+      bonusTimerNext = 5;
+    }
+  }
+}
+
+/* ---------- SPECIAL ---------- */
+function useSpecial(){
+  if(specialCdLeft>0 || energy<era.special.cost) return;
+  energy -= era.special.cost;
+  specialCdLeft = era.special.cd;
+  sfx('special');
+  popText(50, era.special.name+'!', 'var(--violet)');
+  // damage all enemy units
+  for(var i=units.length-1;i>=0;i--){
+    var u=units[i];
+    if(u.team==='e'){
+      var dmg = era.special.baseDmg * 0.6;
+      u.hp -= dmg;
+      if(u.hpFillEl) u.hpFillEl.style.width=Math.max(0,100*u.hp/u.maxHp)+'%';
+      pulse(u.el,'hurtFlash');
+      if(u.hp<=0){ removeUnit(u); sfx('death'); }
+    }
+  }
+  eBaseHp -= era.special.baseDmg;
+  pulse(eBaseIcon,'hitFlash');
+  popText(94, '💥 -'+era.special.baseDmg, 'var(--gold)');
+  updateHud(); checkEnd();
+}
+
+specialBtn.addEventListener('pointerdown', function(ev){ ev.preventDefault(); useSpecial(); });
+
+/* ---------- AI ---------- */
+function aiTickEnhanced(){
+  var m = getDiffMult();
+  aiEnergy = Math.min(ENERGY_CAP, aiEnergy + 3.2*dt*m.eEnergy);
+
+  // AI upgrades on hard
+  if(DIFFICULTY==='hard' && Math.random() < 0.008){
+    var types = ['dmg','def','range'];
+    var t = pick(types);
+    if(E_UPGRADES[t] < 3) E_UPGRADES[t]++;
+  }
+
+  // build turret
+  var myTurrets = turrets.filter(function(t){return t.team==='e';}).length;
+  if(myTurrets < 2 && aiEnergy >= era.turret.cost * 0.9 && Math.random() < (DIFFICULTY==='hard'?0.4:0.2)){
+    buildTurret('e');
+  }
+
+  // spawn units
+  var afford=[];
+  era.units.forEach(function(u,i){ if(u.cost<=aiEnergy) afford.push(i); });
+  if(!afford.length) return;
+
+  var pickIdx;
+  if(DIFFICULTY==='hard'){
+    afford.sort(function(a,b){return era.units[b].cost - era.units[a].cost;});
+    pickIdx = afford[0];
+    if(aiEnergy >= era.units[pickIdx].cost*1.6 && afford.length>1 && Math.random()<0.35) pickIdx = afford[1];
+  } else if(DIFFICULTY==='normal'){
+    pickIdx = afford[Math.floor(Math.random()*afford.length)];
+  } else {
+    pickIdx = afford[0];
+  }
+  trySpawn(pickIdx, 'e');
+}
+
+/* ---------- TICK / LOOP ---------- */
+var dt = 0;
+function tick(){
+  if(!running || paused || gameEnded) return;
+
+  var m = getDiffMult();
+  energy = Math.min(ENERGY_CAP, energy + 3.2*dt*m.pEnergy);
+  specialCdLeft = Math.max(0, specialCdLeft-dt);
+
+  // AI timer
+  aiTimer -= dt;
+  if(aiTimer <= 0){
+    aiTimer = (DIFFICULTY==='hard'?0.7: DIFFICULTY==='easy'?1.4 : 1.1) + Math.random()*0.5;
+    aiTickEnhanced();
+  }
+
+  // bonus quiz timer
+  bonusTimerNext -= dt;
+  if(bonusTimerNext<=0 && !quizActive && !liveRainActive){
+    var r = Math.random();
+    if(r < 0.35 && era.rain && era.rain.length >= 2){
+      bonusTimerNext = 10 + Math.random()*5;
+      startLiveRain();
+    } else {
+      bonusTimerNext = 8 + Math.random()*4;
+      startQuiz('bonus');
+    }
+  }
+
+  // live rain timer doesn't block quiz completely, but let's keep them separate
+  if(!liveRainActive && !quizActive && Math.random() < 0.0008){
+    startLiveRain();
+  }
+
+  // update units
+  for(var i=units.length-1;i>=0;i--){
+    var u=units[i]; if(!u) continue;
+    var dir = u.team==='p'?1:-1;
+
+    // find foe
+    var foe=null, foeDist=999;
+    for(var j=0;j<units.length;j++){
+      var v=units[j]; if(v.team===u.team) continue;
+      var d = (u.team==='p')?(v.x-u.x):(u.x-v.x);
+      if(d>=0 && d<foeDist){ foeDist=d; foe=v; }
+    }
+    // base as foe
+    var baseDist = u.team==='p' ? (94-u.x) : (u.x-6);
+    if(baseDist < foeDist){ foeDist=baseDist; foe={x:u.team==='p'?94:6, team:'base', el:u.team==='p'?eBaseIcon:pBaseIcon}; }
+
+    var effRange = u.range * u.rangeMult;
+    if(foe && foeDist <= effRange){
+      setUnitState(u,'fighting');
+      u.atkCd -= dt;
+      if(u.atkCd<=0){
+        u.atkCd += ATTACK_INTERVAL;
+        var dmg = u.atk * u.atkMult * ATTACK_INTERVAL;
+        if(foe.team==='base'){
+          if(u.team==='p') eBaseHp-=dmg; else pBaseHp-=dmg;
+          pulse(foe.el,'hitFlash');
+          popText(u.team==='p'?94:6, '-'+Math.floor(dmg), u.team==='p'?'var(--gold)':'var(--red)');
+          if(u.team==='p') sfx('hit');
+        } else {
+          var actualDmg = dmg / (foe.defMult || 1);
+          foe.hp -= actualDmg;
+          if(foe.hpFillEl) foe.hpFillEl.style.width=Math.max(0,100*foe.hp/foe.maxHp)+'%';
+          pulse(u.el,'swing'); pulse(foe.el,'hurtFlash');
+          if(u.team==='p') sfx('hit');
+          if(foe.hp<=0){
+            if(foe.team==='e'){ killsThisEra++; totalKills++; sfx('death'); }
+            removeUnit(foe);
+          }
+        }
+      }
+    } else {
+      setUnitState(u,'walking');
+      u.x += dir * u.spd * dt * 0.5;
+      u.x = clamp(u.x, 4, 96);
+    }
+    if(u.el) u.el.style.left = u.x+'%';
+  }
+
+  // turrets
+  for(var t=0;t<turrets.length;t++){
+    var tu=turrets[t];
+    tu.atkCd -= dt;
+    if(tu.atkCd<=0){
+      var tFoe=null, tDist=999;
+      for(var j=0;j<units.length;j++){
+        var v=units[j]; if(v.team===tu.team) continue;
+        var d = Math.abs(v.x - tu.x);
+        if(d < tDist && d <= tu.range){ tDist=d; tFoe=v; }
+      }
+      if(!tFoe){
+        var bDist = tu.team==='p' ? Math.abs(94-tu.x) : Math.abs(tu.x-6);
+        if(bDist <= tu.range) tFoe={team:'base', x:tu.team==='p'?94:6, el:tu.team==='p'?eBaseIcon:pBaseIcon, defMult:1};
+      }
+      if(tFoe){
+        tu.atkCd += 1.2;
+        var tdmg = tu.atk * ATTACK_INTERVAL;
+        if(tFoe.team==='base'){
+          if(tu.team==='p') eBaseHp-=tdmg; else pBaseHp-=tdmg;
+          pulse(tFoe.el,'hitFlash');
+        } else {
+          tFoe.hp -= tdmg / (tFoe.defMult||1);
+          if(tFoe.hpFillEl) tFoe.hpFillEl.style.width=Math.max(0,100*tFoe.hp/tFoe.maxHp)+'%';
+          if(tFoe.hp<=0){ if(tFoe.team==='e'){killsThisEra++;totalKills++;sfx('death');} removeUnit(tFoe); }
+        }
+        sfx('shoot');
+      }
+    }
+  }
+
+  // remove dead
+  for(var i=units.length-1;i>=0;i--){
+    if(units[i].hp<=0){ removeUnit(units[i]); }
+  }
+
+  updateHud();
+  checkEnd();
+  maybeTriggerEraQuiz();
+}
+
+function setUnitState(u, s){
+  if(u.state===s) return;
+  u.state=s;
+  if(!u.el) return;
+  u.el.classList.remove('idle','walking','fighting','swing','hurtFlash');
+  if(s==='walking') u.el.classList.add('walking');
+  else if(s==='fighting') u.el.classList.add('fighting');
+}
+
+function removeUnit(u){
+  if(u.el && u.el.parentNode) u.el.parentNode.removeChild(u.el);
+  units = units.filter(function(x){return x!==u;});
+}
+
+function maybeTriggerEraQuiz(){
+  if(killsThisEra >= eraKillsNeeded[eraIdx] && eraIdx < ERAS.length-1 && !quizActive){
+    startQuiz('era');
+  }
+}
+
+function checkEnd(){
+  pBaseHp = clamp(pBaseHp,0,100); eBaseHp = clamp(eBaseHp,0,100);
+  if(pBaseHp<=0) gameOver(false);
+  else if(eBaseHp<=0 && eraIdx===ERAS.length-1) gameOver(true);
+}
+
+function updateHud(){
+  pHpFill.style.width = pBaseHp+'%'; pHpNum.textContent = Math.floor(pBaseHp);
+  eHpFill.style.width = eBaseHp+'%'; eHpNum.textContent = Math.floor(eBaseHp);
+  energyNum.textContent = Math.floor(energy);
+  if(specialCdLeft>0){ specialCd.classList.remove('hide'); specialCd.textContent = specialCdLeft.toFixed(1)+'с'; specialBtn.classList.add('disabled'); }
+  else { specialCd.classList.add('hide'); specialBtn.classList.remove('disabled'); }
+  // unit button states
+  era.units.forEach(function(u,i){
+    var btn = document.getElementById('ubtn'+i);
+    if(btn) btn.classList.toggle('disabled', energy < u.cost);
+  });
+}
+
+function gameOver(win){
+  gameEnded=true; running=false;
+  if(rafId) cancelAnimationFrame(rafId);
+  sfx(win?'win':'lose');
+  over.classList.remove('hide');
+  document.getElementById('overTag').textContent = win?'ЖЕҢІС!':'ЖЕҢІЛДІК...';
+  document.getElementById('overTitle').textContent = win?'🏆 Сен жеңдің!':'💀 Базаң құлады';
+  var rank = win?'Аңызға айналған батыр!':'Қайта көріп, күшейт!';
+  if(totalKills<5) rank='Жаңа ойыншы';
+  else if(totalKills<15) rank='Тәжірибелі қолбасшы';
+  else if(totalKills<30) rank='Батыр';
+  document.getElementById('rankTitle').textContent = rank;
+  document.getElementById('summaryText').textContent = 'Жеңілген жау: '+totalKills+' | Дәуір: '+(eraIdx+1)+'/5 | Қиындық: '+(DIFFICULTY==='easy'?'Оңай':DIFFICULTY==='hard'?'Қиын':'Орташа');
+}
+
+/* ---------- LOOP ---------- */
+function loop(ts){
+  if(!running) return;
+  if(!lastFrame) lastFrame=ts;
+  dt = Math.min(0.05, (ts-lastFrame)/1000);
+  lastFrame=ts;
+  tick();
+  rafId = requestAnimationFrame(loop);
+}
+
+/* ---------- START / RESET ---------- */
+function startGame(){
+  running=true; paused=false; gameEnded=false; eraIdx=0; era=ERAS[0];
+  pBaseHp=100; eBaseHp=100; energy=0; aiEnergy=0;
+  units=[]; turrets=[]; killsThisEra=0; totalKills=0;
+  specialCdLeft=0; aiTimer=1; bonusTimerNext=10; lastFrame=0;
+  UPGRADES={dmg:0,def:0,range:0}; E_UPGRADES={dmg:0,def:0,range:0};
+  liveRainActive=false; liveRainItems=[]; liveRainWord=null; liveRainCollected=[];
+  quizActive=false; paused=false;
+  if(rafId) cancelAnimationFrame(rafId);
+  // clear field
+  var old = field.querySelectorAll('.unit'); old.forEach(function(el){el.remove();});
+  liveRainEl.innerHTML='';
+  menu.classList.add('hide'); over.classList.add('hide'); gameEl.classList.remove('hide');
+  setupEra(0, false);
+  updateUpgradeUI();
+  updateHud();
+  rafId = requestAnimationFrame(loop);
+}
+
+/* ---------- EVENT HANDLERS ---------- */
+document.getElementById('startBtn').addEventListener('pointerdown', function(ev){ ev.preventDefault(); ensureAudio(); startGame(); });
+
+document.getElementById('again1').addEventListener('pointerdown', function(ev){ ev.preventDefault(); startGame(); });
+document.getElementById('menu1').addEventListener('pointerdown', function(ev){ ev.preventDefault(); menu.classList.remove('hide'); gameEl.classList.add('hide'); over.classList.add('hide'); running=false; if(rafId) cancelAnimationFrame(rafId); });
+
+document.getElementById('shareBtn').addEventListener('pointerdown', function(ev){
+  ev.preventDefault();
+  var text = 'Сөз Соғысы ⚔️ — мен '+(totalKills)+' жауды жеңдім! Дәуір: '+(eraIdx+1)+'/5. Сен де қолданып көр!';
+  if(navigator.share){ navigator.share({title:'Сөз Соғысы',text:text}); }
+  else if(navigator.clipboard){ navigator.clipboard.writeText(text); alert('Нәтиже көшірілді!'); }
+  else { alert(text); }
+});
+
+document.getElementById('mute').addEventListener('pointerdown', function(ev){
+  ev.preventDefault(); window.__muted = !window.__muted; this.textContent = window.__muted?'🔇':'🔊';
+});
+
+// Difficulty
+document.querySelectorAll('.diffBtn').forEach(function(b){
+  b.addEventListener('pointerdown', function(ev){ ev.preventDefault();
+    document.querySelectorAll('.diffBtn').forEach(function(x){x.classList.remove('on');});
+    this.classList.add('on'); DIFFICULTY = this.dataset.d;
+  });
+});
+
+// Upgrades
+document.getElementById('upgDmg').addEventListener('pointerdown', function(ev){ ev.preventDefault(); tryUpgrade('dmg'); });
+document.getElementById('upgDef').addEventListener('pointerdown', function(ev){ ev.preventDefault(); tryUpgrade('def'); });
+document.getElementById('upgRange').addEventListener('pointerdown', function(ev){ ev.preventDefault(); tryUpgrade('range'); });
+
+// Prevent double-tap zoom
+document.addEventListener('dblclick', function(e){ e.preventDefault(); }, {passive:false});
+</script>
+</body>
+</html>
