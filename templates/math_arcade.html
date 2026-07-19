@@ -109,7 +109,7 @@
 <script>
 var YF_ACCOUNT=(function(){
   var KEY='yf_user_v5';
-  var GAME_NAME='math_arcade'; var ENDPOINT='ВСТАВ_APPS_SCRIPT_URL'; /* Google Sheets Apps Script (аккаунттар). Бос болса — тек құрылғыда сақталады. */
+  var GAME_NAME='math_arcade'; var ENDPOINT='https://script.google.com/macros/s/AKfycbxSGdD65Qzmr8LQhOClkc-mnwxSI1EpS2XSA4mtVp-KKN0EgDPxDj_rE11BVGF3xKQGug/exec'; /* Google Sheets Apps Script (аккаунттар). Бос болса — тек құрылғыда сақталады. */
   var user=null;
   function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
   function save(u){ try{ localStorage.setItem(KEY, JSON.stringify(u)); }catch(e){} }
