@@ -1,22 +1,23 @@
-<!-- ==========================================================================
-     1english.kz — Ағылшын ОЙЫН-ТЕСТ v2 (МЕКТЕП ВОРОНКАСЫ)
-     • Многоступенчатый адаптив (MST): роутинг → EASY/CORE/HARD → подтверждение
-     • Потолок B2 · НИКОГДА не показываем правильность (как Duolingo English Test)
-     • Дофамин: переменный XP, комбо, vibe-метр, сундуки, level-up, маскот, звук
-     • Тренды 2026 + юмор «заставили тестить летом» · уровень СКРЫТ от ученика
-     • Слоты ассетов: CONFIG.ASSETS (картинки/видео/маскот) — пусто => эмодзи-фоллбэк
-     • Мектеп: ?school=Мектеп%20№152
-     ⚙️ CONFIG.APPS_SCRIPT_URL — Web App сілтемесі
-     ========================================================================== -->
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0b1a33">
+<title>1english.kz — Тест (инъектируемый v3)</title>
+</head>
+<body>
 <div id="ev">
 <style>
   #ev{--navy:#0f2a55;--navy2:#1b4a8f;--crimson:#e0214c;--crimson2:#ff3d6e;--gold:#ffc23c;--lime:#27e0a0;
       --bg:#0b1a33;--card:#fff;--text:#0f2140;--muted:#6b7794;--line:#e3e9f3;--radius:22px;
       --shadow:0 18px 50px rgba(7,18,40,.45);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+  html,body{height:100%;margin:0;background:#0b1a33;-webkit-text-size-adjust:100%}
   #ev *{box-sizing:border-box;margin:0;padding:0}
-  #ev .wrap{max-width:720px;margin:0 auto;padding:16px;position:relative;z-index:1}
-  #ev{background:radial-gradient(1200px 600px at 50% -10%,#16315f,transparent),linear-gradient(180deg,#0b1a33,#0e2247);min-height:100%;padding:2px}
+  #ev .wrap{max-width:620px;margin:0 auto;padding:16px 16px 26px;position:relative;z-index:1;min-height:100svh;display:flex;flex-direction:column}
+  #ev{background:radial-gradient(1200px 600px at 50% -10%,#16315f,transparent),linear-gradient(180deg,#0b1a33,#0e2247);min-height:100svh;padding:2px}
   #ev .screen{display:none;animation:evf .4s ease} #ev .screen.active{display:block}
+  #ev #ev-landing.active{margin:auto 0;display:flex;flex-direction:column;justify-content:center}
   @keyframes evf{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
   @keyframes evpop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
   @keyframes evfly{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-70px) scale(1.3);opacity:0}}
@@ -268,100 +269,21 @@
     var bn=document.querySelector('#ev .brand b'); if(bn&&b.name)bn.innerHTML=b.name+'<span>'+(b.tld||'')+'</span>';
   })();
 
-  /* ===== БАНК (d: 1=A1,2=A2,3=B1,4=B2) ===== */
-  // routing: жеңілден B1-ге
-  var M1=[
+  /* ===== БАНК — БОТ ИНЪЕКТИТ СЮДА (жалғыз var WORDS). Линейный тест. ===== */
+  var WORDS=[
     {d:1,sk:'vocab',type:'mcq',big:'🍎',q:'Мынау ағылшынша?',o:['Apple','Orange','Banana','Grape'],c:0},
-    {d:1,sk:'grammar',type:'mcq',q:'I ___ a student.',o:['am','is','are','be'],c:0},
-    {d:1,sk:'vocab',type:'match',q:'Жұбын тап (қалай ойласаң):',pairs:[['Dog','Ит'],['Book','Кітап'],['Water','Су'],['Red','Қызыл']]},
-    {d:2,sk:'grammar',type:'mcq',q:'She ___ to school every day.',o:['go','goes','going','went'],c:1},
-    {d:2,sk:'spelling',type:'type',q:'«Қате / ошибка» ағылшынша жаз:',a:'mistake'},
-    {d:2,sk:'vocab',type:'mcq',img:'food',q:"«delicious» дегеніміз не?",o:['өте дәмді','ащы','суық','қатты'],c:0},
-    {d:3,sk:'grammar',type:'mcq',q:'Yesterday I ___ to the cinema.',o:['go','goes','went','gone'],c:2},
-    {d:2,sk:'grammar',type:'build',q:'Сөйлем құра:',words:['I','have','two','brothers'],a:'I have two brothers'},
-    {d:1,sk:'vocab',type:'mcq',img:'nature',q:'Which animal says «meow»?',o:['Cat','Dog','Cow','Horse'],c:0},
-    {d:2,sk:'grammar',type:'mcq',q:'There ___ many people at the party.',o:['was','were','is','be'],c:1},
-    {d:3,sk:'vocab',type:'mcq',img:'city',q:'«Excuse me, how do I ___ to the station?»',o:['get','go','make','do'],c:0},
-    {d:3,sk:'grammar',type:'mcq',q:'I have lived here ___ 2019.',o:['since','for','from','at'],c:0}
-  ];
-  var SPEED=[
-    {d:2,sk:'vocab',type:'mcq',speed:true,q:'Synonym of «happy»?',o:['glad','sad','angry','tired'],c:0},
-    {d:3,sk:'grammar',type:'mcq',speed:true,q:'Past of «buy»?',o:['buyed','bought','buded','buy'],c:1},
-    {d:3,sk:'grammar',type:'mcq',speed:true,q:'She is interested ___ music.',o:['in','on','at','to'],c:0},
-    {d:2,sk:'vocab',type:'mcq',speed:true,q:'Opposite of «expensive»?',o:['cheap','rich','cost','buy'],c:0}
-  ];
-  // EASY (A1-A2)
-  var M2E=[
-    {d:1,sk:'vocab',type:'mcq',img:'school',q:'«Pen» — бұл не?',o:['қалам','кітап','парта','тақта'],c:0},
-    {d:1,sk:'spelling',type:'type',q:'«Мектеп» ағылшынша жаз:',a:'school'},
-    {d:2,sk:'grammar',type:'mcq',q:'There ___ a book on the table.',o:['is','are','am','be'],c:0},
-    {d:1,sk:'vocab',type:'match',q:'Жұбын тап:',pairs:[['Cat','Мысық'],['Sun','Күн'],['Apple','Алма'],['House','Үй']]},
-    {d:2,sk:'spelling',type:'type',q:'Сөзді толық жаз:',display:'f r i e _ d',a:'friend'},
-    {d:2,sk:'grammar',type:'mcq',q:'He ___ football on Sundays.',o:['play','plays','playing','played'],c:1},
-    {d:2,sk:'vocab',type:'mcq',img:'family',q:'«My mother\'s son» — that is my ___.',o:['brother','sister','father','uncle'],c:0},
-    {d:1,sk:'vocab',type:'mcq',img:'city',q:'Where do you buy bread?',o:['shop','school','park','river'],c:0},
-    {d:2,sk:'grammar',type:'mcq',q:'___ is your name?',o:['What','Who','Where','How'],c:0},
-    {d:2,sk:'speaking',type:'speak_read',q:'Дауыстап оқы (микрофон):',text:'beautiful photograph'}
-  ];
-  // CORE (A2-B1)
-  var M2C=[
-    {d:2,sk:'grammar',type:'mcq',q:'An elephant is ___ than a cat.',o:['big','bigger','biggest','more big'],c:1},
-    {d:3,sk:'grammar',type:'mistake',q:'Қай сөйлем ҚАТЕ?',o:['She doesn\'t like tea','He don\'t play tennis','They are happy','I have a cat'],c:1},
-    {d:3,sk:'grammar',type:'build',q:'Сұрақ құра:',words:['where','do','you','live'],a:'where do you live'},
-    {d:3,sk:'grammar',type:'mcq',q:'If it rains tomorrow, we ___ at home.',o:['stay','stays','will stay','stayed'],c:2},
-    {d:2,sk:'listening',type:'type',audio:'She is reading a book in the library.',q:'Тыңда да, ЕКІНШІ сөзді жаз:',hint:'(she ___ …)',a:'is'},
-    {d:3,sk:'listening',type:'mcq',audio:'My brother works in a hospital. He is a doctor.',q:'Тыңда: ағасы кім?',o:['дәрігер','мұғалім','жүргізуші','аспаз'],c:0},
-    {d:3,sk:'vocab',type:'mcq',img:'travel',q:'«I am looking forward ___ the trip.»',o:['to','for','at','on'],c:0},
-    {d:3,sk:'grammar',type:'type',q:'Сөйлемді дұрыста: «He go to school.»',q2:'Дұрыс жаз',a:'He goes to school'},
-    {d:3,sk:'grammar',type:'mcq',q:'I have known her ___ we were children.',o:['since','for','during','while'],c:0},
-    {d:2,sk:'vocab',type:'mcq',img:'nature',q:'A baby dog is a ___.',o:['puppy','kitten','calf','foal'],c:0},
+    {d:1,sk:'vocab',en:'water',kk:'су',e:'💧'},
+    {d:2,sk:'grammar',type:'mcq',q:'She ___ to school every day.',o:['go','goes','going','went'],a:'goes'},
+    {d:2,sk:'vocab',type:'match',q:'Жұбын тап:',pairs:[['Dog','Ит'],['Book','Кітап'],['Sun','Күн'],['Red','Қызыл']]},
     {d:3,sk:'vocab',type:'multimatch',q:'Етістік пен аудармасын қос:',left:['buy','sell','borrow'],right:['сатып алу','сату','қарызға алу','беру','табу','жоғалту','айырбастау'],map:[0,1,2]},
-    {d:3,sk:'grammar',type:'cloze',q:'Бос орындарды толтыр:',passage:'Last weekend we ___ to the mountains and ___ a lot of photos.',blanks:[{o:['went','go','goes'],c:0},{o:['took','take','taked'],c:0}]},
-    {d:3,sk:'listening',type:'listen_dialog',q:'Диалогты тыңда: қыз кешке не істемек?',dialog:[{s:'A',t:'What are you doing this evening?'},{s:'B',t:'I am going to visit my grandmother.'}],o:['әжесіне барады','киноға барады','үйде қалады','жұмысқа барады'],c:0},
-    {d:2,sk:'speaking',type:'speak_repeat',q:'Айтып қайтала (микрофон):',text:'I would like a cup of coffee'}
+    {d:2,sk:'listening',type:'listen',audio:'My brother is a doctor.',q:'Тыңда: ағасы кім?',o:['дәрігер','мұғалім','аспаз'],a:'дәрігер'},
+    {d:3,sk:'grammar',type:'gap',q:'He ___ like coffee.',a:"doesn't",kk:'he → doesn\'t'},
+    {d:2,sk:'grammar',type:'order',a:'I have two brothers',q:'Сөйлем құра:'},
+    {d:3,sk:'grammar',type:'cloze',q:'Толтыр:',passage:'Last weekend we ___ to the mountains and ___ many photos.',blanks:[{o:['went','go','goes'],c:0},{o:['took','take','taked'],c:0}]},
+    {d:4,sk:'vocab',type:'categorize',q:'Дұрыс етістікке салы:',cats:['make','do','take'],items:[{w:'a decision',c:0},{w:'homework',c:1},{w:'a photo',c:2},{w:'a mistake',c:0}]},
+    {d:3,sk:'reading',passage:'Aisha is 15. Last summer she went to London for an English course. She loves animals.',type:'reading',q:'Where did Aisha go?',o:['London','Astana','Paris'],a:'London'}
   ];
-  // HARD (B1-B2)
-  var M2H=[
-    {d:3,sk:'grammar',type:'mistake',q:'Қай сөйлем ҚАТЕ?',o:['I have been to London','She has finished','He have a new car','We were late'],c:2},
-    {d:4,sk:'vocab',type:'mcq',q:'«It\'s raining cats and dogs» means:',o:['it is raining heavily','there are animals','it is sunny','it is cold'],c:0},
-    {d:4,sk:'grammar',type:'mcq',q:'I wish I ___ more time yesterday.',o:['had had','have','will have','have had'],c:0},
-    {d:4,sk:'vocab',type:'mcq',q:'Choose the collocation: «to ___ a decision».',o:['make','do','take','put'],c:0},
-    {d:4,sk:'wordform',type:'type',q:'Word formation: «He is very ___.» (CARE)',q2:'Дұрыс форманы жаз',a:'careful'},
-    {d:4,sk:'grammar',type:'mcq',q:'By next year, she ___ here for a decade.',o:['will have worked','works','worked','is working'],c:0},
-    {d:4,sk:'listening',type:'mcq',audio:'Although it was raining, they decided to go hiking in the mountains.',q:'Тыңда: олар не шешті?',o:['таулармен жорыққа шығу','үйде қалу','кино көру','ұйықтау'],c:0},
-    {d:4,sk:'grammar',type:'type',q:'Transform: «They built this house in 1990.» → «This house ___ in 1990.» (passive)',q2:'Аяқта',a:'was built'},
-    {d:4,sk:'grammar',type:'mcq',q:'Never before ___ such a beautiful sunset.',o:['have I seen','I have seen','I saw','did I saw'],c:0},
-    {d:4,sk:'grammar',type:'mcq',q:'She said that she ___ the report the day before.',o:['had finished','finished','has finished','finishes'],c:0},
-    {d:4,sk:'vocab',type:'mcq',q:'Phrasal verb: «I can\'t ___ with his behaviour any more.»',o:['put up','put on','put off','put down'],c:0},
-    {d:4,sk:'vocab',type:'mcq',q:'«to break the ice» means:',o:['to start a conversation','to feel cold','to win a game','to make a mistake'],c:0},
-    {d:4,sk:'grammar',type:'mcq',q:'If I ___ known earlier, I would have helped you.',o:['had','have','would have','did'],c:0},
-    {d:4,sk:'listening',type:'mcq',audio:'I would rather you didn\'t tell anyone about this just yet.',q:'Тыңда: спикер нені қалайды?',o:['ешкімге айтпауын','бәріне айтуын','тез кетуін','қайталауын'],c:0},
-    {d:4,sk:'vocab',type:'mcq',q:'Choose the best word: «The new policy had a profound ___ on the economy.»',o:['effect','affect','effort','offer'],c:0},
-    {d:4,sk:'grammar',type:'type',q:'Reported: «I am tired,» she said. → She said that she ___ tired.',q2:'Бір сөзбен аяқта',a:'was'},
-    {d:4,sk:'vocab',type:'categorize',q:'Дұрыс етістікке салы:',cats:['make','do','take'],items:[{w:'a decision',c:0},{w:'homework',c:1},{w:'a photo',c:2},{w:'a mistake',c:0},{w:'the dishes',c:1},{w:'a break',c:2}]},
-    {d:4,sk:'speaking',type:'speak_answer',q:'Сұраққа ағылшынша жауап бер (микрофон):',text:'What did you do last weekend?'}
-  ];
-  // CONFIRM (по ветке) — длинный reading + listening + печать
-  var P_READ="Maxat is a 14-year-old student from Shymkent. He has always been curious about how things work, so he spends his weekends building small robots from old parts. Last year he entered a national science competition and, although he didn't win, the judges praised his creativity. Now he dreams of studying engineering abroad, but he knows he must improve his English first.";
-  var M3E=[
-    {d:2,sk:'reading',passage:'Aisha is 15. She lives in Astana. Last summer she went to London for an English course. She loves animals.',type:'mcq',q:'Where did Aisha go last summer?',o:['London','Astana','Almaty','Paris'],c:0},
-    {d:2,sk:'vocab',type:'mcq',img:'sport',q:'«We ___ football every Sunday.»',o:['play','plays','playing','played'],c:0},
-    {d:2,sk:'vocab',type:'mcq',img:'travel',q:'You sleep in a ___ when you travel.',o:['hotel','school','hospital','kitchen'],c:0},
-    {d:2,sk:'spelling',type:'type',q:'«Әдемі / красивый» ағылшынша жаз:',a:'beautiful'}
-  ];
-  var M3C=[
-    {d:3,sk:'reading',passage:P_READ,type:'mcq',q:'Why didn\'t the judges give Maxat the first place but still praised him?',o:['They liked his creativity','He was too young','He cheated','He didn\'t finish'],c:0},
-    {d:3,sk:'reading',passage:P_READ,type:'mcq',q:'What must Maxat do to study abroad?',o:['Improve his English','Win the competition','Move to Astana','Build more robots'],c:0},
-    {d:3,sk:'reading',passage:P_READ,type:'mcq',q:'How does Maxat spend his weekends?',o:['Building small robots','Playing football','Sleeping','Travelling'],c:0},
-    {d:3,sk:'writing',type:'type',q:'Write a short answer: «What is your favourite hobby and why?» (1 sentence)',q2:'Ағылшынша 1 сөйлем',open:true}
-  ];
-  var M3H=[
-    {d:4,sk:'reading',passage:P_READ,type:'mcq',q:'Which statement is an INFERENCE (not directly stated)?',o:['Maxat is persistent and self-driven','Maxat lives in Shymkent','Maxat built robots','Maxat entered a competition'],c:0},
-    {d:4,sk:'listening',type:'type',audio:'Despite the difficulties, she managed to complete the project on time.',q:'Тыңда да, СОҢҒЫ үш сөзді жаз:',hint:'(… on ___ ___)',a:'on time'},
-    {d:4,sk:'reading',passage:P_READ,type:'mcq',q:'In the text, «praised» is closest in meaning to:',o:['admired','criticised','ignored','paid'],c:0},
-    {d:4,sk:'writing',type:'type',q:'Write 1-2 sentences: «Describe a challenge you overcame.»',q2:'Ағылшынша',open:true}
-  ];
-
+  var M1=WORDS,SPEED=[],M2E=[],M2C=[],M2H=[],M3E=[],M3C=[],M3H=[],P_READ='';
   /* ===== КҮЙ ===== */
   var lead={id:null,name:'',cls:'',phone:''};
   var seq=[],i=0,branchDone=false,branch='';
@@ -376,7 +298,7 @@
   function send(p){try{fetch(CONFIG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});}catch(e){}}
   function norm(s){return (s||'').toString().toLowerCase().replace(/[.,!?'’]/g,'').replace(/\s+/g,' ').trim();}
   function speak(t){if(!TTS||muted)return;try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.92;window.speechSynthesis.speak(u);}catch(e){}}
-  if(!TTS){[M1,SPEED,M2E,M2C,M2H,M3E,M3C,M3H].forEach(function(arr){for(var k=arr.length-1;k>=0;k--)if(arr[k].audio||arr[k].type==='listen_dialog')arr.splice(k,1);});}
+  if(!TTS){ for(var k=WORDS.length-1;k>=0;k--){ var w=WORDS[k]; if(w.audio||w.type==='listen'||w.type==='listen_type'||w.type==='listen_dialog') WORDS.splice(k,1); } }
 
   /* ===== ЗВУК (Web Audio, файлсыз) ===== */
   var AC=null;
@@ -420,8 +342,8 @@
   }
 
   /* ===== ОЙЫН ===== */
-  function startTest(){seq=M1.slice();i=0;branchDone=false;branch='';xp=0;combo=0;comboMax=0;vibe=0;answers=[];band={1:{c:0,t:0},2:{c:0,t:0},3:{c:0,t:0},4:{c:0,t:0}};show('test');render();}
-  function estTotal(){return branchDone?seq.length:(M1.length+SPEED.length+8);}
+  function startTest(){ seq=(Array.isArray(WORDS)&&WORDS.length)?WORDS.slice():[{d:1,sk:'vocab',type:'mcq',q:'Дайынсың ба?',o:['Иә','Жоқ'],c:0}]; i=0;branchDone=true;branch='';xp=0;combo=0;comboMax=0;vibe=0;answers=[];band={1:{c:0,t:0},2:{c:0,t:0},3:{c:0,t:0},4:{c:0,t:0}};show('test');render();}
+  function estTotal(){return seq.length;}
   function updHud(){$('h-xp').textContent=xp;$('h-combo').textContent=combo;$('h-prog').textContent=(i+1)+'/'+estTotal();$('h-bar').style.width=(i/estTotal()*100)+'%';$('h-vibe').style.width=vibe+'%';}
 
   function routeAfterM1(){
@@ -449,6 +371,9 @@
   function mascotEl(emo){var map={hype:'hype',think:'think',cool:'cool',dead:'dead',normal:'normal'};var key=map[emo]||'normal';var u=CONFIG.ASSETS.mascot[key];return u?'<img src="'+u+'" alt="">':EMO[key];}
 
   function maybeLevelUp(it,cb){
+    if(i>0 && i%7===0){ overlay('cool','🚀 KELESI DEŃGEÝ','Жарайсың! Жалғастырамыз 🔥',cb); return; }
+    return cb();
+    /* eslint-disable */
     var label = it.speed?'⚡ SPEED RAUND':(branchDone&&i===M1.length+SPEED.length?'🚀 KELESI DEŃGEÝ':'');
     // показываем level-up при входе в SPEED и в M2
     if(it.speed && (i===0 || !seq[i-1] || !seq[i-1].speed)){
@@ -460,8 +385,34 @@
     }
     cb();
   }
+  /* eslint-enable */
 
   var KEYS=['A','B','C','D'];
+  function normItem(it){
+    if(it._n) return it; it._n=1;
+    if(!it.type && it.en) it.type='vocab';
+    if(it.type==='fill'||it.type==='write') it.type='gap';
+    if(it.type==='assemble') it.type='order';
+    if(it.type==='listening') it.type='listen';
+    if(it.type==='vocab' || (it.en&&it.kk&&!it.q&&!it.o)){
+      var poolv=(typeof seq!=='undefined'?seq:WORDS).filter(function(x){return x&&x.en&&x.en!==it.en;}).map(function(x){return x.en;});
+      poolv.sort(function(){return Math.random()-0.5;}); var ov=[it.en]; for(var z=0;z<poolv.length&&ov.length<4;z++){ if(ov.indexOf(poolv[z])<0)ov.push(poolv[z]); }
+      var fb=['water','house','friend','city','apple']; for(var f=0;f<fb.length&&ov.length<3;f++){ if(ov.indexOf(fb[f])<0&&fb[f]!==it.en)ov.push(fb[f]); }
+      ov.sort(function(){return Math.random()-0.5;}); it.q=(it.e?it.e+'  ':'')+'«'+it.kk+'» — ағылшынша?'; it.o=ov; it.c=ov.indexOf(it.en); it.type='mcq';
+    }
+    if(it.type==='gap') it.type='type';                 // вписать → ввод
+    if(it.type==='order'){ it.type='build'; if(!it.words&&it.a) it.words=String(it.a).split(/\s+/); }
+    if(it.type==='listen_type') it.type='type';          // аудио + ввод
+    if(it.type==='listen') it.type='mcq';                // аудио + выбор
+    if(it.type==='reading') it.type='mcq';               // passage уже в шапке + выбор
+    // mcq/mistake: c из a
+    if((it.type==='mcq'||it.type==='mistake') && typeof it.c!=='number' && it.o && it.a!=null){
+      var ix=it.o.indexOf(it.a); it.c=(ix>=0?ix:0);
+    }
+    if(!it.d) it.d=2; if(!it.sk) it.sk='vocab';
+    return it;
+  }
+
   /* ===== СПИКИНГ: Web Speech API (on-device, без ключа/вебхука) ===== */
   var SR = window.SpeechRecognition||window.webkitSpeechRecognition||null;
   function speechScore(said,target){var a=norm(said).split(' ').filter(Boolean),b=norm(target).split(' ').filter(Boolean);if(!b.length)return said&&said.trim()?0.7:0;var hit=0,used={};b.forEach(function(w){for(var k=0;k<a.length;k++){if(!used[k]&&a[k]===w){used[k]=1;hit++;break;}}});return hit/b.length;}
@@ -492,12 +443,12 @@
   }
   function render(){
     locked=false;$('h-speed').classList.remove('on');if(speedT){clearInterval(speedT);speedT=null;}
-    if(!branchDone && i>=M1.length){routeAfterM1();}
     if(i>=seq.length){finish();return;}
     var it=seq[i];
     maybeLevelUp(it,function(){ draw(it); });
   }
   function draw(it){
+    it=normItem(it);
     updHud();var c=$('qcard'),h='';c.classList.remove('glitch');void c.offsetWidth;c.classList.add('glitch');
     var qm=it.speed?'⚡':(['hype','think','cool','dead','normal'][i%5]);
     h+='<span class="qtag'+(it.speed?' speed':'')+'">'+(it.speed?'SPEED ⚡':(BNAME[it.d].toUpperCase()+' · '+it.sk))+'</span>';
@@ -674,3 +625,5 @@
     SR_supported:!!SR, CONFIG:CONFIG };
 })();
 </script>
+</body>
+</html>
