@@ -1,0 +1,457 @@
+<!-- ==========================================================================
+     StudyLine — 1-КЕЗЕҢ (Stage 1): НИШ / БИЛ-КТЛ / РФМШ-ке тегін диагностика
+     Лендинг (ата-аналарға) → Лид-форма → Тест (Логика · Математика · Ағылшын)
+     → Сәттілік дөңгелегі (фортуна) → «БҰЛ ТЕК 1-КЕЗЕҢ» баннері
+     Позиция: «Нақты деңгей — нақты дайындық». Тыңдалым ЖОҚ. ~10–15 минут.
+     Tilda-ға "T123 / HTML код" блогымен қойылады.
+     --------------------------------------------------------------------------
+     РЕБРЕНДИНГ (2026-07-02): DARA ACADEMY → StudyLine. Структура, логика,
+     сұрақтар — өзгеріссіз. Өзгерген тек: атау, логотип-монограмма, футер.
+     ⚙️ CONFIG.APPS_SCRIPT_URL — ортақ backend (DARA-мен бірдей Web App, өзгертпедім).
+     ⚙️ STAGE2_URL — 2-кезең парақшасының сілтемесі — Tilda-да жаңа URL-ге ауыстыр!
+     ========================================================================== -->
+<div id="dapp">
+<style>
+  #dapp{
+    --navy:#141d33; --navy2:#22315a; --ink:#0b1730; --gold:#2e9e5b; --gold2:#43c07a;
+    --bg:#f5f6fa; --card:#ffffff; --text:#101a2e; --muted:#5d6885; --line:#e5e8f0;
+    --ok:#1f9d6b; --radius:20px; --shadow:0 18px 50px rgba(14,31,61,.14);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;
+  }
+  #dapp *{box-sizing:border-box;margin:0;padding:0}
+  #dapp .wrap{max-width:780px;margin:0 auto;padding:18px}
+  #dapp .screen{display:none;animation:dfade .45s ease} #dapp .screen.active{display:block}
+  @keyframes dfade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @keyframes dpop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+  @keyframes dfly{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-60px);opacity:0}}
+  @keyframes dshake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(4px)}50%{transform:translateX(-4px)}}
+  @keyframes dglow{0%,100%{box-shadow:0 0 0 0 rgba(46,158,91,.5)}50%{box-shadow:0 0 0 14px rgba(46,158,91,0)}}
+
+  /* brand */
+  #dapp .brand{display:flex;align-items:center;justify-content:center;gap:11px;margin-bottom:6px}
+  #dapp .brand .bmark{flex:0 0 auto;filter:drop-shadow(0 4px 10px rgba(14,31,61,.25))}
+  #dapp .brand .bword{text-align:left}
+  #dapp .brand .mono{font-size:30px;font-weight:800;letter-spacing:2.5px;color:var(--navy);line-height:1}
+  #dapp .brand .mono span{color:var(--gold)}
+  #dapp .brand small{display:block;letter-spacing:5px;font-size:11px;color:var(--gold);font-weight:700;margin-top:2px}
+
+  #dapp .hero{text-align:center;padding:42px 24px 34px;border-radius:var(--radius);
+    background:linear-gradient(150deg,#0c1b36 0%,#16294c 60%,#21386a 100%);background-color:#141d33;color:#fff;
+    box-shadow:var(--shadow);position:relative;overflow:hidden;border:1px solid #21386a}
+  #dapp .hero::after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(46,158,91,.4),transparent 70%);top:-80px;right:-50px}
+  #dapp .badge{display:inline-block;background:rgba(46,158,91,.16);border:1px solid rgba(46,158,91,.45);color:var(--gold2);padding:8px 16px;border-radius:999px;font-size:13px;font-weight:700;margin-bottom:16px}
+  #dapp .hero h1{font-size:31px;line-height:1.18;font-weight:800;margin-bottom:14px;position:relative;z-index:1}
+  #dapp .hero h1 em{font-style:normal;color:var(--gold2)}
+  #dapp .hero p{font-size:16px;opacity:.95;max-width:560px;margin:0 auto;position:relative;z-index:1}
+  #dapp .stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px;position:relative;z-index:1}
+  #dapp .stat{background:rgba(255,255,255,.08);border:1px solid rgba(46,158,91,.25);border-radius:14px;padding:12px 16px;min-width:120px}
+  #dapp .stat b{display:block;font-size:20px;color:var(--gold2)} #dapp .stat small{opacity:.85;font-size:12px}
+
+  /* 3 опоры */
+  #dapp .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+  #dapp .pillar{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 14px;text-align:center}
+  #dapp .pillar .ic{font-size:26px} #dapp .pillar b{display:block;color:var(--navy);font-size:15px;margin:6px 0 4px}
+  #dapp .pillar small{color:var(--muted);font-size:12.5px;line-height:1.45}
+  #dapp .feats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  #dapp .feat{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+  #dapp .feat .ic{flex:0 0 38px;height:38px;border-radius:11px;background:#e9f5ee;color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:19px}
+  #dapp .feat b{font-size:14.5px;display:block;margin-bottom:2px} #dapp .feat small{color:var(--muted);font-size:12.5px;line-height:1.4}
+
+  #dapp .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:17px;color:var(--navy);background:linear-gradient(135deg,var(--gold),var(--gold2));padding:17px 24px;border-radius:15px;box-shadow:0 12px 26px rgba(46,158,91,.34);transition:transform .15s,box-shadow .15s;margin-top:10px}
+  #dapp .btn:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(46,158,91,.45)}
+  #dapp .btn:active{transform:translateY(0)} #dapp .btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
+  #dapp .btn.dark{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;box-shadow:0 12px 26px rgba(14,31,61,.3)}
+  #dapp .btn.sm{width:auto;font-size:15px;padding:13px 26px;margin-top:0}
+
+  #dapp .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:30px 26px;margin-top:14px}
+  #dapp .field{margin-bottom:16px}
+  #dapp .field label{display:block;font-size:14px;font-weight:600;margin-bottom:7px;color:var(--navy)}
+  #dapp .field label .req{color:#c0392b}
+  #dapp .field input,#dapp .field select{width:100%;border:1.6px solid var(--line);border-radius:13px;padding:15px 16px;font-size:16px;font-family:inherit;color:var(--text);background:#fff;transition:border .15s,box-shadow .15s}
+  #dapp .field input:focus,#dapp .field select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(46,158,91,.16)}
+  #dapp .field .err{color:#c0392b;font-size:13px;margin-top:6px;display:none}
+  #dapp .field.invalid input,#dapp .field.invalid select{border-color:#c0392b} #dapp .field.invalid .err{display:block}
+  #dapp .privacy{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);justify-content:center;margin-top:10px}
+  #dapp .hint{font-size:13px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5}
+
+  /* HUD / тест */
+  #dapp .hud{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+  #dapp .pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:800;color:var(--navy);box-shadow:0 4px 12px rgba(14,31,61,.06)}
+  #dapp .pill.xp{color:#6c4cf1;background:#eef7f1;border-color:#c8e8d5}
+  #dapp .pill.streak{color:#b8472e;background:#fbeee9;border-color:#f3c9bb}
+  #dapp .progress{height:11px;border-radius:999px;background:#e2e7f1;overflow:hidden;margin:4px 0}
+  #dapp .progress i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--navy2),var(--gold));transition:width .4s ease}
+  #dapp .qcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 22px;margin-top:6px;position:relative}
+  #dapp .qtag{display:inline-block;font-size:12px;font-weight:800;color:var(--navy);background:#e9f5ee;border-radius:999px;padding:5px 12px;margin-bottom:14px}
+  #dapp .qbig{font-size:40px;text-align:center;letter-spacing:6px;margin:6px 0 14px}
+  #dapp .qtext{font-size:21px;font-weight:800;line-height:1.35;color:var(--navy);margin-bottom:6px}
+  #dapp .qsub{font-size:14px;color:var(--muted);margin-bottom:18px}
+  #dapp .opts{display:grid;gap:11px}
+  #dapp .opt{display:flex;align-items:center;gap:13px;border:2px solid var(--line);border-radius:14px;padding:15px 16px;font-size:17px;font-weight:600;cursor:pointer;background:#fff;transition:all .14s;text-align:left}
+  #dapp .opt:hover{border-color:var(--gold);background:#fffdf7}
+  #dapp .opt .key{flex:0 0 28px;height:28px;border-radius:8px;background:#e9f5ee;color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
+  #dapp .opt.correct{border-color:var(--ok);background:#e9f9f1} #dapp .opt.correct .key{background:var(--ok);color:#fff}
+  #dapp .opt.wrong{border-color:#c0392b;background:#fdeeea;animation:dshake .4s} #dapp .opt.wrong .key{background:#c0392b;color:#fff}
+  #dapp .opt.dim{opacity:.5}
+  /* qcompare */
+  #dapp .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  #dapp .col{border:2px solid var(--line);border-radius:14px;padding:18px;text-align:center}
+  #dapp .col .lab{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:1px;margin-bottom:8px}
+  #dapp .col .val{font-size:24px;font-weight:800;color:var(--navy)}
+  /* open / build */
+  #dapp textarea,#dapp .numin{width:100%;border:1.6px solid var(--line);border-radius:13px;padding:14px 16px;font-size:16px;font-family:inherit;color:var(--text)}
+  #dapp textarea{min-height:88px;resize:vertical} #dapp .numin{text-align:center;font-size:20px;font-weight:700}
+  #dapp textarea:focus,#dapp .numin:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(46,158,91,.16)}
+  #dapp .answerline{min-height:54px;border:2px dashed var(--line);border-radius:14px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;background:#fafbfe}
+  #dapp .bank{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  #dapp .chip{background:#fff;border:2px solid var(--navy2);color:var(--navy);border-radius:12px;padding:10px 14px;font-size:16px;font-weight:700;cursor:pointer;user-select:none;transition:.12s}
+  #dapp .chip:hover{background:#eef2f8} #dapp .chip.used{opacity:.35;pointer-events:none} #dapp .chip.inline{background:#eef2f8}
+  #dapp .fb{position:absolute;right:18px;top:18px;font-size:26px;opacity:0;transition:.2s} #dapp .fb.show{opacity:1;animation:dpop .3s}
+  #dapp .xpfly{position:fixed;font-size:22px;font-weight:900;color:#6c4cf1;pointer-events:none;z-index:60;animation:dfly .9s ease forwards}
+  #dapp .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(120px);background:var(--navy);color:#fff;padding:13px 22px;border-radius:14px;font-weight:800;font-size:15px;box-shadow:0 14px 30px rgba(14,31,61,.35);transition:transform .35s;z-index:50}
+  #dapp .toast.show{transform:translateX(-50%) translateY(0)}
+
+  /* WHEEL */
+  #dapp .wheelwrap{text-align:center;padding:8px 0 4px}
+  #dapp .wheelwrap h2{font-size:24px;color:var(--navy);margin-bottom:4px}
+  #dapp .wheelwrap p{color:var(--muted);font-size:14.5px;margin-bottom:14px}
+  #dapp .wheelbox{position:relative;width:300px;max-width:86vw;margin:0 auto 16px;aspect-ratio:1/1}
+  #dapp .wheelbox svg{width:100%;height:100%;filter:drop-shadow(0 14px 30px rgba(14,31,61,.25))}
+  #dapp .wheelInner{transform-origin:50% 50%}
+  #dapp .pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);z-index:3;font-size:30px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.3))}
+  #dapp .hub{position:absolute;top:50%;left:50%;width:54px;height:54px;border-radius:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,var(--gold),var(--gold2));border:4px solid #fff;display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--navy);font-size:10px;z-index:2;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+  #dapp .prizecard{display:none;background:linear-gradient(135deg,#eef7f1,#fff);border:2px solid var(--gold);border-radius:18px;padding:22px;margin:6px auto 0;max-width:480px;animation:dpop .5s}
+  #dapp .prizecard.show{display:block} #dapp .prizecard .big{font-size:34px;margin-bottom:6px}
+  #dapp .prizecard h3{color:var(--navy);font-size:22px;margin-bottom:6px} #dapp .prizecard p{color:var(--muted);font-size:14.5px;line-height:1.5}
+
+  /* BIG banner «только 1 этап» */
+  #dapp .stage1note{display:none;margin-top:18px;border-radius:var(--radius);background:linear-gradient(150deg,#0c1b36,#1b3a6b);background-color:#141d33;color:#fff;padding:30px 24px;text-align:center;box-shadow:var(--shadow);border:1px solid rgba(46,158,91,.3);animation:dpop .5s}
+  #dapp .stage1note.show{display:block}
+  #dapp .stage1note .kicker{color:var(--gold2);font-weight:800;letter-spacing:2px;font-size:13px;margin-bottom:8px}
+  #dapp .stage1note h2{font-size:34px;line-height:1.1;font-weight:900;margin-bottom:14px}
+  #dapp .stage1note h2 em{font-style:normal;color:var(--gold2)}
+  #dapp .stage1note p{opacity:.95;font-size:15.5px;line-height:1.6;max-width:560px;margin:0 auto 8px}
+  #dapp .s2list{text-align:left;max-width:520px;margin:16px auto 0;display:grid;gap:10px}
+  #dapp .s2row{display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,.06);border:1px solid rgba(46,158,91,.25);border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.45}
+  #dapp .s2row span{flex:0 0 26px;height:26px;border-radius:50%;background:var(--gold);color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+
+  #dapp .foot{text-align:center;color:var(--muted);font-size:12px;margin:22px 0 6px}
+  @media(max-width:560px){
+    #dapp .hero h1{font-size:25px} #dapp .pillars{grid-template-columns:1fr} #dapp .feats{grid-template-columns:1fr}
+    #dapp .qtext{font-size:19px} #dapp .card,#dapp .qcard{padding:22px 17px} #dapp .stage1note h2{font-size:27px}
+  }
+</style>
+
+<div class="wrap">
+  <div class="brand">
+    <div class="bmark">
+      <svg viewBox="0 0 40 40" width="32" height="32">
+        <rect x="1" y="1" width="38" height="38" rx="10" fill="#141d33"/>
+        <rect x="9" y="24" width="4.6" height="8" rx="1.6" fill="#2E9E5B"/>
+        <rect x="16" y="19" width="4.6" height="13" rx="1.6" fill="#2E9E5B"/>
+        <rect x="23" y="12" width="4.6" height="20" rx="1.6" fill="#43c07a"/>
+        <path d="M31 7 l1.15 3.1 3.1 1.15 -3.1 1.15 -1.15 3.1 -1.15 -3.1 -3.1 -1.15 3.1 -1.15 z" fill="#8a6cff"/>
+      </svg>
+    </div>
+    <div class="bword"><div class="mono">STUDY<span>LINE</span></div><small>НИШ ДАЙЫНДЫҚ</small></div>
+  </div>
+
+  <!-- ===== 1. ЛЕНДИНГ ===== -->
+  <section class="screen active" id="d-landing">
+    <div class="hero">
+      <div class="badge">🎓 НИШ · БИЛ (КТЛ) · РФМШ дайындық</div>
+      <h1>Балаңыз НИШ-ке <em>дайын ба</em>? Тегін диагностика тапсыртыңыз</h1>
+      <p>5–6 сынып оқушысына арналған тегін тест — логика, математика және ағылшын тілінен нақты деңгейді көрсетеді. Бар-жоғы 10–15 минут. Біз кепілдік сатпаймыз — біз дайындаймыз.</p>
+      <div class="stats">
+        <div class="stat"><b>10:1</b><small>бір орынға бәсеке</small></div>
+        <div class="stat"><b>3</b><small>пән: логика, матем, ағылшын</small></div>
+        <div class="stat"><b>0 ₸</b><small>толық тегін</small></div>
+      </div>
+    </div>
+
+    <div class="pillars">
+      <div class="pillar"><div class="ic">⚡️</div><b>Күш</b><small>Күшті ұстаздар, әдістеме, деңгейге бөлінген топтар.</small></div>
+      <div class="pillar"><div class="ic">🌱</div><b>Қамқорлық</b><small>40 минут сабақ, баланы шаршатпайтын қарқын.</small></div>
+      <div class="pillar"><div class="ic">🔍</div><b>Ашықтық</b><small>Жеке куратор, ата-анаға апта сайын есеп.</small></div>
+    </div>
+
+    <div class="feats">
+      <div class="feat"><div class="ic">📊</div><div><b>Нақты есеп</b><small>Қай пәннен дайын, қай жерден осал — нақты көрсетеміз.</small></div></div>
+      <div class="feat"><div class="ic">🧠</div><div><b>НИШ форматы</b><small>Сандық сипаттамалар, логика, ағылшын — нағыз емтихандай.</small></div></div>
+    </div>
+
+    <button class="btn" id="go-form">Тегін диагностиканы бастау →</button>
+    <p class="hint">Бастамас бұрын байланыс деректерін қалдырыңыз — нәтижені сізге жеткіземіз.</p>
+  </section>
+
+  <!-- ===== 2. ЛИД-ФОРМА ===== -->
+  <section class="screen" id="d-form">
+    <div class="card">
+      <h2 style="font-size:23px;color:var(--navy);margin-bottom:6px">Диагностикаға тіркелу</h2>
+      <p style="color:var(--muted);font-size:14.5px;margin-bottom:22px">Деректерді толтырыңыз — содан кейін тест ашылады. Нәтижені куратор сізбен талдайды.</p>
+      <form id="lead-form" novalidate>
+        <div class="field" id="f-name"><label>Баланың аты-жөні <span class="req">*</span></label>
+          <input type="text" name="name" placeholder="Мысалы: Алихан Серіков" autocomplete="name"><div class="err">Атын жазыңыз</div></div>
+        <div class="field" id="f-phone"><label>Ата-ананың WhatsApp нөмірі <span class="req">*</span></label>
+          <input type="tel" name="phone" placeholder="+7 700 000 00 00" inputmode="tel" autocomplete="tel"><div class="err">Нөмірді толық әрі дұрыс жазыңыз</div></div>
+        <div class="field" id="f-grade"><label>Баланың сыныбы <span class="req">*</span></label>
+          <select name="grade"><option value="">— Таңдаңыз —</option><option>5-сынып</option><option>6-сынып</option><option>4-сынып</option><option>7-сынып</option></select><div class="err">Сыныпты таңдаңыз</div></div>
+        <div class="field" id="f-goal"><label>Қай мектепке дайындалғыңыз келеді? <span class="req">*</span></label>
+          <select name="goal"><option value="">— Таңдаңыз —</option><option>НИШ (Назарбаев зияткерлік мектебі)</option><option>БИЛ / КТЛ (Қазақ-түрік лицейі)</option><option>РФМШ</option><option>Әлі шешкен жоқпыз / жалпы дайындық</option></select><div class="err">Мақсатты таңдаңыз</div></div>
+        <div class="field" id="f-ref"><label>Кімнің кодымен келдіңіз? <span style="color:var(--muted);font-weight:400">— міндетті емес</span></label>
+          <input type="text" name="ref" placeholder="Мысалы: SL-A7K2" autocomplete="off"></div>
+        <button type="submit" class="btn" id="start-test">Тесті бастау →</button>
+        <div class="privacy">🔒 Деректер тек оқу деңгейін талдау үшін қолданылады</div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== 3. ТЕСТ ===== -->
+  <section class="screen" id="d-test">
+    <div class="hud">
+      <span class="pill xp">⭐ <span id="h-xp">0</span></span>
+      <span class="pill" id="h-prog">1/18</span>
+      <span class="pill streak">🔥 <span id="h-streak">0</span></span>
+    </div>
+    <div class="progress"><i id="h-bar"></i></div>
+    <div class="qcard" id="qcard"></div>
+  </section>
+
+  <!-- ===== 4. ФОРТУНА + БАННЕР ===== -->
+  <section class="screen" id="d-wheel">
+    <div class="card">
+      <div class="wheelwrap">
+        <h2>🎁 Сыйлық дөңгелегі</h2>
+        <p>1-кезеңді аяқтадың! Дөңгелекті айналдырып, сыйлық ұтып ал 👇</p>
+        <div class="wheelbox">
+          <div class="pointer">🔻</div>
+          <svg viewBox="0 0 200 200" id="wheelSvg"><g class="wheelInner" id="wheelInner"></g></svg>
+          <div class="hub">SL</div>
+        </div>
+        <button class="btn dark" id="spinBtn" style="animation:dglow 1.6s infinite">Айналдыру 🎯</button>
+        <div class="prizecard" id="prizecard">
+          <div class="big" id="prizeBig">🎉</div>
+          <h3 id="prizeTitle"></h3>
+          <p id="prizeText"></p>
+        </div>
+      </div>
+
+      <div class="stage1note" id="stage1note">
+        <div class="kicker">НАЗАР АУДАРЫҢЫЗ</div>
+        <h2>Бұл — тек <em>БІРІНШІ</em> кезең</h2>
+        <p>Сіз қысқа диагностикадан өттіңіз. Балаңыздың НИШ/БИЛ/РФМШ-ке нақты дайындығын анықтайтын <b>негізгі — 2-кезең</b> алда. Ол толық, терең тестілеу.</p>
+        <div class="s2list">
+          <div class="s2row"><span>1</span><div><b>~25 минут, ноутбукпен.</b> Логика, математика және ағылшын бойынша толық, нағыз НИШ форматындағы тестілеу.</div></div>
+          <div class="s2row"><span>2</span><div><b>Ата-анамен бірге.</b> Бұл — байыпты бағалау, сондықтан баланы қолдау үшін қасында болғаныңыз дұрыс.</div></div>
+          <div class="s2row"><span>3</span><div><b>Кіруді куратор ашады.</b> Біз нәтижені талдап, балаңызға арнайы кіру кодын береміз.</div></div>
+        </div>
+        <p style="margin-top:16px"><b>📞 Куратор жақын арада WhatsApp арқылы хабарласады</b> — нәтижені талдап, 2-кезеңді ашады. Сыйлығыңыз сақталады!</p>
+      </div>
+    </div>
+    <div class="foot">© StudyLine · «Нақты деңгей — нақты дайындық» · 1-кезең</div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var CONFIG = {
+    APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyiG4WNVcwUBGCflmecP8JFjcesBMJC8YDb3M_J8u1y4AbKusHqmCmM-jfsuylh4KjsKg/exec",
+    STAGE2_URL: "PASTE_STUDYLINE_STAGE2_URL"
+  };
+
+  /* ===== СЫЙЛЫҚ ДӨҢГЕЛЕГІ =====
+     real:true — нақты ұтыс. weight — шығу салмағы (фейктер ~0). */
+  var SEG = [
+    {label:'15% жеңілдік', short:'15% 💸', real:true,  weight:2000, title:'15% жеңілдік! 🎉', text:'Оқу құнына 15% жеңілдік ұтып алдыңыз. Куратор хабарласқанда қолданады.'},
+    {label:'50% жеңілдік', short:'50% 🔥', real:false, weight:1},
+    {label:'AirPods',      short:'AirPods 🎧', real:false, weight:1},
+    {label:'Куратормен тегін талдау', short:'Куратор 👨‍🏫', real:true, weight:2000, title:'Тегін жеке талдау! 🎉', text:'Куратор тест нәтижеңізді тегін, жеке талдап береді — балаңыздың әлсіз тұстарын нақты көрсетеді.'},
+    {label:'1 ай тегін оқу', short:'1 ай 🎁', real:false, weight:1},
+    {label:'Толық курс тегін', short:'Курс 🏆', real:false, weight:1}
+  ];
+
+  /* ===== СҰРАҚТАР (1-кезең) =====
+     type: mcq | qcompare | build | open
+     open: answer болса — бағаланады; болмаса — ИИ бағалайды (аударма/жазу). */
+  var QCMP = ['А көп','В көп','Тең','Анықтау мүмкін емес'];
+  var QS = [
+    {sub:'Логика', type:'mcq', tag:'Логика · Сандар тізбегі', q:'Тізбекті жалғастыр: 2, 4, 6, 8, ?', o:['9','10','11','12'], correct:1},
+    {sub:'Логика', type:'mcq', tag:'Логика · Аналогия', q:'Кітап : оқу = Тамақ : ?', o:['жеу','көру','есту','жүгіру'], correct:0},
+    {sub:'Логика', type:'mcq', tag:'Логика · Заңдылық', big:'🔴 🔵 🔴 🔵 🔴 ❓', q:'Келесі фигура қандай?', o:['🔵','🔴','🟢','🟡'], correct:0},
+    {sub:'Логика', type:'mcq', tag:'Логика · Қорытынды', q:'Асан Болаттан ұзын. Болат Серіктен ұзын. Кім ең қысқа?', o:['Серік','Болат','Асан','Анықтау мүмкін емес'], correct:0},
+    {sub:'Логика', type:'mcq', tag:'Логика · Артығын тап', q:'Қайсы артық?', o:['2','4','7','8'], correct:2},
+    {sub:'Логика', type:'open', tag:'Логика · Жалғастыр', q:'Тізбекті жалғастыр: 1, 3, 6, 10, ?', sub2:'Тек санды жаз', answer:'15', numeric:true},
+
+    {sub:'Математика', type:'open', tag:'Математика · Есептеу', q:'12 × 4 = ?', answer:'48', numeric:true},
+    {sub:'Математика', type:'mcq', tag:'Математика · Бөлшек', q:'1/2 + 1/4 = ?', o:['3/4','2/6','1/6','1/8'], correct:0},
+    {sub:'Математика', type:'qcompare', tag:'НИШ · Сандық сипаттама', q:'А мен В шамасын салыстыр:', colA:'3 × 6', colB:'4 × 5', o:QCMP, correct:1},
+    {sub:'Математика', type:'open', tag:'Математика · Мәтінді есеп', q:'Дәптер 150 ₸, қалам 80 ₸. 2 дәптер мен 3 қалам неше теңге?', sub2:'Тек санды жаз', answer:'540', numeric:true},
+    {sub:'Математика', type:'mcq', tag:'Математика · Пайыз', q:'200 санының 25% қанша?', o:['50','25','75','100'], correct:0},
+    {sub:'Математика', type:'qcompare', tag:'НИШ · Сандық сипаттама', q:'А мен В шамасын салыстыр:', colA:'1/2', colB:'0,4', o:QCMP, correct:0},
+    {sub:'Математика', type:'open', tag:'Математика · Геометрия', q:'Ұзындығы 5, ені 3 болатын тіктөртбұрыштың ауданы?', sub2:'Тек санды жаз', answer:'15', numeric:true},
+
+    {sub:'Ағылшын', type:'mcq', tag:'Ағылшын · Грамматика', q:'She ___ to school every day.', o:['go','goes','going','went'], correct:1},
+    {sub:'Ағылшын', type:'build', tag:'Ағылшын · Сөйлем құрау', q:'Сөздерден сөйлем жина:', words:['have','I','a','brother'], answer:'I have a brother'},
+    {sub:'Ағылшын', type:'mcq', tag:'Ағылшын · Сөздік', q:"Opposite of 'big'?", o:['small','tall','long','fast'], correct:0},
+    {sub:'Ағылшын', type:'open', tag:'Ағылшын · Аударма', q:'Ағылшыншаға аудар: «Менің атым Алия.»', sub2:'Ағылшынша жаз', ph:'My name is...'},
+    {sub:'Ағылшын', type:'open', tag:'Ағылшын · Жазу', q:'Write 1 sentence about your hobby:', sub2:'Ағылшынша 1 сөйлем', ph:'I like...'}
+  ];
+  var GRADABLE = QS.filter(function(x){ return x.type!=='open' || x.answer; }).length;
+
+  var lead={id:null,name:'',phone:'',grade:'',goal:'',ref:''};
+  var i=0,xp=0,streak=0,streakMax=0,correct=0,answers=[],openAns=[],bySub={},locked=false,startedAt=null,spun=false,finalData=null;
+  var $=function(id){return document.getElementById(id);};
+  function show(n){var s=document.querySelectorAll('#dapp .screen');for(var k=0;k<s.length;k++)s[k].classList.remove('active');$('d-'+n).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+  function toast(t){var e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(function(){e.classList.remove('show');},1400);}
+  function normPhone(r){var d=(r||'').replace(/\D/g,'');if(d.length===11&&d.charAt(0)==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d;}
+  function phoneOk(r){var d=normPhone(r);return d.length===11&&d.charAt(0)==='7';}
+  function send(p){try{fetch(CONFIG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});}catch(e){}}
+  function norm(s){return (s||'').toString().toLowerCase().replace(/[.,!?]/g,'').replace(/\s+/g,' ').replace(/,/g,'.').trim();}
+
+  $('go-form').addEventListener('click',function(){show('form');});
+
+  $('lead-form').addEventListener('submit',function(e){
+    e.preventDefault();var f=e.target;
+    var name=f.elements['name'].value.trim(),phone=f.elements['phone'].value.trim(),grade=f.elements['grade'].value,goal=f.elements['goal'].value,ok=true;
+    var ref=(f.elements['ref']?f.elements['ref'].value.trim():'')||((new URLSearchParams(location.search)).get('ref')||'');
+    function mark(id,bad){$(id).classList[bad?'add':'remove']('invalid');if(bad)ok=false;}
+    mark('f-name',name.length<2);mark('f-phone',!phoneOk(phone));mark('f-grade',!grade);mark('f-goal',!goal);
+    if(!ok)return;
+    lead.id='studyline_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+    lead.name=name;lead.phone=normPhone(phone);lead.grade=grade;lead.goal=goal;lead.ref=ref;startedAt=new Date().toISOString();
+    send({action:'lead',leadId:lead.id,name:lead.name,parentPhone:lead.phone,grade:lead.grade,goal:lead.goal,ref:lead.ref,startedAt:startedAt,testUrl:location.href});
+    startTest();
+  });
+  ['f-name','f-phone','f-grade','f-goal'].forEach(function(id){var el=$(id).querySelector('input,select');
+    el.addEventListener('input',function(){$(id).classList.remove('invalid');});el.addEventListener('change',function(){$(id).classList.remove('invalid');});});
+
+  function startTest(){i=0;xp=0;streak=0;streakMax=0;correct=0;answers=[];openAns=[];bySub={};show('test');render();}
+  function updHud(){$('h-xp').textContent=xp;$('h-streak').textContent=streak;$('h-prog').textContent=(i+1)+'/'+QS.length;$('h-bar').style.width=(i/QS.length*100)+'%';}
+  var KEYS=['A','B','C','D'];
+
+  function render(){
+    locked=false;updHud();
+    var it=QS[i],c=$('qcard'),h='';
+    h+='<span class="qtag">'+it.tag+'</span><div class="fb" id="fb"></div>';
+    if(it.big)h+='<div class="qbig">'+it.big+'</div>';
+    h+='<div class="qtext">'+it.q+'</div>';
+    if(it.sub2)h+='<div class="qsub">'+it.sub2+'</div>';
+
+    if(it.type==='mcq'){
+      h+='<div class="opts">';it.o.forEach(function(t,k){h+='<button class="opt" data-k="'+k+'"><span class="key">'+KEYS[k]+'</span><span>'+t+'</span></button>';});h+='</div>';
+      c.innerHTML=h;c.querySelectorAll('.opt').forEach(function(b){b.addEventListener('click',function(){pickMcq(parseInt(b.dataset.k,10),b);});});
+    }
+    else if(it.type==='qcompare'){
+      h+='<div class="cols"><div class="col"><div class="lab">А</div><div class="val">'+it.colA+'</div></div><div class="col"><div class="lab">В</div><div class="val">'+it.colB+'</div></div></div>';
+      h+='<div class="opts">';it.o.forEach(function(t,k){h+='<button class="opt" data-k="'+k+'"><span class="key">'+KEYS[k]+'</span><span>'+t+'</span></button>';});h+='</div>';
+      c.innerHTML=h;c.querySelectorAll('.opt').forEach(function(b){b.addEventListener('click',function(){pickMcq(parseInt(b.dataset.k,10),b);});});
+    }
+    else if(it.type==='build'){
+      var shuffled=it.words.slice().sort(function(){return Math.random()-.5;});
+      h+='<div class="answerline" id="aline"></div><div class="bank" id="bank">';
+      shuffled.forEach(function(w,k){h+='<div class="chip" data-w="'+w+'" data-id="'+k+'">'+w+'</div>';});
+      h+='</div><button class="btn sm dark" id="bdone" disabled>Дайын →</button>';
+      c.innerHTML=h;var picked=[];
+      function redraw(){var al=$('aline');al.innerHTML='';picked.forEach(function(p,idx){var s=document.createElement('div');s.className='chip inline';s.textContent=p.w;
+        s.addEventListener('click',function(){var b=document.querySelector('#bank .chip[data-id="'+p.id+'"]');if(b)b.classList.remove('used');picked.splice(idx,1);redraw();});al.appendChild(s);});
+        $('bdone').disabled=picked.length!==it.words.length;}
+      c.querySelectorAll('#bank .chip').forEach(function(ch){ch.addEventListener('click',function(){if(ch.classList.contains('used'))return;ch.classList.add('used');picked.push({w:ch.dataset.w,id:ch.dataset.id});redraw();});});
+      $('bdone').addEventListener('click',function(){if(locked)return;var got=picked.map(function(p){return p.w;}).join(' ');pickGraded(got,it.answer,'build');});
+    }
+    else if(it.type==='open'){
+      if(it.numeric){h+='<input id="opent" class="numin" inputmode="numeric" placeholder="жауап" autocomplete="off">';}
+      else{h+='<textarea id="opent" placeholder="'+(it.ph||'')+'"></textarea>';}
+      h+='<div style="margin-top:14px"><button class="btn sm dark" id="odone">Келесі →</button></div>';
+      c.innerHTML=h;
+      $('odone').addEventListener('click',function(){if(locked)return;var v=$('opent').value.trim();
+        if(it.answer){ pickGraded(v,it.answer,'open'); }
+        else { openAns.push({sub:it.sub,q:it.q,answer:v});answers.push({n:i+1,sub:it.sub,type:'open',question:it.q,answer:v});bump(it.sub,null);reward(true,8,'Жарайсың! ✍️');advance(); }
+      });
+    }
+  }
+
+  function flyXP(n){var e=document.createElement('div');e.className='xpfly';e.textContent='+'+n+' XP';e.style.left=(window.innerWidth/2-20)+'px';e.style.top='40%';document.body.appendChild(e);setTimeout(function(){e.remove();},900);}
+  function feedback(ok){var f=$('fb');if(!f)return;f.textContent=ok?'✅':'💡';f.classList.add('show');}
+  function reward(ok,base,msg){if(ok){streak++;if(streak>streakMax)streakMax=streak;var b=streak>=3?5:0,g=base+b;xp+=g;flyXP(g);toast(streak>=3?('🔥 '+streak+' серия! +'+g):msg);}else{streak=0;toast(msg);}updHud();}
+  function bump(sub,ok){if(!bySub[sub])bySub[sub]={c:0,t:0};if(ok!==null){bySub[sub].t++;if(ok)bySub[sub].c++;}}
+  function advance(){locked=true;setTimeout(function(){i++;if(i>=QS.length)goWheel();else render();},620);}
+
+  function pickMcq(k,btn){
+    if(locked)return;locked=true;var it=QS[i],ok=(k===it.correct);
+    var opts=$('qcard').querySelectorAll('.opt');opts.forEach(function(o){o.style.pointerEvents='none';});
+    btn.classList.add(ok?'correct':'wrong');
+    if(!ok){var cb=$('qcard').querySelector('.opt[data-k="'+it.correct+'"]');if(cb)cb.classList.add('correct');}
+    opts.forEach(function(o){if(!o.classList.contains('correct')&&!o.classList.contains('wrong'))o.classList.add('dim');});
+    feedback(ok);if(ok)correct++;bump(it.sub,ok);
+    answers.push({n:i+1,sub:it.sub,type:it.type,question:it.q,chosen:it.o[k],correctAns:it.o[it.correct],isCorrect:ok});
+    reward(ok,10,ok?'Дұрыс! 🎉':'Келесіде дәл боласың 💪');
+    setTimeout(function(){i++;if(i>=QS.length)goWheel();else render();},820);
+  }
+  function pickGraded(got,ans,type){
+    locked=true;var ok=norm(got)===norm(ans);feedback(ok);if(ok)correct++;var it=QS[i];bump(it.sub,ok);
+    answers.push({n:i+1,sub:it.sub,type:type,question:it.q,chosen:got,correctAns:ans,isCorrect:ok});
+    reward(ok,12,ok?'Дәл таптың! 🎯':'Жақсы талпыныс 💪');
+    setTimeout(function(){i++;if(i>=QS.length)goWheel();else render();},820);
+  }
+
+  /* ===== ТЕСТ БІТТІ → ФОРТУНА ===== */
+  function goWheel(){
+    $('h-bar').style.width='100%';
+    var pct=GRADABLE?Math.round(correct/GRADABLE*100):0;
+    var subSummary={};Object.keys(bySub).forEach(function(s){subSummary[s]=bySub[s].t?Math.round(bySub[s].c/bySub[s].t*100):null;});
+    var summary=answers.map(function(a){
+      if(a.type==='open'&&a.correctAns===undefined)return a.n+'. ['+a.sub+'] [ОТКР] '+a.question+' → "'+(a.answer||'—')+'"';
+      return a.n+'. ['+a.sub+'] '+a.chosen+(a.isCorrect?' ✓':' ✗ (дұрыс: '+a.correctAns+')');
+    }).join('\n');
+    finalData={
+      action:'stage1_result',leadId:lead.id,name:lead.name,parentPhone:lead.phone,grade:lead.grade,goal:lead.goal,ref:lead.ref,
+      startedAt:startedAt,finishedAt:new Date().toISOString(),
+      score:correct,total:GRADABLE,percent:pct,
+      bySubject:JSON.stringify(subSummary),xp:xp,streakMax:streakMax,
+      answersSummary:summary,openAnswers:JSON.stringify(openAns),answersJson:JSON.stringify(answers),
+      stage2Url:CONFIG.STAGE2_URL,testUrl:location.href
+    };
+    buildWheel();show('wheel');
+  }
+
+  /* ===== ДӨҢГЕЛЕК ===== */
+  function pt(deg,r){var a=(deg-90)*Math.PI/180;return [100+r*Math.cos(a),100+r*Math.sin(a)];}
+  function buildWheel(){
+    var g=$('wheelInner'),svgns='http://www.w3.org/2000/svg',colors=['#22315a','#6C4CF1'];
+    g.innerHTML='';
+    SEG.forEach(function(s,k){
+      var a0=k*60,a1=(k+1)*60,p0=pt(a0,100),p1=pt(a1,100);
+      var path=document.createElementNS(svgns,'path');
+      path.setAttribute('d','M100 100 L'+p0[0]+' '+p0[1]+' A100 100 0 0 1 '+p1[0]+' '+p1[1]+' Z');
+      path.setAttribute('fill',colors[k%2]);path.setAttribute('stroke','#fff');path.setAttribute('stroke-width','1.5');
+      g.appendChild(path);
+      var mid=pt(a0+30,64),txt=document.createElementNS(svgns,'text');
+      txt.setAttribute('x',mid[0]);txt.setAttribute('y',mid[1]);txt.setAttribute('fill','#fff');
+      txt.setAttribute('font-size','9');txt.setAttribute('font-weight','800');txt.setAttribute('text-anchor','middle');
+      txt.setAttribute('transform','rotate('+(a0+30)+' '+mid[0]+' '+mid[1]+')');
+      txt.textContent=s.short;g.appendChild(txt);
+    });
+  }
+  function pickWin(){var tot=0;SEG.forEach(function(s){tot+=s.weight;});var r=Math.random()*tot,acc=0;for(var k=0;k<SEG.length;k++){acc+=SEG[k].weight;if(r<acc)return k;}return 0;}
+
+  $('spinBtn').addEventListener('click',function(){
+    if(spun)return;spun=true;this.disabled=true;this.style.animation='none';this.textContent='Айналуда...';
+    var win=pickWin(),c=win*60+30,deg=360*6+(360-c)+(Math.random()*30-15);
+    var inner=$('wheelInner');inner.style.transition='transform 4.3s cubic-bezier(.16,.84,.36,1)';inner.style.transform='rotate('+deg+'deg)';
+    setTimeout(function(){reveal(win);},4500);
+  });
+
+  function reveal(win){
+    var s=SEG[win];
+    $('prizeBig').textContent='🎉';
+    $('prizeTitle').textContent=s.title||(s.label+'!');
+    $('prizeText').textContent=s.text||'Куратор хабарласқанда қолданады.';
+    $('prizecard').classList.add('show');
+    if(finalData){finalData.prize=s.label;send(finalData);}  // нәтиже + сыйлық → база/n8n
+    setTimeout(function(){$('stage1note').classList.add('show');window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});},700);
+  }
+})();
+</script>
