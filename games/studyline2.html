@@ -1,0 +1,299 @@
+<!-- ==========================================================================
+     StudyLine — 2-КЕЗЕҢ (Stage 2): ТОЛЫҚ НИШ/БИЛ/РФМШ диагностикасы
+     Кіру КОДпен (куратор жеке береді) → ~25 минут терең тестілеу → Рахмет
+     Логика · Математика · Ағылшын. Ашық + жабық сұрақтар. Тыңдалым ЖОҚ.
+     Ата-анамен бірге, НОУТБУКПЕН орындалады.
+     Tilda-ға бөлек парақшаға "HTML код" блогымен қойылады.
+     --------------------------------------------------------------------------
+     РЕБРЕНДИНГ + РЕСТРУКТУРИЗАЦИЯ (2026-07-02):
+     · DARA ACADEMY → StudyLine (атау, лого, футер).
+     · Сұрақтар саны 36 → 25 (пропорция сақталды: Логика 8 · Математика 9 · Ағылшын 8).
+     · Уақыт 45 мин → 25 мин (TOTAL_TIME және барлық мәтіндегі "45 минут" ауыстырылды).
+     · Ескі нұсқа салыстыру үшін DARA/stage2.html файлында сақталған.
+     ⚙️ CONFIG.APPS_SCRIPT_URL — 1-кезеңмен БІРДЕЙ Web App сілтемесі (ортақ backend).
+     ========================================================================== -->
+<div id="d2app">
+<style>
+  #d2app{--navy:#141d33;--navy2:#22315a;--gold:#2e9e5b;--gold2:#43c07a;--bg:#f5f6fa;--card:#fff;--text:#101a2e;--muted:#5d6885;--line:#e5e8f0;--ok:#1f9d6b;--radius:20px;--shadow:0 18px 50px rgba(14,31,61,.14);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+  #d2app *{box-sizing:border-box;margin:0;padding:0}
+  #d2app .wrap{max-width:800px;margin:0 auto;padding:18px}
+  #d2app .screen{display:none;animation:d2fade .4s ease} #d2app .screen.active{display:block}
+  @keyframes d2fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  @keyframes d2pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+  #d2app .brand{display:flex;align-items:center;justify-content:center;gap:11px;margin-bottom:6px}
+  #d2app .brand .bmark{flex:0 0 auto;filter:drop-shadow(0 4px 10px rgba(14,31,61,.25))}
+  #d2app .brand .bword{text-align:left}
+  #d2app .brand .mono{font-size:27px;font-weight:800;letter-spacing:2px;color:var(--navy)} #d2app .brand .mono span{color:var(--gold)}
+  #d2app .brand small{display:block;letter-spacing:5px;font-size:10px;color:var(--gold);font-weight:700}
+
+  #d2app .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:30px 26px;margin-top:14px}
+  #d2app .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:17px;color:var(--navy);background:linear-gradient(135deg,var(--gold),var(--gold2));padding:16px 24px;border-radius:14px;box-shadow:0 12px 26px rgba(46,158,91,.3);transition:transform .15s}
+  #d2app .btn:hover{transform:translateY(-2px)} #d2app .btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+  #d2app .btn.ghost{background:#fff;color:var(--navy);border:2px solid var(--line);box-shadow:none}
+
+  #d2app .gate{text-align:center}
+  #d2app .gate .lock{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy2));display:flex;align-items:center;justify-content:center;font-size:40px;margin:4px auto 16px;box-shadow:0 12px 30px rgba(14,31,61,.3)}
+  #d2app .gate h2{font-size:24px;color:var(--navy);margin-bottom:10px}
+  #d2app .gate p{color:var(--muted);font-size:15px;line-height:1.55;max-width:500px;margin:0 auto 18px}
+  #d2app .codein{width:100%;max-width:320px;margin:0 auto 12px;display:block;text-align:center;letter-spacing:6px;text-transform:uppercase;font-size:26px;font-weight:800;color:var(--navy);border:2px solid var(--line);border-radius:14px;padding:14px;font-family:inherit}
+  #d2app .codein:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(46,158,91,.16)}
+  #d2app .gate .gerr{color:#c0392b;font-size:14px;font-weight:600;min-height:20px;margin-top:6px}
+  #d2app .gate .note{background:#f5f1e4;border:1px solid #ecdcb4;border-radius:14px;padding:14px 16px;font-size:13.5px;color:#5a4a22;line-height:1.5;margin-top:16px;text-align:left}
+  #d2app .supervise{display:flex;gap:10px;align-items:center;justify-content:center;background:#eef2f8;border:1px solid #d6deea;border-radius:12px;padding:10px 14px;font-size:13px;color:var(--navy);font-weight:600;margin-top:14px}
+
+  #d2app .hud{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+  #d2app .pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:800;color:var(--navy);box-shadow:0 4px 12px rgba(14,31,61,.06)}
+  #d2app .pill.timer{color:#b8472e;background:#fbeee9;border-color:#f3c9bb}
+  #d2app .pill.timer.warn{animation:d2blink 1s steps(2) infinite} @keyframes d2blink{50%{opacity:.4}}
+  #d2app .pill.sec{color:var(--gold);background:#eef7f1;border-color:#c8e8d5}
+  #d2app .progress{height:10px;border-radius:999px;background:#e2e7f1;overflow:hidden;margin:4px 0}
+  #d2app .progress i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--navy2),var(--gold));transition:width .4s ease}
+  #d2app .qcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 22px;margin-top:6px}
+  #d2app .qtag{display:inline-block;font-size:12px;font-weight:800;color:var(--navy);background:#e9f5ee;border-radius:999px;padding:5px 12px;margin-bottom:14px}
+  #d2app .passage{background:#eef2f8;border-left:4px solid var(--navy2);border-radius:12px;padding:14px 16px;font-size:15px;line-height:1.65;margin-bottom:16px;color:#22335a}
+  #d2app .qbig{font-size:34px;text-align:center;letter-spacing:6px;margin:4px 0 12px}
+  #d2app .qtext{font-size:20px;font-weight:800;line-height:1.4;color:var(--navy);margin-bottom:6px}
+  #d2app .qsub{font-size:14px;color:var(--muted);margin-bottom:16px}
+  #d2app .opts{display:grid;gap:10px}
+  #d2app .opt{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:14px;padding:14px 16px;font-size:16px;font-weight:600;cursor:pointer;background:#fff;transition:.12s;text-align:left}
+  #d2app .opt:hover{border-color:var(--gold);background:#fffdf7}
+  #d2app .opt .key{flex:0 0 26px;height:26px;border-radius:7px;background:#e9f5ee;color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+  #d2app .opt.sel{border-color:var(--gold);background:#eef7f1} #d2app .opt.sel .key{background:var(--gold);color:#fff}
+  #d2app .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  #d2app .col{border:2px solid var(--line);border-radius:14px;padding:18px;text-align:center}
+  #d2app .col .lab{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:1px;margin-bottom:8px}
+  #d2app .col .val{font-size:23px;font-weight:800;color:var(--navy)}
+  #d2app textarea,#d2app .numin{width:100%;border:1.6px solid var(--line);border-radius:13px;padding:14px 16px;font-size:16px;font-family:inherit;color:var(--text)}
+  #d2app textarea{min-height:120px;resize:vertical} #d2app .numin{text-align:center;font-size:20px;font-weight:700}
+  #d2app textarea:focus,#d2app .numin:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(46,158,91,.16)}
+  #d2app .counter{font-size:12px;color:var(--muted);text-align:right;margin-top:6px}
+  #d2app .answerline{min-height:54px;border:2px dashed var(--line);border-radius:14px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;background:#fafbfe}
+  #d2app .bank{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  #d2app .chip{background:#fff;border:2px solid var(--navy2);color:var(--navy);border-radius:12px;padding:9px 13px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;transition:.12s}
+  #d2app .chip:hover{background:#eef2f8} #d2app .chip.used{opacity:.35;pointer-events:none} #d2app .chip.inline{background:#eef2f8}
+  #d2app .nav{display:flex;gap:10px;margin-top:18px} #d2app .nav .btn{flex:1}
+
+  #d2app .thanks{text-align:center;padding:14px 6px}
+  #d2app .check{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,var(--ok),#2bbd86);display:flex;align-items:center;justify-content:center;margin:6px auto 16px;animation:d2pop .5s;box-shadow:0 14px 34px rgba(31,157,107,.35)}
+  #d2app .check svg{width:50px;height:50px}
+  #d2app .thanks h2{font-size:25px;color:var(--navy);margin-bottom:10px}
+  #d2app .thanks p{font-size:16px;color:var(--muted);line-height:1.6;max-width:520px;margin:0 auto 8px}
+  #d2app .next{background:#eef2f8;border-radius:16px;padding:18px 20px;margin-top:18px;text-align:left}
+  #d2app .next b{color:var(--navy);display:block;margin-bottom:10px;font-size:15px}
+  #d2app .next .row{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;font-size:14.5px;color:#33425e;line-height:1.5}
+  #d2app .next .row span{flex:0 0 26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+  #d2app .foot{text-align:center;color:var(--muted);font-size:12px;margin:22px 0 6px}
+  @media(max-width:560px){#d2app .qtext{font-size:18px}#d2app .card,#d2app .qcard{padding:22px 17px}}
+</style>
+
+<div class="wrap">
+  <div class="brand">
+    <div class="bmark">
+      <svg viewBox="0 0 40 40" width="30" height="30">
+        <rect x="1" y="1" width="38" height="38" rx="10" fill="#141d33"/>
+        <rect x="9" y="24" width="4.6" height="8" rx="1.6" fill="#2E9E5B"/>
+        <rect x="16" y="19" width="4.6" height="13" rx="1.6" fill="#2E9E5B"/>
+        <rect x="23" y="12" width="4.6" height="20" rx="1.6" fill="#43c07a"/>
+        <path d="M31 7 l1.15 3.1 3.1 1.15 -3.1 1.15 -1.15 3.1 -1.15 -3.1 -3.1 -1.15 3.1 -1.15 z" fill="#8a6cff"/>
+      </svg>
+    </div>
+    <div class="bword"><div class="mono">STUDY<span>LINE</span></div><small>НИШ ДАЙЫНДЫҚ</small></div>
+  </div>
+
+  <!-- ===== GATE ===== -->
+  <section class="screen active" id="g-gate">
+    <div class="card gate">
+      <div class="lock">🔐</div>
+      <h2>2-кезең: Толық диагностика</h2>
+      <p>Бұл — куратор ашқан <b>негізгі, толық тестілеу</b>. Кіру үшін куратор берген кодты енгізіңіз.</p>
+      <input class="codein" id="code" maxlength="8" placeholder="••••••" autocomplete="off">
+      <div class="gerr" id="gerr"></div>
+      <button class="btn" id="enter">Тесті ашу →</button>
+      <div class="supervise">👨‍👩‍👧 Ата-анамен бірге, НОУТБУКПЕН орындаған жөн</div>
+      <div class="note"><b>📋 Маңызды:</b> тест ~25 минутқа созылады және барлық дағдыны тексереді — <b>логика, математика және ағылшын</b>. Сұрақтар нағыз НИШ форматында: сандық сипаттамалар, заңдылықтар, мәтінді есептер және жазба тапсырмалар. Асықпай, өз бетіңше орында. Нәтиже куратор мен ИИ-талдаушыға жетеді.</div>
+    </div>
+    <div class="foot">© StudyLine · «Нақты деңгей — нақты дайындық» · 2-кезең</div>
+  </section>
+
+  <!-- ===== TEST ===== -->
+  <section class="screen" id="g-test">
+    <div class="hud">
+      <span class="pill" id="h-prog">1/25</span>
+      <span class="pill sec" id="h-sec">Логика</span>
+      <span class="pill timer" id="h-timer">⏱ 25:00</span>
+    </div>
+    <div class="progress"><i id="h-bar"></i></div>
+    <div class="qcard" id="qcard"></div>
+  </section>
+
+  <!-- ===== THANKS ===== -->
+  <section class="screen" id="g-thanks">
+    <div class="card thanks">
+      <div class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h2>Толық диагностика аяқталды! 🎓</h2>
+      <p>Рахмет! Сен барлық бөлімді орындадың — логика, математика және ағылшын.</p>
+      <p><b>Куратор мен ИИ-талдаушы нәтижені толық талдап,</b> балаңыздың НИШ/БИЛ/РФМШ-ке нақты дайындық деңгейін, күшті және әлсіз тұстарын анықтап, <b>жеке жыл бойғы оқу жоспарын</b> дайындайды.</p>
+      <div class="next">
+        <b>Келесі қадам:</b>
+        <div class="row"><span>1</span><div>Әр пән бойынша нақты деңгей + ашық жауаптарың CEFR/логика шкаласымен бағаланады.</div></div>
+        <div class="row"><span>2</span><div>Куратор қоңырау шалып, толық есепті және дайындық жоспарын түсіндіреді.</div></div>
+        <div class="row"><span>3</span><div>Балаңызға қанша уақыт қажетін айтып, келесі қадамды ұсынады.</div></div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-top:14px">📞 Жақын арада хабарласамыз. «Нақты деңгей — нақты дайындық».</p>
+    </div>
+    <div class="foot">© StudyLine · 2-кезең</div>
+  </section>
+</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyiG4WNVcwUBGCflmecP8JFjcesBMJC8YDb3M_J8u1y4AbKusHqmCmM-jfsuylh4KjsKg/exec", TOTAL_TIME: 25*60 };
+
+  var QCMP=['А көп','В көп','Тең','Анықтау мүмкін емес'];
+  var P1="Tom is twelve. He wants to study at a special school for talented children. Every evening he solves math problems and reads English books. His dream is to become an engineer. He knows the entrance exam is difficult, so he started preparing one year before.";
+
+  /* type: mcq | qcompare | build | open(numeric/answer/AI) ; sec = бөлім
+     РЕСТРУКТУРИЗАЦИЯ: 36 → 25 сұрақ (Логика 8 · Математика 9 · Ағылшын 8), ~25 минут.
+     Толық 36 сұрақтық нұсқа: DARA/stage2.html (салыстыру үшін сақталды). */
+  var QS=[
+    /* ---- ЛОГИКА (8) ---- */
+    {sec:'Логика',type:'mcq',q:'Тізбекті жалғастыр: 3, 6, 12, 24, ?',o:['36','48','30','40'],correct:1},
+    {sec:'Логика',type:'open',q:'Тізбекті жалғастыр: 1, 1, 2, 3, 5, 8, ?',sub:'Тек санды жаз',answer:'13',numeric:true},
+    {sec:'Логика',type:'mcq',q:'Hand : glove = Foot : ?',o:['sock','shoe','hat','ring'],correct:0},
+    {sec:'Логика',type:'mcq',q:'Қайсы артық (топқа жатпайды)?',o:['square','circle','triangle','cube'],correct:3},
+    {sec:'Логика',type:'mcq',big:'⬆️ ➡️ ⬇️ ⬅️ ⬆️ ❓',q:'Заңдылық бойынша келесі белгі?',o:['➡️','⬇️','⬆️','⬅️'],correct:0},
+    {sec:'Логика',type:'mcq',q:'Айгүл, Бота, Серік — футбол, шахмат, жүзумен айналысады. Бота — шахматшы. Айгүл сумен айналыспайды. Серік немен айналысады?',o:['жүзу','футбол','шахмат','анықталмайды'],correct:0},
+    {sec:'Логика',type:'mcq',q:'Жалғастыр: 2, 5, 10, 17, ?',sub:'(айырмасы 3, 5, 7 …)',o:['24','26','28','25'],correct:1},
+    {sec:'Логика',type:'open',q:'«Себеппен түсіндір»: 28, 26, 24, 22 тізбегінде келесі сан нешеу және НЕЛІКТЕН?',sub:'Жауабыңды бір сөйлеммен түсіндір (қазақша/ағылшынша)',ph:'Келесі сан ... , себебі ...'},
+
+    /* ---- МАТЕМАТИКА (9) ---- */
+    {sec:'Математика',type:'qcompare',q:'А мен В-ні салыстыр:',colA:'7 × 8',colB:'9 × 6',o:QCMP,correct:0},
+    {sec:'Математика',type:'qcompare',q:'А мен В-ні салыстыр:',colA:'2³',colB:'3²',o:QCMP,correct:1},
+    {sec:'Математика',type:'qcompare',q:'А мен В-ні салыстыр:',colA:'80-нің 25%-ы',colB:'100-дің 1/5-і',o:QCMP,correct:2},
+    {sec:'Математика',type:'open',q:'Алманың килосы 400 ₸. 2,5 кг қанша тұрады?',sub:'Тек санды жаз (₸)',answer:'1000',numeric:true},
+    {sec:'Математика',type:'open',q:'Поезд сағатына 60 км жүреді. 150 км қанша сағатта жүреді?',sub:'Тек санды жаз',answer:'2.5',numeric:true},
+    {sec:'Математика',type:'mcq',q:'90 санының 2/3-і қанша?',o:['60','45','30','50'],correct:0},
+    {sec:'Математика',type:'open',q:'Бағасы 5000 ₸ зат 20%-ға арзандады. Жаңа бағасы?',sub:'Тек санды жаз (₸)',answer:'4000',numeric:true},
+    {sec:'Математика',type:'open',q:'Квадраттың периметрі 24 см. Ауданы неше см²?',sub:'Тек санды жаз',answer:'36',numeric:true},
+    {sec:'Математика',type:'open',q:'«Шеш әрі түсіндір»: 3 қалам мен 2 дәптер 660 ₸. Қалам 100 ₸ болса, дәптер қанша? Шешу жолын жаз.',sub:'Жауап пен қысқа шешімді жаз',ph:'Дәптер = ... , себебі ...'},
+
+    /* ---- АҒЫЛШЫН (8) ---- */
+    {sec:'Ағылшын',type:'mcq',q:'If I ___ rich, I would travel the world.',o:['was','were','am','be'],correct:1},
+    {sec:'Ағылшын',type:'mcq',q:"Choose a synonym of 'happy':",o:['glad','sad','angry','tired'],correct:0},
+    {sec:'Ағылшын',type:'mcq',passage:P1,q:'How old is Tom?',o:['12','11','13','10'],correct:0},
+    {sec:'Ағылшын',type:'mcq',passage:P1,q:'What does Tom do every evening?',o:['Solves math and reads English','Plays computer games','Watches TV','Goes to bed early'],correct:0},
+    {sec:'Ағылшын',type:'build',q:'Сөздерден дұрыс сұрақ жина:',words:['where','do','you','live'],answer:'where do you live'},
+    {sec:'Ағылшын',type:'build',q:'Сөздерден дұрыс сөйлем жина:',words:['I','am','going','to','school'],answer:'I am going to school'},
+    {sec:'Ағылшын',type:'open',q:"Correct the mistake: «He don't likes pizza.»",sub:'Дұрыс сөйлемді жаз',ph:'He ...'},
+    {sec:'Ағылшын',type:'open',q:'Write 3–4 sentences: Why do you want to study at this school?',sub:'Ағылшынша жаз',ph:'I want to study here because...',min:40}
+  ];
+  var GRADABLE=QS.filter(function(x){return x.type==='mcq'||x.type==='qcompare'||x.type==='build'||(x.type==='open'&&x.answer);}).length;
+
+  var lead={id:null,name:'',goal:''};
+  var i=0,answers=[],state={},timeLeft=CONFIG.TOTAL_TIME,timer=null,startedAt=null;
+  var $=function(id){return document.getElementById(id);};
+  function show(n){var s=document.querySelectorAll('#d2app .screen');for(var k=0;k<s.length;k++)s[k].classList.remove('active');$('g-'+n).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+  function send(p){try{fetch(CONFIG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});}catch(e){}}
+  function norm(s){return (s||'').toString().toLowerCase().replace(/[.,!?]/g,'').replace(/,/g,'.').replace(/\s+/g,' ').trim();}
+
+  /* ===== GATE ===== */
+  var urlCode=(new URLSearchParams(location.search)).get('code');
+  if(urlCode){$('code').value=urlCode.toUpperCase();}
+  $('enter').addEventListener('click',validate);
+  $('code').addEventListener('keydown',function(e){if(e.key==='Enter')validate();});
+  function validate(){
+    var code=($('code').value||'').trim().toUpperCase();
+    if(code.length<4){$('gerr').textContent='Кодты толық енгізіңіз';return;}
+    $('gerr').textContent='Тексерілуде...';$('enter').disabled=true;
+    fetch(CONFIG.APPS_SCRIPT_URL+'?action=validate&code='+encodeURIComponent(code))
+      .then(function(r){return r.json();})
+      .then(function(d){$('enter').disabled=false;
+        if(d&&d.valid){lead.id=d.leadId;lead.name=d.name||'';lead.goal=d.goal||'';startTest();}
+        else{var m=(d&&d.reason==='done')?'Бұл тест осы кодпен аяқталған.':(d&&d.reason==='stage1')?'Алдымен 1-кезеңнен өту керек.':'Код дұрыс емес. Кураторден тексеріңіз.';$('gerr').textContent=m;}})
+      .catch(function(){$('enter').disabled=false;$('gerr').textContent='Қосылу қатесі. Қайта көріңіз немесе кураторге жазыңыз.';});
+  }
+
+  /* ===== TEST ===== */
+  function startTest(){i=0;answers=[];state={};timeLeft=CONFIG.TOTAL_TIME;startedAt=new Date().toISOString();show('test');render();if(timer)clearInterval(timer);timer=setInterval(tick,1000);updTimer();}
+  function tick(){timeLeft--;updTimer();if(timeLeft<=0){clearInterval(timer);finish(true);}}
+  function updTimer(){var m=Math.floor(timeLeft/60),s=timeLeft%60;var el=$('h-timer');el.innerHTML='⏱ '+m+':'+(s<10?'0':'')+s;if(timeLeft<=180)el.classList.add('warn');else el.classList.remove('warn');}
+  function updHud(){$('h-prog').textContent=(i+1)+'/'+QS.length;$('h-sec').textContent=QS[i].sec;$('h-bar').style.width=(i/QS.length*100)+'%';}
+  var KEYS=['A','B','C','D'];
+
+  function render(){
+    updHud();var it=QS[i],c=$('qcard'),h='';
+    h+='<span class="qtag">'+it.sec+'</span>';
+    if(it.passage)h+='<div class="passage">'+it.passage+'</div>';
+    if(it.big)h+='<div class="qbig">'+it.big+'</div>';
+    h+='<div class="qtext">'+it.q+'</div>';
+    if(it.sub)h+='<div class="qsub">'+it.sub+'</div>';
+
+    if(it.type==='mcq'||it.type==='qcompare'){
+      if(it.type==='qcompare')h+='<div class="cols"><div class="col"><div class="lab">А</div><div class="val">'+it.colA+'</div></div><div class="col"><div class="lab">В</div><div class="val">'+it.colB+'</div></div></div>';
+      h+='<div class="opts" id="opts">';
+      it.o.forEach(function(t,k){var sel=(state[i]===k)?' sel':'';h+='<button class="opt'+sel+'" data-k="'+k+'"><span class="key">'+KEYS[k]+'</span><span>'+t+'</span></button>';});
+      h+='</div>'+nav();c.innerHTML=h;
+      c.querySelectorAll('.opt').forEach(function(b){b.addEventListener('click',function(){state[i]=parseInt(b.dataset.k,10);c.querySelectorAll('.opt').forEach(function(o){o.classList.remove('sel');});b.classList.add('sel');$('next').disabled=false;});});
+      $('next').disabled=(state[i]===undefined);
+    }
+    else if(it.type==='open'){
+      var val=state[i]||'';
+      if(it.numeric)h+='<input id="ta" class="numin" inputmode="text" placeholder="жауап" value="'+val+'" autocomplete="off">';
+      else h+='<textarea id="ta" placeholder="'+(it.ph||'')+'">'+val+'</textarea>';
+      if(it.min)h+='<div class="counter"><span id="cnt">0</span> таңба (мин. '+it.min+')</div>';
+      h+=nav();c.innerHTML=h;
+      var ta=$('ta');
+      function upd(){state[i]=ta.value;var L=ta.value.trim().length;if($('cnt'))$('cnt').textContent=L;var minL=it.min?it.min:1;$('next').disabled=(L<minL);}
+      ta.addEventListener('input',upd);upd();
+    }
+    else if(it.type==='build'){
+      var shuffled=it.words.slice().sort(function(){return Math.random()-.5;});
+      h+='<div class="answerline" id="aline"></div><div class="bank" id="bank">';
+      shuffled.forEach(function(w,k){h+='<div class="chip" data-w="'+w+'" data-id="'+k+'">'+w+'</div>';});
+      h+='</div>'+nav();c.innerHTML=h;var picked=[];
+      function redraw(){var al=$('aline');al.innerHTML='';picked.forEach(function(p,idx){var s=document.createElement('div');s.className='chip inline';s.textContent=p.w;
+        s.addEventListener('click',function(){var b=document.querySelector('#bank .chip[data-id="'+p.id+'"]');if(b)b.classList.remove('used');picked.splice(idx,1);sync();redraw();});al.appendChild(s);});}
+      function sync(){state[i]=picked.map(function(p){return p.w;});$('next').disabled=(picked.length!==it.words.length);}
+      c.querySelectorAll('#bank .chip').forEach(function(ch){ch.addEventListener('click',function(){if(ch.classList.contains('used'))return;ch.classList.add('used');picked.push({w:ch.dataset.w,id:ch.dataset.id});sync();redraw();});});
+      $('next').disabled=true;
+    }
+  }
+  function nav(){var last=(i===QS.length-1)?'Аяқтау ✓':'Келесі →';var back=(i>0)?'<button class="btn ghost" id="back" style="flex:0 0 110px">← Артқа</button>':'';return '<div class="nav">'+back+'<button class="btn" id="next" disabled>'+last+'</button></div>';}
+  $('qcard').addEventListener('click',function(e){if(e.target&&e.target.id==='next'){if(!e.target.disabled)goNext();}if(e.target&&e.target.id==='back'){if(i>0){i--;render();}}});
+  function goNext(){recordAnswer();if(i>=QS.length-1){finish(false);}else{i++;render();}}
+
+  function recordAnswer(){
+    var it=QS[i];
+    if(it.type==='mcq'||it.type==='qcompare'){var k=state[i],ok=(k===it.correct);
+      answers[i]={n:i+1,sec:it.sec,type:it.type,question:it.q,chosen:it.o[k],correctAns:it.o[it.correct],isCorrect:ok};}
+    else if(it.type==='build'){var got=(state[i]||[]).join(' '),ok2=norm(got)===norm(it.answer);
+      answers[i]={n:i+1,sec:it.sec,type:'build',question:it.q,chosen:got,correctAns:it.answer,isCorrect:ok2};}
+    else if(it.type==='open'&&it.answer){var ok3=norm(state[i]||'')===norm(it.answer);
+      answers[i]={n:i+1,sec:it.sec,type:'open',question:it.q,chosen:state[i]||'',correctAns:it.answer,isCorrect:ok3};}
+    else {answers[i]={n:i+1,sec:it.sec,type:'open',question:it.q+(it.sub?' ['+it.sub+']':''),answer:state[i]||''};}
+  }
+
+  function finish(byTimeout){
+    if(timer)clearInterval(timer);
+    if(QS[i]&&answers[i]===undefined)recordAnswer();
+    var correct=0,bySub={};
+    answers.forEach(function(a){if(!a)return;if(a.isCorrect!==undefined){if(!bySub[a.sec])bySub[a.sec]={c:0,t:0};bySub[a.sec].t++;if(a.isCorrect){correct++;bySub[a.sec].c++;}}});
+    var subPct={};Object.keys(bySub).forEach(function(s){subPct[s]=bySub[s].t?Math.round(bySub[s].c/bySub[s].t*100):null;});
+    var pct=GRADABLE?Math.round(correct/GRADABLE*100):0,lvl=levelOf(pct);
+    var summary=answers.map(function(a){if(!a)return'';
+      if(a.isCorrect!==undefined)return a.n+'. ['+a.sec+'] '+a.chosen+(a.isCorrect?' ✓':' ✗ (дұрыс: '+a.correctAns+')');
+      return a.n+'. ['+a.sec+'] '+a.question+' → "'+(a.answer||'—')+'"';}).filter(Boolean).join('\n');
+    var openItems=answers.filter(function(a){return a&&a.answer!==undefined;}).map(function(a){return{sec:a.sec,q:a.question,answer:a.answer};});
+
+    send({action:'stage2_result',leadId:lead.id,name:lead.name,goal:lead.goal,
+      startedAt:startedAt,finishedAt:new Date().toISOString(),byTimeout:!!byTimeout,
+      score:correct,total:GRADABLE,percent:pct,level:lvl.code,cefr:lvl.cefr,
+      bySubject:JSON.stringify(subPct),answersSummary:summary,openAnswers:JSON.stringify(openItems),
+      answersJson:JSON.stringify(answers.filter(Boolean)),testUrl:location.href});
+    show('thanks');
+  }
+  function levelOf(p){if(p<=35)return{code:'Бастапқы',cefr:'A1/төмен'};if(p<=60)return{code:'Орташа',cefr:'A2'};if(p<=80)return{code:'Жақсы',cefr:'B1'};return{code:'Жоғары',cefr:'B1+/B2'};}
+})();
+</script>
