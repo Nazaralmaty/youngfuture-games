@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StudyLine · Симулятор приложения</title>
+<style>
+  :root{
+    --bg:#0b0f1e; --panel:#131a30; --panel2:#0e1424; --line:#233156;
+    --ink:#eaf0ff; --muted:#8b9bc4; --violet:#6d4bff; --cyan:#21d4fd;
+    --lime:#9be870; --gold:#ffce4a; --red:#ff4d6d;
+    --radius:16px; --shadow:0 18px 50px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 15% -10%,#1a2450,transparent),var(--bg);
+    color:var(--ink);min-height:100vh;padding:24px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+  }
+  header{max-width:1180px;margin:0 auto 20px}
+  h1{font-size:22px;font-weight:800;letter-spacing:-.3px}
+  h1 span{color:var(--cyan)}
+  .lead{color:var(--muted);font-size:14px;margin-top:6px;max-width:640px;line-height:1.55}
+
+  .layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start}
+  @media (max-width:900px){ .layout{grid-template-columns:1fr} }
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .card h2{font-size:13px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);
+    padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panel2)}
+  .card .body{padding:18px}
+
+  label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:600}
+  .field{margin-bottom:14px}
+  input,select{width:100%;background:#0a1122;border:1.5px solid var(--line);color:var(--ink);
+    border-radius:11px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;transition:border-color .18s}
+  input:focus,select:focus{border-color:var(--violet)}
+
+  button{font-family:inherit;font-weight:700;cursor:pointer;border:none;border-radius:11px;transition:transform .12s,filter .18s}
+  button:active{transform:translateY(1px)}
+  .btn-primary{width:100%;padding:13px;font-size:15px;color:#0b1330;background:linear-gradient(135deg,var(--lime),#d6ff8a)}
+  .btn-primary:hover{filter:brightness(1.07)}
+  .btn-row{display:flex;gap:8px;margin-top:12px}
+  .btn-ghost{flex:1;padding:10px;font-size:13px;color:var(--ink);background:#1a2440;border:1px solid var(--line)}
+  .btn-ghost:hover{background:#22304f}
+
+  .phone{background:#000;border-radius:34px;padding:11px;box-shadow:var(--shadow);width:100%;max-width:400px;margin:0 auto}
+  .phone .screen{background:#070b1e;border-radius:24px;overflow:hidden;height:660px;position:relative}
+  .phone iframe{width:100%;height:100%;border:0;display:block}
+  .placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:10px;color:var(--muted);font-size:14px;text-align:center;padding:30px}
+  .placeholder .big{font-size:38px;opacity:.55}
+
+  .log{height:390px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px;font-size:12.5px}
+  .log:empty::after{content:"Сообщений пока нет — запустите игру и доиграйте до конца.";
+    color:var(--muted);padding:16px;display:block;text-align:center}
+  .msg{border:1px solid var(--line);border-left:3px solid var(--muted);border-radius:9px;
+    padding:10px 12px;background:var(--panel2);animation:slide .28s ease}
+  @keyframes slide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  .msg.ready{border-left-color:var(--cyan)}
+  .msg.finish{border-left-color:var(--lime);background:linear-gradient(180deg,rgba(155,232,112,.09),transparent)}
+  .msg.close{border-left-color:var(--gold)}
+  .msg.progress{border-left-color:var(--violet)}
+  .msg .top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+  .msg .type{font-weight:800;letter-spacing:.4px;text-transform:uppercase;font-size:11px}
+  .msg .time{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+  .msg pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.55;
+    color:#b9c8ee;white-space:pre-wrap;word-break:break-word}
+
+  .verdict{margin:0 18px 18px;padding:14px 16px;border-radius:12px;font-size:13.5px;line-height:1.6;
+    border:1px solid var(--line);background:var(--panel2);color:var(--muted)}
+  .verdict.ok{border-color:rgba(155,232,112,.4);background:rgba(155,232,112,.08);color:#d6ffb8}
+  .verdict b{color:var(--ink)}
+  .verdict.ok b{color:var(--lime)}
+  code{background:#0a1122;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--cyan)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Симулятор приложения <span>StudyLine</span></h1>
+  <p class="lead">
+    Эта страница притворяется мобильным приложением. Она открывает игру так же, как это сделает
+    настоящее приложение, и показывает <b>каждое сообщение</b>, которое игра отправляет наружу.
+    Доиграйте до конца — и вы увидите результат, по которому начисляется XP.
+  </p>
+</header>
+
+<div class="layout">
+
+  <div>
+    <div class="card">
+      <h2>Кто играет</h2>
+      <div class="body">
+        <div class="field">
+          <label for="fGame">Игра</label>
+          <select id="fGame">
+            <option value="../games/math_arcade.html">math_arcade — Математика Аркада</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fUid">ID ребёнка в StudyLine</label>
+          <input id="fUid" value="8421">
+        </div>
+        <div class="field">
+          <label for="fName">Имя</label>
+          <input id="fName" value="Алихан">
+        </div>
+        <div class="field">
+          <label for="fCls">Класс</label>
+          <input id="fCls" value="5">
+        </div>
+        <div class="field">
+          <label for="fSid">ID сессии (выдаёт приложение)</label>
+          <input id="fSid" value="sess_demo_001">
+        </div>
+
+        <button class="btn-primary" id="launch">▶ Запустить игру</button>
+
+        <div class="btn-row">
+          <button class="btn-ghost" id="cmdPause">⏸ Пауза</button>
+          <button class="btn-ghost" id="cmdResume">▶ Продолжить</button>
+          <button class="btn-ghost" id="clearLog">Очистить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card" style="margin-bottom:20px">
+      <h2>Что приложение получает от игры</h2>
+      <div class="log" id="log"></div>
+      <div class="verdict" id="verdict">
+        <b>Ждём результат.</b> Запустите игру и доиграйте до конца (3 жизни).
+        Когда придёт сообщение <code>finish</code> — связка работает.
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="screen" id="screen">
+        <div class="placeholder">
+          <div class="big">📱</div>
+          <div>Нажмите «Запустить игру»</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var $ = function(id){ return document.getElementById(id); };
+  var log = $('log');
+  var screenEl = $('screen');
+  var frame = null;
+
+  // --- Запуск игры: собираем ссылку так же, как это сделает приложение ------
+
+  function buildGameUrl(){
+    var params = [
+      'uid='  + encodeURIComponent($('fUid').value.trim()),
+      'name=' + encodeURIComponent($('fName').value.trim()),
+      'cls='  + encodeURIComponent($('fCls').value.trim()),
+      'sid='  + encodeURIComponent($('fSid').value.trim()),
+      'lang=kk'
+    ];
+    return $('fGame').value + '?' + params.join('&');
+  }
+
+  function launch(){
+    var url = buildGameUrl();
+    screenEl.innerHTML = '';
+    frame = document.createElement('iframe');
+    frame.src = url;
+    frame.allow = 'autoplay';
+    screenEl.appendChild(frame);
+    addNote('Приложение открыло: ' + url);
+    resetVerdict();
+  }
+
+  // --- Приём сообщений от игры ---------------------------------------------
+
+  function timeNow(){
+    var d = new Date();
+    return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2);
+  }
+
+  function addMessage(message){
+    var box = document.createElement('div');
+    box.className = 'msg ' + message.type;
+    box.innerHTML =
+      '<div class="top"><span class="type">' + message.type + '</span>' +
+      '<span class="time">' + timeNow() + '</span></div>' +
+      '<pre>' + JSON.stringify(message.payload, null, 2) + '</pre>';
+    log.appendChild(box);
+    log.scrollTop = log.scrollHeight;
+
+    if (message.type === 'finish') showVerdict(message);
+    if (message.type === 'close')  addNote('Игра попросила закрыть экран — приложение вернёт ребёнка в меню.');
+  }
+
+  function addNote(text){
+    var box = document.createElement('div');
+    box.className = 'msg';
+    box.innerHTML = '<div class="top"><span class="type">приложение</span>' +
+                    '<span class="time">' + timeNow() + '</span></div><pre>' + text + '</pre>';
+    log.appendChild(box);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function showVerdict(message){
+    var p = message.payload || {};
+    $('verdict').className = 'verdict ok';
+    $('verdict').innerHTML =
+      '<b>✅ Связка работает.</b><br>' +
+      'Ребёнок <b>' + (message.userId || '—') + '</b> закончил игру <b>' + message.game + '</b>: ' +
+      'очков <b>' + (p.score != null ? p.score : '—') + '</b>, ' +
+      'ошибок <b>' + (p.mistakes != null ? p.mistakes : '—') + '</b>, ' +
+      'время <b>' + (p.durationSec != null ? p.durationSec + ' сек' : '—') + '</b>.<br><br>' +
+      'Именно этот JSON приложение отправит на бэкенд StudyLine, и уже там по нему начислится XP. ' +
+      'Игра XP не считает — поэтому правила начисления можно менять без перевыпуска игр.';
+  }
+
+  function resetVerdict(){
+    $('verdict').className = 'verdict';
+    $('verdict').innerHTML = '<b>Ждём результат.</b> Доиграйте до конца (3 жизни). ' +
+      'Когда придёт сообщение <code>finish</code> — связка работает.';
+  }
+
+  window.addEventListener('message', function(event){
+    var data;
+    try { data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data; }
+    catch (e) { return; }
+    if (!data || data.source !== 'studyline-game') return;
+    addMessage(data);
+  });
+
+  // --- Команды ОТ приложения В игру ----------------------------------------
+
+  function sendCommand(type){
+    if (!frame || !frame.contentWindow) { addNote('Сначала запустите игру.'); return; }
+    frame.contentWindow.postMessage(JSON.stringify({ source:'studyline-app', type:type }), '*');
+    addNote('Приложение отправило команду: ' + type);
+  }
+
+  // --- Кнопки ---------------------------------------------------------------
+
+  $('launch').addEventListener('click', launch);
+  $('cmdPause').addEventListener('click', function(){ sendCommand('pause'); });
+  $('cmdResume').addEventListener('click', function(){ sendCommand('resume'); });
+  $('clearLog').addEventListener('click', function(){ log.innerHTML = ''; resetVerdict(); });
+})();
+</script>
+
+</body>
+</html>
