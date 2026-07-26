@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Дала Ойыны · Математика 🎲</title>
+<script src="../db/games-db.js"></script>
 <style>
   :root{--ink:#0b1437;--ink2:#161c47;--violet:#6d4bff;--violet2:#8a6bff;--cyan:#21d4fd;--lime:#9be870;--gold:#ffce4a;--red:#ff4d6d;--wood:#6d4326;--wood2:#8a5a34;}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -96,59 +97,6 @@
 </head>
 <body>
 
-<style>
-#yfAcc{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(7,11,30,.92);backdrop-filter:blur(6px);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif}
-#yfAcc .yfBox{width:100%;max-width:340px;background:linear-gradient(160deg,#0e2247,#0b1a33);border:1px solid #22305f;border-radius:22px;padding:24px 20px;color:#eaf0ff;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-#yfAcc .yfLogo{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#6d4bff,#21d4fd);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
-#yfAcc .yfLogo svg{width:27px;height:27px}
-#yfAcc .yfT{font-size:22px;font-weight:900;margin-bottom:4px}
-#yfAcc .yfS{font-size:13px;color:#9fb0d8;margin-bottom:16px}
-#yfAcc input{width:100%;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;padding:13px 15px;font-size:16px;font-family:inherit;margin-bottom:10px;outline:none}
-#yfAcc input:focus{border-color:#8a6bff}
-#yfAcc #yfErr{color:#ff6b6b;font-size:13px;min-height:16px;margin-bottom:4px}
-#yfAcc #yfGo{width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:900;font-size:17px;color:#0b1330;background:linear-gradient(135deg,#9be870,#d6ff8a);border-radius:14px;padding:14px}
-#yfAcc .yfHint{font-size:11.5px;color:#7e8db0;margin-top:10px}
-</style>
-<div id="yfAcc"><div class="yfBox">
-  <div class="yfLogo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div>
-  <div class="yfT">Ойынға кіру 🎮</div>
-  <div class="yfS">Атыңды жаз — прогресің сақталады.</div>
-  <input id="yfName" placeholder="Атың" autocomplete="off">
-  <input id="yfClass" placeholder="Сыныбың (мыс. 7А)" autocomplete="off">
-  <input id="yfPhone" type="tel" inputmode="tel" placeholder="Нөмірің (міндетті емес)" autocomplete="off">
-  <div id="yfErr"></div>
-  <button id="yfGo">Кіру ▶</button>
-  <div class="yfHint">Бір рет кіресің — келесіде автоматты 🔒</div>
-</div></div>
-<script>
-var YF_ACCOUNT=(function(){
-  var KEY='yf_user_v5';
-  var GAME_NAME='math_board'; var ENDPOINT='https://script.google.com/macros/s/AKfycbxSGdD65Qzmr8LQhOClkc-mnwxSI1EpS2XSA4mtVp-KKN0EgDPxDj_rE11BVGF3xKQGug/exec'; /* Google Sheets Apps Script (аккаунттар). Бос болса — тек құрылғыда сақталады. */
-  var user=null;
-  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
-  function save(u){ try{ localStorage.setItem(KEY, JSON.stringify(u)); }catch(e){} }
-  function normPhone(r){ var d=(r||'').replace(/\D/g,''); if(d.length===11&&d.charAt(0)==='8')d='7'+d.slice(1); if(d.length===10)d='7'+d; return d; }
-  function post(u,ev){ if(!ENDPOINT||ENDPOINT.indexOf('ВСТАВ')===0)return; try{ fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:ev||'account',brand:'youngfuture',game:GAME_NAME,id:u.id,name:u.name,'class':u.cls||'',phone:u.phone||'',ts:new Date().toISOString(),progress:u.progress||{}})}).catch(function(){}); }catch(e){} }
-  function el(id){return document.getElementById(id);}
-  function hide(){ var o=el('yfAcc'); if(o)o.style.display='none'; }
-  user=load();
-  if(user){ hide(); }
-  else {
-    el('yfGo').addEventListener('click',function(){
-      var name=el('yfName').value.trim(), cls=el('yfClass').value.trim(), ph=el('yfPhone').value.trim();
-      if(name.length<1){ el('yfErr').textContent='Атыңды жаз'; return; }
-      user={ id:'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), name:name, cls:cls, phone:normPhone(ph), created:new Date().toISOString(), progress:{} };
-      save(user); post(user,'account'); hide();
-    });
-    el('yfName').addEventListener('keydown',function(e){ if(e.key==='Enter')el('yfGo').click(); });
-  }
-  return {
-    get user(){return user;},
-    saveProgress:function(data){ if(!user)return; user.progress=Object.assign(user.progress||{},data||{}); save(user); post(user,'progress'); },
-    logout:function(){ try{localStorage.removeItem(KEY);}catch(e){} location.reload(); }
-  };
-})();
-</script>
 
 <div id="wrap">
   <button class="mutebtn" id="mute">🔊</button>
@@ -199,6 +147,7 @@ var YF_ACCOUNT=(function(){
     <div style="font-size:13px;letter-spacing:1px;color:#9aa3d0;font-weight:800">ЖЕҢІМПАЗ</div>
     <div class="score-big" id="winWho">🏆</div>
     <div class="sub" id="winSub"></div>
+    <div id="yfBoard" style="display:none"></div>
     <div class="row2"><button class="btn big" id="againBtn">Қайта ойнау ▶</button><button class="btn alt" id="menuBtn">Мәзір</button></div>
   </div>
 
@@ -418,7 +367,8 @@ function finishGame(idx){
   var who=(nPlayers>1)?((idx===0?'1':'2')+'-ойыншы жеңді! 🏆'):'Мәреге жеттің! 🏆';
   $('winWho').textContent=who;
   var sc=players[idx].score;
-  try{if(window.YF_ACCOUNT&&YF_ACCOUNT.user)YF_ACCOUNT.saveProgress({last:sc});}catch(e){}
+  DB.finish({ score: sc, correct: sc },
+            document.getElementById('yfBoard'));
   $('winSub').textContent='Жинаған ұпай: '+sc+' ⭐ · '+(nPlayers>1?'':'Керемет!');
   $('win').classList.add('on');
 }
@@ -435,6 +385,10 @@ $('mute').addEventListener('click',function(){ var on=Sound.toggle(); this.textC
 
 /* test hook */
 window.__BOARD__={ get CELLS(){return CELLS;}, get BANK(){return BANK;}, get players(){return players;}, roll:roll, startGame:startGame, setPlayers:function(n){nPlayers=n;}, TIME_BY_D:TIME_BY_D, N:N, answerCorrectNow:function(){ /* for tests */ } };
+</script>
+<script>
+/* Вход и лидерборд живут в ../db/games-db.js — аккаунт общий для всех игр. */
+DB.mountAuth({ game: 'math_board' });
 </script>
 </body>
 </html>

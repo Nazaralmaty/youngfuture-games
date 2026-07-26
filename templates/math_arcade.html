@@ -83,133 +83,6 @@
 </head>
 <body>
 
-<style>
-/* ── Вход / регистрация ─────────────────────────────────────────────────── */
-#yfAcc{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(7,11,30,.94);backdrop-filter:blur(6px);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;overflow-y:auto}
-#yfAcc .yfBox{width:100%;max-width:340px;background:linear-gradient(160deg,#0e2247,#0b1a33);border:1px solid #22305f;border-radius:22px;padding:24px 20px;color:#eaf0ff;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);margin:auto}
-#yfAcc .yfLogo{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#6d4bff,#21d4fd);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
-#yfAcc .yfLogo svg{width:27px;height:27px}
-#yfAcc .yfT{font-size:22px;font-weight:900;margin-bottom:4px}
-#yfAcc .yfS{font-size:13px;color:#9fb0d8;margin-bottom:16px;line-height:1.45}
-#yfAcc input{width:100%;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;padding:13px 15px;font-size:16px;font-family:inherit;margin-bottom:10px;outline:none}
-#yfAcc input:focus{border-color:#8a6bff}
-#yfAcc #yfErr{color:#ff6b6b;font-size:13px;min-height:18px;margin-bottom:4px;line-height:1.35}
-#yfAcc button.go{width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:900;font-size:17px;color:#0b1330;background:linear-gradient(135deg,#9be870,#d6ff8a);border-radius:14px;padding:14px}
-#yfAcc button.go:disabled{opacity:.55}
-#yfAcc .yfSwap{margin-top:13px;font-size:13px;color:#9fb0d8}
-#yfAcc .yfSwap b{color:#9be870;cursor:pointer;font-weight:800}
-#yfAcc .yfHint{font-size:11px;color:#7e8db0;margin-top:12px;line-height:1.45}
-#yfAcc .only-up{display:block}
-#yfAcc.mode-in .only-up{display:none}
-/* ── Лидерборд на экране результата ──────────────────────────────────────── */
-.lb{width:100%;max-width:340px;margin:12px auto 0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:12px 14px;text-align:left}
-.lb .lbT{font-size:11px;font-weight:800;letter-spacing:.8px;color:#9aa3d0;text-transform:uppercase;margin-bottom:9px}
-.lb .row{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:13.5px}
-.lb .row .p{width:22px;font-weight:900;color:#9aa3d0;flex:none}
-.lb .row .n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lb .row .s{font-weight:900;color:#ffce4a}
-.lb .row.me{background:rgba(155,232,112,.12);border-radius:9px;padding:5px 7px;margin:0 -7px}
-.lb .row.me .n{color:#9be870;font-weight:800}
-.lb .lbE{font-size:12.5px;color:#7e8db0;text-align:center;padding:6px 0}
-</style>
-<div id="yfAcc"><div class="yfBox">
-  <div class="yfLogo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div>
-  <div class="yfT" id="yfTitle">Тіркелу 🎮</div>
-  <div class="yfS" id="yfSub">Нөміріңізді жазыңыз — баланың прогресі сақталады.</div>
-  <input id="yfPhone" type="tel" inputmode="tel" placeholder="+7 700 000 00 00" autocomplete="tel">
-  <input id="yfPass" type="password" placeholder="Құпия сөз (кемінде 6 таңба)" autocomplete="current-password">
-  <input id="yfName" class="only-up" placeholder="Баланың аты" autocomplete="off">
-  <input id="yfClass" class="only-up" placeholder="Сыныбы (мыс. 5)" autocomplete="off">
-  <div id="yfErr"></div>
-  <button class="go" id="yfGo">Тіркелу ▶</button>
-  <div class="yfSwap" id="yfSwap">Аккаунтыңыз бар ма? <b>Кіру</b></div>
-  <div class="yfHint">SMS жіберілмейді, растау қажет емес. Баланың тегі мен мектебі сақталмайды 🔒</div>
-</div></div>
-<script>
-/* Вход и регистрация через Supabase. Логика игры ниже про это не знает —
-   она просто зовёт YF_ACCOUNT.saveProgress(), как и раньше. */
-var YF_ACCOUNT = (function () {
-  var box = document.getElementById('yfAcc');
-  var mode = 'up';                       // 'up' = регистрация, 'in' = вход
-  function el(id) { return document.getElementById(id); }
-  function err(m) { el('yfErr').textContent = m || ''; }
-
-  function setMode(next) {
-    mode = next;
-    box.classList.toggle('mode-in', mode === 'in');
-    el('yfTitle').textContent = mode === 'up' ? 'Тіркелу 🎮' : 'Кіру 🎮';
-    el('yfSub').textContent   = mode === 'up'
-      ? 'Нөміріңізді жазыңыз — баланың прогресі сақталады.'
-      : 'Нөміріңіз бен құпия сөзді енгізіңіз.';
-    el('yfGo').textContent    = mode === 'up' ? 'Тіркелу ▶' : 'Кіру ▶';
-    el('yfSwap').innerHTML    = mode === 'up'
-      ? 'Аккаунтыңыз бар ма? <b>Кіру</b>'
-      : 'Аккаунтыңыз жоқ па? <b>Тіркелу</b>';
-    err('');
-  }
-
-  function hide() { box.style.display = 'none'; }
-
-  function submit() {
-    var phone = DB.normalizePhone(el('yfPhone').value);
-    var pass  = el('yfPass').value;
-    err('');
-
-    if (!phone)          { err('Нөмірді дұрыс жазыңыз: +7 700 000 00 00'); return; }
-    if (pass.length < 6) { err('Құпия сөз кемінде 6 таңба'); return; }
-
-    var form = { phone: phone, password: pass };
-    if (mode === 'up') {
-      form.childName  = el('yfName').value.trim();
-      form.childClass = el('yfClass').value.trim();
-      if (!form.childName) { err('Баланың атын жазыңыз'); return; }
-    }
-
-    el('yfGo').disabled = true;
-    el('yfGo').textContent = 'Күте тұрыңыз…';
-
-    (mode === 'up' ? DB.signUp(form) : DB.signIn(form))
-      .then(hide)
-      .catch(function (e) {
-        var m = String(e.message || e);
-        if (/already registered|already exists/i.test(m)) {
-          err('Бұл нөмір тіркелген. «Кіру» батырмасын басыңыз');
-          setMode('in');
-        } else if (/Invalid login/i.test(m)) {
-          err('Нөмір немесе құпия сөз қате');
-        } else {
-          err(m);
-        }
-      })
-      .then(function () {
-        el('yfGo').disabled = false;
-        el('yfGo').textContent = mode === 'up' ? 'Тіркелу ▶' : 'Кіру ▶';
-      });
-  }
-
-  DB.init({ game: 'math_arcade' }).then(function () {
-    if (DB.isSignedIn) hide(); else setMode('up');
-  });
-
-  el('yfGo').addEventListener('click', submit);
-  el('yfSwap').addEventListener('click', function (e) {
-    if (e.target.tagName === 'B') setMode(mode === 'up' ? 'in' : 'up');
-  });
-  el('yfPass').addEventListener('keydown', function (e) { if (e.key === 'Enter') submit(); });
-
-  return {
-    get user() { return DB.player; },
-    saveProgress: function (result) {
-      if (!DB.isSignedIn) return Promise.resolve(null);
-      return DB.saveSession(result).catch(function (e) {
-        if (window.console) console.warn('[DB] нәтиже сақталмады:', e.message);
-        return null;
-      });
-    },
-    logout: function () { DB.signOut(); location.reload(); }
-  };
-})();
-</script>
 
 <div id="wrap">
   <canvas id="cv"></canvas>
@@ -252,7 +125,7 @@ var YF_ACCOUNT = (function () {
     <div style="font-size:13px;letter-spacing:1px;color:#9aa3d0;font-weight:800">СЕНІҢ НӘТИЖЕҢ</div>
     <div class="score-big" id="oScore">0</div>
     <div class="learned" id="oLearned"></div>
-    <div class="lb" id="oBoard" style="display:none"></div>
+    <div id="yfBoard" style="display:none"></div>
     <div class="cta">
       <b>Көрдің бе? Ағылшынды ойнап үйренуге болады 🎮</b>
       <p>Біз YoungFuture-де дәл осылай оқытамыз. Нақты деңгейіңді тегін біл — жаз 👇</p>
@@ -774,7 +647,14 @@ var UI=(function(){
   }
   function showOver(){ $('hud').classList.remove('on'); $('prompt').classList.remove('on');
     $('oScore').textContent=Engine.score;
-    saveAndShowBoard();
+    DB.finish({
+      score:       Engine.score,
+      correct:     Engine.score,
+      mistakes:    3-Engine.lives,
+      maxCombo:    Engine.comboMax,
+      durationSec: Engine.startedAt ? Math.round((Date.now()-Engine.startedAt)/1000) : 0,
+      difficulty:  Engine.diffKey||'medium'
+    }, document.getElementById('yfBoard'));
     var box=$('oLearned'), uniq=[],seen={}; Engine.learned.forEach(function(w){ if(!seen[w]){seen[w]=1;uniq.push(w);} });
     if(uniq.length){ var h='<div class="lt">ҮЙРЕНГЕН СӨЗДЕР: '+uniq.length+'</div>'; uniq.slice(0,24).forEach(function(w){ var p=w.split(' — '); h+='<span class="wchip">'+p[0]+(p[1]?(' — <b>'+p[1]+'</b>'):'')+'</span>'; }); box.innerHTML=h; }
     else box.innerHTML='';
@@ -791,56 +671,13 @@ var UI=(function(){
   $('ctaStart').href='https://wa.me/77077518715?text='+encodeURIComponent('Сәлеметсіз бе! YoungFuture-дің тегін ағылшын деңгей тесті туралы білгім келеді 🚀');
 
 
-  // ── База данных: сохранить партию и показать топ недели ──────────────────
-  function saveAndShowBoard(){
-    var box=$('oBoard');
-    if(!window.DB||!DB.isSignedIn){ box.style.display='none'; return; }
-
-    box.style.display='block';
-    box.innerHTML='<div class="lbT">Апта үздіктері</div><div class="lbE">Жүктелуде…</div>';
-
-    YF_ACCOUNT.saveProgress({
-      score:       Engine.score,
-      correct:     Engine.score,
-      mistakes:    3-Engine.lives,
-      maxCombo:    Engine.comboMax,
-      durationSec: Engine.startedAt ? Math.round((Date.now()-Engine.startedAt)/1000) : 0,
-      difficulty:  Engine.diffKey||'medium'
-    })
-    .then(function(){ return Promise.all([DB.weeklyTop(5), DB.myRank()]); })
-    .then(function(r){ renderBoard(r[0]||[], r[1]); })
-    .catch(function(){
-      box.innerHTML='<div class="lbT">Апта үздіктері</div>'+
-                    '<div class="lbE">Интернет жоқ — нәтиже кейін жіберіледі</div>';
-    });
-  }
-
-  function renderBoard(top, mine){
-    var box=$('oBoard');
-    if(!top.length){
-      box.innerHTML='<div class="lbT">Апта үздіктері</div>'+
-                    '<div class="lbE">Сен осы аптада біріншісің 🎉</div>';
-      return;
-    }
-    var html='<div class="lbT">Апта үздіктері</div>', inTop=false;
-    top.forEach(function(r){
-      if(r.is_me) inTop=true;
-      html+='<div class="row'+(r.is_me?' me':'')+'">'+
-              '<span class="p">'+r.place+'</span>'+
-              '<span class="n">'+esc(r.child_name)+'</span>'+
-              '<span class="s">'+r.best_score+'</span></div>';
-    });
-    if(!inTop && mine){
-      html+='<div class="row me"><span class="p">'+mine.place+'</span>'+
-            '<span class="n">Сен</span><span class="s">'+mine.best_score+'</span></div>';
-    }
-    box.innerHTML=html;
-  }
-
-  function esc(t){ var d=document.createElement('div'); d.textContent=t||''; return d.innerHTML; }
 
   return { showOver:showOver };
 })();
+</script>
+<script>
+/* Вход и лидерборд живут в ../db/games-db.js — аккаунт общий для всех игр. */
+DB.mountAuth({ game: 'math_arcade' });
 </script>
 </body>
 </html>
