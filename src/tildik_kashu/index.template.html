@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#070b1e">
+<meta name="description" content="Тілдік Қашу — қазақша платформер-ойын: жүгір, секір, сөздерді аш. YoungFuture.">
+<title>Тілдік Қашу · YoungFuture 🏃</title>
+<style>
+  :root{
+    --ink:#0b1437; --ink2:#161c47; --violet:#6d4bff; --violet2:#8a6bff;
+    --cyan:#21d4fd; --lime:#9be870; --gold:#ffce4a; --red:#ff4d6d; --green:#2fe08a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+  body{
+    background:#070b1e;color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+    user-select:none;-webkit-user-select:none;touch-action:none;
+  }
+  .hide{display:none!important}
+
+  #wrap{position:fixed;inset:0;display:flex;flex-direction:column;background:#070b1e;overflow:hidden}
+
+  /* ---------- сцена ---------- */
+  #stage{position:relative;flex:1 1 auto;min-height:0;background:#0a1330}
+  #cv{display:block;width:100%;height:100%;image-rendering:auto}
+
+  /* ---------- HUD ---------- */
+  #hud{position:absolute;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top) + 8px) 10px 0;
+       display:flex;flex-direction:column;gap:6px;pointer-events:none;z-index:6}
+  .hrow{display:flex;align-items:center;gap:8px}
+  #hearts{display:flex;gap:2px;font-size:17px;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+  .heart{color:var(--red)}
+  .heart.off{color:rgba(255,255,255,.22)}
+  .chip{background:rgba(11,19,48,.62);border:1px solid rgba(255,255,255,.14);border-radius:999px;
+        padding:4px 10px;font-size:12px;font-weight:800;display:flex;align-items:center;gap:5px;backdrop-filter:blur(6px)}
+  .chip b{color:var(--gold)}
+  .chip.w b{color:var(--cyan)}
+  .spacer{flex:1}
+  #progBar{height:4px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden;max-width:100%}
+  #progFill{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--lime));transition:width .2s linear}
+
+  .iconbtn{pointer-events:auto;width:34px;height:34px;border-radius:11px;border:1px solid rgba(255,255,255,.18);
+           background:rgba(11,19,48,.7);color:#fff;font-size:15px;cursor:pointer;flex:none;backdrop-filter:blur(6px)}
+  .iconbtn:active{transform:scale(.94)}
+
+  /* ---------- баннер уровня ---------- */
+  #banner{position:absolute;left:0;right:0;top:32%;text-align:center;z-index:7;pointer-events:none;opacity:0}
+  #banner.go{animation:bnr 2.2s ease forwards}
+  #banner b{display:block;font-size:26px;font-weight:900;letter-spacing:-.5px;text-shadow:0 6px 24px rgba(0,0,0,.7)}
+  #banner span{display:block;font-size:13px;color:#c7cdf0;margin-top:2px}
+  @keyframes bnr{0%{opacity:0;transform:translateY(14px) scale(.96)}18%{opacity:1;transform:none}
+                 74%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+
+  /* ---------- управление ---------- */
+  #pad{position:relative;flex:0 0 auto;height:min(32vh,210px);display:none;
+       background:linear-gradient(180deg,#0c1533,#070b1e);border-top:1px solid rgba(255,255,255,.07);z-index:5}
+  @media (pointer:coarse){#pad{display:block}}
+
+  /* Портрет: игровое поле — широкая «квадратная» сцена сверху, управление снизу.
+     Иначе по горизонтали видно всего 10 тайлов и в платформер играть нельзя. */
+  @media (pointer:coarse) and (orientation:portrait){
+    #stage{flex:0 0 auto;height:min(56vh,100vw)}
+    #pad{flex:1 1 auto;height:auto;min-height:180px}
+  }
+  #stickZone{position:absolute;left:0;top:0;bottom:0;width:52%;touch-action:none}
+  #stick{position:absolute;width:104px;height:104px;margin:-52px 0 0 -52px;border-radius:50%;
+         border:2px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);opacity:0;transition:opacity .12s}
+  #stick.on{opacity:1}
+  #knob{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:0;border-radius:50%;
+        background:radial-gradient(circle at 35% 30%,#a99bff,#5b45c9);box-shadow:0 6px 18px rgba(109,75,255,.45);
+        transform:translate(-50%,-50%)}
+  #stickHint{position:absolute;left:18px;bottom:14px;font-size:11px;color:rgba(255,255,255,.3);font-weight:700}
+
+  #btns{position:absolute;right:14px;bottom:14px;display:grid;gap:10px;
+        grid-template-areas:"dash jump" "atk jump";align-items:end}
+  .tbtn{border:none;border-radius:50%;color:#08122c;font-weight:900;font-family:inherit;cursor:pointer;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;
+        box-shadow:0 8px 20px rgba(0,0,0,.4);touch-action:none}
+  .tbtn span{font-size:9px;font-weight:800;opacity:.75;margin-top:2px}
+  .tbtn.on{transform:scale(.92);filter:brightness(1.15)}
+  .tbtn[data-act=jump]{grid-area:jump;width:86px;height:86px;font-size:22px;
+        background:radial-gradient(circle at 35% 30%,#d3ff9a,var(--lime))}
+  .tbtn[data-act=attack]{grid-area:atk;width:62px;height:62px;font-size:20px;
+        background:radial-gradient(circle at 35% 30%,#ffe9a0,var(--gold))}
+  .tbtn[data-act=dash]{grid-area:dash;width:58px;height:58px;font-size:18px;color:#fff;
+        background:radial-gradient(circle at 35% 30%,#7ee8ff,#1aa5d8)}
+
+  @media (orientation:landscape) and (max-height:520px){
+    #pad{position:absolute;inset:0;height:auto;background:none;border:none;pointer-events:none}
+    #stickZone{pointer-events:auto;width:42%}
+    #btns{pointer-events:auto;bottom:calc(env(safe-area-inset-bottom) + 10px);right:calc(env(safe-area-inset-right) + 14px)}
+    #stickHint{display:none}
+  }
+
+  /* ---------- экраны ---------- */
+  .screen{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          text-align:center;padding:22px 18px;overflow-y:auto;
+          background:radial-gradient(circle at 50% 0%,#20296b 0%,#0b1437 58%,#070b1e 100%)}
+  .screen.sheet{background:rgba(6,10,26,.72);backdrop-filter:blur(7px)}
+  .brand{display:flex;align-items:center;gap:8px;margin-bottom:10px;opacity:.9}
+  .logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--violet),var(--cyan));
+        display:flex;align-items:center;justify-content:center;font-size:14px;flex:none}
+  .brand b{font-size:13px;font-weight:800}
+  .brand b i{font-style:normal;color:var(--cyan)}
+
+  h1{font-size:clamp(26px,7vw,40px);font-weight:900;letter-spacing:-.8px;line-height:1.02;
+     text-shadow:0 6px 28px rgba(109,75,255,.5)}
+  h1 em{font-style:normal;color:var(--gold)}
+  h2{font-size:clamp(19px,5vw,26px);font-weight:900;letter-spacing:-.4px}
+  .tagline{font-size:13px;font-weight:800;color:var(--cyan);margin:6px 0 4px;letter-spacing:.3px}
+  .sub{font-size:13px;color:#c7cdf0;line-height:1.55;max-width:330px;margin:6px auto 2px}
+
+  .btn{border:none;cursor:pointer;font-family:inherit;font-weight:900;color:#08122c;
+       background:linear-gradient(135deg,var(--lime),#d6ff8a);border-radius:14px;
+       box-shadow:0 10px 24px rgba(155,232,112,.28);transition:transform .08s}
+  .btn:active{transform:translateY(1px) scale(.985)}
+  .btn.big{font-size:17px;padding:14px 30px;margin-top:14px}
+  .btn.alt{background:linear-gradient(135deg,var(--violet),var(--violet2));color:#fff;font-size:14px;padding:11px 20px;
+           box-shadow:0 10px 24px rgba(109,75,255,.35)}
+  .btn.ghost{background:rgba(255,255,255,.08);color:#fff;font-size:13px;padding:10px 18px;box-shadow:none;
+             border:1px solid rgba(255,255,255,.16)}
+  .row2{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap;justify-content:center}
+
+  .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:16px;
+        padding:13px 15px;max-width:360px;margin:12px auto 0;text-align:left}
+  .card h3{font-size:13px;color:var(--gold);margin-bottom:7px;letter-spacing:.4px}
+  .card p{font-size:12.5px;color:#dfe3f7;line-height:1.65}
+  .card kbd{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);border-radius:6px;
+            padding:1px 6px;font-size:11px;font-weight:800;font-family:inherit}
+
+  #levelPick{display:flex;flex-direction:column;gap:8px;margin-top:14px;width:100%;max-width:330px}
+  .lvbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;cursor:pointer;font-family:inherit;
+         background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:13px;
+         padding:11px 14px;color:#fff;text-align:left}
+  .lvbtn b{font-size:14px;font-weight:800}
+  .lvbtn span{font-size:11.5px;color:#9aa3d0}
+  .lvbtn.locked{opacity:.42;cursor:not-allowed}
+  .lvbtn:not(.locked):active{transform:scale(.99);background:rgba(255,255,255,.12)}
+
+  /* ---------- модалка со словом ---------- */
+  #scrGate .gatecard{background:linear-gradient(160deg,#1a2352,#141a3f);border:1px solid rgba(255,206,74,.3);
+       border-radius:20px;padding:20px 18px 18px;width:100%;max-width:340px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+  .gkick{font-size:11px;font-weight:900;letter-spacing:1.4px;color:var(--gold);text-transform:uppercase}
+  #gateWord{font-size:clamp(28px,9vw,38px);font-weight:900;margin:8px 0 4px;letter-spacing:-.5px;color:#fff}
+  #gateHint{font-size:12px;color:#9aa3d0;margin-bottom:14px}
+  #gateOpts{display:flex;flex-direction:column;gap:9px}
+  .optbtn{font-family:inherit;font-size:16px;font-weight:800;color:#fff;cursor:pointer;
+          background:rgba(255,255,255,.09);border:1.5px solid rgba(255,255,255,.18);border-radius:13px;
+          padding:14px 12px;min-height:52px;transition:transform .08s,background .15s}
+  .optbtn:active{transform:scale(.985)}
+  .optbtn.ok{background:linear-gradient(135deg,#2fe08a,#7cf0a6);border-color:#7cf0a6;color:#06231a}
+  .optbtn.bad{background:linear-gradient(135deg,#ff4d6d,#ff8090);border-color:#ff8090;color:#2a0710}
+
+  /* ---------- статистика ---------- */
+  #endStats,#finalStats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:14px auto 4px;max-width:330px}
+  #endStats div,#finalStats div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+       border-radius:13px;padding:10px 8px}
+  #endStats b,#finalStats b{display:block;font-size:22px;color:var(--gold);line-height:1.1}
+  #endStats span,#finalStats span{display:block;font-size:11px;color:#9aa3d0;margin-top:2px}
+
+  #finalWords{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:12px auto 0;max-width:340px}
+  .wchip{background:rgba(33,212,253,.12);border:1px solid rgba(33,212,253,.32);border-radius:999px;
+         padding:5px 11px;font-size:12px;color:#dff7ff}
+  .wchip b{color:var(--gold);font-weight:800}
+
+  .cta{margin-top:14px;background:linear-gradient(135deg,var(--ink2),#28306e);border:1px solid #3a4488;
+       border-radius:16px;padding:13px 15px;max-width:340px}
+  .cta b{font-size:13.5px}
+  .cta p{font-size:12px;color:#c7cdf0;margin-top:5px;line-height:1.5}
+
+  .foot{margin-top:14px;font-size:11px;color:#6a739b}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+  <div id="stage">
+    <canvas id="cv"></canvas>
+
+    <div id="hud">
+      <div class="hrow">
+        <button id="btnPause" class="iconbtn" aria-label="Кідірту">⏸</button>
+        <button id="muteBtn" class="iconbtn" aria-label="Дыбыс">🔊</button>
+        <div id="hearts" data-hp="-1"></div>
+        <div class="spacer"></div>
+        <div class="chip">🪙 <b id="coinVal">0</b></div>
+        <div class="chip w">📖 <b id="wordVal">0/0</b></div>
+        <div class="chip">⭐ <b id="scoreVal">0</b></div>
+      </div>
+      <div id="progBar"><div id="progFill"></div></div>
+    </div>
+
+    <div id="banner" class="hide"></div>
+  </div>
+
+  <div id="pad">
+    <div id="stickZone">
+      <div id="stick"><div id="knob"></div></div>
+      <div id="stickHint">◀ жүру / ходьба</div>
+    </div>
+    <div id="btns">
+      <button class="tbtn" data-act="dash">⚡<span>ЖЕЛПІН</span></button>
+      <button class="tbtn" data-act="attack">⚔<span>СОҚҚЫ</span></button>
+      <button class="tbtn" data-act="jump">⬆<span>СЕКІРУ</span></button>
+    </div>
+  </div>
+
+  <!-- ================= ЭКРАНЫ ================= -->
+  <section id="scrStart" class="screen">
+    <div class="brand"><div class="logo">⚡</div><b>young<i>future</i></b></div>
+    <h1>ТІЛДІК <em>ҚАШУ</em></h1>
+    <div class="tagline">Жүгір · Секір · Сөздерді аш</div>
+    <p class="sub">Көлеңкелерден қаш, алтын жина, тас қақпаларды ағылшын сөзімен аш. 3 деңгей, 30 сөз.</p>
+    <button id="btnPlay" class="btn big">ОЙНАУ ▶</button>
+    <div class="row2">
+      <button id="btnHow" class="btn ghost">Қалай ойнау?</button>
+    </div>
+    <div id="levelPick"></div>
+    <div class="foot">Рекорд: <b id="bestVal">0</b> ұпай</div>
+  </section>
+
+  <section id="scrHow" class="screen hide">
+    <h2>Басқару</h2>
+    <div class="card">
+      <h3>ТЕЛЕФОН / ПЛАНШЕТ</h3>
+      <p>Сол жақ — саусақпен басып, солға-оңға тарт (джойстик).<br>
+         Оң жақ — <b>⬆ секіру</b> (екі рет — қос секіру), <b>⚔ соққы</b>, <b>⚡ желпіну</b>.</p>
+    </div>
+    <div class="card">
+      <h3>КОМПЬЮТЕР</h3>
+      <p><kbd>A</kbd><kbd>D</kbd> немесе <kbd>←</kbd><kbd>→</kbd> — жүру<br>
+         <kbd>Space</kbd> / <kbd>W</kbd> — секіру (2 рет)<br>
+         <kbd>J</kbd> — соққы · <kbd>Shift</kbd> — желпіну<br>
+         <kbd>P</kbd> — кідірту · <kbd>M</kbd> — дыбыс</p>
+    </div>
+    <div class="card">
+      <h3>МАҚСАТ</h3>
+      <p>Деңгей соңындағы <b>порталға</b> жет. Жолда <b>? қақпалары</b> бар — қазақша сөздің ағылшын аудармасын таңда, қақпа ашылады (+100 ұпай).</p>
+    </div>
+    <button id="btnHowBack" class="btn big">Түсінікті ✓</button>
+  </section>
+
+  <section id="scrGate" class="screen sheet hide">
+    <div class="gatecard">
+      <div class="gkick">Тас қақпа · Сөз қақпасы</div>
+      <div id="gateWord">—</div>
+      <div id="gateHint">Ағылшынша қалай?</div>
+      <div id="gateOpts"></div>
+    </div>
+  </section>
+
+  <section id="scrPause" class="screen sheet hide">
+    <h2>Кідіріс</h2>
+    <p class="sub">Тынысты ал. Ойын күтіп тұр.</p>
+    <button id="btnResume" class="btn big">Жалғастыру ▶</button>
+    <div class="row2">
+      <button id="btnRestart" class="btn ghost">Қайта бастау</button>
+      <button id="btnMenu" class="btn ghost">Мәзірге</button>
+    </div>
+  </section>
+
+  <section id="scrEnd" class="screen hide">
+    <div class="brand"><div class="logo">🏆</div><b>young<i>future</i></b></div>
+    <h2 id="endTitle">Деңгей өтті!</h2>
+    <div id="endStats"></div>
+    <button id="btnNext" class="btn big">Келесі деңгей →</button>
+  </section>
+
+  <section id="scrOver" class="screen hide">
+    <div class="brand"><div class="logo">💔</div><b>young<i>future</i></b></div>
+    <h2>Көлеңке жеңді…</h2>
+    <p class="sub">Ұпай: <b id="overScore">0</b>. Ештеңе етпейді — тағы бір рет көрейік!</p>
+    <button id="btnRetry" class="btn big">Қайта көру ↻</button>
+    <div class="row2"><button id="btnMenu2" class="btn ghost">Мәзірге</button></div>
+  </section>
+
+  <section id="scrFinal" class="screen hide">
+    <div class="brand"><div class="logo">🎓</div><b>young<i>future</i></b></div>
+    <h1>ЖЕҢІС!</h1>
+    <p class="sub">Барлық деңгейден өттің. Міне, ойын барысында ашқан сөздерің:</p>
+    <div id="finalStats">
+      <div><b id="finalScore">0</b><span>ұпай</span></div>
+      <div><b id="finalCount">0</b><span>жаңа сөз</span></div>
+    </div>
+    <div id="finalWords"></div>
+    <!-- Контакты подставь свои: телефон / инстаграм центра -->
+    <div class="cta">
+      <b>Мұндай ойындар мектебіңізге керек пе?</b>
+      <p>youngfuture — балаларға арналған ИИ-ойындар мен тестілер. Брендіңізбен, оқушы тартуға көмектеседі.</p>
+    </div>
+    <button id="btnFinalMenu" class="btn big">Мәзірге ←</button>
+  </section>
+
+</div>
+
+<script>
+/*<<<BUNDLE>>>*/
+</script>
+</body>
+</html>
