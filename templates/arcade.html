@@ -330,7 +330,52 @@ var Engine=(function(){
 
 /* =================== GAMES =================== */
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
-function fitFont(ctx,text,maxW,base,min){ var fs=base; ctx.font='800 '+fs+'px Inter,Arial'; while(fs>(min||8) && ctx.measureText(String(text)).width>maxW){ fs--; ctx.font='800 '+fs+'px Inter,Arial'; } return fs; }
+/* ---- ЕДИНАЯ ПОДГОНКА ПОДПИСЕЙ (длинные слова: environment, температура …) ---- */
+var LBL_MIN=13;                                   /* мельче на телефоне уже не читается */
+function lblFont(fs,w){ return (w||800)+' '+Math.round(fs)+'px Inter,Arial'; }
+/* Делит подпись максимум на 2 строки: сперва по пробелу, иначе — по дефису внутри слова.
+   Возвращает null, если на этом кегле не влезает даже в две строки. */
+function lblLines(ctx,text,fs,maxW,weight){ var s=String(text); ctx.font=lblFont(fs,weight);
+  if(ctx.measureText(s).width<=maxW) return [s];
+  if(s.indexOf(' ')>=0){                          /* есть пробелы — рвём ТОЛЬКО по ним */
+    var parts=s.split(' ');
+    for(var k=1;k<parts.length;k++){
+      var a=parts.slice(0,k).join(' '), b=parts.slice(k).join(' ');
+      if(ctx.measureText(a).width<=maxW && ctx.measureText(b).width<=maxW) return [a,b]; }
+    return null; }
+  if(s.length<=8) return null;                    /* короткое слово лучше уменьшить, чем рвать дефисом */
+  for(var cut=Math.ceil(s.length/2); cut>1 && cut<s.length; cut++){  /* одно длинное слово — дефис */
+    var l1=s.slice(0,cut)+'-', l2=s.slice(cut);
+    if(ctx.measureText(l1).width<=maxW && ctx.measureText(l2).width<=maxW) return [l1,l2]; }
+  return null; }
+/* Подбирает кегль и разбиение так, чтобы влезло и по ширине, и по высоте.
+   Хочешь запретить перенос — передай маленький maxH (на 2 строки не хватит места). */
+function fitLabel(ctx,text,maxW,maxH,basePx,minPx,weight){
+  var s=String(text), min=Math.max(minPx||LBL_MIN,8), base=Math.round(basePx), fs;
+  var comfort=Math.max(min,Math.round(base*0.72));  /* до этого кегля одна строка лучше переноса */
+  function one(f){ ctx.font=lblFont(f,weight); return ctx.measureText(s).width<=maxW && f*1.25<=maxH; }
+  for(fs=base; fs>=comfort; fs--) if(one(fs)) return {lines:[s],fs:fs};
+  for(fs=base; fs>=min; fs--){                      /* не влезло крупно — пробуем две строки */
+    var two=lblLines(ctx,s,fs,maxW,weight);
+    if(two && two.length===2 && fs*2.3<=maxH) return {lines:two,fs:fs}; }
+  for(fs=comfort-1; fs>=min; fs--) if(one(fs)) return {lines:[s],fs:fs};
+  ctx.font=lblFont(min,weight);
+  return {lines:lblLines(ctx,s,min,maxW,weight)||[s],fs:min}; }
+/* Рисует подпись по центру (x,y) — одной или двумя строками. */
+function drawLabel(ctx,text,x,y,maxW,maxH,basePx,minPx,weight){
+  var f=fitLabel(ctx,text,maxW,maxH,basePx,minPx,weight);
+  ctx.font=lblFont(f.fs,weight); ctx.textAlign='center'; ctx.textBaseline='middle';
+  var lh=f.fs*1.06, y0=y-(f.lines.length-1)*lh/2;
+  for(var i=0;i<f.lines.length;i++) ctx.fillText(f.lines[i],x,y0+i*lh);
+  return f; }
+/* Радиус объекта, при котором подпись остаётся читаемой: растим фрукт/пузырь под слово. */
+function labelR(ctx,text,baseR,maxMul){
+  var fs=Math.max(LBL_MIN,Math.round(baseR*0.5)); ctx.font=lblFont(fs);
+  var w=ctx.measureText(String(text)).width, cap=baseR*(maxMul||1.4);
+  var need=(w<=baseR*1.7)? baseR : (w/2+fs)/1.7;  /* длинное слово ляжет в 2 строки */
+  return Math.max(baseR,Math.min(need,cap)); }
+/* Старая сигнатура сохранена для совместимости, но с читаемым нижним пределом. */
+function fitFont(ctx,text,maxW,base,min){ var fs=base; ctx.font='800 '+fs+'px Inter,Arial'; while(fs>(min||LBL_MIN) && ctx.measureText(String(text)).width>maxW){ fs--; ctx.font='800 '+fs+'px Inter,Arial'; } return fs; }
 
 /* ---- 2. CATCH (Сөзді ұста) ---- */
 var CatchGame={ id:'catch', name:'Сөзді ұста', emoji:'🧺', desc:'Дұрыс жауапты себетке ұста', bpm:120,
@@ -365,9 +410,10 @@ var CatchGame={ id:'catch', name:'Сөзді ұста', emoji:'🧺', desc:'Дұ
       },
       draw:function(ctx){ var ih=H*0.062;
         for(var i=0;i<items.length;i++){ var it=items[i];
-          ctx.font='700 '+Math.round(H*0.027)+'px Inter,Arial'; var fw=ctx.measureText(it.label).width, w=fw+H*0.04;
+          var lf=fitLabel(ctx,it.label,W*0.84,ih*0.5,Math.round(H*0.027),LBL_MIN,700); /* ih*0.5 => всегда одна строка */
+          ctx.font=lblFont(lf.fs,700); var fw=ctx.measureText(lf.lines[0]).width, w=Math.min(fw+H*0.04,W*0.9);
           ctx.fillStyle='#fff'; rr(ctx,it.x-w/2,it.y-ih/2,w,ih,ih/2); ctx.fill();
-          ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(it.label,it.x,it.y);
+          ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(lf.lines[0],it.x,it.y);
         }
         ctx.fillStyle='#9be870'; rr(ctx,basketX-bw/2,by,bw,bh,12); ctx.fill();
         ctx.fillStyle='#0b1330'; ctx.font=Math.round(bh*0.95)+'px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🧺',basketX,by+bh/2);
@@ -385,9 +431,9 @@ var NinjaGame={ id:'ninja', name:'Сөз Нинзя', emoji:'🥷', desc:'Дұр
     var COL=['#ff6b6b','#ffce4a','#9be870','#21d4fd','#ff9f43','#a06bff','#ff6fae'];
     function wave(){ var q=E.buildQuestion(E.rndItem(),D.n); cur=q;
       E.setPrompt(q.promptEmoji||q.promptText, !!q.promptEmoji); fruits=[];
-      var n=q.options.length, slot=(W*0.7)/Math.max(1,n);
-      for(var i=0;i<n;i++){ var label=q.options[i]; var px=W*0.15+slot*(i+0.5)+(Math.random()-0.5)*slot*0.3;
-        fruits.push({x:px,y:H*1.02,vx:(W*0.5-px)*0.25+(Math.random()-0.5)*W*0.1,vy:-D.toss*H*(0.92+Math.random()*0.16),r:fr,label:label,correct:(label===q.correct),sliced:false,dead:false,col:COL[i%COL.length]}); }
+      var n=q.options.length, slot=(W*0.86)/Math.max(1,n), rmax=slot*0.5;
+      for(var i=0;i<n;i++){ var label=q.options[i]; var px=W*0.07+slot*(i+0.5)+(Math.random()-0.5)*slot*0.2;
+        fruits.push({x:px,y:H*1.02,vx:(W*0.5-px)*0.25+(Math.random()-0.5)*W*0.1,vy:-D.toss*H*(0.92+Math.random()*0.16),r:Math.min(labelR(E.ctx,label,fr,1.4),rmax),label:label,correct:(label===q.correct),sliced:false,dead:false,col:COL[i%COL.length]}); }
       waveT=0; }
     function distSeg(px,py,ax,ay,bx,by){ var dx=bx-ax,dy=by-ay,l2=dx*dx+dy*dy; if(l2===0)return Math.hypot(px-ax,py-ay);
       var t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/l2)); return Math.hypot(px-(ax+t*dx),py-(ay+t*dy)); }
@@ -413,7 +459,7 @@ var NinjaGame={ id:'ninja', name:'Сөз Нинзя', emoji:'🥷', desc:'Дұр
           ctx.fillStyle=f.col; ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,7); ctx.fill();
           ctx.fillStyle='rgba(255,255,255,.25)'; ctx.beginPath(); ctx.arc(f.x-f.r*0.3,f.y-f.r*0.3,f.r*0.32,0,7); ctx.fill();
           ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle';
-          fitFont(ctx,f.label,f.r*1.7,Math.round(f.r*0.55),9); ctx.fillText(String(f.label),f.x,f.y);
+          drawLabel(ctx,f.label,f.x,f.y,f.r*1.7,f.r*1.7,Math.round(f.r*0.62),LBL_MIN);
         }
         if(trail.length>1){ ctx.strokeStyle='rgba(33,212,253,.7)'; ctx.lineWidth=H*0.008; ctx.lineCap='round'; ctx.beginPath();
           ctx.moveTo(trail[0].x,trail[0].y); for(var t=1;t<trail.length;t++)ctx.lineTo(trail[t].x,trail[t].y); ctx.stroke(); }
@@ -458,9 +504,7 @@ var WhackGame={ id:'whack', name:'Соққы', emoji:'🔨', desc:'Дұрыс ж
           ctx.fillStyle='rgba(255,255,255,.16)'; rr(ctx,h.x-bw/2,cy-bh/2,bw,bh*0.42,bh*0.30); ctx.fill();
           // label — авто-сыйғызу (қыспай, кеспей)
           ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle';
-          var fs=Math.round(bh*0.36); ctx.font='800 '+fs+'px Inter,Arial';
-          while(fs>9 && ctx.measureText(m.label).width>bw*0.9){ fs--; ctx.font='800 '+fs+'px Inter,Arial'; }
-          ctx.fillText(m.label,h.x,cy);
+          drawLabel(ctx,m.label,h.x,cy,bw*0.86,bh*0.9,Math.round(bh*0.36),LBL_MIN);
           ctx.globalAlpha=1;
         }
       }
@@ -478,10 +522,10 @@ var BubbleGame={ id:'bubble', name:'Көпіршік', emoji:'🫧', desc:'Дұ�
     var COL=['#21d4fd','#9be870','#ffce4a','#ff6fae','#a06bff','#ff9f43'];
     function wave(){ var q=E.buildQuestion(E.rndItem(),D.n); cur=q;
       E.setPrompt(q.promptEmoji||q.promptText, !!q.promptEmoji);
-      bubbles=[]; var n=q.options.length, slot=(W*0.84)/Math.max(1,n);
+      bubbles=[]; var n=q.options.length, slot=(W*0.84)/Math.max(1,n), rmax=slot*0.55;
       var order=E.shuffle(q.options.slice());
       for(var i=0;i<n;i++){ var label=order[i]; var px=W*0.08+slot*(i+0.5);
-        bubbles.push({x:px,bx:px,y:H*1.05+i*H*0.10,r:D.r*H,label:label,correct:(label===q.correct),ph:Math.random()*6.28,col:COL[i%COL.length],dead:false}); }
+        bubbles.push({x:px,bx:px,y:H*1.05+i*H*0.10,r:Math.min(labelR(E.ctx,label,D.r*H,1.35),rmax),label:label,correct:(label===q.correct),ph:Math.random()*6.28,col:COL[i%COL.length],dead:false}); }
       gap=0; }
     return { diffKey:'',diff:null,
       resize:function(){ W=E.W;H=E.H; },
@@ -501,7 +545,7 @@ var BubbleGame={ id:'bubble', name:'Көпіршік', emoji:'🫧', desc:'Дұ�
           ctx.strokeStyle=b.col; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,7); ctx.stroke();
           ctx.fillStyle='rgba(255,255,255,.5)'; ctx.beginPath(); ctx.arc(b.x-b.r*0.32,b.y-b.r*0.32,b.r*0.18,0,7); ctx.fill();
           ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
-          fitFont(ctx,b.label,b.r*1.7,Math.round(b.r*0.5),9); ctx.fillText(String(b.label),b.x,b.y);
+          drawLabel(ctx,b.label,b.x,b.y,b.r*1.7,b.r*1.7,Math.round(b.r*0.55),LBL_MIN);
         }
       }
     };
@@ -548,7 +592,7 @@ var MemoryGame={ id:'memory', name:'Жұп Тап', emoji:'🧠', desc:'Ағыл
           if(show){ ctx.fillStyle=c.en?'#6d4bff':'#161c47'; rr(ctx,c.x,c.y,cw,ch,12); ctx.fill();
             ctx.strokeStyle=c.matched?'#9be870':'rgba(255,255,255,.25)'; ctx.lineWidth=2; rr(ctx,c.x,c.y,cw,ch,12); ctx.stroke();
             ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
-            var fs=Math.min(cw*0.26, ch*0.22); ctx.font='800 '+Math.round(fs)+'px Inter,Arial';
+            var fs=Math.max(LBL_MIN,Math.min(cw*0.26, ch*0.22)); ctx.font='800 '+Math.round(fs)+'px Inter,Arial';
             wrapText(ctx,c.face,c.x+cw/2,c.y+ch/2,cw*0.86,fs*1.1);
           } else { ctx.fillStyle='#0e1738'; rr(ctx,c.x,c.y,cw,ch,12); ctx.fill();
             ctx.strokeStyle='rgba(255,255,255,.14)'; ctx.lineWidth=2; rr(ctx,c.x,c.y,cw,ch,12); ctx.stroke();
@@ -559,7 +603,13 @@ var MemoryGame={ id:'memory', name:'Жұп Тап', emoji:'🧠', desc:'Ағыл
       }
     };
     function wrapText(ctx,text,cx,cy,maxw,lh){ var words=String(text).split(' '),line='',lines=[];
-      for(var i=0;i<words.length;i++){ var test=line?line+' '+words[i]:words[i]; if(ctx.measureText(test).width>maxw&&line){lines.push(line);line=words[i];}else line=test; }
+      for(var i=0;i<words.length;i++){ var w=words[i];
+        while(ctx.measureText(w).width>maxw && w.length>2){   /* одно длинное слово — режем с дефисом */
+          var cut=w.length-1;
+          while(cut>1 && ctx.measureText(w.slice(0,cut)+'-').width>maxw) cut--;
+          if(line){lines.push(line);line='';}
+          lines.push(w.slice(0,cut)+'-'); w=w.slice(cut); }
+        var test=line?line+' '+w:w; if(ctx.measureText(test).width>maxw&&line){lines.push(line);line=w;}else line=test; }
       if(line)lines.push(line); var y=cy-(lines.length-1)*lh/2; for(var k=0;k<lines.length;k++)ctx.fillText(lines[k],cx,y+k*lh); }
   }
 };
@@ -609,7 +659,7 @@ var FlappyGame={ id:'flappy', name:'Flappy', emoji:'🐤', desc:'Дұрыс са
     function seg(ctx,x,pw,y0,y1){ if(y1<=y0)return; ctx.fillStyle='#2e7d32'; rr(ctx,x-pw/2,y0,pw,y1-y0,8); ctx.fill();
       ctx.fillStyle='#256528'; rr(ctx,x-pw/2,y1-9,pw,9,4); ctx.fill(); }
     function gapLbl(ctx,x,y,pw,label){ var fs=Math.round(pw*0.22); ctx.font='800 '+fs+'px Inter,Arial';
-      while(fs>10 && ctx.measureText(label).width>pw*1.6){ fs--; ctx.font='800 '+fs+'px Inter,Arial'; }
+      while(fs>LBL_MIN && ctx.measureText(label).width>pw*1.6){ fs--; ctx.font='800 '+fs+'px Inter,Arial'; }
       var w=ctx.measureText(label).width+18; ctx.fillStyle='#eafff0'; rr(ctx,x-w/2,y-fs*0.85,w,fs*1.7,7); ctx.fill();
       ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(label,x,y); }
   }

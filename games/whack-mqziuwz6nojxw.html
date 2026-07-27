@@ -135,7 +135,7 @@ var Sound=(function(){
 /* ============ GAME ============ */
 (function(){
   "use strict";
-  var WORDS=[{"en":"food","kk":"тағам","e":""},{"en":"meal","kk":"ас","e":""},{"en":"breakfast","kk":"таңғы ас","e":""},{"en":"lunch","kk":"түскі ас","e":""},{"en":"dinner","kk":"кешкі ас","e":""},{"en":"bread","kk":"нан","e":"🍞"},{"en":"rice","kk":"күріш","e":"🍚"},{"en":"meat","kk":"ет","e":"🥩"},{"en":"fish","kk":"балық","e":"🐟"},{"en":"chicken","kk":"тауық еті","e":"🍗"},{"en":"egg","kk":"жұмыртқа","e":"🥚"},{"en":"cheese","kk":"ірімшік","e":"🧀"},{"en":"butter","kk":"сары май","e":"🧈"},{"en":"milk","kk":"сүт","e":"🥛"},{"en":"water","kk":"су","e":"💧"},{"en":"juice","kk":"шырын","e":"🧃"},{"en":"tea","kk":"шай","e":"🍵"},{"en":"coffee","kk":"кофе","e":"☕"},{"en":"sugar","kk":"қант","e":"🍬"},{"en":"salt","kk":"тұз","e":"🧂"},{"en":"pepper","kk":"бұрыш","e":"🌶️"},{"en":"vegetable","kk":"көкөніс","e":"🥦"},{"en":"fruit","kk":"жеміс","e":"🍎"},{"en":"apple","kk":"алма","e":"🍎"},{"en":"banana","kk":"банан","e":"🍌"},{"en":"orange","kk":"апельсин","e":"🍊"},{"en":"potato","kk":"картоп","e":"🥔"},{"en":"tomato","kk":"қызанақ","e":"🍅"},{"en":"cook","kk":"пісіру","e":"👩‍🍳"},{"en":"kitchen","kk":"ас үй","e":"🍳"}];
+  var WORDS=[{"en": "food", "kk": "тағам", "e": ""}, {"en": "meal", "kk": "ас", "e": ""}, {"en": "breakfast", "kk": "таңғы ас", "e": ""}, {"en": "lunch", "kk": "түскі ас", "e": ""}, {"en": "dinner", "kk": "кешкі ас", "e": ""}, {"en": "bread", "kk": "нан", "e": "🍞"}, {"en": "rice", "kk": "күріш", "e": "🍚"}, {"en": "meat", "kk": "ет", "e": "🥩"}, {"en": "fish", "kk": "балық", "e": "🐟"}, {"en": "chicken", "kk": "тауық еті", "e": "🍗"}, {"en": "egg", "kk": "жұмыртқа", "e": "🥚"}, {"en": "cheese", "kk": "ірімшік", "e": "🧀"}, {"en": "butter", "kk": "сары май", "e": "🧈"}, {"en": "milk", "kk": "сүт", "e": "🥛"}, {"en": "water", "kk": "су", "e": "💧"}, {"en": "juice", "kk": "шырын", "e": "🧃"}, {"en": "tea", "kk": "шай", "e": "🍵"}, {"en": "coffee", "kk": "кофе", "e": "☕"}, {"en": "sugar", "kk": "қант", "e": "🍬"}, {"en": "salt", "kk": "тұз", "e": "🧂"}, {"en": "pepper", "kk": "бұрыш", "e": "🌶️"}, {"en": "vegetable", "kk": "көкөніс", "e": "🥦"}, {"en": "fruit", "kk": "жеміс", "e": "🍎"}, {"en": "apple", "kk": "алма", "e": "🍎"}, {"en": "banana", "kk": "банан", "e": "🍌"}, {"en": "orange", "kk": "апельсин", "e": "🍊"}, {"en": "potato", "kk": "картоп", "e": "🥔"}, {"en": "tomato", "kk": "қызанақ", "e": "🍅"}, {"en": "cook", "kk": "пісіру", "e": "👩‍🍳"}, {"en": "kitchen", "kk": "ас үй", "e": "🍳"}];
   var DIFFS={
     easy:  {name:'Оңай',  life:2.7, opts:3},
     medium:{name:'Орташа',life:2.0, opts:4},
@@ -250,6 +250,51 @@ var Sound=(function(){
   }
 
   function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+/* ---- ЕДИНАЯ ПОДГОНКА ПОДПИСЕЙ (длинные слова: environment, температура …) ---- */
+var LBL_MIN=13;                                   /* мельче на телефоне уже не читается */
+function lblFont(fs,w){ return (w||800)+' '+Math.round(fs)+'px Inter,Arial'; }
+/* Делит подпись максимум на 2 строки: сперва по пробелу, иначе — по дефису внутри слова.
+   Возвращает null, если на этом кегле не влезает даже в две строки. */
+function lblLines(ctx,text,fs,maxW,weight){ var s=String(text); ctx.font=lblFont(fs,weight);
+  if(ctx.measureText(s).width<=maxW) return [s];
+  if(s.indexOf(' ')>=0){                          /* есть пробелы — рвём ТОЛЬКО по ним */
+    var parts=s.split(' ');
+    for(var k=1;k<parts.length;k++){
+      var a=parts.slice(0,k).join(' '), b=parts.slice(k).join(' ');
+      if(ctx.measureText(a).width<=maxW && ctx.measureText(b).width<=maxW) return [a,b]; }
+    return null; }
+  if(s.length<=8) return null;                    /* короткое слово лучше уменьшить, чем рвать дефисом */
+  for(var cut=Math.ceil(s.length/2); cut>1 && cut<s.length; cut++){  /* одно длинное слово — дефис */
+    var l1=s.slice(0,cut)+'-', l2=s.slice(cut);
+    if(ctx.measureText(l1).width<=maxW && ctx.measureText(l2).width<=maxW) return [l1,l2]; }
+  return null; }
+/* Подбирает кегль и разбиение так, чтобы влезло и по ширине, и по высоте.
+   Хочешь запретить перенос — передай маленький maxH (на 2 строки не хватит места). */
+function fitLabel(ctx,text,maxW,maxH,basePx,minPx,weight){
+  var s=String(text), min=Math.max(minPx||LBL_MIN,8), base=Math.round(basePx), fs;
+  var comfort=Math.max(min,Math.round(base*0.72));  /* до этого кегля одна строка лучше переноса */
+  function one(f){ ctx.font=lblFont(f,weight); return ctx.measureText(s).width<=maxW && f*1.25<=maxH; }
+  for(fs=base; fs>=comfort; fs--) if(one(fs)) return {lines:[s],fs:fs};
+  for(fs=base; fs>=min; fs--){                      /* не влезло крупно — пробуем две строки */
+    var two=lblLines(ctx,s,fs,maxW,weight);
+    if(two && two.length===2 && fs*2.3<=maxH) return {lines:two,fs:fs}; }
+  for(fs=comfort-1; fs>=min; fs--) if(one(fs)) return {lines:[s],fs:fs};
+  ctx.font=lblFont(min,weight);
+  return {lines:lblLines(ctx,s,min,maxW,weight)||[s],fs:min}; }
+/* Рисует подпись по центру (x,y) — одной или двумя строками. */
+function drawLabel(ctx,text,x,y,maxW,maxH,basePx,minPx,weight){
+  var f=fitLabel(ctx,text,maxW,maxH,basePx,minPx,weight);
+  ctx.font=lblFont(f.fs,weight); ctx.textAlign='center'; ctx.textBaseline='middle';
+  var lh=f.fs*1.06, y0=y-(f.lines.length-1)*lh/2;
+  for(var i=0;i<f.lines.length;i++) ctx.fillText(f.lines[i],x,y0+i*lh);
+  return f; }
+/* Радиус объекта, при котором подпись остаётся читаемой: растим фрукт/пузырь под слово. */
+function labelR(ctx,text,baseR,maxMul){
+  var fs=Math.max(LBL_MIN,Math.round(baseR*0.5)); ctx.font=lblFont(fs);
+  var w=ctx.measureText(String(text)).width, cap=baseR*(maxMul||1.4);
+  var need=(w<=baseR*1.7)? baseR : (w/2+fs)/1.7;  /* длинное слово ляжет в 2 строки */
+  return Math.max(baseR,Math.min(need,cap)); }
+
   function heart(cx,cy,s,color){ ctx.fillStyle=color;
     ctx.beginPath();ctx.arc(cx-s*0.5,cy-s*0.25,s*0.5,0,7);ctx.fill();
     ctx.beginPath();ctx.arc(cx+s*0.5,cy-s*0.25,s*0.5,0,7);ctx.fill();
@@ -266,9 +311,7 @@ var Sound=(function(){
     rr(h.x-moleW/2, top-moleH, moleW, moleH+moleH*0.6, moleH*0.4); ctx.fillStyle=m.col; ctx.fill();
     ctx.fillStyle='rgba(255,255,255,.5)'; ctx.beginPath(); ctx.arc(h.x-moleW*0.18,top-moleH*0.55,moleW*0.07,0,7); ctx.fill();
     ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    var fs=Math.round(moleH*0.34); ctx.font='900 '+fs+'px Inter,Arial';
-    if(ctx.measureText(m.label).width>moleW*0.86){ fs=Math.round(moleH*0.24); ctx.font='900 '+fs+'px Inter,Arial'; }
-    ctx.fillText(m.label, h.x, top-moleH*0.3);
+    drawLabel(ctx,m.label,h.x,top-moleH*0.3,moleW*0.82,moleH*0.66,Math.round(moleH*0.34),LBL_MIN,900);
     ctx.restore();
   }
   function draw(){
@@ -289,7 +332,7 @@ var Sound=(function(){
       ctx.fillStyle='#9aa3d0'; ctx.font='800 '+Math.round(H*0.019)+'px Inter,Arial'; ctx.fillText('БАС:', W/2, bannerH*0.3);
       ctx.fillStyle='#fff';
       if(q && q.promptEmoji){ ctx.font=Math.round(H*0.072)+'px serif'; ctx.fillText(q.promptEmoji, W/2, bannerH*0.66); }
-      else if(q){ var pf=Math.round(H*0.046); ctx.font='900 '+pf+'px Inter,Arial'; if(ctx.measureText(q.promptText).width>W*0.86){pf=Math.round(H*0.032);ctx.font='900 '+pf+'px Inter,Arial';} ctx.fillText(q.promptText, W/2, bannerH*0.64); }
+      else if(q){ drawLabel(ctx,q.promptText,W/2,bannerH*0.64,W*0.86,bannerH*0.52,Math.round(H*0.046),LBL_MIN,900); }
       ctx.fillStyle='#fff'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font='800 '+Math.round(H*0.028)+'px Inter,Arial';
       ctx.fillText('⭐ '+score, 56, 24);
       ctx.textAlign='center'; ctx.fillStyle='#21d4fd'; ctx.font='800 '+Math.round(H*0.02)+'px Inter,Arial'; ctx.fillText('Деңгей '+level, W*0.5, bannerH+H*0.02);

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="kk">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>YoungFuture · Математика Аркада 🎮</title>
+<title>YoungFuture · Ағылшын Аркада 🎮</title>
+<script src="../db/games-db.js"></script>
 <style>
   :root{--ink:#0b1437;--ink2:#161c47;--violet:#6d4bff;--violet2:#8a6bff;--cyan:#21d4fd;--lime:#9be870;--gold:#ffce4a;--red:#ff4d6d;}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -82,59 +83,6 @@
 </head>
 <body>
 
-<style>
-#yfAcc{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(7,11,30,.92);backdrop-filter:blur(6px);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif}
-#yfAcc .yfBox{width:100%;max-width:340px;background:linear-gradient(160deg,#0e2247,#0b1a33);border:1px solid #22305f;border-radius:22px;padding:24px 20px;color:#eaf0ff;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-#yfAcc .yfLogo{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#6d4bff,#21d4fd);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
-#yfAcc .yfLogo svg{width:27px;height:27px}
-#yfAcc .yfT{font-size:22px;font-weight:900;margin-bottom:4px}
-#yfAcc .yfS{font-size:13px;color:#9fb0d8;margin-bottom:16px}
-#yfAcc input{width:100%;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;padding:13px 15px;font-size:16px;font-family:inherit;margin-bottom:10px;outline:none}
-#yfAcc input:focus{border-color:#8a6bff}
-#yfAcc #yfErr{color:#ff6b6b;font-size:13px;min-height:16px;margin-bottom:4px}
-#yfAcc #yfGo{width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:900;font-size:17px;color:#0b1330;background:linear-gradient(135deg,#9be870,#d6ff8a);border-radius:14px;padding:14px}
-#yfAcc .yfHint{font-size:11.5px;color:#7e8db0;margin-top:10px}
-</style>
-<div id="yfAcc"><div class="yfBox">
-  <div class="yfLogo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div>
-  <div class="yfT">Вход в игру 🎮</div>
-  <div class="yfS">Впиши имя — прогресс сохранится.</div>
-  <input id="yfName" placeholder="Имя" autocomplete="off">
-  <input id="yfClass" placeholder="Класс (напр. 7А)" autocomplete="off">
-  <input id="yfPhone" type="tel" inputmode="tel" placeholder="Телефон (необязательно)" autocomplete="off">
-  <div id="yfErr"></div>
-  <button id="yfGo">Войти ▶</button>
-  <div class="yfHint">Входишь один раз — дальше автоматически 🔒</div>
-</div></div>
-<script>
-var YF_ACCOUNT=(function(){
-  var KEY='yf_user_v5';
-  var GAME_NAME='math_arcade_ru'; var ENDPOINT='https://script.google.com/macros/s/AKfycbxSGdD65Qzmr8LQhOClkc-mnwxSI1EpS2XSA4mtVp-KKN0EgDPxDj_rE11BVGF3xKQGug/exec'; /* Google Sheets Apps Script (аккаунты). Если пусто — сохраняется только на устройстве. */
-  var user=null;
-  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
-  function save(u){ try{ localStorage.setItem(KEY, JSON.stringify(u)); }catch(e){} }
-  function normPhone(r){ var d=(r||'').replace(/\D/g,''); if(d.length===11&&d.charAt(0)==='8')d='7'+d.slice(1); if(d.length===10)d='7'+d; return d; }
-  function post(u,ev){ if(!ENDPOINT||ENDPOINT.indexOf('ВСТАВ')===0)return; try{ fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:ev||'account',brand:'youngfuture',game:GAME_NAME,id:u.id,name:u.name,'class':u.cls||'',phone:u.phone||'',ts:new Date().toISOString(),progress:u.progress||{}})}).catch(function(){}); }catch(e){} }
-  function el(id){return document.getElementById(id);}
-  function hide(){ var o=el('yfAcc'); if(o)o.style.display='none'; }
-  user=load();
-  if(user){ hide(); }
-  else {
-    el('yfGo').addEventListener('click',function(){
-      var name=el('yfName').value.trim(), cls=el('yfClass').value.trim(), ph=el('yfPhone').value.trim();
-      if(name.length<1){ el('yfErr').textContent='Впиши имя'; return; }
-      user={ id:'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), name:name, cls:cls, phone:normPhone(ph), created:new Date().toISOString(), progress:{} };
-      save(user); post(user,'account'); hide();
-    });
-    el('yfName').addEventListener('keydown',function(e){ if(e.key==='Enter')el('yfGo').click(); });
-  }
-  return {
-    get user(){return user;},
-    saveProgress:function(data){ if(!user)return; user.progress=Object.assign(user.progress||{},data||{}); save(user); post(user,'progress'); },
-    logout:function(){ try{localStorage.removeItem(KEY);}catch(e){} location.reload(); }
-  };
-})();
-</script>
 
 <div id="wrap">
   <canvas id="cv"></canvas>
@@ -146,40 +94,27 @@ var YF_ACCOUNT=(function(){
     <div id="hearts"></div>
     <button id="muteBtn">🔊</button>
   </div>
-  <div id="prompt"><div class="lbl" id="pLbl">ВЫБЕРИ</div><div class="big" id="pBig"></div></div>
+  <div id="prompt"><div class="lbl" id="pLbl">ТАҢДА</div><div class="big" id="pBig"></div></div>
 
   <!-- MENU -->
   <div class="screen on" id="sMenu">
     <div class="brand"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Young<span>Future</span></b></div>
-    <div class="htitle">Математика <em>Аркада</em> 🎮</div>
-    <div class="hsub">Учи формулы играя. Выбери игру, выбери сложность!</div>
+    <div class="htitle">Ағылшын <em>Аркада</em> 🎮</div>
+    <div class="hsub">Ойнап жүріп ағылшын үйрен. Ойынды таңда, қиындықты таңда — кеттік!</div>
     <div class="grid" id="gameGrid"></div>
   </div>
 
-  <!-- LEAD FORM (опционально, LEAD.on) -->
-  <div class="screen" id="sLead">
-    <div class="brand"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Young<span>Future</span></b></div>
-    <div class="htitle" id="leadTitle">Познакомимся перед игрой 👋</div>
-    <div class="hsub" id="leadSub">Результат и уровень получит родитель.</div>
-    <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;margin-top:6px">
-      <input id="leadName" placeholder="Имя" autocomplete="off" style="width:100%;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;padding:14px 16px;font-size:16px;font-family:inherit">
-      <input id="leadClass" placeholder="Класс (напр. 6А)" autocomplete="off" style="width:100%;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;padding:14px 16px;font-size:16px;font-family:inherit">
-      <input id="leadPhone" type="tel" inputmode="tel" placeholder="Телефон родителя +7 700 000 00 00" autocomplete="off" style="width:100%;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;padding:14px 16px;font-size:16px;font-family:inherit">
-      <div id="leadErr" style="color:var(--red);font-size:13px;min-height:16px;text-align:center"></div>
-      <button class="btn big" id="leadGo" style="width:100%">Начать ▶</button>
-    </div>
-  </div>
 
   <!-- DIFFICULTY -->
   <div class="screen" id="sDiff">
-    <button class="back" id="diffBack">← Назад</button>
+    <button class="back" id="diffBack">← Артқа</button>
     <div class="brand" style="margin-top:30px"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Young<span>Future</span></b></div>
     <div class="htitle" id="diffTitle">🎮</div>
     <div class="hsub" id="diffDesc"></div>
     <div class="dwrap">
-      <button class="dbtn" data-d="easy">Лёгкий <small>медленно · просто</small></button>
-      <button class="dbtn" data-d="medium">Средний <small>баланс</small></button>
-      <button class="dbtn" data-d="hard">Сложный <small>быстро · жарко</small></button>
+      <button class="dbtn" data-d="easy">Оңай <small>баяу · оңай</small></button>
+      <button class="dbtn" data-d="medium">Орташа <small>тепе-теңдік</small></button>
+      <button class="dbtn" data-d="hard">Қиын <small>жылдам · қызу</small></button>
     </div>
     <div class="how" id="diffHow"></div>
   </div>
@@ -187,17 +122,18 @@ var YF_ACCOUNT=(function(){
   <!-- RESULTS -->
   <div class="screen" id="sOver">
     <div class="brand" style="margin-top:8px"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Young<span>Future</span></b></div>
-    <div style="font-size:13px;letter-spacing:1px;color:#9aa3d0;font-weight:800">ТВОЙ РЕЗУЛЬТАТ</div>
+    <div style="font-size:13px;letter-spacing:1px;color:#9aa3d0;font-weight:800">СЕНІҢ НӘТИЖЕҢ</div>
     <div class="score-big" id="oScore">0</div>
     <div class="learned" id="oLearned"></div>
+    <div id="yfBoard" style="display:none"></div>
     <div class="cta">
-      <b>Видишь? Формулы можно учить играя 🎮</b>
-      <p>Мы в YoungFuture так и учим. Узнай свой уровень бесплатно — напиши 👇</p>
+      <b>Көрдің бе? Ағылшынды ойнап үйренуге болады 🎮</b>
+      <p>Біз YoungFuture-де дәл осылай оқытамыз. Нақты деңгейіңді тегін біл — жаз 👇</p>
     </div>
     <a class="btn big wa" id="ctaStart" href="#" target="_blank" rel="noopener" style="margin-top:12px">«СТАРТ» — WhatsApp 🚀</a>
     <div class="row2">
-      <button class="btn" id="againBtn">Заново ▶</button>
-      <button class="btn alt" id="menuBtn">Игры</button>
+      <button class="btn" id="againBtn">Қайта ▶</button>
+      <button class="btn alt" id="menuBtn">Ойындар</button>
     </div>
   </div>
 
@@ -272,35 +208,9 @@ var Sound=(function(){
    Опционально. Включи on:true, чтобы перед игрой собирать заявки (для центра).
    endpoint — URL Apps Script (тот же приёмник, что и у тестов), данные падают в Google Sheets.
    Пусто/off — форма не показывается, игра работает как обычно. */
-var LEAD = {
-  on: false,                 // true = показать форму-заявку перед меню
-  endpoint: "",              // "https://script.google.com/macros/s/.../exec"
-  title: "Познакомимся перед игрой 👋",
-  sub: "Результат и уровень получит родитель.",
-  brand: "youngfuture"       // white-label: под каждый центр можно поменять
-};
 
-/* =================== БАЗА ЗАДАНИЙ — воркфлоу заменяет этот массив (единственный var WORDS) =================== */
-var WORDS=[
-  {q:"Формула плотности?",o:["ρ=m/V","V/m","m·V"],a:"ρ=m/V"},
-  {q:"Формула силы?",o:["F=m·a","m/a","a/m"],a:"F=m·a"},
-  {q:"Формула давления?",o:["p=F/A","A/F","F·A"],a:"p=F/A"},
-  {q:"Формула работы?",o:["W=F·d","F/d","F+d"],a:"W=F·d"},
-  {q:"Формула мощности?",o:["P=W/t","t/W","W·t"],a:"P=W/t"},
-  {q:"Кинетич. энергия?",o:["½mv²","mgh","m·v"],a:"½mv²"},
-  {q:"Потенц. энергия?",o:["mgh","½mv²","m/g"],a:"mgh"},
-  {q:"Сила Архимеда?",o:["ρgV","mgh","m/V"],a:"ρgV"},
-  {q:"Площадь ромба?",o:["d₁d₂/2","2πr","πr²"],a:"d₁d₂/2"},
-  {q:"Площадь круга?",o:["πr²","2πr","πd"],a:"πr²"},
-  {q:"Площадь треугольника?",o:["½·a·h","a·h","a·b·c"],a:"½·a·h"},
-  {q:"Дискриминант?",o:["b²−4ac","2a","−b/2a"],a:"b²−4ac"},
-  {q:"sin 30°=?",o:["1/2","√3/2","1"],a:"1/2"},
-  {q:"sin²α+cos²α=?",o:["1","0","2"],a:"1"},
-  {q:"Единица силы?",o:["Ньютон","Джоуль","Паскаль"],a:"Ньютон"},
-  {q:"Единица энергии?",o:["Джоуль","Ватт","Ньютон"],a:"Джоуль"},
-  {en:"Плотность",kk:"m/V"},{en:"Сила",kk:"m·a"},{en:"Давление",kk:"F/A"},{en:"Работа",kk:"F·d"},
-  {en:"Мощность",kk:"W/t"},{en:"Архимед",kk:"ρgV"},{en:"Ромб",kk:"d₁d₂/2"},{en:"Круг",kk:"πr²"}
-];
+/* =================== СӨЗ БАЗАСЫ — воркфлоу осы массивті ауыстырады (жалғыз var WORDS) =================== */
+var WORDS=[{"en": "environment", "kk": "қоршаған орта", "e": "🌍", "lvl": "b1"}, {"en": "responsibility", "kk": "жауапкершілік", "e": "⚖️", "lvl": "b1"}, {"en": "opportunity", "kk": "мүмкіндік", "e": "🚪", "lvl": "b1"}, {"en": "achievement", "kk": "жетістік", "e": "🏆", "lvl": "b1"}, {"en": "experience", "kk": "тәжірибе", "e": "🧗", "lvl": "b1"}, {"en": "knowledge", "kk": "білім", "e": "📚", "lvl": "b1"}, {"en": "decision", "kk": "шешім", "e": "🤔", "lvl": "b1"}, {"en": "development", "kk": "даму", "e": "📈", "lvl": "b1"}, {"en": "advantage", "kk": "артықшылық", "e": "✅", "lvl": "b1"}, {"en": "influence", "kk": "ықпал", "e": "🧲", "lvl": "b1"}, {"en": "improve", "kk": "жақсарту", "e": "🔧", "lvl": "b1"}, {"en": "increase", "kk": "арттыру", "e": "⬆️", "lvl": "b1"}, {"en": "reduce", "kk": "азайту", "e": "⬇️", "lvl": "b1"}, {"en": "suggest", "kk": "ұсыну", "e": "💡", "lvl": "b1"}, {"en": "require", "kk": "талап ету", "e": "📋", "lvl": "b1"}, {"en": "achieve", "kk": "қол жеткізу", "e": "🎯", "lvl": "b1"}, {"en": "consider", "kk": "қарастыру", "e": "🧐", "lvl": "b1"}, {"en": "available", "kk": "қолжетімді", "e": "🟢", "lvl": "b1"}, {"en": "important", "kk": "маңызды", "e": "❗", "lvl": "b1"}, {"en": "possible", "kk": "мүмкін", "e": "🔓", "lvl": "b1"}, {"en": "similar", "kk": "ұқсас", "e": "🔁", "lvl": "b1"}, {"en": "several", "kk": "бірнеше", "e": "🔢", "lvl": "b1"}, {"en": "especially", "kk": "әсіресе", "e": "⭐", "lvl": "b1"}, {"en": "however", "kk": "алайда", "e": "↩️", "lvl": "b1"}, {"en": "therefore", "kk": "сондықтан", "e": "➡️", "lvl": "b1"}, {"en": "pronunciation", "kk": "айтылым", "e": "🗣️", "lvl": "b1"}, {"en": "sustainable", "kk": "тұрақты", "e": "♻️", "lvl": "b2"}, {"en": "consequence", "kk": "салдар", "e": "⛓️", "lvl": "b2"}, {"en": "significant", "kk": "елеулі", "e": "📊", "lvl": "b2"}, {"en": "extraordinary", "kk": "ерекше", "e": "✨", "lvl": "b2"}, {"en": "assumption", "kk": "болжам", "e": "🤷", "lvl": "b2"}, {"en": "negotiate", "kk": "келіссөз жүргізу", "e": "🤝", "lvl": "b2"}];
 
 /* =================== ENGINE =================== */
 var Engine=(function(){
@@ -397,6 +307,7 @@ var Engine=(function(){
 
   E.startGame=function(def,diffKey){
     resize(); E.score=0;E.combo=0;E.comboMax=0;E.lives=3;E.learned=[];E.parts=[];E.pops=[];E.flash=0;E.shake=0;E.diffKey=diffKey;
+    E.startedAt=Date.now();
     E.PICW=WORDS.filter(function(w){return w&&w.e;});
     E.game=def.mk(E); E.game.diffKey=diffKey; E.game.diff=def.diffs[diffKey];
     E.updHud(); E.game.start(def.diffs[diffKey]); E.running=true;
@@ -457,10 +368,10 @@ function labelR(ctx,text,baseR,maxMul){
 /* Старая сигнатура сохранена для совместимости, но с читаемым нижним пределом. */
 function fitFont(ctx,text,maxW,base,min){ var fs=base; ctx.font='800 '+fs+'px Inter,Arial'; while(fs>(min||LBL_MIN) && ctx.measureText(String(text)).width>maxW){ fs--; ctx.font='800 '+fs+'px Inter,Arial'; } return fs; }
 
-/* ---- 2. CATCH (Поймай ответ) ---- */
-var CatchGame={ id:'catch', name:'Поймай ответ', emoji:'🧺', desc:'Лови правильный ответ в корзину', bpm:120,
-  how:'Сверху — вопрос. Двигай корзину пальцем и лови ПРАВИЛЬНЫЙ падающий ответ.',
-  diffs:{ easy:{dist:2,fall:0.13,bw:0.32}, medium:{dist:3,fall:0.16,bw:0.28}, hard:{dist:3,fall:0.20,bw:0.24} },
+/* ---- 2. CATCH (Сөзді ұста) ---- */
+var CatchGame={ id:'catch', name:'Сөзді ұста', emoji:'🧺', desc:'Дұрыс жауапты себетке ұста', bpm:120,
+  how:'Жоғарыда — мақсат. Себетті саусақпен жылжыт та, ДҰРЫС түсіп жатқан жауапты ұста.',
+  diffs:{ easy:{dist:2,fall:0.22,bw:0.30}, medium:{dist:3,fall:0.28,bw:0.26}, hard:{dist:4,fall:0.36,bw:0.21} },
   mk:function(E){
     var W,H,basketX,targetX,bw,bh,by,items,cur,waveGap,D;
     function wave(){ var q=E.buildQuestion(E.rndItem(),1+D.dist); cur=q;
@@ -502,10 +413,10 @@ var CatchGame={ id:'catch', name:'Поймай ответ', emoji:'🧺', desc:'
   }
 };
 
-/* ---- 3. NINJA (Ниндзя) ---- */
-var NinjaGame={ id:'ninja', name:'Ниндзя', emoji:'🥷', desc:'Разрежь свайпом правильный ответ', bpm:126,
-  how:'Сверху — вопрос. Свайпни пальцем и разрежь фрукт с ПРАВИЛЬНЫМ ответом.',
-  diffs:{ easy:{toss:0.95,grav:0.40,n:3}, medium:{toss:1.0,grav:0.52,n:3}, hard:{toss:1.05,grav:0.66,n:3} },
+/* ---- 3. NINJA (Сөз Нинзя) — дұрысын кес ---- */
+var NinjaGame={ id:'ninja', name:'Сөз Нинзя', emoji:'🥷', desc:'Дұрыс жауапты сыпырып кес', bpm:126,
+  how:'Жоғарыда — мақсат. Саусақты сыпыр (свайп) да, ДҰРЫС жауап жазылған жемісті кес.',
+  diffs:{ easy:{toss:0.86,grav:0.62,n:3}, medium:{toss:0.96,grav:0.78,n:3}, hard:{toss:1.06,grav:1.0,n:4} },
   mk:function(E){
     var W,H,fr,fruits,cur,waveT,D,down=false,lastP=null,trail=[];
     var COL=['#ff6b6b','#ffce4a','#9be870','#21d4fd','#ff9f43','#a06bff','#ff6fae'];
@@ -548,10 +459,10 @@ var NinjaGame={ id:'ninja', name:'Ниндзя', emoji:'🥷', desc:'Разре�
   }
 };
 
-/* ---- 4. WHACK (Удар) ---- */
-var WhackGame={ id:'whack', name:'Удар', emoji:'🔨', desc:'Бей по правильному ответу из лунки', bpm:122,
-  how:'Сверху — вопрос. Из лунок выскакивают персонажи — успей нажать на ПРАВИЛЬНЫЙ ответ.',
-  diffs:{ easy:{opts:3,life:5.5}, medium:{opts:3,life:4.5}, hard:{opts:4,life:3.5} },
+/* ---- 4. WHACK (Соққы) — дұрысын ұр ---- */
+var WhackGame={ id:'whack', name:'Соққы', emoji:'🔨', desc:'Дұрыс жауапты ұядан ұр', bpm:122,
+  how:'Жоғарыда — мақсат. Ұялардан кейіпкерлер шығады — ДҰРЫС жауап жазылғанын тез басып үлгер.',
+  diffs:{ easy:{opts:3,life:1.9}, medium:{opts:4,life:1.5}, hard:{opts:5,life:1.15} },
   mk:function(E){
     var W,H,bannerH,mw,mh,holes,moles,cur,waveT,gapT,D;
     var COL=['#ff6b6b','#ffce4a','#9be870','#21d4fd','#a06bff','#ff9f43'];
@@ -579,10 +490,10 @@ var WhackGame={ id:'whack', name:'Удар', emoji:'🔨', desc:'Бей по п�
         for(var j=0;j<moles.length;j++){ var m=moles[j]; if(m.up<=0.02)continue; var h=holes[m.hole];
           var sc=Math.min(1,m.up); ctx.globalAlpha=Math.min(1,m.up*1.4);
           var bw=mw*0.96, bh=mh*0.96*(0.6+0.4*sc), cy=h.y;
-          // body (full card, NO clip — текст виден полностью)
+          // body (full card, NO clip — мәтін толық көрінеді)
           ctx.fillStyle=m.col; rr(ctx,h.x-bw/2,cy-bh/2,bw,bh,bh*0.30); ctx.fill();
           ctx.fillStyle='rgba(255,255,255,.16)'; rr(ctx,h.x-bw/2,cy-bh/2,bw,bh*0.42,bh*0.30); ctx.fill();
-          // label — авто-подгон (без сжатия/обрезки)
+          // label — авто-сыйғызу (қыспай, кеспей)
           ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle';
           drawLabel(ctx,m.label,h.x,cy,bw*0.86,bh*0.9,Math.round(bh*0.36),LBL_MIN);
           ctx.globalAlpha=1;
@@ -593,10 +504,10 @@ var WhackGame={ id:'whack', name:'Удар', emoji:'🔨', desc:'Бей по п�
   }
 };
 
-/* ---- 5. BUBBLE POP (Пузырь) — NEW ---- */
-var BubbleGame={ id:'bubble', name:'Пузырь', emoji:'🫧', desc:'Лопни пузырь с правильным ответом', bpm:118, neww:true,
-  how:'Сверху — вопрос. Пузыри поднимаются — нажми и ЛОПНИ с ПРАВИЛЬНЫМ ответом. Если правильный улетит — теряешь жизнь.',
-  diffs:{ easy:{n:3,vy:0.10,r:0.088}, medium:{n:3,vy:0.12,r:0.082}, hard:{n:4,vy:0.15,r:0.078} },
+/* ---- 5. BUBBLE POP (Көпіршік) — NEW ---- */
+var BubbleGame={ id:'bubble', name:'Көпіршік', emoji:'🫧', desc:'Дұрыс жауап жазылған көпіршікті жар', bpm:118, neww:true,
+  how:'Жоғарыда — мақсат. Көпіршіктер көтеріледі — ДҰРЫС жауап жазылғанын басып ЖАР. Дұрысы қашып кетсе — жан кетеді.',
+  diffs:{ easy:{n:3,vy:0.16,r:0.085}, medium:{n:4,vy:0.21,r:0.078}, hard:{n:5,vy:0.27,r:0.072} },
   mk:function(E){
     var W,H,bubbles,cur,D,gap=0;
     var COL=['#21d4fd','#9be870','#ffce4a','#ff6fae','#a06bff','#ff9f43'];
@@ -632,9 +543,9 @@ var BubbleGame={ id:'bubble', name:'Пузырь', emoji:'🫧', desc:'Лопн�
   }
 };
 
-/* ---- 6. MEMORY MATCH (Найди пару) — NEW ---- */
-var MemoryGame={ id:'memory', name:'Найди пару', emoji:'🧠', desc:'Найди пару: понятие и формула', bpm:108, neww:true,
-  how:'Открывай карты: одно — понятие, другое — формула. Найди ПАРУ. Найдёшь все — победа!',
+/* ---- 6. MEMORY MATCH (Жұп Тап) — NEW ---- */
+var MemoryGame={ id:'memory', name:'Жұп Тап', emoji:'🧠', desc:'Ағылшын мен қазақша жұбын тап', bpm:108, neww:true,
+  how:'Карталарды аш: бірі — ағылшынша, екіншісі — қазақша. ЖҰБЫН тап. Бәрін тапсаң — жеңіс!',
   diffs:{ easy:{pairs:3,cols:2}, medium:{pairs:6,cols:3}, hard:{pairs:8,cols:4} },
   mk:function(E){
     var W,H,cards,cols,rows,cw,ch,gap,ox,oy,flipped,lock,matched,moves,D;
@@ -665,7 +576,7 @@ var MemoryGame={ id:'memory', name:'Найди пару', emoji:'🧠', desc:'Н
             return; } } },
       update:function(dt){ if(lock>0){ lock-=dt; if(lock<=0&&flipped.length===2){ flipped[0].flip=0; flipped[1].flip=0; flipped=[]; } } },
       draw:function(ctx){
-        if(!cards||cards.length<2){ ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font='800 '+Math.round(H*0.028)+'px Inter,Arial'; ctx.fillText('Для этой игры нужны данные 🙂', W/2, H*0.48); return; }
+        if(!cards||cards.length<2){ ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font='800 '+Math.round(H*0.028)+'px Inter,Arial'; ctx.fillText('Бұл ойын үшін сөздер керек 🙂', W/2, H*0.48); return; }
         for(var i=0;i<cards.length;i++){ var c=cards[i]; var show=c.flip>0.5||c.matched;
           ctx.save();
           if(c.matched)ctx.globalAlpha=0.55;
@@ -694,10 +605,10 @@ var MemoryGame={ id:'memory', name:'Найди пару', emoji:'🧠', desc:'Н
   }
 };
 
-/* ---- 7. FLAPPY (Flappy) ---- */
-var FlappyGame={ id:'flappy', name:'Flappy', emoji:'🐤', desc:'Пролетай через правильный проём', bpm:128,
-  how:'Нажимай на экран, чтобы птица летела. В стене 2 проёма — пролетай через проём с ПРАВИЛЬНЫМ ответом.',
-  diffs:{ easy:{spd:0.22,grav:2.0,flap:0.58,gap:0.22}, medium:{spd:0.30,grav:2.4,flap:0.62,gap:0.19}, hard:{spd:0.40,grav:2.9,flap:0.66,gap:0.16} },
+/* ---- 7. FLAPPY (Flappy) — дұрыс саңылаудан ұш ---- */
+var FlappyGame={ id:'flappy', name:'Flappy', emoji:'🐤', desc:'Дұрыс саңылаудан ұшып өт', bpm:128,
+  how:'Экранды басып құсты ұшыр. Қабырғада 2 саңылау — ДҰРЫС жауап жазылған саңылаудан ұшып өт.',
+  diffs:{ easy:{spd:0.32,grav:2.3,flap:0.60,gap:0.20}, medium:{spd:0.44,grav:2.8,flap:0.64,gap:0.17}, hard:{spd:0.58,grav:3.3,flap:0.68,gap:0.15} },
   mk:function(E){
     var W,H,birdX,birdY,vy,wall,D,highC,lowC,gapH,run=0;
     function ask(){ var q=E.buildQuestion(E.rndItem(),2); var top=Math.random()<0.5;
@@ -751,11 +662,11 @@ var GAMES=[FlappyGame,CatchGame,NinjaGame,WhackGame,BubbleGame,MemoryGame];
 var UI=(function(){
   function $(id){return document.getElementById(id);}
   var chosen=null;
-  function screen(id){ ['sLead','sMenu','sDiff','sOver'].forEach(function(s){ $(s).classList.toggle('on', s===id); });
+  function screen(id){ ['sMenu','sDiff','sOver'].forEach(function(s){ $(s).classList.toggle('on', s===id); });
     var playing=(id===null); $('hud').classList.toggle('on',playing); }
   function buildGrid(){ var g=$('gameGrid'); g.innerHTML='';
     GAMES.forEach(function(def){ var d=document.createElement('div'); d.className='gcard';
-      d.innerHTML='<div class="ico">'+def.emoji+'</div><div class="nm">'+def.name+'</div><div class="ds">'+def.desc+'</div>'+(def.neww?'<div class="tag">НОВОЕ</div>':'');
+      d.innerHTML='<div class="ico">'+def.emoji+'</div><div class="nm">'+def.name+'</div><div class="ds">'+def.desc+'</div>'+(def.neww?'<div class="tag">ЖАҢА</div>':'');
       d.addEventListener('click',function(){ Sound.unlock(); Sound.click(); openDiff(def); }); g.appendChild(d); });
   }
   function openDiff(def){ chosen=def; $('diffTitle').textContent=def.emoji+' '+def.name; $('diffDesc').textContent=def.desc; $('diffHow').textContent=def.how||'';
@@ -767,9 +678,16 @@ var UI=(function(){
   }
   function showOver(){ $('hud').classList.remove('on'); $('prompt').classList.remove('on');
     $('oScore').textContent=Engine.score;
-    try{if(window.YF_ACCOUNT&&YF_ACCOUNT.user)YF_ACCOUNT.saveProgress({last:Engine.score});}catch(e){}
+    DB.finish({
+      score:       Engine.score,
+      correct:     Engine.score,
+      mistakes:    3-Engine.lives,
+      maxCombo:    Engine.comboMax,
+      durationSec: Engine.startedAt ? Math.round((Date.now()-Engine.startedAt)/1000) : 0,
+      difficulty:  Engine.diffKey||'medium'
+    }, document.getElementById('yfBoard'));
     var box=$('oLearned'), uniq=[],seen={}; Engine.learned.forEach(function(w){ if(!seen[w]){seen[w]=1;uniq.push(w);} });
-    if(uniq.length){ var h='<div class="lt">ВЫУЧЕНО: '+uniq.length+'</div>'; uniq.slice(0,24).forEach(function(w){ var p=w.split(' — '); h+='<span class="wchip">'+p[0]+(p[1]?(' — <b>'+p[1]+'</b>'):'')+'</span>'; }); box.innerHTML=h; }
+    if(uniq.length){ var h='<div class="lt">ҮЙРЕНГЕН СӨЗДЕР: '+uniq.length+'</div>'; uniq.slice(0,24).forEach(function(w){ var p=w.split(' — '); h+='<span class="wchip">'+p[0]+(p[1]?(' — <b>'+p[1]+'</b>'):'')+'</span>'; }); box.innerHTML=h; }
     else box.innerHTML='';
     screen('sOver');
   }
@@ -781,29 +699,15 @@ var UI=(function(){
   $('menuBtn').addEventListener('click',function(){ Sound.click(); screen('sMenu'); });
   $('muteBtn').addEventListener('click',function(){ var on=Sound.toggle(); this.textContent=on?'🔊':'🔇'; });
   // WhatsApp CTA
-  $('ctaStart').href='https://wa.me/77077518715?text='+encodeURIComponent('Здравствуйте! Хочу узнать про бесплатный вводный урок в YoungFuture 🚀');
+  $('ctaStart').href='https://wa.me/77077518715?text='+encodeURIComponent('Сәлеметсіз бе! YoungFuture-дің тегін ағылшын деңгей тесті туралы білгім келеді 🚀');
 
-  // LEAD FORM (опционально) — собирает заявки ДЛЯ центра в Google Sheets
-  function normPhone(r){ var d=(r||'').replace(/\D/g,''); if(d.length===11&&d.charAt(0)==='8')d='7'+d.slice(1); if(d.length===10)d='7'+d; return d; }
-  function phoneOk(r){ var d=normPhone(r); return d.length===11&&d.charAt(0)==='7'; }
-  if (typeof LEAD!=='undefined' && LEAD && LEAD.on){
-    if(LEAD.title)$('leadTitle').textContent=LEAD.title;
-    if(LEAD.sub)$('leadSub').textContent=LEAD.sub;
-    screen('sLead');
-    $('leadGo').addEventListener('click',function(){
-      var name=$('leadName').value.trim(), cls=$('leadClass').value.trim(), ph=$('leadPhone').value.trim();
-      if(!name){ $('leadErr').textContent='Впиши имя'; return; }
-      if(!phoneOk(ph)){ $('leadErr').textContent='Впиши телефон родителя правильно'; return; }
-      try{ if(LEAD.endpoint){ fetch(LEAD.endpoint,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body:JSON.stringify({action:'lead',source:'arcade',brand:LEAD.brand||'',name:name,'class':cls,parentPhone:normPhone(ph),ts:new Date().toISOString()})}).catch(function(){}); } }catch(e){}
-      Sound.unlock(); Sound.click(); screen('sMenu');
-    });
-    $('leadName').addEventListener('input',function(){ $('leadErr').textContent=''; });
-    $('leadPhone').addEventListener('input',function(){ $('leadErr').textContent=''; });
-  }
 
   return { showOver:showOver };
 })();
+</script>
+<script>
+/* Вход и лидерборд живут в ../db/games-db.js — аккаунт общий для всех игр. */
+DB.mountAuth({ game: 'arcade' });
 </script>
 </body>
 </html>
