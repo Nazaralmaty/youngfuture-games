@@ -43,7 +43,8 @@
   .gcard{background:linear-gradient(160deg,#15205180,#0d163a);border:1px solid #25306a;border-radius:18px;padding:15px 13px;cursor:pointer;
          transition:transform .12s,border-color .12s,box-shadow .12s;text-align:left;position:relative;overflow:hidden}
   .gcard:hover,.gcard:active{transform:translateY(-3px);border-color:var(--violet2);box-shadow:0 14px 28px rgba(109,75,255,.28)}
-  .gcard .ico{font-size:34px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
+  .gcard .ico{font-size:34px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));min-height:40px;display:flex;align-items:center}
+  .gcard .ico img{width:42px;height:42px;border-radius:12px;object-fit:cover;display:block}
   .gcard .nm{font-size:15.5px;font-weight:900;margin-top:7px}
   .gcard .ds{font-size:11.5px;color:#9aa3d0;margin-top:2px;line-height:1.4}
   .gcard .tag{position:absolute;top:9px;right:9px;background:var(--lime);color:var(--ink);font-size:9.5px;font-weight:900;padding:3px 7px;border-radius:999px}
@@ -285,11 +286,44 @@ var Engine=(function(){
     for(var pp=0;pp<E.parts.length;pp++){var q=E.parts[pp];ctx.globalAlpha=Math.max(0,q.life/0.6);ctx.fillStyle=q.col;ctx.fillRect(q.x,q.y,E.H*0.012,E.H*0.012);} ctx.globalAlpha=1;
     for(var pk=0;pk<E.pops.length;pk++){var o=E.pops[pk];ctx.globalAlpha=Math.max(0,o.a);ctx.fillStyle=o.col;ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 '+Math.round(E.H*0.026*o.s)+'px Inter,Arial';ctx.fillText(o.t,o.x,o.y);}ctx.globalAlpha=1;
   }
+  /* ---- Ассеты (фоны режимов и иконки меню) ----
+     Прогрессивное улучшение: путь к assets определяется один раз пробой.
+     Если папки рядом нет — остаются прежний градиент и эмодзи, игра не ломается. */
+  var ASSET_DIRS=['../assets/','../../assets/','assets/'], ASSET_BASE=null, assetCache={}, bgImg={}, bgTried={};
+  /* Каждый ассет ищется сам по себе: отсутствие одного файла не отключает остальные.
+     Первая удачная папка запоминается, чтобы не перебирать её снова. */
+  function loadAsset(name,cb){
+    if(assetCache[name]!==undefined){ cb(assetCache[name]); return; }
+    var dirs=ASSET_BASE?[ASSET_BASE]:ASSET_DIRS, i=0;
+    (function next(){
+      if(i>=dirs.length){ assetCache[name]=false; cb(false); return; }
+      var dir=dirs[i++], img=new Image();
+      img.onload=function(){ ASSET_BASE=dir; assetCache[name]=img; cb(img); };
+      img.onerror=next;
+      img.src=dir+name+'.webp';
+    })();
+  }
+  function bgFor(id){
+    if(!id) return null;
+    if(!bgTried[id]){ bgTried[id]=1;
+      loadAsset('bg_'+id,function(img){ if(img) bgImg[id]=img; });  /* нет файла — остаётся градиент */
+    }
+    return bgImg[id]||null;
+  }
   function drawBG(){
     var g=ctx.createLinearGradient(0,0,0,E.H); g.addColorStop(0,'#23316d'); g.addColorStop(0.6,'#131e47'); g.addColorStop(1,'#0a1330');
     ctx.fillStyle=g; ctx.fillRect(0,0,E.W,E.H);
-    ctx.fillStyle='rgba(255,255,255,.08)'; for(var st=0;st<18;st++){ctx.fillRect((st*67+E.W)%E.W,(st*41)%(E.H*0.8)+10,2,2);}
+    var img=E.game&&bgFor(E.gameId);
+    if(img&&img.width){
+      var s=Math.max(E.W/img.width,E.H/img.height), w=img.width*s, h=img.height*s;
+      ctx.drawImage(img,(E.W-w)/2,(E.H-h)/2,w,h);   /* cover, без искажения пропорций */
+      ctx.fillStyle='rgba(7,11,30,.42)';            /* скрим: подписи на объектах должны читаться */
+      ctx.fillRect(0,0,E.W,E.H);
+    } else {
+      ctx.fillStyle='rgba(255,255,255,.08)'; for(var st=0;st<18;st++){ctx.fillRect((st*67+E.W)%E.W,(st*41)%(E.H*0.8)+10,2,2);}
+    }
   }
+  E.loadAsset=loadAsset;
 
   var last=0;
   function loop(now){ var dt=Math.min(0.05,(now-(last||now))/1000); last=now;
@@ -318,7 +352,7 @@ var Engine=(function(){
     resize(); E.score=0;E.combo=0;E.comboMax=0;E.lives=3;E.learned=[];E.parts=[];E.pops=[];E.flash=0;E.shake=0;E.diffKey=diffKey;
     E.startedAt=Date.now();
     E.PICW=WORDS.filter(function(w){return w&&w.e;});
-    E.game=def.mk(E); E.game.diffKey=diffKey; E.game.diff=def.diffs[diffKey];
+    E.game=def.mk(E); E.game.diffKey=diffKey; E.game.diff=def.diffs[diffKey]; E.gameId=def.id;
     E.updHud(); E.game.start(def.diffs[diffKey]); E.running=true;
     Sound.unlock(); Sound.startMusic(def.bpm||120);
   };
@@ -675,7 +709,7 @@ var UI=(function(){
     var playing=(id===null); $('hud').classList.toggle('on',playing); }
   function buildGrid(){ var g=$('gameGrid'); g.innerHTML='';
     GAMES.forEach(function(def){ var d=document.createElement('div'); d.className='gcard';
-      d.innerHTML='<div class="ico">'+def.emoji+'</div><div class="nm">'+def.name+'</div><div class="ds">'+def.desc+'</div>'+(def.neww?'<div class="tag">ЖАҢА</div>':'');
+      d.innerHTML='<div class="ico" data-ico="'+def.id+'">'+def.emoji+'</div><div class="nm">'+def.name+'</div><div class="ds">'+def.desc+'</div>'+(def.neww?'<div class="tag">ЖАҢА</div>':'');
       d.addEventListener('click',function(){ Sound.unlock(); Sound.click(); openDiff(def); }); g.appendChild(d); });
   }
   function openDiff(def){ chosen=def; $('diffTitle').textContent=def.emoji+' '+def.name; $('diffDesc').textContent=def.desc; $('diffHow').textContent=def.how||'';
@@ -700,8 +734,18 @@ var UI=(function(){
     else box.innerHTML='';
     screen('sOver');
   }
+  /* Иконки подменяются, только если картинки реально нашлись; иначе остаются эмодзи. */
+  function upgradeIcons(){
+    Array.prototype.forEach.call(document.querySelectorAll('.gcard .ico[data-ico]'),function(el){
+      var id=el.getAttribute('data-ico');
+      Engine.loadAsset('icon_'+id,function(img){    /* картинки нет — остаётся эмодзи */
+        if(img){ img.alt=''; el.textContent=''; el.appendChild(img); }
+      });
+    });
+  }
   // wiring
   buildGrid();
+  upgradeIcons();
   $('diffBack').addEventListener('click',function(){ Sound.click(); screen('sMenu'); });
   Array.prototype.forEach.call(document.querySelectorAll('.dbtn'),function(b){ b.addEventListener('click',function(){ startWith(b.dataset.d); }); });
   $('againBtn').addEventListener('click',function(){ if(chosen) startWith(Engine.diffKey||'medium'); });
