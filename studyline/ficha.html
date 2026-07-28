@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StudyLine — 15 фич вне обучения</title>
+<style>
+:root{
+  --navy:#141d33; --navy2:#22315a; --green:#2E9E5B; --green2:#43c07a;
+  --purple:#6C4CF1; --purple2:#8a6cff; --amber:#f2b705; --red:#e5484d;
+  --pink:#ec5f8a; --fire:#ff6a3d; --cyan:#21b8d4;
+  --ink:#182036; --muted:#6b7488; --bg:#f2f4fb; --card:#fff; --line:#e6ebf6;
+  --lock:#aeb6cc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* ---------- Шапка ---------- */
+.hero{
+  background:linear-gradient(160deg,var(--navy) 0%,#1d2a4d 60%,#2a2160 100%);
+  color:#fff;padding:64px 0 72px;position:relative;overflow:hidden;
+}
+.hero::after{
+  content:"";position:absolute;right:-160px;top:-160px;width:520px;height:520px;
+  border-radius:50%;background:radial-gradient(circle,rgba(108,76,241,.45),transparent 68%);
+}
+.hero .wrap{position:relative;z-index:1}
+.kicker{
+  display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:#9be870;border:1.5px solid rgba(155,232,112,.45);
+  padding:6px 13px;border-radius:8px;margin-bottom:22px;
+}
+h1{font-size:clamp(32px,6vw,58px);line-height:1.05;letter-spacing:-1.4px;font-weight:800}
+.hero p.sub{font-size:clamp(16px,2.3vw,21px);color:#c3cbe4;margin-top:20px;max-width:760px}
+.hero .stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+.stat{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);
+  border-radius:14px;padding:14px 18px;min-width:150px}
+.stat b{display:block;font-size:26px;font-weight:800}
+.stat span{font-size:12.5px;color:#aab4d0}
+
+/* ---------- Принципы ---------- */
+.principles{padding:56px 0 8px}
+.sec-title{font-size:clamp(24px,3.6vw,36px);font-weight:800;letter-spacing:-.8px}
+.sec-sub{color:var(--muted);margin-top:10px;font-size:16px;max-width:780px}
+.pgrid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:26px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.pcard b{display:block;font-size:15.5px;margin-bottom:6px}
+.pcard span{font-size:14px;color:var(--muted)}
+.pcard .ic{font-size:22px;margin-bottom:10px;display:block}
+
+/* ---------- Блок ---------- */
+.block{padding:52px 0 10px}
+.block-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  border-top:2px solid var(--line);padding-top:26px}
+.block-tag{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:#fff;background:var(--navy);padding:5px 11px;border-radius:7px}
+.block-head h2{font-size:clamp(21px,3vw,30px);font-weight:800;letter-spacing:-.6px}
+.block-head .cnt{color:var(--lock);font-size:14px;font-weight:700}
+
+/* ---------- Идея ---------- */
+.idea{display:grid;grid-template-columns:1fr;gap:26px;padding:34px 0;
+  border-bottom:1px solid var(--line)}
+.idea:last-child{border-bottom:none}
+.num{font-size:13px;font-weight:800;color:#fff;background:var(--purple);
+  width:34px;height:34px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;margin-bottom:14px}
+.idea h3{font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1.2}
+.idea h3 em{display:block;font-style:normal;font-size:15px;font-weight:600;
+  color:var(--muted);margin-top:5px}
+.lead{font-size:16.5px;margin-top:14px}
+.meta{margin-top:18px;display:grid;gap:10px}
+.mrow{display:grid;grid-template-columns:96px 1fr;gap:12px;font-size:14.5px;
+  align-items:start}
+.mrow b{font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--purple);padding-top:3px}
+.mrow ul{margin:0;padding-left:17px}
+.mrow li{margin-bottom:4px}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.tag{font-size:11.5px;font-weight:700;padding:5px 10px;border-radius:7px;
+  background:#eef0f9;color:var(--navy2)}
+.tag.easy{background:#e4f6ec;color:#1c7a45}
+.tag.mid{background:#fdf3d9;color:#8a6300}
+.tag.hard{background:#fbe6e7;color:#a92f34}
+
+/* ---------- Телефон-мокап ---------- */
+.shot{display:flex;flex-direction:column;align-items:center}
+.phone{
+  width:300px;background:#fff;border-radius:34px;padding:12px 12px 16px;
+  box-shadow:0 24px 60px rgba(20,29,51,.18),0 4px 14px rgba(20,29,51,.08);
+  border:1px solid var(--line);flex-shrink:0;
+}
+.ph-status{display:flex;justify-content:space-between;align-items:center;
+  padding:2px 8px 10px;font-size:10.5px;font-weight:700;color:var(--ink)}
+.ph-status .dots{display:flex;gap:3px;align-items:flex-end}
+.ph-status .dots i{width:2.5px;background:var(--ink);border-radius:1px;display:block}
+.ph-head{display:flex;align-items:center;gap:9px;padding:0 4px 12px}
+.ph-back{width:26px;height:26px;border-radius:9px;background:#f0f2f8;
+  display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--navy2)}
+.ph-title{font-size:14.5px;font-weight:800;flex:1;text-align:center;margin-right:26px}
+.scr{background:#f6f7fc;border-radius:20px;padding:12px;min-height:452px}
+.scr.dark{background:var(--navy);color:#fff}
+.cap{font-size:12.5px;color:var(--muted);margin-top:14px;text-align:center;font-weight:600}
+
+/* элементы внутри экрана */
+.c{background:#fff;border-radius:14px;padding:12px;margin-bottom:9px}
+.scr.dark .c{background:rgba(255,255,255,.08)}
+.c.tight{padding:10px}
+.c.grad-g{background:linear-gradient(150deg,var(--green),#2a8f6f);color:#fff}
+.c.grad-p{background:linear-gradient(150deg,var(--purple),#4a2fbf);color:#fff}
+.c.grad-n{background:linear-gradient(150deg,var(--navy),#2b3a68);color:#fff}
+.c.grad-a{background:linear-gradient(150deg,#f2b705,#e08a00);color:#fff}
+.c.grad-pk{background:linear-gradient(150deg,var(--pink),#c93b6c);color:#fff}
+.t-lbl{font-size:9.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted)}
+.grad-g .t-lbl,.grad-p .t-lbl,.grad-n .t-lbl,.grad-a .t-lbl,.grad-pk .t-lbl,
+.scr.dark .t-lbl{color:rgba(255,255,255,.62)}
+.t-big{font-size:25px;font-weight:800;letter-spacing:-.6px;line-height:1.1}
+.t-md{font-size:14px;font-weight:800}
+.t-sm{font-size:11.5px;font-weight:600}
+.t-xs{font-size:10px;color:var(--muted)}
+.grad-g .t-xs,.grad-p .t-xs,.grad-n .t-xs,.grad-a .t-xs,.grad-pk .t-xs,
+.scr.dark .t-xs{color:rgba(255,255,255,.6)}
+.fl{display:flex;align-items:center;gap:9px}
+.fl.sb{justify-content:space-between}
+.mt6{margin-top:6px}.mt10{margin-top:10px}.mt14{margin-top:14px}
+.bar{height:7px;border-radius:5px;background:#e8ebf5;overflow:hidden}
+.scr.dark .bar,.grad-g .bar,.grad-p .bar,.grad-n .bar{background:rgba(255,255,255,.2)}
+.bar i{display:block;height:100%;border-radius:5px;background:var(--green)}
+.bar.p i{background:var(--purple2)}
+.bar.a i{background:var(--amber)}
+.bar.w i{background:#fff}
+.pill{font-size:9.5px;font-weight:800;padding:4px 8px;border-radius:6px;
+  background:#eef0f9;color:var(--navy2);display:inline-block}
+.pill.g{background:#e4f6ec;color:#1c7a45}
+.pill.a{background:#fdf3d9;color:#8a6300}
+.pill.r{background:#fbe6e7;color:#a92f34}
+.pill.p{background:#ece7fd;color:#5433c9}
+.pill.w{background:rgba(255,255,255,.2);color:#fff}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;
+  border:2px solid #fff}
+.avrow{display:flex}
+.avrow .av+.av{margin-left:-8px}
+.ring{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;margin:0 auto}
+.ring i{width:74px;height:74px;border-radius:50%;background:#fff;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;font-style:normal}
+.scr.dark .ring i{background:var(--navy)}
+.gridr{display:grid;gap:7px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g6{grid-template-columns:repeat(6,1fr)}
+.ph-tile{border-radius:10px;aspect-ratio:1;display:flex;align-items:flex-end;
+  justify-content:flex-start;padding:6px;font-size:9px;font-weight:700;color:#fff}
+.dot7{display:flex;gap:5px;justify-content:space-between}
+.dot7 s{width:100%;height:26px;border-radius:6px;background:#e8ebf5;
+  display:flex;align-items:center;justify-content:center;font-size:9px;
+  font-weight:800;color:var(--lock);text-decoration:none}
+.dot7 s.on{background:var(--green);color:#fff}
+.dot7 s.miss{background:#fbe6e7;color:#a92f34}
+.lst{display:flex;align-items:center;gap:9px;padding:8px 0;
+  border-bottom:1px solid var(--line)}
+.lst:last-child{border-bottom:none}
+.scr.dark .lst{border-color:rgba(255,255,255,.1)}
+.chk{width:19px;height:19px;border-radius:6px;flex-shrink:0;display:flex;
+  align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:800}
+.chk.on{background:var(--green)}
+.chk.off{background:#e8ebf5;color:var(--lock)}
+.chk.no{background:#fbe6e7;color:#a92f34}
+.emo{font-size:17px;line-height:1}
+.route{position:relative;height:96px;border-radius:12px;
+  background:linear-gradient(140deg,#dff0e6,#eaf3fb);overflow:hidden;margin-top:8px}
+.route .ln{position:absolute;left:12px;right:12px;top:52px;height:4px;
+  border-radius:3px;background:#c9d6e6}
+.route .ln i{display:block;height:100%;border-radius:3px;background:var(--green)}
+.route .pin{position:absolute;top:38px;width:12px;height:12px;border-radius:50%;
+  border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.route .lab{position:absolute;top:62px;font-size:8.5px;font-weight:800;color:var(--navy2)}
+.route .walker{position:absolute;top:26px;font-size:16px}
+
+/* ---------- Приоритеты ---------- */
+.prio{padding:56px 0 20px}
+.ptable{margin-top:24px;background:#fff;border:1px solid var(--line);
+  border-radius:16px;overflow:hidden}
+.ptable .hrow,.ptable .row{display:grid;grid-template-columns:1.6fr .8fr .8fr 1fr;
+  gap:10px;padding:12px 14px;align-items:center;font-size:13.5px}
+.ptable .hrow{background:#eef1f9;font-weight:800;font-size:11.5px;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--navy2)}
+.ptable .row{border-top:1px solid var(--line)}
+.ptable .row b{font-weight:700}
+.wave{background:linear-gradient(150deg,var(--navy),#2a2160);color:#fff;
+  border-radius:20px;padding:26px 22px;margin-top:26px}
+.wave h3{font-size:20px;font-weight:800;margin-bottom:14px}
+.wave ol{margin:0;padding-left:20px}
+.wave li{margin-bottom:10px;font-size:15px;color:#dbe1f2}
+.wave li b{color:#9be870}
+.note{background:#fff;border:1px solid var(--line);border-left:4px solid var(--amber);
+  border-radius:12px;padding:16px 18px;margin-top:22px;font-size:14.5px}
+footer{padding:40px 0 60px;color:var(--muted);font-size:13px;text-align:center}
+
+@media(max-width:520px){
+  .ptable .hrow,.ptable .row{grid-template-columns:1.35fr .9fr .9fr .9fr;
+    padding:11px 10px;gap:7px;font-size:12px}
+  .ptable .hrow{font-size:10px;letter-spacing:.04em}
+  .mrow{grid-template-columns:1fr;gap:4px}
+  .mrow b{padding-top:0}
+}
+@media(min-width:640px){
+  .pgrid{grid-template-columns:1fr 1fr}
+}
+@media(min-width:900px){
+  .idea{grid-template-columns:1fr 340px;gap:44px;align-items:start}
+  .idea.rev .txt{order:2}
+  .idea.rev .shot{order:1}
+  .pgrid{grid-template-columns:repeat(3,1fr)}
+  .shot{position:sticky;top:24px}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker">StudyLine · продуктовые идеи</span>
+    <h1>15 механик,<br>которые живут вне уроков</h1>
+    <p class="sub">Ребёнок 10–12 лет заходит в приложение не «учиться», а жить: двигаться, читать, снимать, помогать, соревноваться и быть частью команды. Учёба становится побочным эффектом привычки заходить каждый день.</p>
+    <div class="stats">
+      <div class="stat"><b>15</b><span>идей, 6 направлений</span></div>
+      <div class="stat"><b>0</b><span>уроков и тестов внутри</span></div>
+      <div class="stat"><b>10–12</b><span>лет, 4–6 класс</span></div>
+      <div class="stat"><b>5–7</b><span>лет горизонт отношений</span></div>
+    </div>
+  </div>
+</header>
+
+<section class="principles">
+  <div class="wrap">
+    <h2 class="sec-title">Шесть правил, по которым собраны все 15</h2>
+    <p class="sec-sub">Это не набор случайных фич. Каждая идея проверена по одним и тем же рамкам — тем, что уже зафиксированы в стратегии комьюнити и геймификации.</p>
+    <div class="pgrid">
+      <div class="pcard"><span class="ic">👨‍👩‍👦</span><b>Единица — семья, не ребёнок</b><span>Ребёнок не придёт сам, его приводит мама. Значит, у каждой механики должна быть роль для родителя: видит, подтверждает или участвует.</span></div>
+      <div class="pcard"><span class="ic">🛡️</span><b>Безопасность по умолчанию</b><span>Нет личных сообщений между детьми. Нет свободного текста. Нет публичных фото. Всё видно куратору. Фото — только внутри клана и с согласия родителя.</span></div>
+      <div class="pcard"><span class="ic">🤝</span><b>Команда важнее личного рейтинга</b><span>В 10–12 лет проигрыш «я» бьёт по самооценке, проигрыш «мы» — нет. Поэтому почти везде вклад идёт в клан, а не в личный топ.</span></div>
+      <div class="pcard"><span class="ic">⚡</span><b>Единая валюта XP</b><span>Шаги, книги, добрые дела — всё конвертируется в тот же XP, что и учёба. Не плодим параллельные экономики, кроме двух осознанных исключений.</span></div>
+      <div class="pcard"><span class="ic">🪶</span><b>Дёшево в разработке</b><span>Ни одна идея не требует ML, тяжёлой модерации или своей соцсети. Максимум — счётчик, галочка, фото и таймер.</span></div>
+      <div class="pcard"><span class="ic">🧭</span><b>Каждая идея — повод зайти</b><span>Механика бесполезна, если не даёт причину открыть приложение в день, когда уроков нет. Проверяем каждую именно этим вопросом.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ БЛОК A ============ -->
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <span class="block-tag">Блок A</span>
+      <h2>Тело и энергия</h2>
+      <span class="cnt">3 идеи</span>
+    </div>
+
+    <!-- 1 -->
+    <div class="idea">
+      <div class="txt">
+        <div class="num">01</div>
+        <h3>Қадам жарысы<em>Шагомер как клановый поход по Казахстану</em></h3>
+        <p class="lead">Шаги ребёнка складываются в общий километраж клана, и клан «идёт» по реальной карте: Алматы → Астана, 1 200 км за учебную четверть. Каждый вечер видно, докуда дошли и кто сколько принёс.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Даёт причину открыть приложение в выходной. Родителям нравится то, что уводит ребёнка от экрана, — а тут экран сам просит двигаться.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>Шаги берём из «Здоровья» телефона или из счётчика в приложении</li>
+              <li>Личный топ не показываем — только вклад в клан</li>
+              <li>Дневной потолок 15 000 шагов, чтобы не было трясения телефоном</li>
+              <li>Прошли город на маршруте — клан получает факт о нём</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>1 000 шагов = 10 XP клану. Дошли до Астаны — «Жаяу клан» и герб с маршрутом.</span></div>
+        </div>
+        <div class="tags"><span class="tag easy">Разработка: низкая</span><span class="tag">Ежедневная</span><span class="tag">Клановая</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>9:41</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Қадам жарысы</div></div>
+          <div class="scr">
+            <div class="c grad-g">
+              <div class="t-lbl">Бүгінгі қадамым</div>
+              <div class="t-big mt6">8 240</div>
+              <div class="bar w mt10"><i style="width:55%"></i></div>
+              <div class="t-xs mt6">15 000-нан 55% · күнделікті шек</div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-md">Кланның жолы</span><span class="pill g">72%</span></div>
+              <div class="route">
+                <div class="walker" style="left:63%">🚶</div>
+                <div class="ln"><i style="width:72%"></i></div>
+                <div class="pin" style="left:10px;background:var(--green)"></div>
+                <div class="pin" style="left:calc(72% - 2px);background:var(--amber)"></div>
+                <div class="pin" style="right:10px;background:#c9d6e6"></div>
+                <div class="lab" style="left:8px">Алматы</div>
+                <div class="lab" style="right:8px">Астана</div>
+              </div>
+              <div class="fl sb mt10"><span class="t-sm">864 км жүрілді</span><span class="t-xs">336 км қалды</span></div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Бүгінгі үздік үшеу</div>
+              <div class="lst mt6"><span class="av" style="background:var(--amber)">А</span><span class="t-sm" style="flex:1">Арнұр</span><span class="t-sm">11 400</span></div>
+              <div class="lst"><span class="av" style="background:var(--purple)">С</span><span class="t-sm" style="flex:1">Сәнжар</span><span class="t-sm">9 870</span></div>
+              <div class="lst"><span class="av" style="background:var(--cyan)">Д</span><span class="t-sm" style="flex:1">Данияр</span><span class="t-sm">9 120</span></div>
+            </div>
+            <div class="c tight" style="background:#eaf3ff">
+              <div class="t-xs" style="color:var(--navy2)">📍 Клан Балқашқа жетті — көлдің тереңдігі 26 м</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Қадам жарысы» — вклад личный, зачёт клановый</div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="idea rev">
+      <div class="txt">
+        <div class="num">02</div>
+        <h3>Таңғы 7 минут<em>Утренняя зарядка, которую клан делает одновременно</em></h3>
+        <p class="lead">Каждое утро в 07:30 у всех в клане звонит одно и то же напоминание. Семь минут зарядки под короткое видео. Главное на экране — не твой результат, а счётчик «сколько нас сегодня уже встало».</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Решает главную боль родителя — ребёнка невозможно поднять. Поднимает не мама, а мысль «меня ждут одиннадцать человек».</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>Одно окно на всех: 07:00–08:00, вне окна не засчитывается</li>
+              <li>Ролик 7 минут, снимаем сами с детьми-выпускниками</li>
+              <li>Счётчик «12 из 15» обновляется в реальном времени</li>
+              <li>Пропуск не наказывается — серия просто начинается заново</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>30 XP в день, серия 7 дней — «Таң қырағы». Клан в полном составе неделю — бонус всем.</span></div>
+        </div>
+        <div class="tags"><span class="tag easy">Разработка: низкая</span><span class="tag">Ежедневная</span><span class="tag">Синхронная</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>7:31</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Таңғы 7 минут</div></div>
+          <div class="scr">
+            <div class="c" style="text-align:center;padding-top:16px">
+              <div class="ring" style="background:conic-gradient(var(--green) 0 62%,#e8ebf5 62% 100%)">
+                <i><span class="t-big" style="font-size:22px">4:21</span><span class="t-xs">қалды</span></i>
+              </div>
+              <div class="t-md mt10">Жаттығу жүріп жатыр</div>
+              <div class="t-xs mt6">3-жаттығу: орында секіру</div>
+            </div>
+            <div class="c grad-p">
+              <div class="t-lbl">Кланнан бүгін тұрғандар</div>
+              <div class="fl sb mt6">
+                <span class="t-big">12<span style="font-size:15px;opacity:.7"> / 15</span></span>
+                <span class="avrow">
+                  <span class="av" style="background:var(--amber)">А</span>
+                  <span class="av" style="background:var(--cyan)">Д</span>
+                  <span class="av" style="background:var(--pink)">Р</span>
+                  <span class="av" style="background:var(--green)">С</span>
+                  <span class="av" style="background:#5b6ba8">+8</span>
+                </span>
+              </div>
+              <div class="bar w mt10"><i style="width:80%"></i></div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-md">Менің сериям</span><span class="pill g">9 күн</span></div>
+              <div class="dot7 mt10">
+                <s class="on">Дс</s><s class="on">Сс</s><s class="on">Ср</s>
+                <s class="on">Бс</s><s class="on">Жм</s><s class="on">Сн</s><s>Жк</s>
+              </div>
+              <div class="t-xs mt10">Рекорд: 14 күн · барлығы 63 жаттығу</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Таңғы 7 минут» — тянет не результат, а присутствие своих</div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="idea">
+      <div class="txt">
+        <div class="num">03</div>
+        <h3>Күн тәртібі<em>Трекер режима: подъём, экран, сон</em></h3>
+        <p class="lead">Три отметки в день — во сколько встал, сколько сидел в телефоне, во сколько лёг. Отмечает ребёнок, подтверждает родитель одним касанием. Неделя видна как полоска из семи квадратов.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>В анкете дети сами трижды писали про режим и сон. Для мамы это самая понятная ценность из всех пятнадцати: «у ребёнка наладился сон» продаёт лучше, чем «+200 XP».</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>Цели ставит родитель один раз: подъём, лимит экрана, отбой</li>
+              <li>Ребёнок отмечает сам — доверие важнее точности</li>
+              <li>Считаем не идеальные дни, а долю выполненного за неделю</li>
+              <li>Красный день не сгорает и не отнимает XP, просто виден</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>15 XP за отметку. Неделя выше 80% — «Темірдей тәртіп» и уровень родителю в кабинете.</span></div>
+        </div>
+        <div class="tags"><span class="tag easy">Разработка: низкая</span><span class="tag">Ежедневная</span><span class="tag">Родитель в связке</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>21:48</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Күн тәртібі</div></div>
+          <div class="scr">
+            <div class="c grad-n">
+              <div class="t-lbl">Осы апта</div>
+              <div class="fl sb mt6"><span class="t-big">86%</span><span class="pill w">+3% өткен аптадан</span></div>
+              <div class="dot7 mt10">
+                <s class="on">Дс</s><s class="on">Сс</s><s class="miss">Ср</s>
+                <s class="on">Бс</s><s class="on">Жм</s><s class="on">Сн</s><s class="on">Жк</s>
+              </div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Бүгін</div>
+              <div class="lst mt6"><span class="chk on">✓</span><span class="emo">🌅</span><span style="flex:1"><span class="t-sm">Ояну</span><br><span class="t-xs">мақсат 07:00</span></span><span class="pill g">06:52</span></div>
+              <div class="lst"><span class="chk on">✓</span><span class="emo">📱</span><span style="flex:1"><span class="t-sm">Экран уақыты</span><br><span class="t-xs">шек 2 сағат</span></span><span class="pill g">1 с 35 м</span></div>
+              <div class="lst"><span class="chk off">·</span><span class="emo">🌙</span><span style="flex:1"><span class="t-sm">Ұйқы</span><br><span class="t-xs">мақсат 22:00</span></span><span class="pill">күтуде</span></div>
+            </div>
+            <div class="c tight" style="background:#f3f0ff">
+              <div class="fl"><span class="emo">👩</span><span class="t-xs" style="color:var(--navy2)">Анаң растайды: «Ұйқы» белгісі 22:00-де ашылады</span></div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Соңғы 4 апта</div>
+              <div class="fl sb mt10" style="align-items:flex-end;height:52px">
+                <span style="width:18%;height:56%;background:#cfd6e8;border-radius:5px"></span>
+                <span style="width:18%;height:70%;background:#cfd6e8;border-radius:5px"></span>
+                <span style="width:18%;height:64%;background:#cfd6e8;border-radius:5px"></span>
+                <span style="width:18%;height:92%;background:var(--green);border-radius:5px"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Күн тәртібі» — красный день видно, но он не наказывает</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ БЛОК B ============ -->
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <span class="block-tag">Блок B</span>
+      <h2>Творчество и голос</h2>
+      <span class="cnt">3 идеи</span>
+    </div>
+
+    <!-- 4 -->
+    <div class="idea">
+      <div class="txt">
+        <div class="num">04</div>
+        <h3>Фото жарыс<em>Еженедельный фотоконкурс на заданную тему</em></h3>
+        <p class="lead">В понедельник клан получает тему: «мой завтрак», «осень во дворе», «моё рабочее место», «мой питомец». Одно фото от каждого до пятницы. Видно только своему клану и куратору.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Ребёнок хочет быть замеченным, но соцсеть ему давать нельзя. Это управляемая витрина: тема задана, круг закрыт, свободного текста нет.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>Родитель один раз даёт согласие на показ фото внутри клана</li>
+              <li>Одно фото в неделю, переснять можно до дедлайна</li>
+              <li>Вместо комментариев — четыре готовые реакции</li>
+              <li>Топ-3 выбирает куратор, а не голосование детей</li>
+              <li>Лучшие кадры уходят в «Клан альбомы» — он копится годами</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>50 XP за участие, 150 за топ-3. Фото года — печатаем и отдаём на офлайн-встрече.</span></div>
+        </div>
+        <div class="tags"><span class="tag mid">Разработка: средняя</span><span class="tag">Еженедельная</span><span class="tag">Нужна модерация</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>16:20</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Фото жарыс</div></div>
+          <div class="scr">
+            <div class="c grad-pk">
+              <div class="t-lbl">Осы аптаның тақырыбы</div>
+              <div class="t-md mt6" style="font-size:18px">Менің таңғы асым</div>
+              <div class="fl sb mt10"><span class="t-xs">Жұма 20:00-ге дейін</span><span class="pill w">2 күн қалды</span></div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-md">Клан жіберді</span><span class="pill">9 / 15</span></div>
+              <div class="gridr g3 mt10">
+                <div class="ph-tile" style="background:linear-gradient(150deg,#f6c56b,#e08a3c)">Арнұр</div>
+                <div class="ph-tile" style="background:linear-gradient(150deg,#8fd6a8,#3f9b6b)">Аружан</div>
+                <div class="ph-tile" style="background:linear-gradient(150deg,#9fb8e8,#4f6fb5)">Данияр</div>
+                <div class="ph-tile" style="background:linear-gradient(150deg,#e8a0bd,#c15584)">Мадина</div>
+                <div class="ph-tile" style="background:linear-gradient(150deg,#c3aef0,#7b5bd6)">Сәнжар</div>
+                <div class="ph-tile" style="background:#eceff7;color:var(--lock);align-items:center;justify-content:center;font-size:18px">+4</div>
+              </div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-sm">Менің суретім</span><span class="pill g">жіберілді</span></div>
+              <div class="ph-tile mt10" style="background:linear-gradient(150deg,#f6c56b,#e08a3c);aspect-ratio:16/9;border-radius:12px;align-items:flex-end">бүгін 08:14</div>
+              <div class="fl mt10" style="gap:6px">
+                <span class="pill">👏 6</span><span class="pill">🔥 4</span><span class="pill">💪 2</span><span class="pill">😍 5</span>
+              </div>
+            </div>
+            <div class="c tight" style="background:#eef7f0">
+              <div class="t-xs" style="color:#1c7a45">🔒 Суреттер тек кланға және кураторға көрінеді</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Фото жарыс» — закрытый круг, готовые реакции, без комментариев</div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="idea rev">
+      <div class="txt">
+        <div class="num">05</div>
+        <h3>Талант сахнасы<em>Сцена талантов: одно видео в месяц</em></h3>
+        <p class="lead">Раз в месяц ребёнок может показать, что умеет вне школы: домбра, вокал, танец, фокус, скейт, рисунок. Одно видео до 60 секунд. Куратор собирает лучшие в «Концерт айы» — общий эфир для всех семей.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Видео — вторая по частоте просьба детей в анкете. Это единственная механика, где ребёнок ценен не за то, чему мы его учим, а за то, кто он есть. Такое не забывают.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>До 60 секунд, снимает родитель с его телефона</li>
+              <li>Куратор смотрит до публикации — жёсткая премодерация</li>
+              <li>Видно клану; в «Концерт айы» попадает с отдельного согласия</li>
+              <li>Эфир концерта — раз в месяц, вечером, смотрят семьями</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>200 XP за выступление. Попал в концерт — титул «Сахна жұлдызы» на месяц.</span></div>
+        </div>
+        <div class="tags"><span class="tag hard">Разработка: высокая</span><span class="tag">Ежемесячная</span><span class="tag">Премодерация обязательна</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>19:05</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Талант сахнасы</div></div>
+          <div class="scr">
+            <div class="c grad-a">
+              <div class="t-lbl">Ай концерті</div>
+              <div class="t-md mt6" style="font-size:17px">30 мамыр · 20:00</div>
+              <div class="t-xs mt6">Отбасыңмен бірге қара — 12 өнер</div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Кланның өнерлері</div>
+              <div class="lst mt6">
+                <span class="ph-tile" style="width:44px;aspect-ratio:1;background:linear-gradient(150deg,#f6c56b,#c98a1b);border-radius:9px;align-items:center;justify-content:center;font-size:15px">▶</span>
+                <span style="flex:1"><span class="t-sm">Айсұлу · Домбыра</span><br><span class="t-xs">«Адай» · 0:52</span></span>
+                <span class="pill a">Топ-3</span>
+              </div>
+              <div class="lst">
+                <span class="ph-tile" style="width:44px;aspect-ratio:1;background:linear-gradient(150deg,#9fb8e8,#4f6fb5);border-radius:9px;align-items:center;justify-content:center;font-size:15px">▶</span>
+                <span style="flex:1"><span class="t-sm">Данияр · Скейт</span><br><span class="t-xs">Ollie · 0:34</span></span>
+                <span class="pill">👏 14</span>
+              </div>
+              <div class="lst">
+                <span class="ph-tile" style="width:44px;aspect-ratio:1;background:linear-gradient(150deg,#e8a0bd,#c15584);border-radius:9px;align-items:center;justify-content:center;font-size:15px">▶</span>
+                <span style="flex:1"><span class="t-sm">Мадина · Би</span><br><span class="t-xs">Қара жорға · 0:47</span></span>
+                <span class="pill">🔥 9</span>
+              </div>
+            </div>
+            <div class="c" style="border:1.5px dashed var(--purple2);background:#f6f3ff">
+              <div class="t-md" style="color:var(--purple)">Сенің кезегің</div>
+              <div class="t-xs mt6">Осы айда әлі өнер көрсеткен жоқсың. 60 секунд жетеді.</div>
+              <div class="fl mt10" style="gap:6px"><span class="pill p">🎻 Аспап</span><span class="pill p">🎤 Ән</span><span class="pill p">💃 Би</span><span class="pill p">🎨 Сурет</span></div>
+            </div>
+            <div class="c tight" style="background:#eef7f0">
+              <div class="t-xs" style="color:#1c7a45">🔒 Куратор көрмейінше ешкім көрмейді</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Талант сахнасы» — ценят за то, кто ты, а не за оценку</div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="idea">
+      <div class="txt">
+        <div class="num">06</div>
+        <h3>Менің мақсатым<em>Личная неучебная цель на 8 недель</em></h3>
+        <p class="lead">Ребёнок сам выбирает цель, к школе не относящуюся: научиться кататься на велосипеде, собрать кубик за минуту, выучить песню на домбре, отжаться 20 раз. Приложение разбивает её на 4–6 шагов и ведёт по ним два месяца.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Учит доводить до конца то, что выбрал сам. Это единственная механика, где нет ни клана, ни соревнования, — она про отношения с собой. Такой контраст нужен, иначе всё превращается в гонку.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>Каталог из ~40 готовых целей + «своя» с помощью куратора</li>
+              <li>Цель делится на шаги автоматически по шаблону</li>
+              <li>Раз в неделю один вопрос: «сдвинулся?» — да / нет / застрял</li>
+              <li>«Застрял» два раза подряд — куратору падает сигнал</li>
+              <li>Финал — короткое видео «получилось», по желанию в галерею</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>400 XP за доведённую цель. Значок в профиль навсегда — их коллекционируют.</span></div>
+        </div>
+        <div class="tags"><span class="tag mid">Разработка: средняя</span><span class="tag">Долгая</span><span class="tag">Личная, без рейтинга</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>18:12</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Менің мақсатым</div></div>
+          <div class="scr">
+            <div class="c" style="text-align:center">
+              <div class="emo" style="font-size:34px">🚲</div>
+              <div class="t-md mt10" style="font-size:16px">Велосипед тебуді үйрену</div>
+              <div class="t-xs mt6">8 аптаның 5-аптасы</div>
+              <div class="bar mt10"><i style="width:50%"></i></div>
+              <div class="t-xs mt6">4 қадамның 2-еуі орындалды</div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Қадамдар</div>
+              <div class="lst mt6"><span class="chk on">✓</span><span style="flex:1"><span class="t-sm">Тепе-теңдікті ұстау</span><br><span class="t-xs">1–2 апта</span></span></div>
+              <div class="lst"><span class="chk on">✓</span><span style="flex:1"><span class="t-sm">Педальсыз сырғу</span><br><span class="t-xs">3–4 апта</span></span></div>
+              <div class="lst"><span class="chk off">3</span><span style="flex:1"><span class="t-sm">10 метр өз бетімше</span><br><span class="t-xs">5–6 апта · қазір</span></span></div>
+              <div class="lst"><span class="chk off">4</span><span style="flex:1"><span class="t-sm">Аулада бір айналым</span><br><span class="t-xs">7–8 апта</span></span></div>
+            </div>
+            <div class="c" style="border:1.5px dashed #cfd6e8">
+              <div class="t-sm">Осы аптада жылжыдың ба?</div>
+              <div class="fl mt10" style="gap:6px">
+                <span class="pill g" style="flex:1;text-align:center;padding:9px">Иә</span>
+                <span class="pill" style="flex:1;text-align:center;padding:9px">Жоқ</span>
+                <span class="pill a" style="flex:1;text-align:center;padding:9px">Тұрып қалдым</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Менің мақсатым» — без клана и рейтинга, только ты и цель</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ БЛОК C ============ -->
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <span class="block-tag">Блок C</span>
+      <h2>Характер и привычки</h2>
+      <span class="cnt">3 идеи</span>
+    </div>
+
+    <!-- 7 -->
+    <div class="idea">
+      <div class="txt">
+        <div class="num">07</div>
+        <h3>Оқу әдеті<em>Привычка чтения: 10 уровней за 39 дней</em></h3>
+        <p class="lead">Уже спроектированная лестница: 1 страница × 4 дня, 2 страницы × 4 дня и так до 10 страниц. Итого около 210 страниц за 39 дней — средний срок формирования привычки. Здесь она достраивается полкой прочитанного и клановой библиотекой.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Единственная механика, которую родитель готов оплачивать отдельно. «Мой ребёнок начал читать» — сильнейший отзыв, который вообще может быть у edtech в Казахстане.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>10 уровней, отчёт по прочитанному не обязателен для прогресса</li>
+              <li>Полка: обложки прочитанных книг копятся годами</li>
+              <li>Клановая библиотека — что читают твои, без свободных отзывов</li>
+              <li>Финал: отчёт + разговор с куратором + сертификат «StudyLine оқырманы»</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>20 XP в день, 100 за уровень. Сертификат и книга в подарок на офлайн-встрече.</span></div>
+        </div>
+        <div class="tags"><span class="tag easy">Разработка: низкая</span><span class="tag">Уже спроектирована</span><span class="tag">Продаёт сама себя</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>20:40</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Оқу әдеті</div></div>
+          <div class="scr">
+            <div class="c grad-g">
+              <div class="fl sb"><span class="t-lbl">6-деңгей</span><span class="pill w">39 күннің 23-і</span></div>
+              <div class="t-big mt6">6 бет × 4 күн</div>
+              <div class="bar w mt10"><i style="width:68%"></i></div>
+              <div class="t-xs mt6">143 / 210 бет оқылды</div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Бүгінгі оқу</div>
+              <div class="fl sb mt10"><span class="t-sm">6 беттің 4-еуі</span><span class="pill a">2 бет қалды</span></div>
+              <div class="dot7 mt10">
+                <s class="on">1</s><s class="on">2</s><s class="on">3</s>
+                <s class="on">4</s><s>5</s><s>6</s><s style="opacity:.3">·</s>
+              </div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-md">Оқылған кітаптар</span><span class="pill">7</span></div>
+              <div class="gridr g4 mt10">
+                <div class="ph-tile" style="aspect-ratio:2/3;background:linear-gradient(150deg,#e8815a,#b8442c);font-size:7px">Алдар<br>Көсе</div>
+                <div class="ph-tile" style="aspect-ratio:2/3;background:linear-gradient(150deg,#5fa8d3,#2c5f8f);font-size:7px">Ер<br>Төстік</div>
+                <div class="ph-tile" style="aspect-ratio:2/3;background:linear-gradient(150deg,#8fc46b,#4b8236);font-size:7px">Менің<br>атым<br>Қожа</div>
+                <div class="ph-tile" style="aspect-ratio:2/3;background:#eceff7;color:var(--lock);align-items:center;justify-content:center;font-size:14px">+4</div>
+              </div>
+            </div>
+            <div class="c tight" style="background:#f3f0ff">
+              <div class="t-xs" style="color:var(--navy2)">📚 Кланда қазір «Ер Төстікті» 4 бала оқып жүр</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Оқу әдеті» — полка растёт годами и остаётся с ребёнком</div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="idea rev">
+      <div class="txt">
+        <div class="num">08</div>
+        <h3>Жақсылық банкі<em>Банк добрых дел, который заканчивается реальным делом</em></h3>
+        <p class="lead">Ребёнок отмечает добрые дела: помог маме, уступил место, объяснил однокласснику, покормил уличную кошку. За каждое — «жүрек». Клан копит сердца, и когда набирает тысячу, StudyLine делает настоящее доброе дело от имени этого клана.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Здесь мы впервые обещаем ребёнку, что его действия меняют что-то за пределами экрана. Это самая сильная эмоциональная привязка из всех пятнадцати — и лучший материал для рассказа родителям и школам.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>Список из ~20 готовых дел, свободного ввода нет</li>
+              <li>До 3 дел в день, чтобы не превратилось в накрутку</li>
+              <li>Клановая цель: 1 000 сердец = 10 деревьев / помощь приюту</li>
+              <li>Результат обязательно показываем фото- и видеоотчётом</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>Отдельная валюта «жүрек» — не смешивается с XP. Клан-исполнитель получает именную табличку у высаженных деревьев.</span></div>
+        </div>
+        <div class="tags"><span class="tag mid">Разработка: средняя</span><span class="tag">Нужен бюджет на дела</span><span class="tag">Сильный PR</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>17:33</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Жақсылық банкі</div></div>
+          <div class="scr">
+            <div class="c grad-pk" style="text-align:center">
+              <div class="emo" style="font-size:26px">❤️</div>
+              <div class="t-big mt6">47</div>
+              <div class="t-xs">менің жүрегім · осы айда</div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-md">Кланның мақсаты</span><span class="pill p">742 / 1000</span></div>
+              <div class="bar p mt10"><i style="width:74%"></i></div>
+              <div class="fl mt10" style="gap:8px"><span class="emo">🌳</span><span class="t-xs">1000 жүрек = Алматыда 10 ағаш отырғызамыз. Тақтайшада кланның аты тұрады.</span></div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Бүгін не істедің?</div>
+              <div class="lst mt6"><span class="chk on">✓</span><span class="emo">🧹</span><span class="t-sm" style="flex:1">Анама үй жинасуға көмектестім</span><span class="pill r">+3</span></div>
+              <div class="lst"><span class="chk on">✓</span><span class="emo">📖</span><span class="t-sm" style="flex:1">Сыныптасыма есеп түсіндірдім</span><span class="pill r">+2</span></div>
+              <div class="lst"><span class="chk off">+</span><span class="emo">🐈</span><span class="t-sm" style="flex:1;color:var(--muted)">Далада мысықты тамақтандыру</span><span class="pill">+2</span></div>
+              <div class="lst"><span class="chk off">+</span><span class="emo">🚌</span><span class="t-sm" style="flex:1;color:var(--muted)">Автобуста орын беру</span><span class="pill">+2</span></div>
+              <div class="t-xs mt10">Күніне 3 іс — жеткілікті. Сапа саннан маңызды.</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Жақсылық банкі» — сердца клана превращаются в реальные деревья</div>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="idea">
+      <div class="txt">
+        <div class="num">09</div>
+        <h3>Қалта ақша<em>Карманные деньги и первая финансовая грамотность</em></h3>
+        <p class="lead">Ребёнок ведёт свои деньги: сколько дали, сколько потратил, сколько отложил. Ставит цель — наушники за 15 000 ₸ — и видит, за сколько недель дойдёт. Родитель может назначить домашние дела с ценником.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Финансовой грамотности в школе нет, а запрос у родителей огромный. Это тема, ради которой мама сама покажет приложение другой маме — она про будущее ребёнка, а не про оценки.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>Никаких реальных платежей — только учёт, цифры вводит ребёнок</li>
+              <li>Цель накопления с прогнозом «дойдёшь к 12 апреля»</li>
+              <li>Родитель в своём кабинете может завести «дело — сумма»</li>
+              <li>Правило «отложи 10% с любого прихода» — включается по желанию</li>
+              <li>Раз в месяц короткий разбор: на что ушло больше всего</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>XP за регулярность ведения, не за суммы. Достиг цели накопления — значок «Жинақтаушы».</span></div>
+        </div>
+        <div class="tags"><span class="tag mid">Разработка: средняя</span><span class="tag">Уникально на рынке KZ</span><span class="tag">Без реальных денег</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>15:07</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Қалта ақша</div></div>
+          <div class="scr">
+            <div class="c grad-n">
+              <div class="t-lbl">Қолымдағы ақша</div>
+              <div class="t-big mt6">8 400 ₸</div>
+              <div class="fl sb mt10"><span class="t-xs">Осы айда келді 12 000 ₸</span><span class="t-xs">Кетті 3 600 ₸</span></div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-md">Жинақ мақсаты</span><span class="pill g">56%</span></div>
+              <div class="fl mt10" style="gap:9px">
+                <span class="emo" style="font-size:22px">🎧</span>
+                <span style="flex:1"><span class="t-sm">Құлаққап</span><br><span class="t-xs">8 400 / 15 000 ₸</span></span>
+              </div>
+              <div class="bar mt10"><i style="width:56%"></i></div>
+              <div class="t-xs mt6">Осылай жинасаң — 12 сәуірде аласың</div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Соңғы жазбалар</div>
+              <div class="lst mt6"><span class="chk on" style="background:var(--green)">↑</span><span style="flex:1"><span class="t-sm">Апам берді</span><br><span class="t-xs">3 сәуір</span></span><span class="t-sm" style="color:var(--green)">+2 000</span></div>
+              <div class="lst"><span class="chk no">↓</span><span style="flex:1"><span class="t-sm">Мектеп асханасы</span><br><span class="t-xs">3 сәуір</span></span><span class="t-sm" style="color:var(--red)">−600</span></div>
+              <div class="lst"><span class="chk on" style="background:var(--green)">↑</span><span style="flex:1"><span class="t-sm">Ауланы тазаладым</span><br><span class="t-xs">анам тапсырды · 1 сәуір</span></span><span class="t-sm" style="color:var(--green)">+1 500</span></div>
+            </div>
+            <div class="c tight" style="background:#fdf7e3">
+              <div class="t-xs" style="color:#8a6300">💡 Әр кіріcтің 10%-ын бөліп қой — жыл соңында 14 400 ₸ болады</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Қалта ақша» — учёт и цель, реальных денег в приложении нет</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ БЛОК D ============ -->
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <span class="block-tag">Блок D</span>
+      <h2>Семья</h2>
+      <span class="cnt">2 идеи</span>
+    </div>
+
+    <!-- 10 -->
+    <div class="idea">
+      <div class="txt">
+        <div class="num">10</div>
+        <h3>Күн сұрағы<em>Вопрос дня, из которого за год собирается книга семьи</em></h3>
+        <p class="lead">Каждый вечер приложение даёт один вопрос — ребёнку и родителю одновременно. «О чём ты мечтал в моём возрасте?», «Какой день был самым смешным?». Оба отвечают коротко, ответы видят только они двое. За год набирается 300 ответов — и мы отдаём их семье книгой.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Прямое попадание в цель кабинета родителя — «увеличить количество счастливых дней семьи». И самый дешёвый в разработке способ привязать к продукту не ребёнка, а маму: книгу с ответами дочери она не выбросит никогда.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>Один вопрос в 20:00, банк из 365 вопросов</li>
+              <li>Ответ виден второму только после того, как ответил сам</li>
+              <li>Никакой публичности — это единственная закрытая механика</li>
+              <li>Раз в квартал — PDF; за год — печатная книга «Отбасы кітабы»</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>40 XP ребёнку и уровень маме в кабинете. Книга в подарок при 200+ ответах за год.</span></div>
+        </div>
+        <div class="tags"><span class="tag easy">Разработка: низкая</span><span class="tag">Ежедневная</span><span class="tag">Держит родителя</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>20:14</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Күн сұрағы</div></div>
+          <div class="scr">
+            <div class="c grad-p">
+              <div class="t-lbl">Бүгінгі сұрақ · 3 сәуір</div>
+              <div class="t-md mt6" style="font-size:16px;line-height:1.35">Анам, сен менің жасымда кім болғың келді?</div>
+            </div>
+            <div class="c">
+              <div class="fl"><span class="av" style="background:var(--pink)">А</span><span class="t-sm" style="flex:1">Анам жауап берді</span><span class="pill g">20:06</span></div>
+              <div class="t-xs mt10" style="color:var(--ink);font-size:11.5px;line-height:1.45">«Дәрігер болғым келді. Ауылда бізге жалғыз фельдшер келетін, мен соған қарап тұратынмын...»</div>
+            </div>
+            <div class="c">
+              <div class="fl"><span class="av" style="background:var(--cyan)">А</span><span class="t-sm" style="flex:1">Менің жауабым</span><span class="pill">жазылуда</span></div>
+              <div class="mt10" style="border:1.5px dashed #cfd6e8;border-radius:10px;padding:11px">
+                <span class="t-xs">Мен ұшқыш болғым келеді, өйткені...</span>
+                <span style="display:inline-block;width:1.5px;height:12px;background:var(--purple);vertical-align:-2px"></span>
+              </div>
+            </div>
+            <div class="c grad-a">
+              <div class="fl sb"><span class="t-lbl">Отбасы кітабы</span><span class="pill w">84 жауап</span></div>
+              <div class="bar w mt10"><i style="width:28%"></i></div>
+              <div class="t-xs mt6">200 жауапта — басып шығарып сыйлаймыз</div>
+            </div>
+            <div class="c tight" style="background:#eef7f0">
+              <div class="t-xs" style="color:#1c7a45">🔒 Бұл жауаптарды тек сен және анаң көресіңдер</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Күн сұрағы» — единственная полностью приватная механика</div>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <div class="idea rev">
+      <div class="txt">
+        <div class="num">11</div>
+        <h3>Отбасы миссиясы<em>Семейные миссии, которые запускает ребёнок</em></h3>
+        <p class="lead">В кабинете родителя задания идут сверху вниз — маме. Здесь наоборот: ребёнок получает миссию и сам зовёт взрослого. Позвонить бабушке, приготовить вместе ужин, разобрать старые фото, починить что-нибудь.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Переворачивает роли: обычно инициатива всегда у взрослого. Ребёнок, который сам организовал семейный вечер, чувствует себя иначе — и мама это запоминает. Дополняет кабинет родителя, а не дублирует его.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>Одна миссия в неделю, выпадает в пятницу вечером</li>
+              <li>Подтверждение — фото, которое уходит только в семейный альбом</li>
+              <li>Ни клан, ни куратор этих фото не видят</li>
+              <li>Отказаться можно — прилетит другая, давления нет</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>120 XP ребёнку и закрытие недельного уровня в кабинете мамы — одна миссия работает на двоих.</span></div>
+        </div>
+        <div class="tags"><span class="tag easy">Разработка: низкая</span><span class="tag">Еженедельная</span><span class="tag">Связка с кабинетом родителя</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>19:40</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Отбасы миссиясы</div></div>
+          <div class="scr">
+            <div class="c grad-g">
+              <div class="t-lbl">Осы аптаның миссиясы</div>
+              <div class="fl mt6" style="gap:10px">
+                <span class="emo" style="font-size:26px">📞</span>
+                <span class="t-md" style="font-size:16px">Әжеме қоңырау шалып,<br>балалығы туралы сұра</span>
+              </div>
+              <div class="t-xs mt10">Кемінде 5 минут сөйлес. Бір сұрақ жетеді — қалғанын әжең өзі айтады.</div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Дәлел</div>
+              <div class="mt10" style="border:1.5px dashed #cfd6e8;border-radius:12px;padding:20px;text-align:center">
+                <div class="emo" style="font-size:22px">📷</div>
+                <div class="t-xs mt6">Бірге түскен суретті қос</div>
+              </div>
+              <div class="t-xs mt10">🔒 Бұл сурет тек отбасы альбомына түседі. Клан да, куратор да көрмейді.</div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-md">Отбасы альбомы</span><span class="pill">23 сурет</span></div>
+              <div class="gridr g3 mt10">
+                <div class="ph-tile" style="background:linear-gradient(150deg,#f3c98b,#c98a4b)">наурыз</div>
+                <div class="ph-tile" style="background:linear-gradient(150deg,#a8cfe8,#5b8fb5)">ақпан</div>
+                <div class="ph-tile" style="background:linear-gradient(150deg,#c9b8e8,#7b5bd6)">қаңтар</div>
+              </div>
+            </div>
+            <div class="c tight" style="background:#f3f0ff">
+              <div class="t-xs" style="color:var(--navy2)">👩 Орындасаң — анаңның кабинетінде 6-деңгей ашылады</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Отбасы миссиясы» — инициатива у ребёнка, фото не выходит из семьи</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ БЛОК E ============ -->
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <span class="block-tag">Блок E</span>
+      <h2>Игра и досуг</h2>
+      <span class="cnt">2 идеи</span>
+    </div>
+
+    <!-- 12 -->
+    <div class="idea">
+      <div class="txt">
+        <div class="num">12</div>
+        <h3>Логика аренасы<em>Шахматы и логические игры один на один</em></h3>
+        <p class="lead">Асинхронные партии внутри клана: шахматы, тоғызқұмалақ, судоку-дуэль, «кто быстрее». Ходишь когда удобно, соперник — только свои. По субботам вечером — турнир клана против клана.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>«Ойын» — самая частая просьба детей в анкете, двадцать упоминаний. Игры мы уже умеем делать: есть репозиторий youngfuture-games и готовые движки. Это досуг, который выглядит как игра и при этом развивает мышление.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>Соперник только из своего клана или из клана-соперника недели</li>
+              <li>Ход в течение суток, иначе техническое поражение</li>
+              <li>Тоғызқұмалақ обязательно — это наша культурная опора</li>
+              <li>Личного рейтинга нет, есть вклад в клановый счёт</li>
+              <li>Субботний турнир 20:00 — точка сбора недели</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>25 XP за партию, 100 за победу в субботнем турнире. Роль «Клан логигі» — тому, кто выиграл больше всех.</span></div>
+        </div>
+        <div class="tags"><span class="tag mid">Разработка: средняя</span><span class="tag">Переиспользуем youngfuture-games</span><span class="tag">Ежедневная</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>18:55</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Логика аренасы</div></div>
+          <div class="scr">
+            <div class="c grad-p">
+              <div class="fl sb"><span class="t-lbl">Сенбілік турнир</span><span class="pill w">2 күн</span></div>
+              <div class="t-md mt6" style="font-size:15px">Astana Tigers · Almaty Wolves</div>
+              <div class="fl sb mt10"><span class="t-big" style="font-size:20px">14 : 11</span><span class="t-xs">клан есебі</span></div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-md">Сенің кезегің</span><span class="pill a">2 партия</span></div>
+              <div class="lst mt6">
+                <span class="emo">♟️</span>
+                <span style="flex:1"><span class="t-sm">Шахмат · Данияр</span><br><span class="t-xs">14-жүріс · 6 сағат қалды</span></span>
+                <span class="pill p">жүр</span>
+              </div>
+              <div class="lst">
+                <span class="emo">🪨</span>
+                <span style="flex:1"><span class="t-sm">Тоғызқұмалақ · Аружан</span><br><span class="t-xs">8-жүріс · 19 сағат қалды</span></span>
+                <span class="pill p">жүр</span>
+              </div>
+              <div class="lst">
+                <span class="emo">🔢</span>
+                <span style="flex:1;color:var(--muted)"><span class="t-sm">Судоку-дуэль</span><br><span class="t-xs">қарсылас іздеуде</span></span>
+                <span class="pill">күту</span>
+              </div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Кланға қосқан үлесім</div>
+              <div class="fl sb mt10"><span class="t-big" style="font-size:20px">7</span><span class="t-xs">жеңіс · 12 партиядан</span></div>
+              <div class="bar p mt10"><i style="width:58%"></i></div>
+              <div class="t-xs mt6">Кланда 3-орындасың</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Логика аренасы» — соперник всегда свой, рейтинг только клановый</div>
+      </div>
+    </div>
+
+    <!-- 13 -->
+    <div class="idea rev">
+      <div class="txt">
+        <div class="num">13</div>
+        <h3>Тұмар<em>Питомец, который растёт только от внеучебных дел</em></h3>
+        <p class="lead">У ребёнка живёт беркут (или барс, или тұлпар — на выбор). Он растёт не от уроков, а от всего остального: шагов, прочитанных страниц, зарядки, добрых дел, режима. Пять источников энергии — пять предыдущих механик, сведённых в одну картинку.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Это связующий слой, а не отдельная фича. Без него четырнадцать механик рассыпаются на четырнадцать экранов. Питомец отвечает на вопрос «зачем мне всё это сразу» и даёт одну понятную цель ребёнку 10 лет.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>Пять шкал энергии = пять механик блоков A и C</li>
+              <li>Питомец не умирает и не болеет — никакого шантажа виной</li>
+              <li>Растёт медленно: полный рост примерно за учебный год</li>
+              <li>Внешний вид меняется на этапах, видно клану</li>
+              <li>Казахские образы: бүркіт, барыс, тұлпар, қасқыр</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>Сам питомец и есть награда. Взрослая форма — редкая, её видно в профиле и в клане.</span></div>
+        </div>
+        <div class="tags"><span class="tag hard">Разработка: высокая</span><span class="tag">Нужна иллюстрация</span><span class="tag">Связывает всё</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>21:02</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Тұмар</div></div>
+          <div class="scr dark">
+            <div class="c" style="text-align:center;background:radial-gradient(circle at 50% 30%,rgba(242,183,5,.28),rgba(255,255,255,.05));">
+              <div class="emo" style="font-size:52px">🦅</div>
+              <div class="t-md mt10" style="font-size:16px">Сұңқар</div>
+              <div class="t-xs mt6">5-деңгей · бозбала кезең</div>
+              <div class="bar w mt10"><i style="width:64%;background:var(--amber)"></i></div>
+              <div class="t-xs mt6">Келесі кезеңге 640 қуат</div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Қуат көздері</div>
+              <div class="lst mt6"><span class="emo">👟</span><span class="t-sm" style="flex:1">Қадам</span><span style="width:74px"><span class="bar"><i style="width:80%"></i></span></span></div>
+              <div class="lst"><span class="emo">📖</span><span class="t-sm" style="flex:1">Оқу</span><span style="width:74px"><span class="bar"><i style="width:68%"></i></span></span></div>
+              <div class="lst"><span class="emo">💪</span><span class="t-sm" style="flex:1">Жаттығу</span><span style="width:74px"><span class="bar"><i style="width:90%"></i></span></span></div>
+              <div class="lst"><span class="emo">❤️</span><span class="t-sm" style="flex:1">Жақсылық</span><span style="width:74px"><span class="bar"><i style="width:47%"></i></span></span></div>
+              <div class="lst"><span class="emo">🌙</span><span class="t-sm" style="flex:1">Тәртіп</span><span style="width:74px"><span class="bar"><i style="width:86%"></i></span></span></div>
+            </div>
+            <div class="c tight" style="background:rgba(242,183,5,.16)">
+              <div class="t-xs" style="color:#ffd76a">🪶 «Жақсылық» шкаласы артта — сол жақтан өссе, қауырсыны алтын түске енеді</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Тұмар» — сводит пять механик в одну понятную ребёнку цель</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ БЛОК F ============ -->
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <span class="block-tag">Блок F</span>
+      <h2>Принадлежность</h2>
+      <span class="cnt">2 идеи</span>
+    </div>
+
+    <!-- 14 -->
+    <div class="idea">
+      <div class="txt">
+        <div class="num">14</div>
+        <h3>Клан кездесуі<em>Офлайн-встреча клана и городской квест</em></h3>
+        <p class="lead">Раз в квартал клан встречается вживую: парк, квест по городу, командные игры, чай с родителями. В приложении — афиша, сбор, чек-ин на месте и альбом события, который остаётся навсегда.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Пока дети не увидели друг друга вживую, клан остаётся картинкой. Одна встреча превращает игровую механику в настоящую дружбу — а дружбу из продукта уже не вынуть. Плюс это точка, где мамы знакомятся между собой, и начинается сарафан.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>Раз в квартал, суббота, 2–3 часа, город по кланам</li>
+              <li>Ведёт куратор клана — тот же человек, что и в приложении</li>
+              <li>Чек-ин по коду на месте, никакой геолокации детей</li>
+              <li>Квест командный: клан против клана, а не ребёнок против ребёнка</li>
+              <li>Родители приглашены и остаются — это половина смысла</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>Значок «Болдым» за каждую встречу — их видно в профиле. Три встречи подряд — «Клан жүрегі».</span></div>
+        </div>
+        <div class="tags"><span class="tag hard">Операционка: тяжёлая</span><span class="tag">Раз в квартал</span><span class="tag">Главный драйвер сарафана</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>12:30</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Клан кездесуі</div></div>
+          <div class="scr">
+            <div class="c grad-n">
+              <div class="t-lbl">Көктем квесті</div>
+              <div class="t-md mt6" style="font-size:18px">18 сәуір · сенбі</div>
+              <div class="t-xs mt6">Алматы · Ботаникалық бақ · 11:00–14:00</div>
+              <div class="fl sb mt10">
+                <span class="avrow">
+                  <span class="av" style="background:var(--amber)">А</span>
+                  <span class="av" style="background:var(--cyan)">Д</span>
+                  <span class="av" style="background:var(--pink)">М</span>
+                  <span class="av" style="background:var(--green)">С</span>
+                  <span class="av" style="background:#5b6ba8">+8</span>
+                </span>
+                <span class="pill w">12 / 15 барады</span>
+              </div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Квест бағыты</div>
+              <div class="lst mt6"><span class="chk on">1</span><span style="flex:1"><span class="t-sm">Кіреберіс — командаға бөліну</span><br><span class="t-xs">11:00</span></span></div>
+              <div class="lst"><span class="chk on">2</span><span style="flex:1"><span class="t-sm">Оранжерея — өсімдік жұмбағы</span><br><span class="t-xs">11:40</span></span></div>
+              <div class="lst"><span class="chk off">3</span><span style="flex:1"><span class="t-sm">Көл жағасы — команда ойындары</span><br><span class="t-xs">12:30</span></span></div>
+              <div class="lst"><span class="chk off">4</span><span style="flex:1"><span class="t-sm">Шай және марапаттау</span><br><span class="t-xs">13:30 · ата-аналармен</span></span></div>
+            </div>
+            <div class="c" style="background:#f3f0ff">
+              <div class="fl"><span class="emo">👨‍👩‍👦</span><span class="t-xs" style="color:var(--navy2);flex:1">Ата-аналар да шақырылады. Кездесудің жартысы — солар үшін.</span></div>
+            </div>
+            <div class="c tight">
+              <div class="fl sb"><span class="t-xs">Өткен кездесулер</span><span class="pill g">🏅 3 белгі</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Клан кездесуі» — здесь клан перестаёт быть картинкой</div>
+      </div>
+    </div>
+
+    <!-- 15 -->
+    <div class="idea rev">
+      <div class="txt">
+        <div class="num">15</div>
+        <h3>Аңыздар<em>Выпускники-наставники: те, кто уже поступил</em></h3>
+        <p class="lead">Дети, поступившие в НИШ, БИЛ и РФМШ, остаются в продукте как наставники клана. Раз в неделю — короткое видео-обращение, раз в месяц — ответы на вопросы детей. Вопросы дети выбирают из готового списка, свободного текста нет.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Замыкает третий круг комьюнити и решает главную проблему: ребёнку 10 лет НИШ — абстракция. Живой Диас, который два года назад сидел на его месте, — не абстракция. Плюс это удерживает выпускников, которых иначе мы теряем навсегда.</span></div>
+          <div class="mrow"><b>Механика</b>
+            <ul>
+              <li>За каждым кланом закреплён один выпускник</li>
+              <li>Видео 1–2 минуты в неделю, тему предлагает куратор</li>
+              <li>Вопросы — только из готового списка, ответ публичный для клана</li>
+              <li>Никаких личных контактов между выпускником и ребёнком</li>
+              <li>Наставнику платим — это его первая работа, и это тоже часть истории</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Награда</b><span>Ребёнку — доступ и ответ на свой вопрос. Наставнику — оплата и статус. Продукту — живое доказательство, что система работает.</span></div>
+        </div>
+        <div class="tags"><span class="tag mid">Разработка: средняя</span><span class="tag">Нужны выпускники</span><span class="tag">Закрывает круг 3</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>17:10</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Аңыздар</div></div>
+          <div class="scr">
+            <div class="c grad-n">
+              <div class="fl" style="gap:11px">
+                <span class="av" style="width:44px;height:44px;font-size:16px;background:var(--green)">Д</span>
+                <span style="flex:1">
+                  <span class="t-md" style="font-size:16px">Диас Н.</span><br>
+                  <span class="t-xs">НИШ Алматы · 2024 жыл</span>
+                </span>
+                <span class="pill w">тәлімгер</span>
+              </div>
+              <div class="t-xs mt10">«Мен де 5-сыныпта осы қосымшада отырдым. Сұрақтарың болса — қой.»</div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Осы аптаның видеосы</div>
+              <div class="ph-tile mt10" style="aspect-ratio:16/9;border-radius:12px;background:linear-gradient(150deg,#3b5aa8,#1d2a4d);align-items:center;justify-content:center;font-size:22px">▶</div>
+              <div class="t-sm mt10">«Емтихан алдында қалай ұйықтадым»</div>
+              <div class="t-xs mt6">1 мин 40 сек · 12 бала көрді</div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Ай сайынғы сұрақ</div>
+              <div class="t-xs mt6" style="color:var(--ink)">Кланның сұрағын таңда — Диас видеомен жауап береді:</div>
+              <div class="lst mt6"><span class="chk on">✓</span><span class="t-sm" style="flex:1">НИШ-те қиын болды ма?</span><span class="pill p">7</span></div>
+              <div class="lst"><span class="chk off">·</span><span class="t-sm" style="flex:1;color:var(--muted)">Достарың бар ма сонда?</span><span class="pill">4</span></div>
+              <div class="lst"><span class="chk off">·</span><span class="t-sm" style="flex:1;color:var(--muted)">Күніне қанша сағат оқыдың?</span><span class="pill">3</span></div>
+            </div>
+            <div class="c tight" style="background:#eef7f0">
+              <div class="t-xs" style="color:#1c7a45">🔒 Жеке хат алмасу жоқ — барлығы кланға ашық</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Аңыздар» — НИШ перестаёт быть абстракцией</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ПРИОРИТЕТЫ ============ -->
+<section class="prio">
+  <div class="wrap">
+    <h2 class="sec-title">Что делать первым</h2>
+    <p class="sec-sub">Пятнадцать сразу не запускают — половина умрёт от того, что ребёнок не поймёт, куда смотреть. Оценка по двум осям: сколько даёт для удержания и сколько стоит сделать.</p>
+
+    <div class="ptable">
+      <div class="hrow"><span>Механика</span><span>Эффект</span><span>Стоимость</span><span>Ритм</span></div>
+      <div class="row"><b>10 · Күн сұрағы</b><span>Очень высокий</span><span>Низкая</span><span>Каждый день</span></div>
+      <div class="row"><b>07 · Оқу әдеті</b><span>Очень высокий</span><span>Низкая</span><span>Каждый день</span></div>
+      <div class="row"><b>01 · Қадам жарысы</b><span>Высокий</span><span>Низкая</span><span>Каждый день</span></div>
+      <div class="row"><b>04 · Фото жарыс</b><span>Высокий</span><span>Средняя</span><span>Каждую неделю</span></div>
+      <div class="row"><b>02 · Таңғы 7 минут</b><span>Высокий</span><span>Низкая</span><span>Каждый день</span></div>
+      <div class="row"><b>03 · Күн тәртібі</b><span>Средний</span><span>Низкая</span><span>Каждый день</span></div>
+      <div class="row"><b>11 · Отбасы миссиясы</b><span>Высокий</span><span>Низкая</span><span>Каждую неделю</span></div>
+      <div class="row"><b>08 · Жақсылық банкі</b><span>Высокий</span><span>Средняя</span><span>Каждый день</span></div>
+      <div class="row"><b>12 · Логика аренасы</b><span>Высокий</span><span>Средняя</span><span>Каждый день</span></div>
+      <div class="row"><b>14 · Клан кездесуі</b><span>Очень высокий</span><span>Тяжёлая операционка</span><span>Раз в квартал</span></div>
+      <div class="row"><b>06 · Менің мақсатым</b><span>Средний</span><span>Средняя</span><span>Раз в неделю</span></div>
+      <div class="row"><b>09 · Қалта ақша</b><span>Средний</span><span>Средняя</span><span>Каждую неделю</span></div>
+      <div class="row"><b>15 · Аңыздар</b><span>Высокий</span><span>Средняя + люди</span><span>Каждую неделю</span></div>
+      <div class="row"><b>05 · Талант сахнасы</b><span>Средний</span><span>Высокая</span><span>Раз в месяц</span></div>
+      <div class="row"><b>13 · Тұмар</b><span>Высокий как слой</span><span>Высокая</span><span>Постоянно</span></div>
+    </div>
+
+    <div class="wave">
+      <h3>Три волны запуска</h3>
+      <ol>
+        <li><b>Волна 1 — «дешёво и каждый день».</b> Күн сұрағы, Оқу әдеті, Қадам жарысы. Три механики, все дешёвые, все ежедневные, все дают маме то, что она расскажет подруге. Этого достаточно, чтобы проверить главную гипотезу: заходят ли в дни без уроков.</li>
+        <li><b>Волна 2 — «клан оживает».</b> Фото жарыс, Логика аренасы, Таңғы 7 минут, Отбасы миссиясы. Появляется причина смотреть друг на друга. Здесь же первая офлайн-встреча — без неё клан не станет настоящим.</li>
+        <li><b>Волна 3 — «смысл и глубина».</b> Жақсылық банкі, Аңыздар, Тұмар, Қалта ақша. Дорогие, но именно они превращают приложение в то, из чего не уходят. Тұмар — только последним: он собирает уже работающие механики, раньше собирать нечего.</li>
+      </ol>
+    </div>
+
+    <div class="note">
+      <b>Одно предупреждение.</b> Пятнадцать механик — это пятнадцать поводов для уведомлений. Если каждая начнёт звонить, ребёнок отключит уведомления целиком и мы потеряем всё сразу. Нужно правило: не больше двух пушей в день на ребёнка и один на родителя, с общим приоритетом. Это решается до запуска, а не после.
+    </div>
+
+    <div class="note" style="border-left-color:var(--purple)">
+      <b>Вопросы, которые остаются дизайнеру и мне.</b> Где физически живут эти механики в четырёх вкладках — вешаем всё на «главное» или заводим отдельный раздел? Кто модерирует фото и видео при 1 000 детей — куратор не потянет. Нужен ли Тұмар вообще, если ребёнок и так видит XP. И считаем ли мы шаги без телефона у ребёнка — у части аудитории его просто нет.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">StudyLine · 15 механик вне процесса обучения · подготовлено для отбора идей</div>
+</footer>
+
+</body>
+</html>
