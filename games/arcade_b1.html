@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>StudyLine · Математика Аркада 🎮</title>
-<script src="../bridge/studyline-bridge.js"></script>
+<title>YoungFuture · Ағылшын Аркада 🎮</title>
+<script src="../db/games-db.js"></script>
 <style>
   :root{--ink:#0b1437;--ink2:#161c47;--violet:#6d4bff;--violet2:#8a6bff;--cyan:#21d4fd;--lime:#9be870;--gold:#ffce4a;--red:#ff4d6d;}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -84,7 +84,6 @@
 </head>
 <body>
 
-<!-- Вход убран: ребёнок уже авторизован в приложении StudyLine (см. studyline-bridge.js) -->
 
 <div id="wrap">
   <canvas id="cv"></canvas>
@@ -100,9 +99,9 @@
 
   <!-- MENU -->
   <div class="screen on" id="sMenu">
-    <div class="brand"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Study<span>Line</span></b></div>
-    <div class="htitle">Математика <em>Аркада</em> 🎮</div>
-    <div class="hsub">Ойнап жүріп формулаларды жаттап ал. Ойынды таңда, қиындықты таңда!</div>
+    <div class="brand"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Young<span>Future</span></b></div>
+    <div class="htitle">Ағылшын <em>Аркада</em> 🎮</div>
+    <div class="hsub">Ойнап жүріп ағылшын үйрен. Ойынды таңда, қиындықты таңда — кеттік!</div>
     <div class="grid" id="gameGrid"></div>
   </div>
 
@@ -110,7 +109,7 @@
   <!-- DIFFICULTY -->
   <div class="screen" id="sDiff">
     <button class="back" id="diffBack">← Артқа</button>
-    <div class="brand" style="margin-top:30px"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Study<span>Line</span></b></div>
+    <div class="brand" style="margin-top:30px"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Young<span>Future</span></b></div>
     <div class="htitle" id="diffTitle">🎮</div>
     <div class="hsub" id="diffDesc"></div>
     <div class="dwrap">
@@ -123,19 +122,20 @@
 
   <!-- RESULTS -->
   <div class="screen" id="sOver">
-    <div class="brand" style="margin-top:8px"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Study<span>Line</span></b></div>
+    <div class="brand" style="margin-top:8px"><div class="logo"><svg viewBox="0 0 100 100"><path d="M20 24 L50 78 L80 24" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="9" fill="#9be870"/></svg></div><b>Young<span>Future</span></b></div>
     <div style="font-size:13px;letter-spacing:1px;color:#9aa3d0;font-weight:800">СЕНІҢ НӘТИЖЕҢ</div>
     <div class="score-big" id="oScore">0</div>
     <div class="learned" id="oLearned"></div>
-    <div class="cta" id="xpBox">
-      <b id="xpTitle">Жарайсың! 🎉</b>
-      <p id="xpText">Нәтижең StudyLine-ға жіберілді.</p>
+    <div id="yfBoard" style="display:none"></div>
+    <div class="cta">
+      <b>Көрдің бе? Ағылшынды ойнап үйренуге болады 🎮</b>
+      <p>Біз YoungFuture-де дәл осылай оқытамыз. Нақты деңгейіңді тегін біл — жаз 👇</p>
     </div>
+    <a class="btn big wa" id="ctaStart" href="#" target="_blank" rel="noopener" style="margin-top:12px">«СТАРТ» — WhatsApp 🚀</a>
     <div class="row2">
       <button class="btn" id="againBtn">Қайта ▶</button>
       <button class="btn alt" id="menuBtn">Ойындар</button>
     </div>
-    <button class="btn alt" id="slCloseBtn" style="margin-top:9px;display:none;width:100%;max-width:280px">← Қосымшаға оралу</button>
   </div>
 
   <!-- COUNTDOWN -->
@@ -211,26 +211,7 @@ var Sound=(function(){
    Пусто/off — форма не показывается, игра работает как обычно. */
 
 /* =================== СӨЗ БАЗАСЫ — воркфлоу осы массивті ауыстырады (жалғыз var WORDS) =================== */
-var WORDS=[
-  {q:"Тығыздық формуласы?",o:["ρ=m/V","V/m","m·V"],a:"ρ=m/V"},
-  {q:"Күш формуласы?",o:["F=m·a","m/a","a/m"],a:"F=m·a"},
-  {q:"Қысым формуласы?",o:["p=F/A","A/F","F·A"],a:"p=F/A"},
-  {q:"Жұмыс формуласы?",o:["W=F·d","F/d","F+d"],a:"W=F·d"},
-  {q:"Қуат формуласы?",o:["P=W/t","t/W","W·t"],a:"P=W/t"},
-  {q:"Кинетик. энергия?",o:["½mv²","mgh","m·v"],a:"½mv²"},
-  {q:"Потенц. энергия?",o:["mgh","½mv²","m/g"],a:"mgh"},
-  {q:"Архимед күші?",o:["ρgV","mgh","m/V"],a:"ρgV"},
-  {q:"Ромб ауданы?",o:["d₁d₂/2","2πr","πr²"],a:"d₁d₂/2"},
-  {q:"Шеңбер ауданы?",o:["πr²","2πr","πd"],a:"πr²"},
-  {q:"Үшбұрыш ауданы?",o:["½·a·h","a·h","a·b·c"],a:"½·a·h"},
-  {q:"Дискриминант?",o:["b²−4ac","2a","−b/2a"],a:"b²−4ac"},
-  {q:"sin 30°=?",o:["1/2","√3/2","1"],a:"1/2"},
-  {q:"sin²α+cos²α=?",o:["1","0","2"],a:"1"},
-  {q:"Күш бірлігі?",o:["Ньютон","Джоуль","Паскаль"],a:"Ньютон"},
-  {q:"Энергия бірлігі?",o:["Джоуль","Ватт","Ньютон"],a:"Джоуль"},
-  {en:"Тығыздық",kk:"m/V"},{en:"Күш",kk:"m·a"},{en:"Қысым",kk:"F/A"},{en:"Жұмыс",kk:"F·d"},
-  {en:"Қуат",kk:"W/t"},{en:"Архимед",kk:"ρgV"},{en:"Ромб",kk:"d₁d₂/2"},{en:"Шеңбер",kk:"πr²"}
-];
+var WORDS=[{"en": "environment", "kk": "қоршаған орта", "e": "🌍", "lvl": "b1"}, {"en": "responsibility", "kk": "жауапкершілік", "e": "⚖️", "lvl": "b1"}, {"en": "opportunity", "kk": "мүмкіндік", "e": "🚪", "lvl": "b1"}, {"en": "achievement", "kk": "жетістік", "e": "🏆", "lvl": "b1"}, {"en": "experience", "kk": "тәжірибе", "e": "🧗", "lvl": "b1"}, {"en": "knowledge", "kk": "білім", "e": "📚", "lvl": "b1"}, {"en": "decision", "kk": "шешім", "e": "🤔", "lvl": "b1"}, {"en": "development", "kk": "даму", "e": "📈", "lvl": "b1"}, {"en": "advantage", "kk": "артықшылық", "e": "✅", "lvl": "b1"}, {"en": "influence", "kk": "ықпал", "e": "🧲", "lvl": "b1"}, {"en": "improve", "kk": "жақсарту", "e": "🔧", "lvl": "b1"}, {"en": "increase", "kk": "арттыру", "e": "⬆️", "lvl": "b1"}, {"en": "reduce", "kk": "азайту", "e": "⬇️", "lvl": "b1"}, {"en": "suggest", "kk": "ұсыну", "e": "💡", "lvl": "b1"}, {"en": "require", "kk": "талап ету", "e": "📋", "lvl": "b1"}, {"en": "achieve", "kk": "қол жеткізу", "e": "🎯", "lvl": "b1"}, {"en": "consider", "kk": "қарастыру", "e": "🧐", "lvl": "b1"}, {"en": "available", "kk": "қолжетімді", "e": "🟢", "lvl": "b1"}, {"en": "important", "kk": "маңызды", "e": "❗", "lvl": "b1"}, {"en": "possible", "kk": "мүмкін", "e": "🔓", "lvl": "b1"}, {"en": "similar", "kk": "ұқсас", "e": "🔁", "lvl": "b1"}, {"en": "several", "kk": "бірнеше", "e": "🔢", "lvl": "b1"}, {"en": "especially", "kk": "әсіресе", "e": "⭐", "lvl": "b1"}, {"en": "however", "kk": "алайда", "e": "↩️", "lvl": "b1"}, {"en": "therefore", "kk": "сондықтан", "e": "➡️", "lvl": "b1"}, {"en": "pronunciation", "kk": "айтылым", "e": "🗣️", "lvl": "b1"}, {"en": "sustainable", "kk": "тұрақты", "e": "♻️", "lvl": "b2"}, {"en": "consequence", "kk": "салдар", "e": "⛓️", "lvl": "b2"}, {"en": "significant", "kk": "елеулі", "e": "📊", "lvl": "b2"}, {"en": "extraordinary", "kk": "ерекше", "e": "✨", "lvl": "b2"}, {"en": "assumption", "kk": "болжам", "e": "🤷", "lvl": "b2"}, {"en": "negotiate", "kk": "келіссөз жүргізу", "e": "🤝", "lvl": "b2"}];
 
 /* =================== ENGINE =================== */
 var Engine=(function(){
@@ -424,7 +405,7 @@ function fitFont(ctx,text,maxW,base,min){ var fs=base; ctx.font='800 '+fs+'px In
 /* ---- 2. CATCH (Сөзді ұста) ---- */
 var CatchGame={ id:'catch', name:'Сөзді ұста', emoji:'🧺', desc:'Дұрыс жауапты себетке ұста', bpm:120,
   how:'Жоғарыда — мақсат. Себетті саусақпен жылжыт та, ДҰРЫС түсіп жатқан жауапты ұста.',
-  diffs:{ easy:{dist:2,fall:0.13,bw:0.32}, medium:{dist:3,fall:0.16,bw:0.28}, hard:{dist:3,fall:0.20,bw:0.24} },
+  diffs:{ easy:{dist:2,fall:0.22,bw:0.30}, medium:{dist:3,fall:0.28,bw:0.26}, hard:{dist:4,fall:0.36,bw:0.21} },
   mk:function(E){
     var W,H,basketX,targetX,bw,bh,by,items,cur,waveGap,D;
     function wave(){ var q=E.buildQuestion(E.rndItem(),1+D.dist); cur=q;
@@ -469,7 +450,7 @@ var CatchGame={ id:'catch', name:'Сөзді ұста', emoji:'🧺', desc:'Дұ
 /* ---- 3. NINJA (Сөз Нинзя) — дұрысын кес ---- */
 var NinjaGame={ id:'ninja', name:'Сөз Нинзя', emoji:'🥷', desc:'Дұрыс жауапты сыпырып кес', bpm:126,
   how:'Жоғарыда — мақсат. Саусақты сыпыр (свайп) да, ДҰРЫС жауап жазылған жемісті кес.',
-  diffs:{ easy:{toss:0.95,grav:0.40,n:3}, medium:{toss:1.0,grav:0.52,n:3}, hard:{toss:1.05,grav:0.66,n:3} },
+  diffs:{ easy:{toss:0.86,grav:0.62,n:3}, medium:{toss:0.96,grav:0.78,n:3}, hard:{toss:1.06,grav:1.0,n:4} },
   mk:function(E){
     var W,H,fr,fruits,cur,waveT,D,down=false,lastP=null,trail=[];
     var COL=['#ff6b6b','#ffce4a','#9be870','#21d4fd','#ff9f43','#a06bff','#ff6fae'];
@@ -515,7 +496,7 @@ var NinjaGame={ id:'ninja', name:'Сөз Нинзя', emoji:'🥷', desc:'Дұр
 /* ---- 4. WHACK (Соққы) — дұрысын ұр ---- */
 var WhackGame={ id:'whack', name:'Соққы', emoji:'🔨', desc:'Дұрыс жауапты ұядан ұр', bpm:122,
   how:'Жоғарыда — мақсат. Ұялардан кейіпкерлер шығады — ДҰРЫС жауап жазылғанын тез басып үлгер.',
-  diffs:{ easy:{opts:3,life:5.5}, medium:{opts:3,life:4.5}, hard:{opts:4,life:3.5} },
+  diffs:{ easy:{opts:3,life:1.9}, medium:{opts:4,life:1.5}, hard:{opts:5,life:1.15} },
   mk:function(E){
     var W,H,bannerH,mw,mh,holes,moles,cur,waveT,gapT,D;
     var COL=['#ff6b6b','#ffce4a','#9be870','#21d4fd','#a06bff','#ff9f43'];
@@ -560,7 +541,7 @@ var WhackGame={ id:'whack', name:'Соққы', emoji:'🔨', desc:'Дұрыс ж
 /* ---- 5. BUBBLE POP (Көпіршік) — NEW ---- */
 var BubbleGame={ id:'bubble', name:'Көпіршік', emoji:'🫧', desc:'Дұрыс жауап жазылған көпіршікті жар', bpm:118, neww:true,
   how:'Жоғарыда — мақсат. Көпіршіктер көтеріледі — ДҰРЫС жауап жазылғанын басып ЖАР. Дұрысы қашып кетсе — жан кетеді.',
-  diffs:{ easy:{n:3,vy:0.10,r:0.088}, medium:{n:3,vy:0.12,r:0.082}, hard:{n:4,vy:0.15,r:0.078} },
+  diffs:{ easy:{n:3,vy:0.16,r:0.085}, medium:{n:4,vy:0.21,r:0.078}, hard:{n:5,vy:0.27,r:0.072} },
   mk:function(E){
     var W,H,bubbles,cur,D,gap=0;
     var COL=['#21d4fd','#9be870','#ffce4a','#ff6fae','#a06bff','#ff9f43'];
@@ -661,7 +642,7 @@ var MemoryGame={ id:'memory', name:'Жұп Тап', emoji:'🧠', desc:'Ағыл
 /* ---- 7. FLAPPY (Flappy) — дұрыс саңылаудан ұш ---- */
 var FlappyGame={ id:'flappy', name:'Flappy', emoji:'🐤', desc:'Дұрыс саңылаудан ұшып өт', bpm:128,
   how:'Экранды басып құсты ұшыр. Қабырғада 2 саңылау — ДҰРЫС жауап жазылған саңылаудан ұшып өт.',
-  diffs:{ easy:{spd:0.22,grav:2.0,flap:0.58,gap:0.22}, medium:{spd:0.30,grav:2.4,flap:0.62,gap:0.19}, hard:{spd:0.40,grav:2.9,flap:0.66,gap:0.16} },
+  diffs:{ easy:{spd:0.32,grav:2.3,flap:0.60,gap:0.20}, medium:{spd:0.44,grav:2.8,flap:0.64,gap:0.17}, hard:{spd:0.58,grav:3.3,flap:0.68,gap:0.15} },
   mk:function(E){
     var W,H,birdX,birdY,vy,wall,D,highC,lowC,gapH,run=0;
     function ask(){ var q=E.buildQuestion(E.rndItem(),2); var top=Math.random()<0.5;
@@ -731,7 +712,14 @@ var UI=(function(){
   }
   function showOver(){ $('hud').classList.remove('on'); $('prompt').classList.remove('on');
     $('oScore').textContent=Engine.score;
-    sendResultToStudyLine();
+    DB.finish({
+      score:       Engine.score,
+      correct:     Engine.score,
+      mistakes:    3-Engine.lives,
+      maxCombo:    Engine.comboMax,
+      durationSec: Engine.startedAt ? Math.round((Date.now()-Engine.startedAt)/1000) : 0,
+      difficulty:  Engine.diffKey||'medium'
+    }, document.getElementById('yfBoard'));
     var box=$('oLearned'), uniq=[],seen={}; Engine.learned.forEach(function(w){ if(!seen[w]){seen[w]=1;uniq.push(w);} });
     if(uniq.length){ var h='<div class="lt">ҮЙРЕНГЕН СӨЗДЕР: '+uniq.length+'</div>'; uniq.slice(0,24).forEach(function(w){ var p=w.split(' — '); h+='<span class="wchip">'+p[0]+(p[1]?(' — <b>'+p[1]+'</b>'):'')+'</span>'; }); box.innerHTML=h; }
     else box.innerHTML='';
@@ -754,54 +742,16 @@ var UI=(function(){
   $('againBtn').addEventListener('click',function(){ if(chosen) startWith(Engine.diffKey||'medium'); });
   $('menuBtn').addEventListener('click',function(){ Sound.click(); screen('sMenu'); });
   $('muteBtn').addEventListener('click',function(){ var on=Sound.toggle(); this.textContent=on?'🔊':'🔇'; });
-  // ── StudyLine: связь с приложением ────────────────────────────────────────
-  SL.init({ game:'math_arcade' });
-
-  // Пауза/возобновление по команде приложения (звонок, сворачивание).
-  SL.on('pause',  function(){ try{ Engine.running=false; Sound.stopMusic(); }catch(e){} });
-  SL.on('resume', function(){ try{ if(Engine.game) Engine.running=true; }catch(e){} });
-
-  // Кнопка возврата — показываем только внутри приложения.
-  if (SL.isInApp) {
-    var closeBtn=$('slCloseBtn');
-    closeBtn.style.display='block';
-    closeBtn.addEventListener('click',function(){ Sound.click(); SL.close(); });
-  }
-
-  // Приветствие по имени — приложение уже знает, кто играет.
-  if (SL.user && SL.user.name) {
-    var hi=document.querySelector('#sMenu .hsub');
-    if (hi) hi.textContent=SL.user.name+', ойнап жүріп формулаларды жаттап ал 🎮';
-  }
-
-  // Отправка результата. XP считает бэкенд StudyLine — игра шлёт сырые числа.
-  function sendResultToStudyLine(){
-    var durationSec = Engine.startedAt ? Math.round((Date.now()-Engine.startedAt)/1000) : 0;
-    var learnedUniq = Engine.learned.filter(function(w,i,a){ return a.indexOf(w)===i; });
-
-    SL.finish({
-      score:       Engine.score,
-      correct:     Engine.score,
-      mistakes:    3-Engine.lives,
-      maxCombo:    Engine.comboMax,
-      durationSec: durationSec,
-      difficulty:  Engine.diffKey || 'medium',
-      details:     { learnedWords: learnedUniq.length }
-    });
-
-    var text=$('xpText');
-    if (text) {
-      text.textContent = SL.isInApp
-        ? 'Нәтижең StudyLine-ға жіберілді. XP тез арада қосылады ⭐'
-        : 'Тест режимі: нәтиже консольге жазылды.';
-    }
-  }
-
-  SL.ready();
+  // WhatsApp CTA
+  $('ctaStart').href='https://wa.me/77077518715?text='+encodeURIComponent('Сәлеметсіз бе! YoungFuture-дің тегін ағылшын деңгей тесті туралы білгім келеді 🚀');
 
 
   return { showOver:showOver };
 })();
+</script>
+<script>
+/* Вход и лидерборд живут в ../db/games-db.js — аккаунт общий для всех игр. */
+DB.mountAuth({ game: 'arcade' });
 </script>
 </body>
 </html>

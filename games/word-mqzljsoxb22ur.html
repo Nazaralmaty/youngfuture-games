@@ -137,35 +137,7 @@ var Sound=(function(){
 /* ============ GAME ============ */
 (function(){
   "use strict";
-  var WORDS=[
-    {en:"apple",kk:"алма",e:"🍎"},{en:"bread",kk:"нан",e:"🍞"},{en:"water",kk:"су",e:"💧"},
-    {en:"milk",kk:"сүт",e:"🥛"},{en:"egg",kk:"жұмыртқа",e:"🥚"},{en:"fish",kk:"балық",e:"🐟"},
-    {en:"meat",kk:"ет",e:"🍖"},{en:"tea",kk:"шай",e:"🍵"},{en:"dog",kk:"ит",e:"🐶"},
-    {en:"cat",kk:"мысық",e:"🐱"},{en:"bird",kk:"құс",e:"🐦"},{en:"horse",kk:"жылқы",e:"🐴"},
-    {en:"cow",kk:"сиыр",e:"🐮"},{en:"sheep",kk:"қой",e:"🐑"},{en:"wolf",kk:"қасқыр",e:"🐺"},
-    {en:"bear",kk:"аю",e:"🐻"},{en:"fox",kk:"түлкі",e:"🦊"},{en:"lion",kk:"арыстан",e:"🦁"},
-    {en:"camel",kk:"түйе",e:"🐫"},{en:"hand",kk:"қол",e:"✋"},{en:"eye",kk:"көз",e:"👁️"},
-    {en:"ear",kk:"құлақ",e:"👂"},{en:"nose",kk:"мұрын",e:"👃"},{en:"foot",kk:"аяқ",e:"🦶"},
-    {en:"tooth",kk:"тіс",e:"🦷"},{en:"heart",kk:"жүрек",e:"❤️"},{en:"house",kk:"үй",e:"🏠"},
-    {en:"door",kk:"есік",e:"🚪"},{en:"window",kk:"терезе",e:"🪟"},{en:"chair",kk:"орындық",e:"🪑"},
-    {en:"bed",kk:"төсек",e:"🛏️"},{en:"key",kk:"кілт",e:"🔑"},{en:"book",kk:"кітап",e:"📖"},
-    {en:"pen",kk:"қалам",e:"🖊️"},{en:"pencil",kk:"қарындаш",e:"✏️"},{en:"school",kk:"мектеп",e:"🏫"},
-    {en:"bag",kk:"сөмке",e:"🎒"},{en:"ball",kk:"доп",e:"⚽"},{en:"phone",kk:"телефон",e:"📱"},
-    {en:"shoe",kk:"аяқ киім",e:"👟"},{en:"hat",kk:"бас киім",e:"🎩"},{en:"shirt",kk:"көйлек",e:"👕"},
-    {en:"sun",kk:"күн",e:"☀️"},{en:"moon",kk:"ай",e:"🌙"},{en:"star",kk:"жұлдыз",e:"⭐"},
-    {en:"tree",kk:"ағаш",e:"🌳"},{en:"flower",kk:"гүл",e:"🌸"},{en:"mountain",kk:"тау",e:"⛰️"},
-    {en:"rain",kk:"жаңбыр",e:"🌧️"},{en:"snow",kk:"қар",e:"❄️"},{en:"fire",kk:"от",e:"🔥"},
-    {en:"stone",kk:"тас",e:"🪨"},{en:"car",kk:"көлік",e:"🚗"},{en:"clock",kk:"сағат",e:"🕐"},
-    {en:"money",kk:"ақша",e:"💰"},{en:"mother",kk:"ана",e:"👩"},{en:"father",kk:"әке",e:"👨"},
-    {en:"child",kk:"бала",e:"🧒"},
-    {en:"red",kk:"қызыл",e:""},{en:"blue",kk:"көк",e:""},{en:"green",kk:"жасыл",e:""},
-    {en:"yellow",kk:"сары",e:""},{en:"big",kk:"үлкен",e:""},{en:"small",kk:"кіші",e:""},
-    {en:"hot",kk:"ыстық",e:""},{en:"cold",kk:"суық",e:""},{en:"run",kk:"жүгіру",e:""},
-    {en:"jump",kk:"секіру",e:""},{en:"eat",kk:"жеу",e:""},{en:"drink",kk:"ішу",e:""},
-    {en:"sleep",kk:"ұйықтау",e:""},{en:"read",kk:"оқу",e:""},{en:"write",kk:"жазу",e:""},
-    {en:"good",kk:"жақсы",e:""},{en:"bad",kk:"жаман",e:""},{en:"friend",kk:"дос",e:""},
-    {en:"road",kk:"жол",e:""}
-  ];
+  var WORDS=[{"en": "apple", "kk": "алма", "e": "🍎"}, {"en": "bread", "kk": "нан", "e": "🍞"}, {"en": "water", "kk": "су", "e": "💧"}, {"en": "milk", "kk": "сүт", "e": "🥛"}, {"en": "egg", "kk": "жұмыртқа", "e": "🥚"}, {"en": "fish", "kk": "балық", "e": "🐟"}, {"en": "meat", "kk": "ет", "e": "🍖"}, {"en": "tea", "kk": "шай", "e": "🍵"}, {"en": "dog", "kk": "ит", "e": "🐶"}, {"en": "cat", "kk": "мысық", "e": "🐱"}, {"en": "bird", "kk": "құс", "e": "🐦"}, {"en": "horse", "kk": "жылқы", "e": "🐴"}, {"en": "cow", "kk": "сиыр", "e": "🐮"}, {"en": "sheep", "kk": "қой", "e": "🐑"}, {"en": "wolf", "kk": "қасқыр", "e": "🐺"}, {"en": "bear", "kk": "аю", "e": "🐻"}, {"en": "fox", "kk": "түлкі", "e": "🦊"}, {"en": "lion", "kk": "арыстан", "e": "🦁"}, {"en": "camel", "kk": "түйе", "e": "🐫"}, {"en": "hand", "kk": "қол", "e": "✋"}, {"en": "eye", "kk": "көз", "e": "👁️"}, {"en": "ear", "kk": "құлақ", "e": "👂"}, {"en": "nose", "kk": "мұрын", "e": "👃"}, {"en": "foot", "kk": "аяқ", "e": "🦶"}, {"en": "tooth", "kk": "тіс", "e": "🦷"}, {"en": "heart", "kk": "жүрек", "e": "❤️"}, {"en": "house", "kk": "үй", "e": "🏠"}, {"en": "door", "kk": "есік", "e": "🚪"}, {"en": "window", "kk": "терезе", "e": "🪟"}, {"en": "chair", "kk": "орындық", "e": "🪑"}, {"en": "bed", "kk": "төсек", "e": "🛏️"}, {"en": "key", "kk": "кілт", "e": "🔑"}, {"en": "book", "kk": "кітап", "e": "📖"}, {"en": "pen", "kk": "қалам", "e": "🖊️"}, {"en": "pencil", "kk": "қарындаш", "e": "✏️"}, {"en": "school", "kk": "мектеп", "e": "🏫"}, {"en": "bag", "kk": "сөмке", "e": "🎒"}, {"en": "ball", "kk": "доп", "e": "⚽"}, {"en": "phone", "kk": "телефон", "e": "📱"}, {"en": "shoe", "kk": "аяқ киім", "e": "👟"}, {"en": "hat", "kk": "бас киім", "e": "🎩"}, {"en": "shirt", "kk": "көйлек", "e": "👕"}, {"en": "sun", "kk": "күн", "e": "☀️"}, {"en": "moon", "kk": "ай", "e": "🌙"}, {"en": "star", "kk": "жұлдыз", "e": "⭐"}, {"en": "tree", "kk": "ағаш", "e": "🌳"}, {"en": "flower", "kk": "гүл", "e": "🌸"}, {"en": "mountain", "kk": "тау", "e": "⛰️"}, {"en": "rain", "kk": "жаңбыр", "e": "🌧️"}, {"en": "snow", "kk": "қар", "e": "❄️"}, {"en": "fire", "kk": "от", "e": "🔥"}, {"en": "stone", "kk": "тас", "e": "🪨"}, {"en": "car", "kk": "көлік", "e": "🚗"}, {"en": "clock", "kk": "сағат", "e": "🕐"}, {"en": "money", "kk": "ақша", "e": "💰"}, {"en": "mother", "kk": "ана", "e": "👩"}, {"en": "father", "kk": "әке", "e": "👨"}, {"en": "child", "kk": "бала", "e": "🧒"}, {"en": "red", "kk": "қызыл", "e": ""}, {"en": "blue", "kk": "көк", "e": ""}, {"en": "green", "kk": "жасыл", "e": ""}, {"en": "yellow", "kk": "сары", "e": ""}, {"en": "big", "kk": "үлкен", "e": ""}, {"en": "small", "kk": "кіші", "e": ""}, {"en": "hot", "kk": "ыстық", "e": ""}, {"en": "cold", "kk": "суық", "e": ""}, {"en": "run", "kk": "жүгіру", "e": ""}, {"en": "jump", "kk": "секіру", "e": ""}, {"en": "eat", "kk": "жеу", "e": ""}, {"en": "drink", "kk": "ішу", "e": ""}, {"en": "sleep", "kk": "ұйықтау", "e": ""}, {"en": "read", "kk": "оқу", "e": ""}, {"en": "write", "kk": "жазу", "e": ""}, {"en": "good", "kk": "жақсы", "e": ""}, {"en": "bad", "kk": "жаман", "e": ""}, {"en": "friend", "kk": "дос", "e": ""}, {"en": "road", "kk": "жол", "e": ""}];
   var PICW=WORDS.filter(function(w){return w.e;});
 
   var DIFFS={
@@ -288,6 +260,51 @@ var Sound=(function(){
   }
 
   function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+/* ---- ЕДИНАЯ ПОДГОНКА ПОДПИСЕЙ (длинные слова: environment, температура …) ---- */
+var LBL_MIN=13;                                   /* мельче на телефоне уже не читается */
+function lblFont(fs,w){ return (w||800)+' '+Math.round(fs)+'px Inter,Arial'; }
+/* Делит подпись максимум на 2 строки: сперва по пробелу, иначе — по дефису внутри слова.
+   Возвращает null, если на этом кегле не влезает даже в две строки. */
+function lblLines(ctx,text,fs,maxW,weight){ var s=String(text); ctx.font=lblFont(fs,weight);
+  if(ctx.measureText(s).width<=maxW) return [s];
+  if(s.indexOf(' ')>=0){                          /* есть пробелы — рвём ТОЛЬКО по ним */
+    var parts=s.split(' ');
+    for(var k=1;k<parts.length;k++){
+      var a=parts.slice(0,k).join(' '), b=parts.slice(k).join(' ');
+      if(ctx.measureText(a).width<=maxW && ctx.measureText(b).width<=maxW) return [a,b]; }
+    return null; }
+  if(s.length<=8) return null;                    /* короткое слово лучше уменьшить, чем рвать дефисом */
+  for(var cut=Math.ceil(s.length/2); cut>1 && cut<s.length; cut++){  /* одно длинное слово — дефис */
+    var l1=s.slice(0,cut)+'-', l2=s.slice(cut);
+    if(ctx.measureText(l1).width<=maxW && ctx.measureText(l2).width<=maxW) return [l1,l2]; }
+  return null; }
+/* Подбирает кегль и разбиение так, чтобы влезло и по ширине, и по высоте.
+   Хочешь запретить перенос — передай маленький maxH (на 2 строки не хватит места). */
+function fitLabel(ctx,text,maxW,maxH,basePx,minPx,weight){
+  var s=String(text), min=Math.max(minPx||LBL_MIN,8), base=Math.round(basePx), fs;
+  var comfort=Math.max(min,Math.round(base*0.72));  /* до этого кегля одна строка лучше переноса */
+  function one(f){ ctx.font=lblFont(f,weight); return ctx.measureText(s).width<=maxW && f*1.25<=maxH; }
+  for(fs=base; fs>=comfort; fs--) if(one(fs)) return {lines:[s],fs:fs};
+  for(fs=base; fs>=min; fs--){                      /* не влезло крупно — пробуем две строки */
+    var two=lblLines(ctx,s,fs,maxW,weight);
+    if(two && two.length===2 && fs*2.3<=maxH) return {lines:two,fs:fs}; }
+  for(fs=comfort-1; fs>=min; fs--) if(one(fs)) return {lines:[s],fs:fs};
+  ctx.font=lblFont(min,weight);
+  return {lines:lblLines(ctx,s,min,maxW,weight)||[s],fs:min}; }
+/* Рисует подпись по центру (x,y) — одной или двумя строками. */
+function drawLabel(ctx,text,x,y,maxW,maxH,basePx,minPx,weight){
+  var f=fitLabel(ctx,text,maxW,maxH,basePx,minPx,weight);
+  ctx.font=lblFont(f.fs,weight); ctx.textAlign='center'; ctx.textBaseline='middle';
+  var lh=f.fs*1.06, y0=y-(f.lines.length-1)*lh/2;
+  for(var i=0;i<f.lines.length;i++) ctx.fillText(f.lines[i],x,y0+i*lh);
+  return f; }
+/* Радиус объекта, при котором подпись остаётся читаемой: растим фрукт/пузырь под слово. */
+function labelR(ctx,text,baseR,maxMul){
+  var fs=Math.max(LBL_MIN,Math.round(baseR*0.5)); ctx.font=lblFont(fs);
+  var w=ctx.measureText(String(text)).width, cap=baseR*(maxMul||1.4);
+  var need=(w<=baseR*1.7)? baseR : (w/2+fs)/1.7;  /* длинное слово ляжет в 2 строки */
+  return Math.max(baseR,Math.min(need,cap)); }
+
   function heart(cx,cy,s,color){ ctx.fillStyle=color;
     ctx.beginPath();ctx.arc(cx-s*0.5,cy-s*0.25,s*0.5,0,7);ctx.fill();
     ctx.beginPath();ctx.arc(cx+s*0.5,cy-s*0.25,s*0.5,0,7);ctx.fill();
@@ -305,9 +322,10 @@ var Sound=(function(){
         if(it.kind==='emoji'){ ctx.font=Math.round(ih*0.92)+'px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
           ctx.fillStyle='rgba(255,255,255,.12)'; ctx.beginPath(); ctx.arc(it.x,it.y,ih*0.62,0,7); ctx.fill();
           ctx.fillStyle='#fff'; ctx.fillText(it.label,it.x,it.y+ih*0.02);
-        } else { ctx.font='700 '+Math.round(H*0.027)+'px Inter,Arial'; var fw=ctx.measureText(it.label).width, bw=fw+H*0.04;
+        } else { var lf=fitLabel(ctx,it.label,W*0.84,ih*0.5,Math.round(H*0.027),LBL_MIN,700); /* ih*0.5 => всегда одна строка */
+          ctx.font=lblFont(lf.fs,700); var fw=ctx.measureText(lf.lines[0]).width, bw=Math.min(fw+H*0.04,W*0.9);
           ctx.fillStyle='#ffffff'; rr(it.x-bw/2,it.y-ih/2,bw,ih,ih/2); ctx.fill();
-          ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(it.label,it.x,it.y);
+          ctx.fillStyle='#0b1330'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(lf.lines[0],it.x,it.y);
         }
       }
       // basket

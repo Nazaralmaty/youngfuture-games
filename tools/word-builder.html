@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YoungFuture · Сөз конструкторы</title>
+<style>
+  :root{--ink:#0b1437;--ink2:#161c47;--violet:#6d4bff;--violet2:#8a6bff;--cyan:#21d4fd;--lime:#9be870;--gold:#ffce4a;--red:#ff4d6d;}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:#070b1e;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+       line-height:1.5;padding:18px;min-height:100vh}
+  .page{max-width:1000px;margin:0 auto}
+  h1{font-size:22px;font-weight:900;letter-spacing:-.02em}
+  h1 span{background:linear-gradient(135deg,var(--violet2),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#9aa3d0;font-size:13.5px;margin:4px 0 18px}
+  .card{background:linear-gradient(160deg,#15205180,#0d163a);border:1px solid #25306a;border-radius:16px;padding:15px;margin-bottom:14px}
+  .card h2{font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#9aa3d0;margin-bottom:11px}
+  .row{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+  button,select,input,textarea{font-family:inherit;font-size:14px}
+  button{background:linear-gradient(135deg,var(--violet),var(--violet2));color:#fff;border:none;border-radius:11px;
+         padding:10px 15px;font-weight:800;cursor:pointer}
+  button:hover{filter:brightness(1.12)}
+  button.ghost{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16)}
+  button.go{background:linear-gradient(135deg,var(--lime),#d6ff8a);color:var(--ink)}
+  button.danger{background:rgba(255,77,109,.16);border:1px solid rgba(255,77,109,.4);color:#ffb3c2}
+  select,input,textarea{background:rgba(11,19,48,.75);border:1px solid rgba(255,255,255,.16);color:#fff;
+         border-radius:10px;padding:9px 11px;width:100%}
+  textarea{min-height:96px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+  .lvls{display:flex;flex-wrap:wrap;gap:7px}
+  .lvl{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);
+       border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800;cursor:pointer;user-select:none}
+  .lvl.on{background:linear-gradient(135deg,var(--violet),var(--violet2));border-color:transparent}
+  .stats{display:flex;flex-wrap:wrap;gap:9px}
+  .stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:9px 13px;min-width:112px}
+  .stat b{display:block;font-size:19px;font-weight:900}
+  .stat span{font-size:11.5px;color:#9aa3d0;text-transform:uppercase;letter-spacing:.05em}
+  .warn{background:rgba(255,206,74,.1);border:1px solid rgba(255,206,74,.35);color:#ffe6a6;
+        border-radius:12px;padding:10px 13px;font-size:13px;margin-top:10px}
+  .err{background:rgba(255,77,109,.12);border-color:rgba(255,77,109,.4);color:#ffc2ce}
+  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#9aa3d0;
+     padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.12);white-space:nowrap}
+  td{padding:4px 5px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:middle}
+  td input,td select{padding:7px 9px;border-radius:8px;font-size:13.5px}
+  td.long input{border-color:rgba(255,206,74,.55)}
+  .del{background:none;border:none;color:#ff6b8a;font-size:17px;cursor:pointer;padding:3px 7px;font-weight:900}
+  .len{font-size:11.5px;color:#9aa3d0;text-align:center;font-variant-numeric:tabular-nums}
+  .len.big{color:var(--gold);font-weight:900}
+  footer{color:#6f79a8;font-size:12px;text-align:center;padding:14px 0 4px}
+  @media(max-width:620px){ body{padding:12px} .stat{min-width:92px} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Сөз <span>конструкторы</span></h1>
+  <p class="sub">Меняешь базу слов — получаешь готовую игру. Без n8n, без разработчиков: собери и выложи файл.</p>
+
+  <div class="card">
+    <h2>1 · База слов</h2>
+    <div class="row">
+      <button class="ghost" id="loadDefault">Загрузить базу проекта</button>
+      <button class="ghost" id="pickFile">Открыть JSON…</button>
+      <button class="ghost" id="fromGame">Взять из готовой игры…</button>
+      <button id="addRow">+ Слово</button>
+      <button class="danger" id="clearAll">Очистить</button>
+      <input type="file" id="fileIn" accept=".json" hidden>
+      <input type="file" id="gameIn" accept=".html" hidden>
+    </div>
+    <div id="msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>2 · Быстрый ввод</h2>
+    <p class="sub" style="margin:0 0 9px">Строка на слово: <code>environment = қоршаған орта = 🌍 = b1</code>. Эмодзи и уровень можно не писать.</p>
+    <textarea id="bulk" placeholder="environment = қоршаған орта = 🌍 = b1&#10;opportunity = мүмкіндік"></textarea>
+    <div class="row" style="margin-top:9px"><button id="bulkAdd">Добавить в базу</button></div>
+  </div>
+
+  <div class="card">
+    <h2>3 · Слова</h2>
+    <div class="stats" id="stats"></div>
+    <div id="checks"></div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>English</th><th>Қазақша</th><th style="width:62px">Эмодзи</th><th style="width:96px">Уровень</th><th style="width:52px">Букв</th><th style="width:40px"></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h2>4 · Сборка игры</h2>
+    <div class="row">
+      <div style="flex:1 1 210px"><select id="tpl"></select></div>
+      <div style="flex:1 1 150px"><input id="outName" placeholder="имя файла" value="arcade_b1"></div>
+    </div>
+    <p class="sub" style="margin:11px 0 6px">Какие уровни взять в игру:</p>
+    <div class="lvls" id="lvlPick"></div>
+    <div class="row" style="margin-top:13px">
+      <button class="go" id="build">Собрать и скачать игру</button>
+      <button class="ghost" id="saveJson">Сохранить базу в JSON</button>
+    </div>
+    <div id="buildMsg"></div>
+  </div>
+
+  <footer>Кладёшь скачанный файл в <code>games/</code> и пушишь — ссылка живая.</footer>
+</div>
+
+<script>
+/* ---------- состояние ---------- */
+var LEVELS=['a1','a2','b1','b2','c1'];
+var bank=[];              /* [{en,kk,e,lvl}] */
+var pickedLevels={};      /* какие уровни идут в сборку */
+LEVELS.forEach(function(l){ pickedLevels[l]=true; });
+
+var TEMPLATES=[
+  {file:'arcade.html',           name:'Ағылшын Аркада (6 ойын)'},
+  {file:'arcade_ru.html',        name:'Аркада — русская версия'},
+  {file:'whack.html',            name:'Соққы (кроты)'},
+  {file:'word.html',             name:'Сөзді ұста (корзина)'},
+  {file:'math_arcade.html',      name:'Математика Аркада'},
+  {file:'math_arcade_ru.html',   name:'Математика — русская версия'}
+];
+
+var $=function(id){ return document.getElementById(id); };
+
+/* ---------- сообщения ---------- */
+function note(where,text,kind){
+  var box=$(where);
+  if(!text){ box.innerHTML=''; return; }
+  box.innerHTML='<div class="warn'+(kind==='err'?' err':'')+'">'+esc(text)+'</div>';
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+/* ---------- таблица ---------- */
+function render(){
+  var tb=$('rows'); tb.innerHTML='';
+  bank.forEach(function(w,i){
+    var tr=document.createElement('tr');
+    var long=(w.en||'').length>=11;      /* с такой длины начинается перенос в игре */
+    tr.innerHTML=
+      '<td class="'+(long?'long':'')+'"><input data-i="'+i+'" data-k="en" value="'+esc(w.en||'')+'" placeholder="english"></td>'+
+      '<td><input data-i="'+i+'" data-k="kk" value="'+esc(w.kk||'')+'" placeholder="аудармасы"></td>'+
+      '<td><input data-i="'+i+'" data-k="e" value="'+esc(w.e||'')+'" placeholder="🙂"></td>'+
+      '<td><select data-i="'+i+'" data-k="lvl">'+
+        LEVELS.map(function(l){ return '<option value="'+l+'"'+(w.lvl===l?' selected':'')+'>'+l.toUpperCase()+'</option>'; }).join('')+
+      '</select></td>'+
+      '<td class="len'+(long?' big':'')+'">'+(w.en||'').length+'</td>'+
+      '<td><button class="del" data-del="'+i+'" title="удалить">×</button></td>';
+    tb.appendChild(tr);
+  });
+  stats();
+}
+
+function stats(){
+  var byLvl={}; LEVELS.forEach(function(l){ byLvl[l]=0; });
+  var longest='';
+  bank.forEach(function(w){
+    if(byLvl[w.lvl]!==undefined) byLvl[w.lvl]++;
+    if((w.en||'').length>longest.length) longest=w.en||'';
+  });
+  $('stats').innerHTML=
+    '<div class="stat"><b>'+bank.length+'</b><span>всего</span></div>'+
+    LEVELS.filter(function(l){return byLvl[l];}).map(function(l){
+      return '<div class="stat"><b>'+byLvl[l]+'</b><span>'+l.toUpperCase()+'</span></div>'; }).join('')+
+    '<div class="stat" style="min-width:150px"><b style="font-size:15px">'+esc(longest||'—')+'</b><span>самое длинное · '+longest.length+'</span></div>';
+
+  /* проверки, которые реально ломают игру */
+  var problems=[], seen={}, dup=[];
+  bank.forEach(function(w){
+    var k=(w.en||'').trim().toLowerCase();
+    if(!k || !(w.kk||'').trim()) return;
+    if(seen[k]) dup.push(k); else seen[k]=1;
+  });
+  var empty=bank.filter(function(w){ return !(w.en||'').trim() || !(w.kk||'').trim(); }).length;
+  if(empty) problems.push(empty+' строк без английского или перевода — в игру не попадут');
+  if(dup.length) problems.push('повторы: '+dup.slice(0,5).join(', ')+(dup.length>5?' и ещё '+(dup.length-5):''));
+  if(bank.length<4) problems.push('меньше 4 слов — играм не хватит вариантов ответа');
+  note('checks', problems.join(' · '), problems.length?'err':'');
+}
+
+/* ---------- правки ---------- */
+$('rows').addEventListener('input',function(e){
+  var t=e.target, i=t.getAttribute('data-i'), k=t.getAttribute('data-k');
+  if(i===null||!k) return;
+  bank[+i][k]=t.value;
+  if(k==='en'){ render(); var next=document.querySelector('[data-i="'+i+'"][data-k="en"]'); if(next){ next.focus(); next.setSelectionRange(next.value.length,next.value.length); } }
+  else stats();
+});
+$('rows').addEventListener('change',function(e){
+  var t=e.target, i=t.getAttribute('data-i'), k=t.getAttribute('data-k');
+  if(i!==null&&k){ bank[+i][k]=t.value; stats(); }
+});
+$('rows').addEventListener('click',function(e){
+  var d=e.target.getAttribute('data-del');
+  if(d!==null){ bank.splice(+d,1); render(); }
+});
+
+$('addRow').onclick=function(){ bank.push({en:'',kk:'',e:'',lvl:'b1'}); render();
+  var last=document.querySelector('tr:last-child [data-k="en"]'); if(last) last.focus(); };
+$('clearAll').onclick=function(){ if(confirm('Очистить всю базу в конструкторе? Файлы на диске не тронутся.')){ bank=[]; render(); } };
+
+/* ---------- загрузка ---------- */
+function adopt(items,src){
+  var added=0;
+  (items||[]).forEach(function(w){
+    if(!w||typeof w!=='object') return;
+    if(!w.en||!w.kk) return;                       /* вопросы (q/o/a) конструктор не редактирует */
+    bank.push({en:String(w.en),kk:String(w.kk),e:w.e?String(w.e):'',lvl:(w.lvl||w.level||'b1').toLowerCase()});
+    added++;
+  });
+  render();
+  note('msg','Загружено '+added+' слов'+(src?' из '+src:'')+'.');
+}
+
+$('loadDefault').onclick=function(){
+  fetch('../db/words/en_kk.json').then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status); return r.json();
+  }).then(function(j){ bank=[]; adopt(j,'db/words/en_kk.json'); })
+  .catch(function(e){ note('msg','Не удалось прочитать db/words/en_kk.json ('+e.message+'). Открой конструктор через локальный сервер или GitHub Pages, а не двойным кликом.','err'); });
+};
+
+$('pickFile').onclick=function(){ $('fileIn').click(); };
+$('fileIn').onchange=function(e){
+  var f=e.target.files[0]; if(!f) return;
+  var fr=new FileReader();
+  fr.onload=function(){ try{ var j=JSON.parse(fr.result); bank=[]; adopt(Array.isArray(j)?j:j.words,f.name); }
+    catch(err){ note('msg','Это не похоже на JSON: '+err.message,'err'); } };
+  fr.readAsText(f);
+};
+
+$('fromGame').onclick=function(){ $('gameIn').click(); };
+$('gameIn').onchange=function(e){
+  var f=e.target.files[0]; if(!f) return;
+  var fr=new FileReader();
+  fr.onload=function(){
+    var m=/var (?:WORDS|BANK)\s*=\s*(\[[\s\S]*?\]);/.exec(fr.result);
+    if(!m){ note('msg','В этом файле нет банка слов (var WORDS=[…]).','err'); return; }
+    try{ bank=[]; adopt(JSON.parse(m[1]),f.name); }
+    catch(err){ note('msg','Банк найден, но не разобрался: '+err.message,'err'); }
+  };
+  fr.readAsText(f);
+};
+
+/* ---------- быстрый ввод ---------- */
+$('bulkAdd').onclick=function(){
+  var lines=$('bulk').value.split('\n'), added=0;
+  lines.forEach(function(line){
+    line=line.trim(); if(!line) return;
+    var p=line.split(/\s*[=|;\t]\s*/);
+    if(p.length<2||!p[0]||!p[1]) return;
+    var lvl='b1', e='';
+    for(var i=2;i<p.length;i++){
+      if(LEVELS.indexOf(p[i].toLowerCase())>=0) lvl=p[i].toLowerCase(); else if(p[i]) e=p[i];
+    }
+    bank.push({en:p[0],kk:p[1],e:e,lvl:lvl}); added++;
+  });
+  $('bulk').value=''; render();
+  note('msg', added? ('Добавлено '+added+' слов.') : 'Ни одной строки не разобрал — нужен разделитель «=».', added?'':'err');
+};
+
+/* ---------- уровни и шаблоны ---------- */
+function renderLevels(){
+  $('lvlPick').innerHTML=LEVELS.map(function(l){
+    return '<span class="lvl'+(pickedLevels[l]?' on':'')+'" data-lvl="'+l+'">'+l.toUpperCase()+'</span>'; }).join('');
+}
+$('lvlPick').addEventListener('click',function(e){
+  var l=e.target.getAttribute('data-lvl'); if(!l) return;
+  pickedLevels[l]=!pickedLevels[l]; renderLevels();
+});
+$('tpl').innerHTML=TEMPLATES.map(function(t){ return '<option value="'+t.file+'">'+t.name+'</option>'; }).join('');
+
+/* ---------- сборка ---------- */
+function selected(){
+  return bank.filter(function(w){
+    return (w.en||'').trim() && (w.kk||'').trim() && pickedLevels[w.lvl];
+  }).map(function(w){
+    var o={en:w.en.trim().toLowerCase(),kk:w.kk.trim()};
+    if(w.e) o.e=w.e;
+    return o;
+  });
+}
+
+$('build').onclick=function(){
+  var words=selected();
+  if(words.length<4){ note('buildMsg','Нужно минимум 4 слова выбранных уровней — сейчас '+words.length+'.','err'); return; }
+  var tpl=$('tpl').value;
+  note('buildMsg','Собираю из '+tpl+'…');
+  fetch('../templates/'+tpl).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status); return r.text();
+  }).then(function(html){
+    var re=/var (WORDS|BANK)\s*=\s*\[[\s\S]*?\];/;
+    if(!re.test(html)) throw new Error('в шаблоне не нашёлся var WORDS=[…]');
+    var out=html.replace(re,function(m,name){ return 'var '+name+'='+JSON.stringify(words)+';'; });
+    var name=($('outName').value.trim()||'game').replace(/[^a-z0-9_\-]/gi,'_')+'.html';
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([out],{type:'text/html'}));
+    a.download=name; a.click(); URL.revokeObjectURL(a.href);
+    var longest=words.reduce(function(a,b){ return b.en.length>a.length?b.en:a; },'');
+    note('buildMsg','Готово: '+name+' · '+words.length+' слов · самое длинное «'+longest+'» ('+longest.length+' букв) — в игре оно переносится на две строки.');
+  }).catch(function(e){
+    note('buildMsg','Не собралось: '+e.message+'. Конструктор должен открываться через сервер (или GitHub Pages), чтобы читать шаблоны.','err');
+  });
+};
+
+$('saveJson').onclick=function(){
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(bank,null,2)],{type:'application/json'}));
+  a.download='en_kk.json'; a.click(); URL.revokeObjectURL(a.href);
+};
+
+/* ---------- старт ---------- */
+renderLevels();
+bank=[{en:'',kk:'',e:'',lvl:'b1'}];
+render();
+$('loadDefault').click();
+</script>
+</body>
+</html>
