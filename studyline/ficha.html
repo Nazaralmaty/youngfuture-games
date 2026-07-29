@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>StudyLine — 15 фич вне обучения</title>
+<title>StudyLine — 20 фич вне обучения</title>
 <style>
 :root{
   --navy:#141d33; --navy2:#22315a; --green:#2E9E5B; --green2:#43c07a;
@@ -204,6 +204,36 @@ h1{font-size:clamp(32px,6vw,58px);line-height:1.05;letter-spacing:-1.4px;font-we
   border-radius:12px;padding:16px 18px;margin-top:22px;font-size:14.5px}
 footer{padding:40px 0 60px;color:var(--muted);font-size:13px;text-align:center}
 
+
+/* ---------- Блок ML ---------- */
+.mlnote{background:linear-gradient(150deg,#141d33,#2a2160);color:#dbe1f2;border-radius:18px;
+  padding:22px 24px;margin-top:24px;font-size:15px;line-height:1.55}
+.mlnote b{color:#9be870}
+.wave{display:flex;align-items:center;gap:3px;height:52px;justify-content:center}
+.wave i{width:4px;border-radius:2px;background:#6C4CF1;display:block}
+.phon{display:flex;gap:5px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.phon span{font-size:20px;font-weight:800;padding:6px 10px;border-radius:9px}
+.ph-ok{background:#e4f6ec;color:#1c7a45}
+.ph-warn{background:#fdf3d9;color:#8a6300}
+.ph-bad{background:#fbe6e7;color:#a92f34}
+.graph{position:relative;height:184px;margin-top:6px}
+.gnode{position:absolute;font-size:9.5px;font-weight:700;padding:6px 9px;border-radius:9px;
+  background:#e4f6ec;color:#1c7a45;border:1.5px solid #8fd0a4;white-space:nowrap}
+.gnode.pale{background:#f1f2f5;color:#5c6172;border-color:#dcdfe8}
+.gline{position:absolute;height:2px;background:#c2cfe0;transform-origin:left center}
+.gline.dash{background:repeating-linear-gradient(90deg,#c2cfe0 0 5px,transparent 5px 10px)}
+.riskbar{height:9px;border-radius:5px;background:#eef0f9;overflow:hidden;margin-top:8px}
+.riskbar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#f2b705,#e5484d)}
+.spark{display:flex;align-items:flex-end;gap:3px;height:30px}
+.spark i{width:6px;border-radius:2px;background:#c2cfe0;display:block}
+.spark i.hot{background:#e5484d}
+.ocr{position:relative;border-radius:12px;overflow:hidden;background:linear-gradient(160deg,#efe4cf,#ddcdb0);height:150px}
+.ocrline{position:absolute;height:9px;border-radius:3px;background:rgba(60,52,40,.42)}
+.ocrbox{position:absolute;border:2px solid #2E9E5B;border-radius:5px;background:rgba(46,158,91,.16)}
+.bubble{max-width:82%;border-radius:14px;padding:9px 11px;font-size:11px;line-height:1.4}
+.bubble.them{background:#EDEFF4;color:#182036}
+.bubble.me{background:#6C4CF1;color:#fff;margin-left:auto}
+
 @media(max-width:520px){
   .ptable .hrow,.ptable .row{grid-template-columns:1.35fr .9fr .9fr .9fr;
     padding:11px 10px;gap:7px;font-size:12px}
@@ -228,11 +258,11 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px;text-align:center}
 <header class="hero">
   <div class="wrap">
     <span class="kicker">StudyLine · продуктовые идеи</span>
-    <h1>15 механик,<br>которые живут вне уроков</h1>
+    <h1>20 механик,<br>которые живут вне уроков</h1>
     <p class="sub">Ребёнок 10–12 лет заходит в приложение не «учиться», а жить: двигаться, читать, снимать, помогать, соревноваться и быть частью команды. Учёба становится побочным эффектом привычки заходить каждый день.</p>
     <div class="stats">
-      <div class="stat"><b>15</b><span>идей, 6 направлений</span></div>
-      <div class="stat"><b>0</b><span>уроков и тестов внутри</span></div>
+      <div class="stat"><b>20</b><span>идей, 7 направлений</span></div>
+      <div class="stat"><b>5</b><span>из них на машинном обучении</span></div>
       <div class="stat"><b>10–12</b><span>лет, 4–6 класс</span></div>
       <div class="stat"><b>5–7</b><span>лет горизонт отношений</span></div>
     </div>
@@ -241,14 +271,14 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px;text-align:center}
 
 <section class="principles">
   <div class="wrap">
-    <h2 class="sec-title">Шесть правил, по которым собраны все 15</h2>
+    <h2 class="sec-title">Шесть правил, по которым собраны все 20</h2>
     <p class="sec-sub">Это не набор случайных фич. Каждая идея проверена по одним и тем же рамкам — тем, что уже зафиксированы в стратегии комьюнити и геймификации.</p>
     <div class="pgrid">
       <div class="pcard"><span class="ic">👨‍👩‍👦</span><b>Единица — семья, не ребёнок</b><span>Ребёнок не придёт сам, его приводит мама. Значит, у каждой механики должна быть роль для родителя: видит, подтверждает или участвует.</span></div>
       <div class="pcard"><span class="ic">🛡️</span><b>Безопасность по умолчанию</b><span>Нет личных сообщений между детьми. Нет свободного текста. Нет публичных фото. Всё видно куратору. Фото — только внутри клана и с согласия родителя.</span></div>
       <div class="pcard"><span class="ic">🤝</span><b>Команда важнее личного рейтинга</b><span>В 10–12 лет проигрыш «я» бьёт по самооценке, проигрыш «мы» — нет. Поэтому почти везде вклад идёт в клан, а не в личный топ.</span></div>
       <div class="pcard"><span class="ic">⚡</span><b>Единая валюта XP</b><span>Шаги, книги, добрые дела — всё конвертируется в тот же XP, что и учёба. Не плодим параллельные экономики, кроме двух осознанных исключений.</span></div>
-      <div class="pcard"><span class="ic">🪶</span><b>Дёшево в разработке</b><span>Ни одна идея не требует ML, тяжёлой модерации или своей соцсети. Максимум — счётчик, галочка, фото и таймер.</span></div>
+      <div class="pcard"><span class="ic">🪶</span><b>Два эшелона по цене</b><span>Идеи 01–15 намеренно дешёвые: счётчик, галочка, фото, таймер — ни ML, ни тяжёлой модерации. Блок G (16–20) сделан по обратному принципу: там ML — это суть механики, а не украшение.</span></div>
       <div class="pcard"><span class="ic">🧭</span><b>Каждая идея — повод зайти</b><span>Механика бесполезна, если не даёт причину открыть приложение в день, когда уроков нет. Проверяем каждую именно этим вопросом.</span></div>
     </div>
   </div>
@@ -1174,10 +1204,327 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px;text-align:center}
 </section>
 
 <!-- ============ ПРИОРИТЕТЫ ============ -->
+
+<!-- ============ БЛОК G ============ -->
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <span class="block-tag">Блок G</span>
+      <h2>Механики на машинном обучении</h2>
+      <span class="cnt">5 идей</span>
+    </div>
+
+    <div class="mlnote">
+      <b>Здесь правило «дёшево в разработке» снято намеренно.</b> Первые пятнадцать идей построены так, чтобы их можно было запустить силами текущей команды. Эти пять — обратный случай: ML в них не украшение, а само вещество механики, и без него они не работают вообще. Две из пяти чинят узкие места, которые честно названы в первой части: модерацию тысячи фото в неделю и невозможность заметить уходящего ребёнка вовремя.
+      <br><br>
+      <b>Главный актив — не модель, а данные.</b> Речь казахстанских детей 10–12 лет, их рукописный текст на казахской кириллице, их конспекты своими словами — таких размеченных корпусов практически не существует. Модель конкурент повторит за квартал; четыре года детской речи из Алматы — нет.
+    </div>
+
+    <!-- 16 -->
+    <div class="idea">
+      <div class="txt">
+        <div class="num">16</div>
+        <h3>Дауыс<em>Тренажёр произношения на казахском</em></h3>
+        <p class="lead">Ребёнок читает вслух — модель слушает и показывает пофонемно, где произношение поехало: «қ» вместо «к», проглоченная «ң», слишком мягкая «ұ». Не оценка «правильно/неправильно», а карта звуков с подсказкой, что сделать языком.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Городские казахские дети часто говорят по-казахски с русской фонетикой, и это больная тема для родителей. Ни один школьный учитель не даст персональную обратную связь по каждому звуку — а модель даёт, каждый вечер и без стыда перед классом.</span></div>
+          <div class="mrow"><b>Как работает</b>
+            <ul>
+              <li>ASR-модель (wav2vec2 / Whisper), дообученная на детской казахской речи</li>
+              <li>Форсированное выравнивание записи с эталоном → оценка по каждой фонеме</li>
+              <li>Отдельная голова модели на «трудную шестёрку»: ә, ө, ү, ұ, қ, ң</li>
+              <li>Подсказки — не текстом, а короткой анимацией артикуляции</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Данные</b><span>Стартовый корпус собирается механикой №07 «Оқу әдеті» — дети и так читают вслух каждый день. 1 000 детей × 5 минут × 39 дней ≈ 3 200 часов детской казахской речи за один цикл привычки.</span></div>
+          <div class="mrow"><b>Риск</b><span>Голоса детей — чувствительные данные. Нужно отдельное согласие родителя, хранение только эмбеддингов вместо сырого аудио после обработки и запрет на передачу третьим лицам, зафиксированный публично.</span></div>
+        </div>
+        <div class="tags"><span class="tag hard">ML: высокая сложность</span><span class="tag">Нужен корпус речи</span><span class="tag">Защищаемый актив</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>9:41</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Дауыс</div></div>
+          <div class="scr">
+            <div class="c grad-p">
+              <div class="t-lbl">Оқы: 3-сөйлем</div>
+              <div class="t-md mt6" style="font-size:17px">Құрақ көрпе әжемнің қолынан шыққан</div>
+            </div>
+            <div class="c">
+              <div class="wave">
+                <i style="height:14px"></i><i style="height:26px"></i><i style="height:40px"></i><i style="height:30px"></i>
+                <i style="height:46px"></i><i style="height:22px"></i><i style="height:36px"></i><i style="height:50px"></i>
+                <i style="height:28px"></i><i style="height:18px"></i><i style="height:38px"></i><i style="height:24px"></i>
+                <i style="height:44px"></i><i style="height:16px"></i><i style="height:32px"></i><i style="height:20px"></i>
+              </div>
+              <div class="t-xs" style="text-align:center">Жазба · 4 сек</div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Дыбыстар бойынша</div>
+              <div class="phon">
+                <span class="ph-ok">Қ</span><span class="ph-ok">ұ</span><span class="ph-ok">р</span>
+                <span class="ph-warn">а</span><span class="ph-bad">қ</span>
+              </div>
+              <div class="fl sb mt14"><span class="t-sm">Дәлдік</span><span class="pill a">78%</span></div>
+              <div class="bar a mt6"><i style="width:78%"></i></div>
+            </div>
+            <div class="c" style="background:#FBE6E7">
+              <div class="t-sm" style="color:#a92f34">«қ» тым жұмсақ естіледі</div>
+              <div class="t-xs mt6" style="color:#7a2f34">Тілдің түбін таңдайға қарай көтер — «к» емес, тереңірек</div>
+            </div>
+            <div class="c tight" style="background:#EEF7F0">
+              <div class="t-xs" style="color:#1c7a45">🎧 3 күнде «қ» дыбысы 41% → 78% жақсарды</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Дауыс» — оценка по каждому звуку, а не общий балл</div>
+      </div>
+    </div>
+
+    <!-- 17 -->
+    <div class="idea rev">
+      <div class="txt">
+        <div class="num">17</div>
+        <h3>Ерте белгі<em>Модель, которая видит уходящего ребёнка за три недели</em></h3>
+        <p class="lead">Модель читает поведение, а не оценки: во сколько заходит, как быстро отвечает, оборвался ли стрик, стал ли короче конспект, отказался ли от заданий. И предсказывает, что ребёнок бросит — задолго до того, как это заметит куратор или мама.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Это самая коммерчески ценная идея из всех двадцати. Отток — главная дыра любой подписки, а причина ухода почти всегда видна в данных за недели до самого ухода. Куратор физически не может держать в голове 200 детей; модель может.</span></div>
+          <div class="mrow"><b>Как работает</b>
+            <ul>
+              <li>Градиентный бустинг на событийных логах + анализ выживаемости для «когда», а не только «уйдёт ли»</li>
+              <li>Признаки: сдвиг времени входа на ночь, длина сессии, обрыв стрика, отказы, длина конспектов, падение реакций от друзей</li>
+              <li>Отдельный сигнал по семье: мама перестала ставить лайки — предиктор сильнее детских</li>
+              <li>Модель объясняет вклад каждого фактора, иначе куратор ей не поверит</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Что на выходе</b><span>Не «удержать любой ценой», а карточка куратору: кто, насколько, почему и что сделать в ближайшие дни. Ребёнок и родитель никакого «риск-скора» не видят никогда.</span></div>
+          <div class="mrow"><b>Риск</b><span>Соблазн превратить это в давление на семью. Нужно жёсткое правило: сигнал ведёт к человеческому звонку и вопросу «что случилось», а не к автоматической скидке или пуш-бомбардировке.</span></div>
+        </div>
+        <div class="tags"><span class="tag mid">ML: средняя сложность</span><span class="tag">Данные уже копятся</span><span class="tag">Прямо влияет на выручку</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>9:41</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Ерте белгі</div></div>
+          <div class="scr">
+            <div class="c grad-n">
+              <div class="t-lbl">Назар аудару керек</div>
+              <div class="fl sb mt6"><span class="t-big">7</span><span class="t-xs">оқушы · 214-тен</span></div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-md">Арнұр Т.</span><span class="pill r">72%</span></div>
+              <div class="t-xs mt6">Кету ықтималдығы · 3 апта ішінде</div>
+              <div class="riskbar"><i style="width:72%"></i></div>
+              <div class="fl sb mt14">
+                <span class="spark">
+                  <i style="height:26px"></i><i style="height:24px"></i><i style="height:27px"></i>
+                  <i style="height:19px"></i><i style="height:14px"></i><i class="hot" style="height:9px"></i><i class="hot" style="height:5px"></i>
+                </span>
+                <span class="t-xs">белсенділік · 7 апта</span>
+              </div>
+            </div>
+            <div class="c">
+              <div class="t-lbl">Неліктен</div>
+              <div class="lst mt6"><span class="emo">🌙</span><span class="t-sm" style="flex:1">Кіру уақыты түнге ауысты</span><span class="pill r">+31%</span></div>
+              <div class="lst"><span class="emo">🔥</span><span class="t-sm" style="flex:1">Серия 2 рет үзілді</span><span class="pill a">+18%</span></div>
+              <div class="lst"><span class="emo">👩</span><span class="t-sm" style="flex:1">Анасы 12 күн лайк қоймады</span><span class="pill r">+23%</span></div>
+            </div>
+            <div class="c" style="background:#EDF7E2">
+              <div class="t-sm" style="color:#4A6B2A">Ұсыныс: 3 күн ішінде анасына қоңырау шал</div>
+              <div class="t-xs mt6" style="color:#4A6B2A">Ұқсас жағдайда қоңырау кетуді 61% азайтқан</div>
+            </div>
+            <div class="c tight" style="background:#EEF0F6">
+              <div class="t-xs">🔒 Бұл экранды тек куратор көреді</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран куратора «Ерте белгі» — ни ребёнок, ни родитель его не видят</div>
+      </div>
+    </div>
+
+    <!-- 18 -->
+    <div class="idea">
+      <div class="txt">
+        <div class="num">18</div>
+        <h3>Ойлау картасы<em>Карта понимания из конспектов ребёнка</em></h3>
+        <p class="lead">Ученик уже пишет конспекты своими словами — это есть на экране 36. Модель читает их за год и строит растущую карту: какие понятия он реально понял, какие только назвал, а где связь между ними не выстроилась. И отличает своё объяснение от пересказа учебника.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Родитель годами не может ответить на вопрос «он понял или вызубрил». Оценка этого не показывает. Карта понимания показывает — и это то, чего в Казахстане не даёт никто.</span></div>
+          <div class="mrow"><b>Как работает</b>
+            <ul>
+              <li>Многоязычные эмбеддинги (LaBSE / XLM-R) — конспекты идут вперемешку на казахском и русском</li>
+              <li>Извлечение понятий и связей между ними → граф, растущий год за годом</li>
+              <li>Детектор своей формулировки: близость к тексту урока отличает перефраз от копипаста</li>
+              <li>Красный флаг не «мало написал», а «написал чужими словами три раза подряд»</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Что на выходе</b><span>Ребёнку — растущее дерево, которое приятно заполнять. Родителю — честная картина. Куратору — точка, где объяснение не дошло.</span></div>
+          <div class="mrow"><b>Риск</b><span>Казахский в NLP заметно слабее русского: модель будет ошибаться чаще на казахских конспектах. Пока точность не выровнена, показывать только как подсказку куратору, а не как вердикт родителю.</span></div>
+        </div>
+        <div class="tags"><span class="tag hard">ML: высокая сложность</span><span class="tag">Данные уже есть</span><span class="tag">Двуязычный NLP</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>9:41</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Ойлау картасы</div></div>
+          <div class="scr">
+            <div class="c grad-g">
+              <div class="t-lbl">Түсіну картасы · математика</div>
+              <div class="fl sb mt6"><span class="t-big">31</span><span class="t-xs">ұғым байланысқан</span></div>
+            </div>
+            <div class="c">
+              <div class="graph">
+                <div class="gline" style="left:92px; top:52px; width:32px; transform:rotate(-48deg)"></div>
+                <div class="gline" style="left:92px; top:56px; width:40px; transform:rotate(26deg)"></div>
+                <div class="gline" style="left:130px; top:88px; width:34px; transform:rotate(56deg)"></div>
+                <div class="gline" style="left:46px; top:64px; width:58px; transform:rotate(62deg)"></div>
+                <div class="gline dash" style="left:122px; top:142px; width:34px; transform:rotate(18deg)"></div>
+                <div class="gnode" style="left:6px; top:40px">Тригонометрия</div>
+                <div class="gnode" style="left:120px; top:6px">Синус</div>
+                <div class="gnode" style="left:128px; top:64px">Косинус</div>
+                <div class="gnode pale" style="left:136px; top:118px">Тангенс</div>
+                <div class="gnode" style="left:10px; top:112px">Үшбұрыш</div>
+                <div class="gnode pale" style="left:74px; top:152px">Формула</div>
+              </div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-sm">Өз сөзімен</span><span class="pill g">74%</span></div>
+              <div class="bar mt6"><i style="width:74%"></i></div>
+              <div class="fl sb mt10"><span class="t-sm">Оқулықтан көшірме</span><span class="pill">26%</span></div>
+              <div class="bar mt6"><i style="width:26%; background:#C7CAD1"></i></div>
+            </div>
+            <div class="c tight" style="background:#FDF3DF">
+              <div class="t-xs" style="color:#8a6300">⚠ «Тангенс» үш рет аталды, бірақ ешқашан түсіндірілмеді</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Ойлау картасы» — бледные узлы названы, но не объяснены</div>
+      </div>
+    </div>
+
+    <!-- 19 -->
+    <div class="idea rev">
+      <div class="txt">
+        <div class="num">19</div>
+        <h3>Кешкі әңгіме<em>Голосовой собеседник, который спрашивает не про уроки</em></h3>
+        <p class="lead">Вечером маскот задаёт три вопроса голосом и слушает ответ: что было смешного, с кем поссорился, чего ждёшь завтра. Из разговоров собирается трекер настроения, темы для родителя и — главное — сигнал куратору, если в речи появляется тревожное.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Ребёнок 10–12 лет часто не говорит взрослым главного. Игрушке, которая не оценивает и не расскажет классу, говорит охотнее. Это единственная механика, способная поймать травлю или одиночество раньше семьи — и одновременно самая ответственная из всех двадцати.</span></div>
+          <div class="mrow"><b>Как работает</b>
+            <ul>
+              <li>Казахско-русские ASR и TTS + языковая модель с жёстким сценарным каркасом</li>
+              <li>Модель ведёт разговор по трём заготовленным веткам, свободной болтовни нет</li>
+              <li>Отдельный классификатор рисков: травля, страх, конфликт в семье, самоуничижение</li>
+              <li>Любой риск — немедленная эскалация на живого куратора, без исключений</li>
+              <li>Родитель видит темы и настроение, но не расшифровку — иначе ребёнок замолчит</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Красные линии</b><span>Никаких советов по здоровью, отношениям и безопасности от модели. Никакой имитации живого человека — ребёнок всегда знает, что это программа. При любом сомнении разговор останавливается и приходит человек.</span></div>
+          <div class="mrow"><b>Риск</b><span>Самая опасная идея списка. Один плохой ответ модели ребёнку в трудный вечер — репутационная катастрофа, которую не отыграть. Запускать только после внешней экспертизы детского психолога и с ручной проверкой выборки диалогов.</span></div>
+        </div>
+        <div class="tags"><span class="tag hard">ML: очень высокая</span><span class="tag hard">Максимальный риск</span><span class="tag">Нужен психолог</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>9:41</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Кешкі әңгіме</div></div>
+          <div class="scr">
+            <div class="c grad-p">
+              <div class="fl" style="gap:11px">
+                <span style="font-size:30px">🦉</span>
+                <span><span class="t-md">Үкі</span><br><span class="t-xs">кешкі әңгіме · 3 сұрақ</span></span>
+              </div>
+            </div>
+            <div class="c">
+              <div class="bubble them">Бүгін не қызық болды?</div>
+              <div class="bubble me mt10">🎙 0:14 · «Данияр екеуміз футбол ойнадық, мен гол салдым»</div>
+              <div class="bubble them mt10">Керемет! Ал көңіліңді түсірген нәрсе болды ма?</div>
+              <div class="bubble me mt10">🎙 0:22 · «Сабақта маған күлді… ұялдым»</div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-sm">Бүгінгі көңіл-күй</span><span class="pill a">аралас</span></div>
+              <div class="fl mt10" style="gap:6px">
+                <span class="pill g">достық</span><span class="pill">спорт</span><span class="pill r">ұялу</span>
+              </div>
+            </div>
+            <div class="c" style="background:#FBE6E7">
+              <div class="t-sm" style="color:#a92f34">Кураторға белгі жіберілді</div>
+              <div class="t-xs mt6" style="color:#7a2f34">Сыныпта мазақтау белгісі — 24 сағат ішінде адам хабарласады</div>
+            </div>
+            <div class="c tight" style="background:#EEF0F6">
+              <div class="t-xs">🔒 Анаң тақырыпты көреді, сөзбе-сөз жазбаны — жоқ</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Кешкі әңгіме» — риск всегда уходит живому человеку</div>
+      </div>
+    </div>
+
+    <!-- 20 -->
+    <div class="idea">
+      <div class="txt">
+        <div class="num">20</div>
+        <h3>Компьютерлік көз<em>Распознавание тетради и автопроверка фото</em></h3>
+        <p class="lead">Ребёнок фотографирует бумажный конспект — модель читает рукописную казахскую кириллицу и засчитывает работу. Она же проверяет, что фото в «Фото жарыс» действительно на тему недели, и снимает с куратора тысячу проверок вручную.</p>
+        <div class="meta">
+          <div class="mrow"><b>Зачем</b><span>Это прямое лечение узкого места, которое честно названо в блоке B: при тысяче детей куратор физически не проверит тысячу фото в неделю. Плюс возвращает в продукт бумагу — дети в 4–6 классе всё ещё пишут от руки, и заставлять их печатать конспект неправильно.</span></div>
+          <div class="mrow"><b>Как работает</b>
+            <ul>
+              <li>HTR — распознавание рукописного текста, дообученное на казахской кириллице (ә, і, ң, ғ, ү, ұ, қ, ө, һ)</li>
+              <li>Модель типа CLIP сверяет фото с темой недели: «мой завтрак» — это правда завтрак</li>
+              <li>Автоматически проходит только уверенное распознавание; спорное уходит куратору</li>
+              <li>Отдельный фильтр небезопасного содержимого до того, как фото увидит клан</li>
+            </ul>
+          </div>
+          <div class="mrow"><b>Что это даёт</b><span>Механики №04 и №11 становятся масштабируемыми: куратор смотрит десятки спорных случаев вместо тысячи обычных.</span></div>
+          <div class="mrow"><b>Риск</b><span>Рукописный казахский — редкая задача, готовых моделей нет, размечать придётся самим. И нельзя допустить, чтобы автопроверка отклонила честную работу ребёнка: при сомнении всегда засчитываем и отправляем человеку.</span></div>
+        </div>
+        <div class="tags"><span class="tag hard">ML: высокая сложность</span><span class="tag">Чинит блок B</span><span class="tag">Нужна разметка</span></div>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="ph-status"><span>9:41</span><span class="dots"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="ph-head"><div class="ph-back">‹</div><div class="ph-title">Компьютерлік көз</div></div>
+          <div class="scr">
+            <div class="c">
+              <div class="t-lbl">Дәптеріңнің суреті</div>
+              <div class="ocr mt10">
+                <div class="ocrline" style="left:16px; top:18px; width:150px"></div>
+                <div class="ocrline" style="left:16px; top:40px; width:186px"></div>
+                <div class="ocrline" style="left:16px; top:62px; width:120px"></div>
+                <div class="ocrline" style="left:16px; top:96px; width:172px"></div>
+                <div class="ocrline" style="left:16px; top:118px; width:96px"></div>
+                <div class="ocrbox" style="left:10px; top:11px; width:164px; height:20px"></div>
+                <div class="ocrbox" style="left:10px; top:33px; width:200px; height:20px"></div>
+                <div class="ocrbox" style="left:10px; top:55px; width:134px; height:20px"></div>
+                <div class="ocrbox" style="left:10px; top:89px; width:186px; height:20px"></div>
+              </div>
+            </div>
+            <div class="c">
+              <div class="fl sb"><span class="t-md">Танылды</span><span class="pill g">92%</span></div>
+              <div class="bar mt6"><i style="width:92%"></i></div>
+              <div class="t-xs mt10" style="color:#182036">«Мен бүгін тригонометрияны қайталадым. Синус пен косинустың айырмашылығын түсіндім…»</div>
+            </div>
+            <div class="c">
+              <div class="lst"><span class="chk on">✓</span><span class="t-sm" style="flex:1">Тақырыпқа сай</span><span class="pill g">авто</span></div>
+              <div class="lst"><span class="chk on">✓</span><span class="t-sm" style="flex:1">Өз қолжазбасы</span><span class="pill g">авто</span></div>
+              <div class="lst"><span class="chk off">?</span><span class="t-sm" style="flex:1">Соңғы жол оқылмады</span><span class="pill a">кураторға</span></div>
+            </div>
+            <div class="c tight" style="background:#EEF7F0">
+              <div class="t-xs" style="color:#1c7a45">🤖 Осы аптада 940 фотоның 61-і ғана адамға жетті</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap">Экран «Компьютерлік көз» — спорное всегда уходит человеку</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="prio">
   <div class="wrap">
     <h2 class="sec-title">Что делать первым</h2>
-    <p class="sec-sub">Пятнадцать сразу не запускают — половина умрёт от того, что ребёнок не поймёт, куда смотреть. Оценка по двум осям: сколько даёт для удержания и сколько стоит сделать.</p>
+    <p class="sec-sub">Двадцать сразу не запускают — половина умрёт от того, что ребёнок не поймёт, куда смотреть. Оценка по двум осям: сколько даёт для удержания и сколько стоит сделать.</p>
 
     <div class="ptable">
       <div class="hrow"><span>Механика</span><span>Эффект</span><span>Стоимость</span><span>Ритм</span></div>
@@ -1196,6 +1543,11 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px;text-align:center}
       <div class="row"><b>15 · Аңыздар</b><span>Высокий</span><span>Средняя + люди</span><span>Каждую неделю</span></div>
       <div class="row"><b>05 · Талант сахнасы</b><span>Средний</span><span>Высокая</span><span>Раз в месяц</span></div>
       <div class="row"><b>13 · Тұмар</b><span>Высокий как слой</span><span>Высокая</span><span>Постоянно</span></div>
+      <div class="row" style="background:#faf9ff"><b>17 · Ерте белгі</b><span>Очень высокий</span><span>ML средняя</span><span>Фоново</span></div>
+      <div class="row" style="background:#faf9ff"><b>20 · Компьютерлік көз</b><span>Высокий</span><span>ML высокая</span><span>По событию</span></div>
+      <div class="row" style="background:#faf9ff"><b>16 · Дауыс</b><span>Очень высокий</span><span>ML высокая</span><span>Каждый день</span></div>
+      <div class="row" style="background:#faf9ff"><b>18 · Ойлау картасы</b><span>Высокий</span><span>ML высокая</span><span>Каждую неделю</span></div>
+      <div class="row" style="background:#faf9ff"><b>19 · Кешкі әңгіме</b><span>Очень высокий</span><span>ML предельная</span><span>Каждый день</span></div>
     </div>
 
     <div class="wave">
@@ -1204,13 +1556,18 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px;text-align:center}
         <li><b>Волна 1 — «дешёво и каждый день».</b> Күн сұрағы, Оқу әдеті, Қадам жарысы. Три механики, все дешёвые, все ежедневные, все дают маме то, что она расскажет подруге. Этого достаточно, чтобы проверить главную гипотезу: заходят ли в дни без уроков.</li>
         <li><b>Волна 2 — «клан оживает».</b> Фото жарыс, Логика аренасы, Таңғы 7 минут, Отбасы миссиясы. Появляется причина смотреть друг на друга. Здесь же первая офлайн-встреча — без неё клан не станет настоящим.</li>
         <li><b>Волна 3 — «смысл и глубина».</b> Жақсылық банкі, Аңыздар, Тұмар, Қалта ақша. Дорогие, но именно они превращают приложение в то, из чего не уходят. Тұмар — только последним: он собирает уже работающие механики, раньше собирать нечего.</li>
+        <li><b>Волна 4 — машинное обучение.</b> Начинать с <b>Ерте белгі</b> (17): данные для неё копятся с первого дня волны 1, модель самая простая из пяти, а эффект на выручку прямой. Следом <b>Компьютерлік көз</b> (20) — он снимает потолок с фото-механик. <b>Дауыс</b> (16) — когда накопится корпус детской речи с привычки чтения. <b>Ойлау картасы</b> (18) — когда конспектов наберётся на год. <b>Кешкі әңгіме</b> (19) — последней и только после внешней экспертизы, если вообще.</li>
       </ol>
     </div>
 
     <div class="note">
-      <b>Одно предупреждение.</b> Пятнадцать механик — это пятнадцать поводов для уведомлений. Если каждая начнёт звонить, ребёнок отключит уведомления целиком и мы потеряем всё сразу. Нужно правило: не больше двух пушей в день на ребёнка и один на родителя, с общим приоритетом. Это решается до запуска, а не после.
+      <b>Одно предупреждение.</b> Двадцать механик — это двадцать поводов для уведомлений. Если каждая начнёт звонить, ребёнок отключит уведомления целиком и мы потеряем всё сразу. Нужно правило: не больше двух пушей в день на ребёнка и один на родителя, с общим приоритетом. Это решается до запуска, а не после.
     </div>
 
+
+    <div class="note" style="border-left-color:var(--red)">
+      <b>Отдельно про блок G.</b> Пять ML-механик стоят дороже всех пятнадцати предыдущих вместе — и по деньгам, и по ответственности. Порядок здесь важнее скорости: сначала данные, потом модель, и только потом показ ребёнку. Ни одну из них нельзя запускать «на пробу» — модель, ошибающаяся на детях, стоит дороже, чем отсутствующая функция. Из пяти я бы трогал <b>Кешкі әңгіме</b> в последнюю очередь: она самая сильная и самая опасная одновременно.
+    </div>
     <div class="note" style="border-left-color:var(--purple)">
       <b>Вопросы, которые остаются дизайнеру и мне.</b> Где физически живут эти механики в четырёх вкладках — вешаем всё на «главное» или заводим отдельный раздел? Кто модерирует фото и видео при 1 000 детей — куратор не потянет. Нужен ли Тұмар вообще, если ребёнок и так видит XP. И считаем ли мы шаги без телефона у ребёнка — у части аудитории его просто нет.
     </div>
