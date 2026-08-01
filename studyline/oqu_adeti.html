@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1">
+<meta name="theme-color" content="#FFFFFF">
+<title>Оқу әдеті — StudyLine</title>
+<!--
+  StudyLine · Оқу әдеті — production, WebView контейнерге арналған.
+  Мост: ../bridge/studyline-bridge.js (ойындармен бірдей контракт).
+  Мазмұн: books.js. Жаңа кітап қосу үшін тек сол файлды өзгертеді.
+  Дизайн негізі: 375px (Figma study_line), контент 343, шет 16, gap 16.
+-->
+<style>
+:root{
+  /* Figma study_line-нен алынған түстер */
+  --green:#87BE4B; --green-d:#6FA53A; --green-l:#A8D46F;
+  --mint:#DFF4F1; --cream:#FDF4D8; --pink:#F5E2F9; --blue:#E2E9FD;
+  --navy:#111543; --ink:#141728; --muted:#8A8FA3; --line:#ECEEF5;
+  --bg:#FFFFFF; --card:#FFFFFF; --paper:#FBF8F1; --paper-ink:#2C2618;
+  --red:#E0574B; --gold:#E7B744;
+  --r-lg:24px; --r-md:18px; --r-sm:14px;
+  --pad:16px;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{
+  font-family:var(--font);background:#EDEFF4;color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  display:flex;align-items:center;justify-content:center;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* Сахна: телефонда бүкіл экранды алады, кең экранда 9:16 рамка */
+#stage{
+  position:relative;width:100%;height:100dvh;max-width:460px;
+  background:var(--bg);overflow:hidden;display:flex;flex-direction:column;
+}
+@media (min-width:600px) and (min-height:700px){
+  #stage{height:min(96dvh,calc(460px * 16 / 9));border-radius:28px;
+    box-shadow:0 24px 70px rgba(17,21,67,.28)}
+}
+
+/* ── көріністер ───────────────────────────────────────────── */
+.view{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
+.view.on{display:flex}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.pad{padding:0 var(--pad)}
+
+/* ── шапка ────────────────────────────────────────────────── */
+.bar{
+  display:flex;align-items:center;gap:10px;flex:none;
+  padding:calc(var(--safe-t) + 10px) var(--pad) 10px;background:var(--bg);
+}
+.ico-btn{
+  width:38px;height:38px;border-radius:12px;border:1.5px solid var(--line);
+  display:grid;place-items:center;flex:none;background:#fff;transition:transform .12s
+}
+.ico-btn:active{transform:scale(.93)}
+.bar h1{font-size:19px;font-weight:800;letter-spacing:-.4px;flex:1}
+.streak{
+  display:inline-flex;align-items:center;gap:5px;background:#FFF3E4;
+  border-radius:999px;padding:7px 12px;font-size:13.5px;font-weight:800;color:#C4791F
+}
+
+/* ── герой ────────────────────────────────────────────────── */
+.hero{
+  position:relative;border-radius:var(--r-lg);overflow:hidden;
+  background:linear-gradient(135deg,var(--green-l) 0%,var(--green) 55%,var(--green-d) 100%);
+  padding:18px 18px 18px;color:#fff;margin-bottom:14px;isolation:isolate
+}
+.hero::after{
+  content:"";position:absolute;right:-52px;top:-52px;width:190px;height:190px;
+  border-radius:50%;background:rgba(255,255,255,.14);z-index:-1
+}
+.hero .owl{
+  position:absolute;right:-14px;bottom:-10px;width:142px;
+  pointer-events:none;filter:drop-shadow(0 6px 14px rgba(0,0,0,.18))
+}
+.hero .kicker{font-size:12.5px;font-weight:700;color:rgba(255,255,255,.85)}
+.hero h2{font-size:27px;font-weight:800;line-height:1.12;letter-spacing:-.6px;margin-top:4px}
+.hero .sub{font-size:13px;color:rgba(255,255,255,.9);margin-top:6px;max-width:60%}
+.cta{
+  display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--green-d);
+  border-radius:999px;padding:11px 12px 11px 18px;font-size:15px;font-weight:800;
+  margin-top:16px;box-shadow:0 6px 18px rgba(0,0,0,.14);transition:transform .12s
+}
+.cta:active{transform:scale(.96)}
+.cta .arw{
+  width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;
+  display:grid;place-items:center;font-size:15px
+}
+.hero.done{background:linear-gradient(135deg,#3FB27A,#2E9E5B)}
+
+/* ── карточкалар ──────────────────────────────────────────── */
+.card{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);
+  padding:14px;margin-bottom:12px
+}
+.sec{
+  display:flex;align-items:baseline;margin:6px 2px 10px;
+}
+.sec h3{font-size:17px;font-weight:800;letter-spacing:-.3px}
+.sec a{margin-left:auto;font-size:14px;font-weight:700;color:var(--green-d)}
+
+.bookrow{display:flex;gap:13px;align-items:center;width:100%;text-align:left}
+.cov{
+  width:56px;height:78px;border-radius:10px;flex:none;object-fit:cover;
+  background:var(--line);box-shadow:0 4px 12px rgba(17,21,67,.14)
+}
+.bookrow .t{font-size:15.5px;font-weight:800;letter-spacing:-.2px}
+.bookrow .s{font-size:12.5px;color:var(--muted);margin-top:2px}
+.pbar{height:6px;border-radius:3px;background:#EEF0F6;margin-top:9px;overflow:hidden}
+.pbar i{display:block;height:100%;border-radius:3px;background:var(--green);transition:width .4s}
+.plbl{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;color:var(--muted);margin-top:5px}
+
+.week{display:flex;gap:8px;align-items:flex-end;height:66px;margin-top:10px}
+.wk{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+.wk{position:relative}
+.wk::before{content:"";position:absolute;left:0;right:0;bottom:22px;top:0;
+  border-radius:5px;background:#F4F6FA}
+.wk i{display:block;width:100%;border-radius:5px 5px 2px 2px;background:#DDE2EE;min-height:6px;position:relative}
+.wk.on i{background:var(--green)}
+.wk small{font-size:10.5px;color:var(--muted);font-weight:700}
+
+.tiles{display:flex;gap:12px;margin-bottom:14px}
+.tile{
+  flex:1;border-radius:var(--r-md);padding:14px;text-align:left;
+  display:flex;flex-direction:column;gap:2px;transition:transform .12s
+}
+.tile:active{transform:scale(.97)}
+.tile.a{background:var(--mint)}.tile.b{background:var(--cream)}
+.tile .ti{font-size:15px;font-weight:800}
+.tile .ts{font-size:12px;color:#6B7183}
+.tile img{width:44px;height:44px;object-fit:contain;margin-bottom:4px}
+
+/* ── кітапхана ────────────────────────────────────────────── */
+.shelf{margin-bottom:18px}
+.shelf h4{font-size:15px;font-weight:800;margin:0 2px 10px;display:flex;align-items:baseline}
+.shelf h4 span{margin-left:auto;font-size:12px;color:var(--muted);font-weight:700}
+.strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.bcard{flex:0 0 112px;text-align:left;transition:transform .12s}
+.bcard:active{transform:scale(.96)}
+.bcard img{width:112px;height:158px;border-radius:12px;object-fit:cover;
+  box-shadow:0 6px 16px rgba(17,21,67,.16);background:var(--line)}
+.bcard .t{font-size:13px;font-weight:800;margin-top:8px;line-height:1.25}
+.bcard .d{font-size:11px;color:var(--muted);margin-top:2px}
+.bcard .badge{display:inline-block;margin-top:6px;font-size:10.5px;font-weight:800;
+  color:var(--green-d);background:#F0F8E6;border-radius:999px;padding:3px 8px}
+.bcard .badge.on{color:#fff;background:var(--green)}
+
+/* ── кітап беті ───────────────────────────────────────────── */
+.bhero{padding:0 var(--pad) 16px;display:flex;gap:16px;align-items:flex-end}
+.bhero img{width:110px;height:156px;border-radius:14px;object-fit:cover;
+  box-shadow:0 10px 26px rgba(17,21,67,.22);flex:none}
+.bhero h2{font-size:22px;font-weight:800;line-height:1.15;letter-spacing:-.5px}
+.bhero .au{font-size:12.5px;color:var(--muted);margin-top:5px}
+.facts{display:flex;gap:10px;margin-bottom:14px}
+.fact{flex:1;background:#F7F8FC;border-radius:var(--r-sm);padding:12px 8px;text-align:center}
+.fact b{display:block;font-size:18px;font-weight:800}
+.fact small{font-size:10.5px;color:var(--muted)}
+.about{font-size:14px;line-height:1.6;color:#3A4056}
+
+.btn{
+  display:block;width:100%;border-radius:16px;padding:15px;font-size:16px;font-weight:800;
+  text-align:center;transition:transform .12s
+}
+.btn:active{transform:scale(.975)}
+.btn.p{background:var(--green);color:#fff;box-shadow:0 8px 20px rgba(135,190,75,.4)}
+.btn.g{background:#F2F4F9;color:#4A5163}
+
+/* ── оқырман ──────────────────────────────────────────────── */
+#reader{background:var(--paper)}
+.rtop{flex:none;padding:calc(var(--safe-t) + 14px) var(--pad) 0;position:relative;z-index:4}
+.rline{height:3px;border-radius:2px;background:#E7DECD;overflow:hidden}
+.rline i{display:block;height:100%;background:var(--green);transition:width .3s}
+.rx{
+  position:absolute;right:10px;top:calc(var(--safe-t) + 24px);width:34px;height:34px;
+  border-radius:50%;background:rgba(44,38,24,.07);display:grid;place-items:center;
+  font-size:17px;color:#6B6252;z-index:5
+}
+/* тостқа арналған орын — сондықтан ол мәтінді ешқашан жаппайды */
+.rpage{
+  flex:1;overflow-y:auto;padding:64px 22px 12px;font-size:17px;line-height:1.85;
+  color:var(--paper-ink);font-family:Georgia,"Times New Roman",serif;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain
+}
+.rpage p{margin-bottom:15px;white-space:pre-line}
+.rfoot{flex:none;padding:8px 22px calc(var(--safe-b) + 14px);
+  display:flex;justify-content:space-between;font-size:12px;color:#9A8F78;font-weight:700}
+.rzone{position:absolute;top:56px;bottom:52px;width:32%;z-index:2}
+.rzone.l{left:0}.rzone.r{right:0}
+
+#toast{
+  position:absolute;left:12px;right:12px;top:calc(var(--safe-t) + 18px);
+  border-radius:15px;padding:12px 15px;display:flex;align-items:center;gap:10px;
+  font-size:13.5px;font-weight:800;background:#fff;color:var(--ink);
+  box-shadow:0 12px 30px rgba(17,21,67,.2);z-index:6;
+  transform:translateY(-140%);transition:transform .34s cubic-bezier(.2,.9,.3,1.2)
+}
+#toast.show{transform:translateY(0)}
+#toast.ok{background:var(--green);color:#fff}
+#toast.fire{background:linear-gradient(135deg,#FF8A3D,var(--gold));color:#3A2200}
+
+/* ── қадамдар ─────────────────────────────────────────────── */
+.step{display:flex;gap:12px;margin-bottom:10px}
+.rail{flex:0 0 36px;display:flex;flex-direction:column;align-items:center}
+.num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+  font-weight:800;font-size:14px;color:#fff;flex:none;background:#E5E9F3;color:#A9B0C4}
+.step.done .num{background:var(--green)}
+.step.now .num{background:#FF8A3D;box-shadow:0 0 0 4px rgba(255,138,61,.18)}
+.vl{flex:1;width:3px;background:var(--line);margin:4px 0;border-radius:2px}
+.step.done .vl{background:var(--green-l)}
+.sb{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:12px 13px}
+.step.now .sb{border-color:#FFD9BE;background:#FFFBF7}
+.sb .t{display:flex;align-items:center;gap:8px}
+.sb h5{font-size:14.5px;font-weight:800}
+.pg{margin-left:auto;font-size:11px;font-weight:800;color:var(--green-d);
+  background:#F0F8E6;border-radius:999px;padding:4px 9px;white-space:nowrap}
+.step.lock .pg{background:#F1F3F9;color:#A9B0C4}
+.sb .m{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+
+/* ── күн экраны / финал ───────────────────────────────────── */
+.full{
+  position:absolute;inset:0;z-index:20;display:none;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:calc(var(--safe-t) + 24px) 24px calc(var(--safe-b) + 24px);color:#fff
+}
+.full.on{display:flex}
+#dayDone{background:linear-gradient(160deg,#3FB27A,#2E9E5B)}
+#finale{background:linear-gradient(165deg,#1B2350,#3A2F86)}
+.seal{width:104px;height:104px;border-radius:50%;background:rgba(255,255,255,.16);
+  border:2px solid rgba(255,255,255,.32);display:grid;place-items:center;margin-bottom:18px}
+.seal img{width:66px}
+.full h2{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.full p{font-size:14.5px;color:rgba(255,255,255,.88);margin-top:8px;max-width:290px}
+.pills{display:flex;gap:10px;margin-top:24px;width:100%;max-width:330px}
+.pill{flex:1;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.22);
+  border-radius:15px;padding:12px 6px}
+.pill b{display:block;font-size:19px;font-weight:800}
+.pill small{font-size:10.5px;color:rgba(255,255,255,.82)}
+.acts{width:100%;max-width:330px;margin-top:26px;display:flex;flex-direction:column;gap:10px}
+.acts .a1{background:#fff;color:#2E9E5B;font-weight:800;padding:15px;border-radius:16px;font-size:16px}
+#finale .acts .a1{color:#3A2F86}
+.acts .a2{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);
+  color:#fff;font-weight:700;padding:14px;border-radius:16px;font-size:15px}
+
+.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- ═══ ХАБ ═══ -->
+  <section class="view on" id="hub">
+    <div class="bar">
+      <button class="ico-btn" id="btnExit" aria-label="Шығу">‹</button>
+      <h1>Оқу әдеті</h1>
+      <div class="streak" id="streakChip">🔥 0 күн</div>
+    </div>
+    <div class="scroll pad">
+      <div class="hero" id="hero">
+        <img class="owl" src="assets/hero_owl.png" alt="">
+        <div class="kicker" id="heroKicker">Бүгінгі мақсат</div>
+        <h2 id="heroTitle">4 бет оқы</h2>
+        <div class="sub" id="heroSub">Бүгін тағы 4 бет — және мақсат орындалады.</div>
+        <button class="cta" id="btnRead">
+          <span id="ctaLabel">Оқуды бастау</span><span class="arw">›</span>
+        </button>
+      </div>
+
+      <div class="card">
+        <button class="bookrow" id="curBook">
+          <img class="cov" id="curCov" src="" alt="">
+          <div style="flex:1;min-width:0">
+            <div class="t" id="curTitle">—</div>
+            <div class="s" id="curShelf">—</div>
+            <div class="pbar"><i id="curBar" style="width:0%"></i></div>
+            <div class="plbl"><span id="curPage">—</span><span id="curPct">0%</span></div>
+          </div>
+        </button>
+      </div>
+
+      <div class="card">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:var(--muted)">
+          АПТА БОЙЫНША БЕТТЕР</div>
+        <div class="week" id="week"></div>
+      </div>
+
+      <div class="tiles">
+        <button class="tile a" id="btnLib">
+          <img src="assets/icon_english.png" alt="">
+          <span class="ti">Кітапхана</span>
+          <span class="ts" id="libCount">—</span>
+        </button>
+        <button class="tile b" id="btnSteps">
+          <img src="assets/icon_oqu.png" alt="">
+          <span class="ti">10 қадам</span>
+          <span class="ts" id="stepLbl">—</span>
+        </button>
+      </div>
+      <div class="card" id="taskCard">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:var(--muted)">
+          ОСЫ ҚАДАМНЫҢ ТАПСЫРМАСЫ</div>
+        <div id="taskTxt" style="font-size:15px;font-weight:700;margin-top:8px;line-height:1.45">—</div>
+        <div style="font-size:12.5px;color:var(--muted);margin-top:8px">
+          Міндетті емес. Келесі қадамға өту үшін оқыған да жеткілікті.</div>
+      </div>
+      <div style="height:20px"></div>
+    </div>
+  </section>
+
+  <!-- ═══ КІТАПХАНА ═══ -->
+  <section class="view" id="library">
+    <div class="bar">
+      <button class="ico-btn nav-back" aria-label="Артқа">‹</button>
+      <h1>Кітапхана</h1>
+    </div>
+    <div class="scroll pad" id="shelves"></div>
+  </section>
+
+  <!-- ═══ КІТАП ═══ -->
+  <section class="view" id="book">
+    <div class="bar">
+      <button class="ico-btn nav-back" aria-label="Артқа">‹</button>
+      <h1></h1>
+    </div>
+    <div class="scroll">
+      <div class="bhero">
+        <img id="bkCov" src="" alt="">
+        <div><h2 id="bkTitle">—</h2><div class="au" id="bkAuthor">—</div></div>
+      </div>
+      <div class="pad">
+        <div class="facts">
+          <div class="fact"><b id="bkPages">—</b><small>бет</small></div>
+          <div class="fact"><b id="bkDays">—</b><small>күн</small></div>
+          <div class="fact"><b id="bkRead">—</b><small>оқылды</small></div>
+        </div>
+        <div class="card"><div class="about" id="bkAbout">—</div></div>
+        <button class="btn p" id="bkStart">Оқуды бастау</button>
+        <div style="height:24px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ҚАДАМДАР ═══ -->
+  <section class="view" id="steps">
+    <div class="bar">
+      <button class="ico-btn nav-back" aria-label="Артқа">‹</button>
+      <h1>10 қадам</h1>
+    </div>
+    <div class="scroll pad" id="stepList"></div>
+  </section>
+
+  <!-- ═══ ОҚЫРМАН ═══ -->
+  <section class="view" id="reader">
+    <div class="rtop"><div class="rline"><i id="rBar" style="width:0%"></i></div></div>
+    <button class="rx" id="rClose" aria-label="Жабу">✕</button>
+    <div class="rpage" id="rPage"></div>
+    <div class="rfoot"><span id="rNum">—</span><span id="rBook">—</span></div>
+    <button class="rzone l" id="rPrev" aria-label="Алдыңғы бет"></button>
+    <button class="rzone r" id="rNext" aria-label="Келесі бет"></button>
+    <div id="toast"><span id="toastIco">✓</span><span id="toastTxt"></span></div>
+  </section>
+
+  <!-- ═══ КҮН ЭКРАНЫ ═══ -->
+  <div class="full" id="dayDone">
+    <div class="seal"><img src="assets/icon_oqu.png" alt=""></div>
+    <h2>Бүгінгі мақсат орындалды</h2>
+    <p id="ddSub">—</p>
+    <div class="pills">
+      <div class="pill"><b id="ddPages">0</b><small>бүгін оқыдың</small></div>
+      <div class="pill"><b id="ddStreak">0</b><small>күн қатарынан</small></div>
+      <div class="pill"><b id="ddTotal">0</b><small>барлығы</small></div>
+    </div>
+    <div class="acts">
+      <button class="a1" id="ddMore">Жалғастыру</button>
+      <button class="a2" id="ddClose">Дайын</button>
+    </div>
+  </div>
+
+  <!-- ═══ ФИНАЛ ═══ -->
+  <div class="full" id="finale">
+    <div class="seal"><img src="assets/icon_oqu.png" alt=""></div>
+    <h2>Әдет қалыптасты</h2>
+    <p>39 күн бойы оқыдың. Енді бұл — сенің әдетің.</p>
+    <div class="pills">
+      <div class="pill"><b id="fnDays">39</b><small>күн</small></div>
+      <div class="pill"><b id="fnPages">210</b><small>бет</small></div>
+      <div class="pill"><b id="fnBooks">0</b><small>кітап</small></div>
+    </div>
+    <div class="acts">
+      <button class="a1" id="fnOk">Еркін оқуды бастау</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="../bridge/studyline-bridge.js"></script>
+<script src="books.js"></script>
+<script>
+'use strict';
+(function () {
+
+/* ── тұрақтылар ───────────────────────────────────────────────────────── */
+var STEPS = [
+  { pages:1,  days:4, task:'Оқығаныңды бір сөйлеммен айтып бер' },
+  { pages:2,  days:4, task:'Ұнаған кейіпкерді сурет салып көрсет' },
+  { pages:3,  days:4, task:'Үш жаңа сөзді жаттап, мағынасын айт' },
+  { pages:4,  days:4, task:'Оқыған оқиғаны өз сөзіңмен айтып бер' },
+  { pages:5,  days:4, task:'Ұнаған сөйлемді дәптерге жаз' },
+  { pages:6,  days:4, task:'Кейіпкерге хат жаз' },
+  { pages:7,  days:4, task:'Оқиғаның жалғасын ойлап тап' },
+  { pages:8,  days:4, task:'Досыңа кітапты ұсын — неге екенін айт' },
+  { pages:9,  days:4, task:'Кітап бойынша үш сұрақ құрастыр' },
+  { pages:10, days:3, task:'Куратормен әңгіме — әдет туралы' }
+];
+/* Бетте кемінде осынша секунд болмаса, бет есептелмейді.
+   Мақсаты — парақтап шығуды нормаға жаздырмау. Балаға ескерту жазылмайды. */
+var READ_MIN_SEC = 20;
+var TOAST_EVERY  = 4;   // тосттар арасындағы ең аз бет саны
+var TOAST_MAX    = 3;   // бір сессияға
+
+/* ── мост және пайдаланушы ────────────────────────────────────────────── */
+var SL = window.SL || { init:function(){}, ready:function(){}, progress:function(){},
+                        finish:function(){}, close:function(){}, user:{}, isInApp:false };
+SL.init({ game:'oqu_adeti' });
+var UID = (SL.user && SL.user.id) || 'guest';
+
+/* ── күй ──────────────────────────────────────────────────────────────── */
+var KEY = 'sl_oqu_' + UID;
+var S;
+
+function today(){ var d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function pad(n){ return n<10 ? '0'+n : ''+n; }
+
+function blank(){
+  return { step:1, dayInStep:0, streak:0, best:0, total:0,
+           days:{}, books:{}, current:null, toasts:{}, startedAt:today(), finished:false };
+}
+function load(){
+  try { S = JSON.parse(localStorage.getItem(KEY)) || blank(); }
+  catch(e){ S = blank(); }
+  if (!S.books) S = blank();
+  return S;
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+function goal(){ return STEPS[Math.min(S.step,10)-1].pages; }
+function todayPages(){ return S.days[today()] || 0; }
+function bookState(id){
+  if (!S.books[id]) S.books[id] = { page:0, done:false };
+  return S.books[id];
+}
+function booksDone(){ var n=0; for (var k in S.books) if (S.books[k].done) n++; return n; }
+
+/* ── көріністерді ауыстыру ────────────────────────────────────────────── */
+var stack = ['hub'];
+function show(id){
+  var v = document.getElementById(id);
+  if (!v) return;
+  [].forEach.call(document.querySelectorAll('.view'), function(el){ el.classList.remove('on'); });
+  v.classList.add('on');
+  var sc = v.querySelector('.scroll'); if (sc) sc.scrollTop = 0;
+}
+function go(id){ if (stack[stack.length-1] !== id) stack.push(id); show(id); render(id); }
+function back(){ if (stack.length>1) stack.pop(); var id=stack[stack.length-1]; show(id); render(id); }
+
+/* ── кітаптар ─────────────────────────────────────────────────────────── */
+var BOOKS = window.BOOKS || [];
+function byId(id){ for (var i=0;i<BOOKS.length;i++) if (BOOKS[i].id===id) return BOOKS[i]; return null; }
+function current(){
+  if (!S.current || !byId(S.current)) {
+    var next = null;
+    for (var i=0;i<BOOKS.length;i++) if (!bookState(BOOKS[i].id).done) { next = BOOKS[i]; break; }
+    S.current = next ? next.id : (BOOKS[0] ? BOOKS[0].id : null);
+  }
+  return byId(S.current);
+}
+
+/* ── рендер ───────────────────────────────────────────────────────────── */
+function render(id){
+  if (id==='hub')     renderHub();
+  if (id==='library') renderLibrary();
+  if (id==='steps')   renderSteps();
+}
+
+function renderHub(){
+  var g = goal(), tp = todayPages(), left = Math.max(0, g - tp), done = left === 0;
+  document.getElementById('streakChip').textContent = '🔥 ' + S.streak + ' күн';
+
+  var hero = document.getElementById('hero');
+  hero.classList.toggle('done', done);
+  document.getElementById('heroKicker').textContent = done ? 'Бүгін бітті' : 'Бүгінгі мақсат';
+  document.getElementById('heroTitle').textContent  = done ? 'Мақсат орындалды' : left + ' бет оқы';
+  document.getElementById('heroSub').textContent    = done
+      ? 'Бүгін ' + tp + ' бет оқыдың. Қаласаң, жалғастыр.'
+      : (tp > 0 ? 'Бүгін ' + tp + ' бет оқыдың. Тағы ' + left + ' бет қалды.'
+                : S.step + '-қадамдасың. Күніне ' + g + ' бет.');
+  document.getElementById('ctaLabel').textContent = tp > 0 ? 'Жалғастыру' : 'Оқуды бастау';
+
+  var b = current();
+  var row = document.getElementById('curBook');
+  if (b) {
+    row.style.display = '';
+    var st = bookState(b.id), pct = Math.round(st.page / b.pages.length * 100);
+    document.getElementById('curCov').src      = b.cover;
+    document.getElementById('curTitle').textContent = b.title;
+    document.getElementById('curShelf').textContent = b.shelf + ' · ' + b.pages.length + ' бет';
+    document.getElementById('curBar').style.width   = pct + '%';
+    document.getElementById('curPage').textContent  = (st.page + 1) + '-бет';
+    document.getElementById('curPct').textContent   = pct + '%';
+  } else { row.style.display = 'none'; }
+
+  /* апталық баған: соңғы 4 апта */
+  var wk = document.getElementById('week'); wk.innerHTML = '';
+  var weeks = weekTotals(), max = Math.max.apply(null, weeks.concat([1]));
+  weeks.forEach(function(v,i){
+    var d = document.createElement('div');
+    d.className = 'wk' + (i===3 ? ' on' : '');
+    d.innerHTML = '<i style="height:' + Math.max(4, Math.round(v/max*100)) + '%"></i>' +
+                  '<small>' + (i===3 ? 'осы' : (i+1)+'-ап') + '</small>';
+    wk.appendChild(d);
+  });
+
+  document.getElementById('taskTxt').textContent = STEPS[Math.min(S.step,10)-1].task;
+  document.getElementById('libCount').textContent = BOOKS.length + ' кітап';
+  document.getElementById('stepLbl').textContent  = S.step + '-қадам';
+}
+
+function weekTotals(){
+  var out=[0,0,0,0], now=new Date();
+  for (var key in S.days){
+    var d=new Date(key+'T00:00:00');
+    var diff=Math.floor((now-d)/86400000);
+    var w=3-Math.floor(diff/7);
+    if (w>=0 && w<4) out[w]+=S.days[key];
+  }
+  return out;
+}
+
+function renderLibrary(){
+  var host = document.getElementById('shelves'); host.innerHTML = '';
+  if (!BOOKS.length){ host.innerHTML = '<div class="empty">Кітапхана әзірге бос.</div>'; return; }
+  var groups = {}, order = [];
+  BOOKS.forEach(function(b){
+    var k = bookState(b.id).done ? 'Оқылған' : b.shelf;
+    if (!groups[k]) { groups[k] = []; order.push(k); }
+    groups[k].push(b);
+  });
+  order.forEach(function(name){
+    var sh = document.createElement('div'); sh.className = 'shelf';
+    var strip = '';
+    groups[name].forEach(function(b){
+      var st = bookState(b.id);
+      var days = Math.max(1, Math.ceil(b.pages.length / goal()));
+      var badge = st.done ? '<span class="badge">бітті</span>'
+                : st.page > 0 ? '<span class="badge on">жалғасы</span>'
+                : '<span class="badge">' + days + ' күн</span>';
+      strip += '<button class="bcard" data-book="' + b.id + '">' +
+               '<img src="' + b.cover + '" alt="">' +
+               '<div class="t">' + esc(b.title) + '</div>' +
+               '<div class="d">' + b.pages.length + ' бет</div>' + badge + '</button>';
+    });
+    sh.innerHTML = '<h4>' + esc(name) + '<span>' + groups[name].length + '</span></h4>' +
+                   '<div class="strip">' + strip + '</div>';
+    host.appendChild(sh);
+  });
+  host.insertAdjacentHTML('beforeend', '<div style="height:20px"></div>');
+}
+
+function renderBook(b){
+  var st = bookState(b.id);
+  document.getElementById('bkCov').src = b.cover;
+  document.getElementById('bkTitle').textContent  = b.title;
+  document.getElementById('bkAuthor').textContent = b.author;
+  document.getElementById('bkPages').textContent  = b.pages.length;
+  document.getElementById('bkDays').textContent   = Math.max(1, Math.ceil(b.pages.length/goal()));
+  document.getElementById('bkRead').textContent   = st.page;
+  document.getElementById('bkAbout').textContent  = b.about;
+  document.getElementById('bkStart').textContent  =
+    st.done ? 'Қайта оқу' : (st.page > 0 ? 'Жалғастыру · ' + (st.page+1) + '-бет' : 'Оқуды бастау');
+  document.getElementById('bkStart').onclick = function(){
+    S.current = b.id; save(); openReader(st.done ? 0 : st.page);
+  };
+  show('book'); stack.push('book');
+}
+
+function renderSteps(){
+  var host = document.getElementById('stepList'); host.innerHTML = '';
+  STEPS.forEach(function(s, i){
+    var n = i + 1;
+    var cls = n < S.step ? 'done' : (n === S.step ? 'now' : 'lock');
+    var meta = n < S.step ? 'Аяқталды ✓'
+             : n === S.step ? S.dayInStep + '/' + s.days + ' күн орындалды. Тапсырма: ' + s.task +
+                              ' <b style="color:var(--muted);font-weight:700">Міндетті емес.</b>'
+             : '🔒 Тапсырма: ' + s.task;
+    var d = document.createElement('div');
+    d.className = 'step ' + cls;
+    d.innerHTML = '<div class="rail"><div class="num">' + (n===10 ? '★' : n) + '</div>' +
+                  (n<10 ? '<div class="vl"></div>' : '') + '</div>' +
+                  '<div class="sb"><div class="t"><h5>' + n + '-қадам' +
+                  (n===S.step ? ' · қазір' : '') + '</h5>' +
+                  '<span class="pg">' + s.pages + ' бет × ' + s.days + ' күн</span></div>' +
+                  '<div class="m">' + meta + '</div></div>';
+    host.appendChild(d);
+  });
+  host.insertAdjacentHTML('beforeend', '<div style="height:20px"></div>');
+}
+
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+/* ── оқырман ──────────────────────────────────────────────────────────── */
+var R = { book:null, idx:0, since:0, counted:false, toastsShown:0, sincePages:0, sessionPages:0 };
+
+function openReader(page){
+  var b = current(); if (!b) return;
+  R.book = b;
+  R.idx = Math.min(typeof page === 'number' ? page : bookState(b.id).page, b.pages.length - 1);
+  R.toastsShown = 0; R.sincePages = TOAST_EVERY; R.sessionPages = 0;
+  show('reader'); stack.push('reader');
+  paint();
+  SL.progress({ event:'reader_open', book:b.id, page:R.idx });
+}
+
+function paint(){
+  var b = R.book;
+  document.getElementById('rPage').innerHTML = '<p>' + esc(b.pages[R.idx]) + '</p>';
+  document.getElementById('rPage').scrollTop = 0;
+  document.getElementById('rNum').textContent  = (R.idx + 1) + ' / ' + b.pages.length;
+  document.getElementById('rBook').textContent = b.title;
+  document.getElementById('rBar').style.width  = ((R.idx + 1) / b.pages.length * 100) + '%';
+  R.since = Date.now(); R.counted = false;
+}
+
+function turn(dir){
+  var b = R.book, next = R.idx + dir;
+  if (next < 0) return;
+
+  if (dir > 0) countPage();
+
+  if (next >= b.pages.length){ finishBook(); return; }
+  R.idx = next;
+  var st = bookState(b.id);
+  if (R.idx > st.page) st.page = R.idx;
+  save(); paint();
+}
+
+/* Бет тек нақты оқылса ғана есептеледі. Парақтаса — үнсіз есептелмейді. */
+function countPage(){
+  if (R.counted) return;
+  if ((Date.now() - R.since) / 1000 < READ_MIN_SEC) return;
+  R.counted = true;
+
+  var d = today(), before = todayPages();
+  S.days[d] = before + 1;
+  S.total += 1;
+  R.sessionPages += 1; R.sincePages += 1;
+  save();
+
+  SL.progress({ event:'page', book:R.book.id, page:R.idx + 1, todayPages:S.days[d] });
+
+  var g = goal();
+  if (before + 1 === g) { completeDay(); return; }
+  pickToast();
+}
+
+function pickToast(){
+  if (R.toastsShown >= TOAST_MAX || R.sincePages < TOAST_EVERY) return;
+  var b = R.book, pct = Math.round((R.idx + 1) / b.pages.length * 100);
+  var t = null;
+  if (S.streak + 1 > S.best && S.best > 0) t = { k:'best', ico:'🔥', cls:'fire', txt:'Жаңа рекорд — ' + (S.streak) + ' күн' };
+  else if (pct >= 75 && pct < 100) t = { k:'p75', ico:'📖', cls:'', txt:'75%. Аз қалды.' };
+  else if (pct >= 50 && pct < 75)  t = { k:'p50', ico:'📖', cls:'', txt:'Жартысы оқылды. Күшті!' };
+  else if (pct >= 25 && pct < 50)  t = { k:'p25', ico:'📖', cls:'', txt:'Кітаптың ¼ бөлігі артта' };
+  else if (R.sessionPages === 3)   t = { k:'run', ico:'👏', cls:'', txt:'Тоқтамай оқып жатырсың' };
+  if (!t) return;
+
+  var key = b.id + ':' + t.k;
+  if (S.toasts[key]) return;
+  S.toasts[key] = 1; save();
+  toast(t.txt, t.ico, t.cls);
+}
+
+var toastTimer;
+function toast(text, ico, cls){
+  var el = document.getElementById('toast');
+  document.getElementById('toastTxt').textContent = text;
+  document.getElementById('toastIco').textContent = ico || '✓';
+  el.className = cls || '';
+  void el.offsetWidth;
+  el.classList.add('show');
+  R.toastsShown += 1; R.sincePages = 0;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2200);
+}
+
+function completeDay(){
+  var d = today();
+  if (S.lastDay === d) return;
+  var prev = S.lastDay;
+  S.lastDay = d;
+
+  var y = new Date(Date.now() - 86400000);
+  var yk = y.getFullYear() + '-' + pad(y.getMonth()+1) + '-' + pad(y.getDate());
+  S.streak = (prev === yk) ? S.streak + 1 : 1;
+  if (S.streak > S.best) S.best = S.streak;
+
+  S.dayInStep += 1;
+  if (S.dayInStep >= STEPS[S.step-1].days && S.step < 10){ S.step += 1; S.dayInStep = 0; }
+  else if (S.dayInStep >= STEPS[9].days && S.step === 10){ S.finished = true; }
+  save();
+
+  /* Шикі нәтиже қосымшаға кетеді. XP-ды бэкенд санайды, біз емес. */
+  SL.finish({ goalPages:goal(), pagesToday:S.days[d], totalPages:S.total,
+              streak:S.streak, step:S.step, book:R.book ? R.book.id : null });
+
+  document.getElementById('ddSub').textContent =
+    'Бүгін ' + S.days[d] + ' бет оқыдың. ' + S.streak + '-күн қатарынан.';
+  document.getElementById('ddPages').textContent  = S.days[d];
+  document.getElementById('ddStreak').textContent = S.streak;
+  document.getElementById('ddTotal').textContent  = S.total;
+  document.getElementById('dayDone').classList.add('on');
+}
+
+function finishBook(){
+  var st = bookState(R.book.id);
+  st.done = true; st.page = R.book.pages.length - 1;
+  S.current = null; save();
+  toast('Кітап бітті!', '🎉', 'ok');
+  setTimeout(function(){
+    if (S.finished) { showFinale(); return; }
+    while (stack.length && stack[stack.length-1] === 'reader') stack.pop();
+    back();
+  }, 1400);
+}
+
+function showFinale(){
+  document.getElementById('fnDays').textContent  = Object.keys(S.days).length;
+  document.getElementById('fnPages').textContent = S.total;
+  document.getElementById('fnBooks').textContent = booksDone();
+  document.getElementById('finale').classList.add('on');
+}
+
+/* ── оқиғалар ─────────────────────────────────────────────────────────── */
+function on(id, fn){ var el = document.getElementById(id); if (el) el.addEventListener('click', fn); }
+
+on('btnRead',  function(){ openReader(); });
+on('btnLib',   function(){ go('library'); });
+on('btnSteps', function(){ go('steps'); });
+on('curBook',  function(){ var b = current(); if (b) renderBook(b); });
+on('btnExit',  function(){ SL.close(); });
+
+[].forEach.call(document.querySelectorAll('.nav-back'), function(el){
+  el.addEventListener('click', back);
+});
+
+document.getElementById('shelves').addEventListener('click', function(e){
+  var t = e.target.closest('[data-book]'); if (!t) return;
+  var b = byId(t.getAttribute('data-book')); if (b) renderBook(b);
+});
+
+on('rNext',  function(){ turn(1); });
+on('rPrev',  function(){ turn(-1); });
+on('rClose', function(){
+  countPage();
+  while (stack.length && stack[stack.length-1] === 'reader') stack.pop();
+  back();
+});
+
+on('ddMore',  function(){ document.getElementById('dayDone').classList.remove('on'); });
+on('ddClose', function(){
+  document.getElementById('dayDone').classList.remove('on');
+  while (stack.length && stack[stack.length-1] === 'reader') stack.pop();
+  back();
+});
+on('fnOk', function(){
+  document.getElementById('finale').classList.remove('on');
+  back();
+});
+
+/* свайп — тек оқырманда */
+(function(){
+  var x0 = null, y0 = null;
+  var page = document.getElementById('reader');
+  page.addEventListener('touchstart', function(e){
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+  }, { passive:true });
+  page.addEventListener('touchend', function(e){
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.6) turn(dx < 0 ? 1 : -1);
+    x0 = y0 = null;
+  }, { passive:true });
+})();
+
+/* аппараттық «артқа» — қосымша жіберетін оқиға */
+if (SL.on) SL.on('back', function(){ if (stack.length > 1) back(); else SL.close(); });
+
+/* ── старт ────────────────────────────────────────────────────────────── */
+load();
+if (!BOOKS.length) {
+  document.getElementById('hub').querySelector('.scroll').innerHTML =
+    '<div class="empty">Кітапхана жүктелмеді. Интернетті тексеріп, қайта кіріңіз.</div>';
+} else {
+  current(); save(); renderHub();
+}
+SL.ready();
+
+})();
+</script>
+</body>
+</html>
