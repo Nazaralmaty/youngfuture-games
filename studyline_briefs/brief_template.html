@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Бриф для звонка — StudyLine</title>
+<style>
+:root{
+  --ink:#0b1437; --ink2:#161c47; --ink3:#1e2559;
+  --violet:#6d4bff; --violet2:#8a6bff; --cyan:#21d4fd;
+  --lime:#9be870; --gold:#ffce4a; --red:#ff4d6d;
+  --txt:#eef1ff; --dim:#9aa2cc; --line:rgba(255,255,255,.09);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--ink); color:var(--txt);
+  font:400 16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(900px 500px at 15% -10%,rgba(109,75,255,.20),transparent 60%),
+                   radial-gradient(700px 400px at 95% 0%,rgba(33,212,253,.12),transparent 60%);
+  background-attachment:fixed;
+}
+.wrap{max-width:940px;margin:0 auto;padding:0 18px 90px}
+
+/* ---------- шапка ---------- */
+header{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);
+  background:rgba(11,20,55,.82);border-bottom:1px solid var(--line)}
+.hrow{max-width:940px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:12px}
+.logo{width:30px;height:30px;border-radius:9px;flex:none;
+  background:linear-gradient(135deg,var(--violet),var(--cyan));
+  display:grid;place-items:center;font-weight:800;font-size:16px;color:#fff}
+.hname{font-weight:700;font-size:15px;letter-spacing:.1px}
+.hsub{font-size:12px;color:var(--dim)}
+.hspace{flex:1}
+.btn{background:var(--ink3);color:var(--txt);border:1px solid var(--line);
+  border-radius:9px;padding:8px 13px;font:600 13px/1 inherit;cursor:pointer;
+  transition:.15s;white-space:nowrap}
+.btn:hover{background:var(--violet);border-color:var(--violet)}
+.btn.copied{background:var(--lime);color:#0b1437;border-color:var(--lime)}
+
+/* ---------- титул ---------- */
+.hero{padding:34px 0 8px}
+.eyebrow{font:700 12px/1 inherit;letter-spacing:1.6px;text-transform:uppercase;color:var(--cyan)}
+h1{font-size:clamp(30px,5.2vw,44px);line-height:1.08;font-weight:800;margin:12px 0 10px;letter-spacing:-.5px}
+.meta{color:var(--dim);font-size:14px;display:flex;flex-wrap:wrap;gap:6px 14px}
+.temp{display:inline-flex;align-items:center;gap:8px;margin-top:18px;
+  padding:9px 15px;border-radius:999px;font-weight:700;font-size:14px}
+.temp b{font-weight:800}
+.t-hot{background:rgba(255,77,109,.15);color:#ff8fa5;border:1px solid rgba(255,77,109,.4)}
+.t-warm{background:rgba(255,206,74,.14);color:var(--gold);border:1px solid rgba(255,206,74,.38)}
+.t-cold{background:rgba(33,212,253,.12);color:var(--cyan);border:1px solid rgba(33,212,253,.35)}
+.verdict{margin-top:20px;padding:20px 22px;border-radius:16px;
+  background:linear-gradient(135deg,rgba(109,75,255,.22),rgba(33,212,253,.10));
+  border:1px solid rgba(138,107,255,.35);font-size:18px;line-height:1.45;font-weight:600}
+
+/* ---------- секции ---------- */
+section{margin-top:44px}
+h2{font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);
+  font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.card{background:var(--ink2);border:1px solid var(--line);border-radius:16px;padding:20px}
+.grid{display:grid;gap:12px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+
+/* ---------- KPI ---------- */
+.kpi{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px}
+.kpi .v{font-size:30px;font-weight:800;letter-spacing:-1px;line-height:1}
+.kpi .l{font-size:12px;color:var(--dim);margin-top:7px;line-height:1.35}
+.kpi.acc{border-color:rgba(255,77,109,.45);background:linear-gradient(180deg,rgba(255,77,109,.12),var(--ink2))}
+.kpi.acc .v{color:#ff8fa5}
+
+/* ---------- три цифры ---------- */
+.num{background:var(--ink2);border:1px solid var(--line);border-radius:16px;padding:22px;
+  position:relative;overflow:hidden}
+.num::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;
+  background:linear-gradient(180deg,var(--violet),var(--cyan))}
+.num .big{font-size:38px;font-weight:800;letter-spacing:-1.4px;line-height:1;
+  background:linear-gradient(100deg,var(--cyan),var(--violet2));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.num .lab{font-weight:700;margin-top:10px;font-size:15px}
+.num .use{color:var(--dim);font-size:13.5px;margin-top:7px;line-height:1.45}
+
+/* ---------- карта разрыва ---------- */
+.bar{padding:15px 0;border-bottom:1px solid var(--line)}
+.bar:last-child{border-bottom:0}
+.bhead{display:flex;align-items:baseline;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+.bname{font-weight:700;font-size:15px}
+.bnum{margin-left:auto;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+.bgap{font-weight:800;font-size:16px;font-variant-numeric:tabular-nums}
+.track{height:12px;border-radius:99px;background:var(--ink3);position:relative;overflow:hidden}
+.fill{position:absolute;inset:0 auto 0 0;border-radius:99px}
+.thr{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--txt);opacity:.85}
+.bfoot{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-top:7px;gap:10px}
+.share{font-size:12px;color:var(--dim)}
+
+/* ---------- флаги времени ---------- */
+.flag{border-radius:14px;padding:16px;border:1px solid var(--line);background:var(--ink2)}
+.flag.red{border-color:rgba(255,77,109,.45);background:linear-gradient(180deg,rgba(255,77,109,.13),var(--ink2))}
+.flag.warn{border-color:rgba(255,206,74,.4);background:linear-gradient(180deg,rgba(255,206,74,.10),var(--ink2))}
+.flag.ok{border-color:rgba(155,232,112,.35)}
+.flag .fs{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
+.dot{width:9px;height:9px;border-radius:99px;flex:none}
+.flag.red .dot{background:var(--red)} .flag.warn .dot{background:var(--gold)} .flag.ok .dot{background:var(--lime)}
+.flag .ft{font-size:13px;color:var(--dim);margin-top:4px;font-variant-numeric:tabular-nums}
+.flag .fx{font-size:14px;margin-top:9px;line-height:1.45}
+
+/* ---------- диагноз ---------- */
+.diag{padding:17px 19px;border-radius:14px;background:var(--ink2);border:1px solid var(--line)}
+.diag h3{font-size:16px;font-weight:700;margin-bottom:7px}
+.diag p{color:#c9cfee;font-size:14.5px;line-height:1.55}
+
+/* ---------- скрипт ---------- */
+.step{background:var(--ink2);border:1px solid var(--line);border-radius:16px;
+  padding:18px 20px;margin-bottom:12px}
+.stop{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+.snum{width:27px;height:27px;border-radius:8px;flex:none;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--violet),var(--violet2));font-weight:800;font-size:13px}
+.stitle{font-weight:700;font-size:16px}
+.stime{margin-left:auto;font-size:12px;color:var(--dim);white-space:nowrap}
+.say{position:relative;border-radius:12px;padding:15px 44px 15px 17px;
+  background:rgba(255,255,255,.045);border-left:3px solid var(--cyan);
+  font-size:15.5px;line-height:1.6;white-space:pre-wrap}
+.copy{position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:8px;
+  border:1px solid var(--line);background:var(--ink3);color:var(--dim);cursor:pointer;
+  font-size:13px;display:grid;place-items:center;transition:.15s}
+.copy:hover{color:#fff;background:var(--violet);border-color:var(--violet)}
+.copy.copied{background:var(--lime);color:#0b1437;border-color:var(--lime)}
+.why{margin-top:11px;font-size:13.5px;color:var(--dim);line-height:1.5}
+.why b{color:var(--gold);font-weight:700}
+
+/* ---------- возражения ---------- */
+details{background:var(--ink2);border:1px solid var(--line);border-radius:14px;
+  margin-bottom:10px;overflow:hidden}
+summary{padding:15px 18px;cursor:pointer;font-weight:700;font-size:15px;list-style:none;
+  display:flex;align-items:center;gap:11px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"?";width:23px;height:23px;border-radius:7px;flex:none;
+  background:rgba(255,206,74,.18);color:var(--gold);display:grid;place-items:center;
+  font-size:13px;font-weight:800}
+details[open] summary{border-bottom:1px solid var(--line)}
+.ans{padding:15px 18px 17px;font-size:15px;line-height:1.6;color:#d4d9f5;white-space:pre-wrap}
+
+/* ---------- план ---------- */
+.mon{background:var(--ink2);border:1px solid var(--line);border-radius:16px;padding:19px}
+.mtag{display:inline-block;padding:4px 11px;border-radius:99px;font-size:11.5px;font-weight:800;
+  letter-spacing:.7px;text-transform:uppercase;background:rgba(33,212,253,.14);color:var(--cyan);margin-bottom:11px}
+.mon h3{font-size:16.5px;font-weight:700;margin-bottom:5px}
+.mgoal{font-size:13.5px;color:var(--gold);font-weight:600;margin-bottom:12px}
+.mon ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.mon li{font-size:13.5px;color:#c4caeb;padding-left:17px;position:relative;line-height:1.45}
+.mon li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;
+  border-radius:99px;background:var(--violet2)}
+
+/* ---------- follow-up ---------- */
+.wa{background:var(--ink2);border:1px solid rgba(155,232,112,.3);border-radius:16px;padding:18px 20px}
+.wa .txt{white-space:pre-wrap;font-size:15px;line-height:1.6;color:#d8ddf8;
+  background:rgba(155,232,112,.06);border-radius:12px;padding:15px 17px;margin-bottom:13px}
+
+/* ---------- стоп-лист ---------- */
+.dont{display:flex;gap:11px;padding:13px 16px;border-radius:12px;
+  background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.25);
+  font-size:14.5px;line-height:1.5;margin-bottom:9px}
+.dont::before{content:"✕";color:var(--red);font-weight:800;flex:none}
+
+footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);
+  color:var(--dim);font-size:12.5px;line-height:1.6}
+
+@media (max-width:820px){
+  .g4{grid-template-columns:repeat(2,1fr)} .g3,.g2{grid-template-columns:1fr}
+  .hsub{display:none}
+  .temp{border-radius:14px;align-items:flex-start;line-height:1.4}
+}
+@media print{
+  body{background:#fff;color:#111}
+  header,.copy,.btn{display:none}
+  .card,.kpi,.num,.flag,.diag,.step,details,.mon,.wa{background:#fff;border-color:#ccc}
+  details:not([open]) .ans{display:block}
+  .num .big{color:#4a2fd0;-webkit-text-fill-color:#4a2fd0}
+  .verdict{background:#f2f0ff;color:#111}
+  section{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header><div class="hrow">
+  <div class="logo">S</div>
+  <div>
+    <div class="hname" id="h-name">—</div>
+    <div class="hsub">Бриф менеджера по продажам · StudyLine</div>
+  </div>
+  <div class="hspace"></div>
+  <button class="btn" onclick="window.print()">Печать / PDF</button>
+</div></header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Индивидуальный разбор диагностики</div>
+    <h1 id="v-name">—</h1>
+    <div class="meta" id="v-meta"></div>
+    <div id="v-temp"></div>
+    <div class="verdict" id="v-verdict"></div>
+  </div>
+
+  <section>
+    <h2>Цифры из диагностики</h2>
+    <div class="grid g4" id="v-kpi"></div>
+  </section>
+
+  <section>
+    <h2>Три цифры, которые надо назвать в звонке</h2>
+    <div class="grid g3" id="v-nums"></div>
+  </section>
+
+  <section>
+    <h2>Карта разрыва — где именно теряются баллы</h2>
+    <div class="card" id="v-bars"></div>
+  </section>
+
+  <section>
+    <h2>Красные флаги по времени</h2>
+    <div class="grid g2" id="v-flags"></div>
+  </section>
+
+  <section>
+    <h2>Диагноз — что говорить о ребёнке</h2>
+    <div class="grid" id="v-diag"></div>
+  </section>
+
+  <section>
+    <h2>Скрипт звонка</h2>
+    <div id="v-script"></div>
+  </section>
+
+  <section>
+    <h2>Возражения</h2>
+    <div id="v-obj"></div>
+  </section>
+
+  <section>
+    <h2>Что продаём — план на 3 месяца</h2>
+    <div class="grid g3" id="v-plan"></div>
+  </section>
+
+  <section>
+    <h2>Follow-up после звонка</h2>
+    <div class="wa">
+      <div class="txt" id="v-wa"></div>
+      <button class="btn" data-copy="#v-wa">Скопировать сообщение</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Чего не делать</h2>
+    <div id="v-donts"></div>
+  </section>
+
+  <footer id="v-foot"></footer>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+
+// экранируем всё, кроме <b> — единственный тег, который разрешён в текстах брифа
+const esc = s => String(s==null?'':s)
+  .replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))
+  .replace(/&lt;(\/?b)&gt;/g,'<$1>');
+const $ = id => document.getElementById(id);
+const html = (id,s) => { const e=$(id); if(e) e.innerHTML = s; };
+
+const d = DATA || {};
+const st = d.student || {}, tot = d.total || {};
+
+document.title = 'Бриф для звонка — ' + (st.name || 'StudyLine');
+html('h-name', esc(st.name || '—'));
+html('v-name', esc(st.name || '—'));
+html('v-meta', [st.grade, st.city, st.date].filter(Boolean).map(x=>'<span>'+esc(x)+'</span>').join(''));
+
+if (d.temperature) {
+  const cls = {'горячий':'t-hot','тёплый':'t-warm','холодный':'t-cold'}[d.temperature.level] || 't-warm';
+  html('v-temp', '<div class="temp '+cls+'"><b>'+esc(d.temperature.level.toUpperCase())+'</b>'+esc(d.temperature.why)+'</div>');
+}
+html('v-verdict', esc(d.verdict));
+
+html('v-kpi', [
+  ['<span>'+tot.score+'</span><span style="font-size:17px;color:var(--dim)"> / '+tot.max+'</span>', 'Балл Аиши из возможных', ''],
+  [tot.threshold, 'Проходной балл на грант', ''],
+  ['−'+tot.gap, 'Не хватает до проходного', 'acc'],
+  [tot.chance+'%', 'Шанс поступления по модели StudyLine', '']
+].map(([v,l,c]) => '<div class="kpi '+c+'"><div class="v">'+v+'</div><div class="l">'+esc(l)+'</div></div>').join(''));
+
+html('v-nums', (d.key_numbers||[]).map(n =>
+  '<div class="num"><div class="big">'+esc(n.value)+'</div><div class="lab">'+esc(n.label)+
+  '</div><div class="use">'+esc(n.use)+'</div></div>').join(''));
+
+html('v-bars', (d.subjects||[]).map(s => {
+  const pct = Math.max(2, Math.min(100, s.score / s.max * 100));
+  const thr = Math.min(100, s.threshold / s.max * 100);
+  const col = s.gap >= 100 ? 'var(--red)' : s.gap >= 50 ? 'var(--gold)' : 'var(--lime)';
+  return '<div class="bar"><div class="bhead"><span class="bname">'+esc(s.name)+'</span>'+
+    '<span class="bnum">'+s.score+' / '+s.max+' · порог '+s.threshold+'</span>'+
+    '<span class="bgap" style="color:'+col+'">−'+s.gap+'</span></div>'+
+    '<div class="track"><div class="fill" style="width:'+pct+'%;background:'+col+'"></div>'+
+    '<div class="thr" style="left:'+thr+'%"></div></div>'+
+    '<div class="bfoot"><span>'+esc(s.note||'')+'</span>'+
+    '<span class="share">'+Math.round(s.gap/(tot.gap||1)*100)+'% всего разрыва</span></div></div>';
+}).join(''));
+
+html('v-flags', (d.red_flags||[]).map(f =>
+  '<div class="flag '+esc(f.level)+'"><div class="fs"><span class="dot"></span>'+esc(f.subject)+'</div>'+
+  '<div class="ft">'+esc(f.fact)+'</div><div class="fx">'+esc(f.text)+'</div></div>').join(''));
+
+html('v-diag', (d.diagnosis||[]).map(x =>
+  '<div class="diag"><h3>'+esc(x.title)+'</h3><p>'+esc(x.text)+'</p></div>').join(''));
+
+html('v-script', (d.script||[]).map((s,i) =>
+  '<div class="step"><div class="stop"><div class="snum">'+(i+1)+'</div>'+
+  '<div class="stitle">'+esc(s.title)+'</div><div class="stime">'+esc(s.time||'')+'</div></div>'+
+  '<div class="say" id="say'+i+'">'+esc(s.say)+
+  '<button class="copy" data-copy="#say'+i+'" title="Скопировать">⧉</button></div>'+
+  (s.why ? '<div class="why"><b>Зачем:</b> '+esc(s.why)+'</div>' : '')+'</div>').join(''));
+
+html('v-obj', (d.objections||[]).map(o =>
+  '<details><summary>'+esc(o.q)+'</summary><div class="ans">'+esc(o.a)+'</div></details>').join(''));
+
+html('v-plan', (d.plan||[]).map(m =>
+  '<div class="mon"><span class="mtag">'+esc(m.month)+'</span><h3>'+esc(m.focus)+'</h3>'+
+  '<div class="mgoal">'+esc(m.goal)+'</div><ul>'+
+  (m.topics||[]).map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul></div>').join(''));
+
+html('v-wa', esc((d.followup||{}).whatsapp || ''));
+
+html('v-donts', (d.donts||[]).map(x => '<div class="dont">'+esc(x)+'</div>').join(''));
+
+html('v-foot', 'Собрано автоматически по PDF-диагностике StudyLine. Данные в брифе — только из отчёта ученика; '+
+  'цифры разрыва посчитаны кодом, а не моделью. Документ содержит персональные данные ребёнка — '+
+  'не пересылайте ссылку никому, кроме менеджера, ведущего сделку.');
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-copy]');
+  if (!b) return;
+  const src = document.querySelector(b.dataset.copy);
+  const text = (src.innerText || '').replace(/⧉\s*$/,'').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const old = b.textContent;
+    b.classList.add('copied');
+    b.textContent = b.classList.contains('copy') ? '✓' : 'Скопировано';
+    setTimeout(() => { b.classList.remove('copied'); b.textContent = old; }, 1400);
+  });
+});
+</script>
+</body>
+</html>
