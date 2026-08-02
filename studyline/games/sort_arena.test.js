@@ -18,7 +18,7 @@ function makeRng(seed){var s=(seed>>>0)||1;return function(){
   s^=s<<13;s>>>=0;s^=s>>17;s^=s<<5;s>>>=0;return s/4294967296;};}
 `+slice('var EGG=[','/* ═════════════ 5. РИСОВАНИЕ')
  +'\nmodule.exports={buildTask,levelCfg,solveState,legalMoves,applyMove,'
- +'isSolved,cloneState,topRun,nestDone,MAX_NODES};';
+ +'isSolved,cloneState,topRun,nestDone,exprBank,TOPICS,MAX_NODES};';
 
 const mod={exports:{}};
 new Function('module','exports',src)(mod,mod.exports);
@@ -41,6 +41,7 @@ function evalExpr(t){
 
 const t0=Date.now();
 let totalPar=0, hardest={n:0,par:0}, mathNodes=0, exprCount=0;
+let blindEggs=0, totalEggs=0;
 
 for(let n=1;n<=M.MAX_NODES;n++){
   const cfg=M.levelCfg(n);
@@ -96,14 +97,29 @@ for(let n=1;n<=M.MAX_NODES;n++){
 
     t.labels.forEach((set,c)=>{
       assert.strictEqual(set.length,cfg.cap,`у значения ${t.values[c]} не ${cfg.cap} записей`+w);
-      assert.strictEqual(new Set(set).size,cfg.cap,`записи значения ${t.values[c]} повторяются`+w);
+      assert.strictEqual(new Set(set.map(e=>e.t)).size,cfg.cap,
+        `записи значения ${t.values[c]} повторяются`+w);
       set.forEach(e=>{
-        assert.strictEqual(evalExpr(e),t.values[c],
-          `«${e}» не равно ${t.values[c]}`+w);
-        assert.ok(e.length<=7,`«${e}» не влезет на яйцо (${e.length} симв.)`+w);
+        assert.strictEqual(evalExpr(e.t),t.values[c],
+          `«${e.t}» не равно ${t.values[c]}`+w);
+        assert.ok(e.t.length<=7,`«${e.t}» не влезет на яйцо (${e.t.length} симв.)`+w);
+        assert.ok(e.k==='plain'||M.TOPICS.indexOf(e.k)>=0,
+          `у «${e.t}» неизвестная тема «${e.k}»`+w);
         exprCount++;
       });
     });
+
+    // маска «без цвета»: доля должна быть одинаковой у КАЖДОГО значения,
+    // иначе у одного числа все яйца бесцветны, а у другого ни одного
+    const want=Math.round(cfg.cap*(cfg.blind||0));
+    assert.strictEqual(t.blindMask.length,cfg.colors,'маска не той длины'+w);
+    t.blindMask.forEach((m,c)=>{
+      assert.strictEqual(m.length,cfg.cap,'маска значения не той длины'+w);
+      assert.strictEqual(m.filter(Boolean).length,want,
+        `у значения ${t.values[c]} без цвета ${m.filter(Boolean).length}, а не ${want}`+w);
+    });
+    blindEggs+=want*cfg.colors;
+    totalEggs+=cfg.cap*cfg.colors;
 
     // каждая пара (значение, запись) встречается на поле ровно один раз
     const pairs={};
@@ -122,3 +138,12 @@ const ms=Date.now()-t0;
 console.log(`OK: ${M.MAX_NODES} раскладок решаемы, детерминированы, ${ms} мс`);
 console.log(`   средний par ${(totalPar/M.MAX_NODES).toFixed(1)} ходов, длиннее всего — тапсырма ${hardest.n} (${hardest.par})`);
 console.log(`   учебных тапсырм ${mathNodes}, проверено выражений ${exprCount} — все равны своему числу`);
+console.log(`   яиц без цветовой подсказки ${blindEggs} из ${totalEggs} (${Math.round(blindEggs/totalEggs*100)}%) — их нельзя положить, не посчитав`);
+
+// каждая тема обязана уметь породить вопрос для разбора ошибок
+M.TOPICS.forEach(topic=>{
+  let found=0;
+  for(let v=2;v<=12;v++){ const b=M.exprBank(v)[topic]; if(b&&b.length) found+=b.length; }
+  assert.ok(found>0,`тема «${topic}» не даёт ни одного выражения — разбор ошибок по ней невозможен`);
+});
+console.log(`   все ${M.TOPICS.length} тем дают материал для разбора ошибок`);

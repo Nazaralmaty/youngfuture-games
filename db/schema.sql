@@ -194,5 +194,34 @@ create unique index if not exists players_phone_uidx
   on public.players (parent_phone);
 
 
+-- ── 7. Номер узла арены ────────────────────────────────────────────────────
+-- Игры с картой (sort_arena — «Логика аренасы») пишут не просто «сыграл»,
+-- а «прошёл тапсырму N». Без этой колонки сервер не может считать
+-- прогрессию по карте: номер уходил только внутрь JSON-поля details,
+-- по которому не построить ни индекс, ни агрегат.
+--
+-- Nullable специально: у аркад без карты (math_arcade и т.п.) узла нет.
+
+alter table public.game_sessions
+  add column if not exists level int;
+
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'game_sessions_level_range') then
+    alter table public.game_sessions
+      add constraint game_sessions_level_range check (level is null or level between 1 and 100);
+  end if;
+end $$;
+
+comment on column public.game_sessions.level is
+  'Номер узла карты арены (тапсырма). NULL для игр без карты.';
+
+-- Прогресс ребёнка по конкретной игре: максимальный пройденный узел.
+create index if not exists game_sessions_level_idx
+  on public.game_sessions (player_id, game, level desc)
+  where level is not null;
+
+
 -- ── Готово ─────────────────────────────────────────────────────────────────
 -- Проверка: select * from public.weekly_leaderboard('math_arcade', 10);
+-- Проверка: select max(level) from public.game_sessions where game = 'sort_arena';

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sort Arena — ревью и дорожная карта</title>
+<style>
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171a; --surface: #1c2024; --surface-2: #20262a;
+      --ink: #e9e4d6; --ink-dim: #a9a89c;
+      --accent: #d9a54a; --accent-2: #6bab95;
+      --line: rgba(233,228,214,0.14);
+      --ok: #6bab95; --warn: #d9a54a; --bad: #d97a5a;
+    }
+  }
+  :root {
+    --bg: #efe9da; --surface: #ffffff; --surface-2: #f7f3e7;
+    --ink: #23241f; --ink-dim: #5c5b50;
+    --accent: #b8842a; --accent-2: #3c6e5e;
+    --line: rgba(35,36,31,0.13);
+    --ok: #3c6e5e; --warn: #b8842a; --bad: #b1503a;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  .page { max-width: 860px; margin: 0 auto; padding: 56px 24px 96px; }
+  h1, h2, h3 {
+    font-family: Georgia, "Times New Roman", ui-serif, serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .eyebrow {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin-bottom: 14px;
+  }
+  .eyebrow .egg { width: 9px; height: 11px; border-radius: 50% 50% 46% 46%; background: var(--accent); flex: none; }
+  header h1 { font-size: clamp(28px, 4.2vw, 38px); margin: 0 0 10px; color: var(--ink); }
+  header .thesis { font-size: 17px; color: var(--ink-dim); max-width: 62ch; margin: 0 0 6px; }
+  header .meta { font-size: 13px; color: var(--ink-dim); margin-top: 18px; }
+
+  section { margin-top: 52px; }
+  h2 { font-size: 22px; margin: 0 0 6px; }
+  h2 .num { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: 10px; }
+  .lede { color: var(--ink-dim); font-size: 15px; max-width: 68ch; margin: 0 0 22px; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 14px; margin-bottom: 22px; }
+  .stat {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .stat .n { font-family: Georgia, serif; font-size: 28px; font-variant-numeric: tabular-nums; }
+  .stat .n.bad { color: var(--bad); }
+  .stat .n.ok { color: var(--ok); }
+  .stat .l { font-size: 12.5px; color: var(--ink-dim); margin-top: 3px; }
+
+  .bars { display: flex; flex-direction: column; gap: 10px; margin: 22px 0; }
+  .bar-row { display: grid; grid-template-columns: 140px 1fr 90px; gap: 12px; align-items: center; font-size: 13.5px; }
+  .bar-track { height: 10px; background: var(--surface-2); border-radius: 5px; overflow: hidden; border: 1px solid var(--line); }
+  .bar-fill { height: 100%; border-radius: 5px 0 0 5px; }
+  .bar-fill.low { background: var(--bad); }
+  .bar-fill.mid { background: var(--warn); }
+  .bar-fill.high { background: var(--ok); }
+  .bar-row .pct { text-align: right; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-dim); background: var(--surface-2); }
+  tr:last-child td { border-bottom: none; }
+  td.rec { font-weight: 600; }
+  .chip { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+  .chip.impact-high { background: rgba(60,110,94,0.16); color: var(--ok); }
+  .chip.impact-med { background: rgba(184,132,42,0.16); color: var(--warn); }
+  .chip.effort-low { border: 1px solid var(--line); color: var(--ink-dim); }
+  .chip.effort-med { border: 1px solid var(--line); color: var(--ink-dim); }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 22px 0; }
+  @media (max-width: 620px) { .compare { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .card.no { border-color: rgba(177,80,58,0.4); }
+  .card.yes { border-color: rgba(60,110,94,0.4); }
+  .card .tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; margin-bottom: 8px; }
+  .card.no .tag { color: var(--bad); }
+  .card.yes .tag { color: var(--ok); }
+  .card h3 { font-size: 16px; margin: 0 0 8px; }
+  .card p { font-size: 14px; color: var(--ink-dim); margin: 0; }
+
+  .flow { display: flex; flex-direction: column; gap: 0; margin: 22px 0; }
+  .flow-step { display: grid; grid-template-columns: 28px 1fr; gap: 14px; padding: 12px 0; border-left: 2px solid var(--line); padding-left: 18px; margin-left: 13px; position: relative; }
+  .flow-step:last-child { border-left-color: transparent; }
+  .flow-step::before { content: ""; position: absolute; left: -6px; top: 16px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+  .flow-step .lvl { font-family: Georgia, serif; font-size: 15px; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .flow-step .desc { font-size: 13.5px; color: var(--ink-dim); margin-top: 2px; }
+  .flow-step.gate .lvl { color: var(--accent); }
+
+  ul.plain { margin: 0; padding-left: 20px; font-size: 14.5px; }
+  ul.plain li { margin-bottom: 8px; }
+
+  .callout {
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px 18px; font-size: 14px; margin: 20px 0;
+  }
+  .callout strong { color: var(--accent); }
+
+  footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-dim); }
+  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.92em; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="eyebrow"><span class="egg"></span>StudyLine · Sort Arena</div>
+  <h1>Игра собрана. Учебный слой — ещё нет.</h1>
+  <p class="thesis">Идея «жди сутки или сдай тест» решает удержание, а не обучение — и на 82% уровней ребёнку нечего проверять тестом, потому что цвет уже даёт ответ. Ниже — что чинить в первую очередь, если в игре будет полноценный бэкенд.</p>
+  <div class="meta">Ревью · 2026-08-02 · основа: council (4 роли) + разбор кода игры</div>
+</header>
+
+<section>
+  <h2><span class="num">01</span>Где сейчас теряется обучение</h2>
+  <p class="lede">17 тапсырм, но настоящий счёт обязателен только в трёх последних — там, где цветовая подсказка выключена.</p>
+
+  <div class="bars">
+    <div class="bar-row"><span>1–6 · түс</span><div class="bar-track"><div class="bar-fill low" style="width:2%"></div></div><span class="pct">≈0% счёта</span></div>
+    <div class="bar-row"><span>7–14 · сан</span><div class="bar-track"><div class="bar-fill mid" style="width:20%"></div></div><span class="pct">цвет подсказывает</span></div>
+    <div class="bar-row"><span>15–17 · вслепую</span><div class="bar-track"><div class="bar-fill high" style="width:100%"></div></div><span class="pct">счёт обязателен</span></div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="n bad">3 / 17</div><div class="l">уровней требуют реального счёта</div></div>
+    <div class="stat"><div class="n bad">2–3×</div><div class="l">сколько раз gate вообще сработает на пилоте</div></div>
+    <div class="stat"><div class="n ok">1 строка</div><div class="l">в levelCfg сдвигает blind раньше — уже предусмотрено</div></div>
+  </div>
+
+  <div class="callout">В блоке 7–14 ребёнок физически может пройти уровень, не читая выражение на яйце — сортирует по цвету. Это выглядит как математический контент, но им не является.</div>
+</section>
+
+<section>
+  <h2><span class="num">02</span>Почему time-gate — не тот рычаг</h2>
+  <div class="compare">
+    <div class="card no">
+      <div class="tag">Жди сутки / сдай тест</div>
+      <h3>Что происходит на самом деле</h3>
+      <p>Штраф с отложенным действием — прямо противоречит принципу ТЗ «без таймера и штрафа». Ребёнок либо ждёт и теряет вовлечение, либо угадывает тест до правильного ответа, либо просто закрывает игру. Сработает 2–3 раза за весь пилот — статистически ничтожно, чтобы понять, работает ли механика.</p>
+    </div>
+    <div class="card yes">
+      <div class="tag">Разбор ошибок каждые 5 уровней</div>
+      <h3>Что предлагается вместо</h3>
+      <p>2–3 мини-задачи из тем, где ребёнок сам ошибся в этой сессии — часть core loop, не барьер снаружи. Обхода нет вообще, потому что нет пути, которым можно срезать нечестно. Тот же ритм «пауза каждые 5», без слова «нельзя».</p>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="flow-step"><span class="lvl">1–6</span><div><div class="desc">Түс — правило игры, без учебной нагрузки</div></div></div>
+    <div class="flow-step"><span class="lvl">7–9</span><div><div class="desc">Сан с цветом — экспозиция, как сейчас</div></div></div>
+    <div class="flow-step gate"><span class="lvl">10</span><div><div class="desc">Цвет гасится раньше (было — только с 15-го)</div></div></div>
+    <div class="flow-step gate"><span class="lvl">после 5, 10, 15</span><div><div class="desc">Обязательный разбор ошибок из личного лога — не gate, часть прогрессии</div></div></div>
+    <div class="flow-step"><span class="lvl">стрик</span><div><div class="desc">Бонус-звезда за игру подряд по дням — пряник вместо кнута, тот же эффект на возврат</div></div></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">03</span>С бэкендом — что меняется</h2>
+  <p class="lede">Раз игра будет жить внутри приложения с полноценной базой, а не как самодостаточный HTML-файл — три вещи становится можно и нужно делать правильно, а не через localStorage-костыли.</p>
+  <ul class="plain">
+    <li><strong>Счёт и звёзды пересчитывает бэкенд</strong>, а не доверяет тому, что игра прислала в <code>SL.finish()</code> — сейчас это сырой JSON от клиента, его можно подменить в консоли. Игра шлёт лог ходов, сервер сам считает результат.</li>
+    <li><strong>Прогресс по темам живёт не в игре, а в приложении.</strong> Дроби и проценты встречаются не только в Sort Arena — если mastery/spaced repetition посчитать внутри одного HTML-файла игры, это не заработает для остальных игр StudyLine. У моста уже есть <code>SL.progress()</code> для событий с тегом темы — им и нужно пользоваться, а решение «разблокировать / повторить» принимает центральный бэкенд.</li>
+    <li><strong>Уровни можно генерировать, а не хардкодить.</strong> После обучающего блока 1–6 — пул выражений с весом по слабым темам ребёнка вместо фиксированных 17 раскладок. Контента становится сколько угодно, и он сам подстраивается.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="num">04</span>Приоритеты</h2>
+  <p class="lede">Ранжировано по impact/effort. Первые три строки — без новой инфраструктуры, только правки в уже существующих файлах.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Что</th><th>Impact</th><th>Effort</th><th>Зачем</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="rec">Сдвинуть blind-режим на уровни 8–10</td>
+          <td><span class="chip impact-high">высокий</span></td>
+          <td><span class="chip effort-low">низкий</span></td>
+          <td>Одно поле в <code>levelCfg</code> — уже предусмотрено в ТЗ п.7.2</td>
+        </tr>
+        <tr>
+          <td class="rec">Убрать time-gate, поставить разбор ошибок</td>
+          <td><span class="chip impact-high">высокий</span></td>
+          <td><span class="chip effort-low">низкий</span></td>
+          <td>Снимает противоречие с философией «без штрафа», не даёт обходов по построению</td>
+        </tr>
+        <tr>
+          <td class="rec">Streak-бонус вместо блокировки</td>
+          <td><span class="chip impact-med">средний</span></td>
+          <td><span class="chip effort-low">низкий</span></td>
+          <td>Та же цель — ежедневный возврат — без риска фрустрации</td>
+        </tr>
+        <tr>
+          <td class="rec">Сервер пересчитывает счёт из лога ходов</td>
+          <td><span class="chip impact-high">высокий</span></td>
+          <td><span class="chip effort-med">средний</span></td>
+          <td>Закрывает подмену результата с клиента, нужно и для B2B-отчётности школам</td>
+        </tr>
+        <tr>
+          <td class="rec">Миграция <code>level</code> в <code>game_sessions</code></td>
+          <td><span class="chip impact-med">средний</span></td>
+          <td><span class="chip effort-low">низкий</span></td>
+          <td>Уже стоит в п.7.3 ТЗ — без неё gate и mastery нечем считать на сервере</td>
+        </tr>
+        <tr>
+          <td class="rec">Topic-mastery по <code>SL.progress()</code> в центральном бэкенде</td>
+          <td><span class="chip impact-high">высокий</span></td>
+          <td><span class="chip effort-med">средний</span></td>
+          <td>Один раз для всех игр StudyLine, не только Sort Arena — реальный spaced repetition</td>
+        </tr>
+        <tr>
+          <td class="rec">Родительская тепловая карта слабых тем</td>
+          <td><span class="chip impact-med">средний</span></td>
+          <td><span class="chip effort-low">низкий</span></td>
+          <td>Побочный продукт mastery-таблицы — это и продаётся школам в B2B</td>
+        </tr>
+        <tr>
+          <td class="rec">Процедурная генерация уровней после 1–6</td>
+          <td><span class="chip impact-med">средний</span></td>
+          <td><span class="chip effort-med">средний</span></td>
+          <td>Снимает потолок в 17 захардкоженных задач, но ждёт данных с пилота</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  Полный текст — разбор совета (4 роли), детали механики и SQL-набросок — в <code>SORT_ARENA_РЕВЬЮ_RU.md</code> в этой же папке.
+</footer>
+
+</div>
+</body>
+</html>

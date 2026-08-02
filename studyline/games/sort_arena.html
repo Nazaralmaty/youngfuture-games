@@ -63,6 +63,22 @@
   .stat b{display:block;font-size:19px;color:#fff;margin-top:2px}
   .hint{font-size:12px;color:#8fc7a8;margin-top:14px;line-height:1.5}
 
+  /* ───────── разбор ошибок ───────── */
+  .dtag{display:inline-block;padding:5px 13px;border-radius:999px;font-size:11.5px;font-weight:900;
+        letter-spacing:.8px;background:rgba(255,206,74,.18);color:var(--gold);margin-bottom:12px}
+  #sDrill h2{font-size:44px;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+  .opts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+  .opt{border:none;cursor:pointer;font-family:inherit;font-weight:900;font-size:24px;
+       padding:16px 0;border-radius:16px;color:#0d2a18;
+       background:linear-gradient(180deg,#ffe9a8,#f4c14e);box-shadow:0 5px 0 #b8862a;
+       font-variant-numeric:tabular-nums;transition:opacity .2s}
+  .opt:active{transform:translateY(3px);box-shadow:0 2px 0 #b8862a}
+  .opt.wait{opacity:.45;pointer-events:none}
+  .opt.gone{opacity:.2;pointer-events:none;background:#4a5a50;box-shadow:0 5px 0 #2b352f;color:#9fb5a8}
+  .dots{display:flex;justify-content:center;gap:7px;margin-top:16px}
+  .dots i{width:9px;height:9px;border-radius:99px;background:rgba(255,255,255,.22);font-style:normal}
+  .dots i.on{background:var(--lime)}
+
   /* ───────── помощники внизу (зона большого пальца) ───────── */
   #tools{position:absolute;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:5;
          display:none;gap:9px}
@@ -122,6 +138,18 @@
         <button class="btn sm" id="nextBtn">Келесі</button>
       </div>
       <div class="hint" id="winHint"></div>
+    </div>
+  </div>
+
+  <!-- разбор ошибок: каждые 5 тапсырм, только по темам, где реально ошибся -->
+  <div class="screen" id="sDrill">
+    <div class="card">
+      <div class="dtag" id="dTopic">Бөлу</div>
+      <h2 id="dQ">12÷4</h2>
+      <p id="dSub">Мәні қандай?</p>
+      <div class="opts" id="dOpts"></div>
+      <div class="dots" id="dDots"></div>
+      <div class="hint" id="dHint">Қателескен тақырыптарды бекітеміз</div>
     </div>
   </div>
 
@@ -507,13 +535,17 @@ var MAX_NODES=17;     /* пока делаем только первый био�
    Две оси сразу: головоломка и учебная нагрузка.
 
    1–6   «түс»  — только цвета. Ребёнок осваивает правило перекладывания.
-   7–14  «сан»  — на яйцах выражения. Одинаковое значение = одна группа,
-                  цвет ещё подсказывает. Ребёнок раз за разом видит, что
-                  12÷4, 9÷3, 1+2 и 3 — одно и то же. Это тренировка
-                  эквивалентности, а не викторина поверх игры.
-   15–17 «сан», БЕЗ ЦВЕТА — скорлупа у всех одинаковая, группу видно только
-                  через вычисление. Здесь ребёнок обязан считать: чтобы
-                  понять, можно ли положить яйцо сверху, надо посчитать оба.
+   7     «сан»  — появляются выражения, цвет ещё подсказывает всё.
+   8–14  «сан», цвет гаснет на РАСТУЩЕЙ доле яиц (25% → 75%). Бесцветное
+                  яйцо нельзя положить наугад: чтобы понять, ляжет ли оно,
+                  надо посчитать. Так реальный счёт появляется с 8-го уровня,
+                  а не только в последней трети.
+   15–17 «сан», БЕЗ ЦВЕТА совсем.
+
+   Почему долей, а не выключателем: раньше 14 уровней из 17 проходились
+   визуально, счёт начинался только на 15-м — учебная работа была сжата
+   в последние минуты сессии. Доля `blind` растёт плавно, и рядом всегда
+   есть цветные яйца-опоры, по которым видно соответствие «цвет ↔ число».
 
    Сложность головоломки в последнем блоке снижена (меньше значений):
    максимум планирования плюс максимум счёта одновременно — это не вызов,
@@ -526,17 +558,17 @@ function levelCfg(n){
     /*4*/ {colors:5,free:2,cap:4,mode:'color'},
     /*5*/ {colors:6,free:2,cap:4,mode:'color'},
     /*6*/ {colors:5,free:1,cap:4,mode:'color'},          /* первая «тесная» */
-    /*7*/ {colors:3,free:2,cap:4,mode:'math'},           /* появляются выражения */
-    /*8*/ {colors:4,free:2,cap:4,mode:'math'},
-    /*9*/ {colors:5,free:2,cap:4,mode:'math'},
-    /*10*/{colors:5,free:2,cap:5,mode:'math'},           /* ұя глубже */
-    /*11*/{colors:6,free:2,cap:4,mode:'math'},
-    /*12*/{colors:5,free:1,cap:4,mode:'math'},
-    /*13*/{colors:6,free:2,cap:4,mode:'math'},
-    /*14*/{colors:7,free:2,cap:4,mode:'math'},
-    /*15*/{colors:4,free:2,cap:4,mode:'math',blind:true},/* цвет убран */
-    /*16*/{colors:5,free:2,cap:4,mode:'math',blind:true},
-    /*17*/{colors:5,free:1,cap:4,mode:'math',blind:true} /* босс биома */
+    /*7*/ {colors:3,free:2,cap:4,mode:'math',blind:0},   /* появляются выражения */
+    /*8*/ {colors:4,free:2,cap:4,mode:'math',blind:0.25},/* цвет гаснет на части яиц */
+    /*9*/ {colors:5,free:2,cap:4,mode:'math',blind:0.25},
+    /*10*/{colors:5,free:2,cap:5,mode:'math',blind:0.4}, /* ұя глубже */
+    /*11*/{colors:6,free:2,cap:4,mode:'math',blind:0.5},
+    /*12*/{colors:5,free:1,cap:4,mode:'math',blind:0.5},
+    /*13*/{colors:6,free:2,cap:4,mode:'math',blind:0.75},
+    /*14*/{colors:7,free:2,cap:4,mode:'math',blind:0.75},
+    /*15*/{colors:4,free:2,cap:4,mode:'math',blind:1},   /* цвет убран совсем */
+    /*16*/{colors:5,free:2,cap:4,mode:'math',blind:1},
+    /*17*/{colors:5,free:1,cap:4,mode:'math',blind:1}    /* босс биома */
   ];
   return C[clamp(n,1,BIOME_NODES)-1];
 }
@@ -546,31 +578,44 @@ function levelCfg(n){
    складывает их в одну ұя и тем самым проговаривает: это всё одно число.
    Категории перебираются по кругу, чтобы в группе не оказалось четырёх
    сложений подряд. Материал — программа 5–6 класса. */
-function exprsFor(v,count,rng){
-  var cat=[[],[],[],[],[],[]], i;
-  for(i=1;i<v;i++) cat[0].push(i+'+'+(v-i));                     /* сложение */
-  for(i=1;i<=8;i++) cat[1].push((v+i)+'−'+i);                    /* вычитание */
-  for(i=2;i<=9;i++) if(v%i===0) cat[2].push(i+'×'+(v/i));        /* умножение */
-  for(i=2;i<=9;i++) if(v*i<=99) cat[3].push((v*i)+'÷'+i);        /* деление */
-  if(v*2<=40) cat[4].push('½·'+(v*2));                           /* доли */
-  if(v*3<=40) cat[4].push('⅓·'+(v*3));
-  if(v*4<=40) cat[4].push('¼·'+(v*4));
-  if(v*2<=100) cat[5].push('50%·'+(v*2));                        /* проценты */
-  if(v*4<=100) cat[5].push('25%·'+(v*4));
-  if(v*10<=100) cat[5].push('10%·'+(v*10));
-  if(v===4) cat[2].push('2²'); if(v===9) cat[2].push('3²');
-  if(v===8) cat[2].push('2³');
+var TOPICS=['add','sub','mul','div','frac','percent','pow'];
+var TOPIC_KK={add:'Қосу',sub:'Азайту',mul:'Көбейту',div:'Бөлу',
+              frac:'Үлес',percent:'Пайыз',pow:'Дәреже',plain:'Сан'};
 
-  var out=[String(v)], seen={}, c=0, guard=0;    /* само число — якорь */
+/* Все записи числа v, разложенные по темам. Тема нужна дважды:
+   чтобы разбор ошибок бил именно по слабому месту, и чтобы бэкенд
+   мог вести topic_mastery (см. SORT_ARENA_РЕВЬЮ_RU.md, п. 3.2). */
+function exprBank(v){
+  var b={add:[],sub:[],mul:[],div:[],frac:[],percent:[],pow:[]}, i;
+  for(i=1;i<v;i++) b.add.push(i+'+'+(v-i));
+  for(i=1;i<=8;i++) b.sub.push((v+i)+'−'+i);
+  for(i=2;i<=9;i++) if(v%i===0) b.mul.push(i+'×'+(v/i));
+  for(i=2;i<=9;i++) if(v*i<=99) b.div.push((v*i)+'÷'+i);
+  if(v*2<=40) b.frac.push('½·'+(v*2));
+  if(v*3<=40) b.frac.push('⅓·'+(v*3));
+  if(v*4<=40) b.frac.push('¼·'+(v*4));
+  if(v*2<=100) b.percent.push('50%·'+(v*2));
+  if(v*4<=100) b.percent.push('25%·'+(v*4));
+  if(v*10<=100) b.percent.push('10%·'+(v*10));
+  if(v===4) b.pow.push('2²');
+  if(v===9) b.pow.push('3²');
+  if(v===8) b.pow.push('2³');
+  return b;
+}
+
+function exprsFor(v,count,rng){
+  var b=exprBank(v);
+  var out=[{t:String(v),k:'plain'}], seen={}, c=0, guard=0;  /* само число — якорь */
   seen[String(v)]=1;
-  while(out.length<count&&guard++<300){
-    var list=cat[c%cat.length]; c++;
+  while(out.length<count&&guard++<400){
+    var key=TOPICS[c%TOPICS.length]; c++;
+    var list=b[key];
     if(!list.length) continue;
     var e=list[Math.floor(rng()*list.length)];
     if(seen[e]) continue;
-    seen[e]=1; out.push(e);
+    seen[e]=1; out.push({t:e,k:key});
   }
-  while(out.length<count) out.push(String(v)+'+0');
+  while(out.length<count) out.push({t:String(v)+'+0',k:'add'});
   return out;
 }
 
@@ -653,12 +698,24 @@ function buildTask(n){
   var cfg=levelCfg(n), rng=makeRng(n*7919+13), i,j,att;
 
   /* Учебная начинка: каждому цвету — своё число и cap разных его записей. */
-  var values=null, labels=null;
+  var values=null, labels=null, blindMask=null;
   if(cfg.mode==='math'){
     var bag=[2,3,4,5,6,7,8,9,10,12];
     for(i=bag.length-1;i>0;i--){ var b1=Math.floor(rng()*(i+1)), b2=bag[i]; bag[i]=bag[b1]; bag[b1]=b2; }
     values=bag.slice(0,cfg.colors);
     labels=values.map(function(v){ return exprsFor(v,cfg.cap,rng); });
+
+    /* Ровно доля blind у КАЖДОГО значения, а не в среднем по полю:
+       при случайном броске могло выйти, что у одного числа бесцветны все
+       четыре яйца, а у другого — ни одного. */
+    var per=Math.round(cfg.cap*(cfg.blind||0));
+    blindMask=values.map(function(){
+      var idx=[],m=[],i2;
+      for(i2=0;i2<cfg.cap;i2++){ idx.push(i2); m.push(false); }
+      for(i2=idx.length-1;i2>0;i2--){ var r2=Math.floor(rng()*(i2+1)),t2=idx[i2]; idx[i2]=idx[r2]; idx[r2]=t2; }
+      for(i2=0;i2<per;i2++) m[idx[i2]]=true;
+      return m;
+    });
   }
 
   for(att=0;att<80;att++){
@@ -681,7 +738,8 @@ function buildTask(n){
 
     var sol=solveState(cloneState(st),cfg.cap,150000);
     if(sol) return {n:n,cap:cfg.cap,colors:cfg.colors,free:cfg.free,
-                    mode:cfg.mode,blind:!!cfg.blind,values:values,labels:labels,
+                    mode:cfg.mode,blind:cfg.blind||0,values:values,labels:labels,
+                    blindMask:blindMask,
                     start:cloneState(st),startLab:cloneState(sl),par:sol.moves.length};
   }
 
@@ -700,7 +758,8 @@ function buildTask(n){
   }
   var s2=solveState(cloneState(safe),cfg.cap,150000);
   return {n:n,cap:cfg.cap,colors:cfg.colors,free:cfg.free,
-          mode:cfg.mode,blind:!!cfg.blind,values:values,labels:labels,
+          mode:cfg.mode,blind:cfg.blind||0,values:values,labels:labels,
+          blindMask:blindMask,
           start:safe,startLab:safeL,par:s2?s2.moves.length:cfg.colors*2};
 }
 
@@ -1126,7 +1185,7 @@ function drawFX(ctx){
    Источник истины по XP — бэкенд StudyLine, здесь только «где я на карте». */
 var KEY='sl_sort_arena_v1';
 var Save={
-  data:{stars:{},cur:1},
+  data:{stars:{},cur:1,week:null},
   load:function(){ try{ var r=localStorage.getItem(KEY);
     if(r){ var d=JSON.parse(r); if(d&&d.stars){ this.data=d; } } }catch(e){} },
   put:function(){ try{ localStorage.setItem(KEY,JSON.stringify(this.data)); }catch(e){} },
@@ -1139,7 +1198,33 @@ var Save={
     if(n>=this.data.cur) this.data.cur=Math.min(MAX_NODES+1,n+1);
     this.put();
   },
-  total:function(){ var s=0; for(var k in this.data.stars) s+=this.data.stars[k]; return s; }
+  total:function(){ var s=0; for(var k in this.data.stars) s+=this.data.stars[k]; return s; },
+
+  /* Недельная шкала вместо стрика. Стрик наказывает за пропуск и после
+     срыва выталкивает ребёнка совсем — это прямо записано в
+     StudyLine_ГЕЙМИФИКАЦИЯ_ДЕҢГЕЙ_RU.md. Здесь шкала обнуляется в
+     понедельник сама, пропуск дня ничего не отнимает. */
+  weekKey:function(){
+    var d=new Date(); d.setHours(0,0,0,0);
+    d.setDate(d.getDate()-((d.getDay()+6)%7));      /* понедельник */
+    return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+  },
+  weekDays:function(){
+    var k=this.weekKey();
+    if(!this.data.week||this.data.week.k!==k)
+      this.data.week={k:k,d:[0,0,0,0,0,0,0]};
+    return this.data.week.d;
+  },
+  markToday:function(){
+    var d=this.weekDays(), i=(new Date().getDay()+6)%7;
+    if(!d[i]){ d[i]=1; this.put(); return true; }
+    return false;
+  },
+  daysThisWeek:function(){
+    var d=this.weekDays(), n=0;
+    for(var i=0;i<7;i++) if(d[i]) n++;
+    return n;
+  }
 };
 
 /* ═════════════ 8. ИГРА ═════════════ */
@@ -1150,7 +1235,8 @@ var Game=(function(){
   var sel=-1, hist=[], moves=0, undos=0, restarts=0, startedAt=0;
   var fly=null, idleT=0, hintA=0, hintCalc=0, hintFrom=-1, hintTo=-1, streak=0;
   var mapScroll=0, mapMax=0, mapNodes=[], mapDrag=null, pulse=0;
-  var session={ nodes:0, moves:0, stars:0, undos:0 };
+  var session={ nodes:0, moves:0, stars:0, undos:0, errors:0 };
+  var errors=[], errTopics={};   /* темы, в которых ребёнок ошибся за сессию */
   var flies=[];
   function makeFlies(){
     flies=[];
@@ -1262,7 +1348,8 @@ var Game=(function(){
     $('tools').classList.add('on');
     syncButtons();
     Mascot.set('think',3.4, task.mode==='math'
-      ? (task.blind?'Есепте: мәні бірдей болса — бір ұяға':'12÷4 мен 3 — бір сан')
+      ? (task.blind>=1?'Есепте: мәні бірдей болса — бір ұяға'
+                     :(task.blind>0?'Түссіз жұмыртқаны есепте':'12÷4 мен 3 — бір сан'))
       : 'Бір ұяда — бір ғана түс');
     Sound.unlock();
   }
@@ -1312,9 +1399,17 @@ var Game=(function(){
 
   /* ── правила поля ─────────────────────────────────────────────────── */
   function state(){ return nests.map(function(b){ return b.eggs; }); }
-  /* надпись конкретного яйца; в режиме цветов её нет */
+  /* надпись, тема и «без цвета?» для конкретного яйца (значение c, запись l) */
   function labelAt(c,l){
-    return (task&&task.labels&&task.labels[c])?task.labels[c][l]:null;
+    var e=task&&task.labels&&task.labels[c]&&task.labels[c][l];
+    return e?e.t:null;
+  }
+  function topicAt(c,l){
+    var e=task&&task.labels&&task.labels[c]&&task.labels[c][l];
+    return e?e.k:null;
+  }
+  function blindAt(c,l){
+    return !!(task&&task.blindMask&&task.blindMask[c]&&task.blindMask[c][l]);
   }
   function stuck(){
     if(!task||fly) return false;
@@ -1328,6 +1423,21 @@ var Game=(function(){
     if(nestDone(a,cap)) return 0;
     if(b.length&&b[b.length-1]!==a[a.length-1]) return 0;
     return Math.min(topRun(a),cap-b.length);
+  }
+
+  /* Тема, в которой ребёнок ошибся. Берём оба яйца — и то, что нёс,
+     и то, на что клал: ошибиться мог в любом из двух. */
+  function noteError(from,to){
+    if(!task||task.mode!=='math') return;
+    [nests[from],nests[to]].forEach(function(b){
+      if(!b.eggs.length) return;
+      var k=b.eggs.length-1;
+      var topic=topicAt(b.eggs[k],b.lab[k]);
+      if(!topic||topic==='plain') return;
+      errors.push({topic:topic,expr:labelAt(b.eggs[k],b.lab[k]),
+                   value:task.values[b.eggs[k]],level:task.n});
+      errTopics[topic]=(errTopics[topic]||0)+1;
+    });
   }
 
   function doMove(i,j,k,silent){
@@ -1397,7 +1507,10 @@ var Game=(function(){
     else {
       /* мягкий отказ: ни жизней, ни очков — просто «сюда нельзя» */
       nests[i].shake=1; Sound.nope(); streak=0;
-      Mascot.set('sad',0.7,'Үстіндегі түс сәйкес емес');
+      noteError(sel,i);
+      Mascot.set('sad',0.7, task.mode==='math'
+        ? 'Мәндері әртүрлі — есепте'
+        : 'Үстіндегі түс сәйкес емес');
       sel=-1;
     }
     syncButtons();
@@ -1500,6 +1613,7 @@ var Game=(function(){
     var stars=(clean&&moves<=task.par+3)?3:((undos+restarts*2)<=4?2:1);
     var prev=Save.starsOf(task.n);
     Save.complete(task.n,stars);
+    var newDay=Save.markToday();
 
     session.nodes++; session.moves+=moves; session.undos+=undos+restarts;
     session.stars+=Math.max(0,stars-prev);
@@ -1513,7 +1627,12 @@ var Game=(function(){
     try{
       SL.progress({ level:task.n, stars:stars, moves:moves, par:task.par,
                     undos:undos, restarts:restarts, colors:task.colors, cap:cap,
-                    durationSec:Math.round((Date.now()-startedAt)/1000) });
+                    mode:task.mode, blind:task.blind,
+                    durationSec:Math.round((Date.now()-startedAt)/1000),
+                    /* сырьё для сервера: по логу ходов результат пересчитывается
+                       независимо, по темам ошибок ведётся topic_mastery */
+                    start:task.start, moveLog:hist.slice(),
+                    errors:errors.filter(function(e){ return e.level===task.n; }) });
     }catch(e){}
 
     $('winTitle').textContent=stars===3?'Мінсіз!':'Жарайсың!';
@@ -1523,7 +1642,9 @@ var Game=(function(){
     $('wUndo').textContent=undos+restarts;
     var last=task.n>=BIOME_NODES;
     $('nextBtn').textContent=last?'Аяқтау':'Келесі';
-    $('winHint').textContent=stars===3?'':'3 жұлдыз: артқа қайтармай, '+(task.par+3)+' қадамға дейін.';
+    $('winHint').textContent=newDay
+      ? ('Осы аптада '+Save.daysThisWeek()+' күн ойнадың 🔥')
+      : (stars===3?'':'3 жұлдыз: артқа қайтармай, '+(task.par+3)+' қадамға дейін.');
     ['st1','st2','st3'].forEach(function(id){ $(id).classList.remove('on'); });
     $('sWin').classList.add('on');
     $('tools').classList.remove('on');
@@ -1581,7 +1702,8 @@ var Game=(function(){
         var yy=b.slotY(k)-(isLift?L.slotH*0.9+Math.sin(G.t*3)*2:0);
         var sq=(k===n-flying-1)?b.land:0;
         drawEgg(ctx,b.eggs[k],b.cx,yy,L.eggRx,L.eggRy,
-          {squash:sq,shadow:isLift,label:labelAt(b.eggs[k],b.lab[k]),blind:task.blind});
+          {squash:sq,shadow:isLift,label:labelAt(b.eggs[k],b.lab[k]),
+           blind:blindAt(b.eggs[k],b.lab[k])});
       }
       drawBasketFront(ctx,b,nestDone(b.eggs,cap),
         (task.values&&b.eggs.length)?('= '+task.values[b.eggs[0]]):null);
@@ -1601,7 +1723,8 @@ var Game=(function(){
         var top=Math.min(fly.fy,b.y-L.eggRy*0.9)-26;
         var y=(1-e)*(1-e)*fly.fy+2*(1-e)*e*top+e*e*ty;
         if(p<1) drawEgg(ctx,fly.cols[k],x,y,L.eggRx,L.eggRy,
-          {rot:(1-e)*0.5,shadow:true,label:labelAt(fly.cols[k],fly.labs[k]),blind:task.blind});
+          {rot:(1-e)*0.5,shadow:true,label:labelAt(fly.cols[k],fly.labs[k]),
+           blind:blindAt(fly.cols[k],fly.labs[k])});
       }
     }
   }
@@ -1672,6 +1795,17 @@ var Game=(function(){
     rr(ctx,G.W/2-lw/2,ly-13,lw,26,13); ctx.fill();
     ctx.fillStyle='rgba(255,255,255,.94)';
     ctx.fillText(lbl,G.W/2,ly+1);
+
+    /* Неделя: семь точек, сегодняшняя в кольце. Пропуск ничего не отнимает. */
+    var wd=Save.weekDays(), today=(new Date().getDay()+6)%7;
+    var dx=G.W/2-6*11, dy=ly+26;
+    for(var w=0;w<7;w++){
+      var px=dx+w*22;
+      ctx.beginPath(); ctx.arc(px,dy,6,0,TAU);
+      ctx.fillStyle=wd[w]?'#9be870':'rgba(255,255,255,.26)'; ctx.fill();
+      if(w===today){ ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.arc(px,dy,9.5,0,TAU); ctx.stroke(); }
+    }
     ctx.restore();
   }
 
@@ -1739,7 +1873,116 @@ var Game=(function(){
     map:openMap, start:start, undo:undo, restart:restart, hint:askHint,
     cur:function(){ return task?task.n:Save.data.cur; },
     session:session,
+    errTopics:function(){ return errTopics; },
     pause:function(){ sel=-1; }
+  };
+})();
+
+/* ═════════════ 8b. РАЗБОР ОШИБОК ═════════════
+   Каждые 5 тапсырм, по темам, где ребёнок реально ошибся в этой сессии.
+   Это не барьер снаружи игры, а часть прогрессии: обойти нечем, потому что
+   обходного пути «подождать и получить то же самое» не существует.
+   Ошибок не было — разбора нет: наказывать не за что.
+
+   Защита от угадывания (иначе это капча, а не проверка):
+   варианты оживают не сразу, после промаха — пауза, правильный ответ
+   не подсвечивается, вариант просто гаснет. */
+var Drill=(function(){
+  function $(id){ return document.getElementById(id); }
+  var qs=[], qi=0, onDone=null, armed=false, lockT=0;
+
+  var ARM_MS=800;    /* пока не истекло — тапы не принимаются */
+  var MISS_MS=1000;  /* пауза после промаха */
+
+  /* Вопрос по теме: берём число и одну из его записей именно этой темы. */
+  function makeQuestion(topic,rnd){
+    var pool=[], v, b, i;
+    for(v=2;v<=12;v++){
+      b=exprBank(v)[topic];
+      if(b&&b.length) for(i=0;i<b.length;i++) pool.push({t:b[i],v:v});
+    }
+    if(!pool.length) return null;
+    var q=pool[Math.floor(rnd()*pool.length)];
+
+    /* Отвлекающие — правдоподобные промахи, а не случайные числа:
+       соседние значения и типичные слипы (удвоил / поделил пополам). */
+    var cand=[q.v-1,q.v+1,q.v-2,q.v+2,q.v*2,Math.round(q.v/2)];
+    var opts=[q.v], seen={}; seen[q.v]=1;
+    for(i=cand.length-1;i>0;i--){ var j=Math.floor(rnd()*(i+1)),t=cand[i]; cand[i]=cand[j]; cand[j]=t; }
+    for(i=0;i<cand.length&&opts.length<3;i++){
+      if(cand[i]>0&&!seen[cand[i]]){ seen[cand[i]]=1; opts.push(cand[i]); }
+    }
+    for(i=opts.length-1;i>0;i--){ var j2=Math.floor(rnd()*(i+1)),t2=opts[i]; opts[i]=opts[j2]; opts[j2]=t2; }
+    return {topic:topic,text:q.t,value:q.v,opts:opts};
+  }
+
+  function render(){
+    var q=qs[qi];
+    $('dTopic').textContent=TOPIC_KK[q.topic]||q.topic;
+    $('dQ').textContent=q.text;
+    var box=$('dOpts'); box.innerHTML='';
+    q.opts.forEach(function(o){
+      var b=document.createElement('button');
+      b.className='opt wait'; b.textContent=o;
+      b.addEventListener('click',function(){ answer(b,o,q); });
+      box.appendChild(b);
+    });
+    var d=$('dDots'); d.innerHTML='';
+    for(var i=0;i<qs.length;i++){
+      var el=document.createElement('i');
+      if(i<qi) el.className='on';
+      d.appendChild(el);
+    }
+    armed=false;
+    setTimeout(function(){
+      armed=true;
+      var list=box.querySelectorAll('.opt');
+      for(var i=0;i<list.length;i++) list[i].classList.remove('wait');
+    },ARM_MS);
+  }
+
+  function answer(btn,val,q){
+    if(!armed||Date.now()<lockT) return;
+    if(val===q.value){
+      Sound.land(2);
+      try{ SL.progress({type:'drill',topic:q.topic,expression:q.text,correct:true}); }catch(e){}
+      qi++;
+      if(qi>=qs.length){ finish(); return; }
+      render();
+    } else {
+      Sound.nope();
+      try{ SL.progress({type:'drill',topic:q.topic,expression:q.text,correct:false}); }catch(e){}
+      btn.classList.add('gone');
+      lockT=Date.now()+MISS_MS;      /* пауза: подбор перебором не проходит */
+      $('dSub').textContent='Асықпа, қайта есепте';
+    }
+  }
+
+  function finish(){
+    $('sDrill').classList.remove('on');
+    Sound.win();
+    var cb=onDone; onDone=null;
+    if(cb) cb();
+  }
+
+  return {
+    /* Показать разбор, если есть по чему. Вернёт false — значит нечего разбирать. */
+    open:function(topics,seed,done){
+      var keys=Object.keys(topics||{}).filter(function(k){ return topics[k]>0; });
+      if(!keys.length) return false;
+      keys.sort(function(a,b){ return topics[b]-topics[a]; });   /* где больше ошибок — первым */
+      var rnd=makeRng(seed||1), out=[];
+      for(var i=0;i<3;i++){
+        var q=makeQuestion(keys[i%keys.length],rnd);
+        if(q) out.push(q);
+      }
+      if(!out.length) return false;
+      qs=out; qi=0; onDone=done; lockT=0;
+      $('dSub').textContent='Мәні қандай?';
+      $('sDrill').classList.add('on');
+      render();
+      return true;
+    }
   };
 })();
 
@@ -1767,7 +2010,12 @@ var Game=(function(){
   });
   $('nextBtn').addEventListener('click',function(){
     Sound.click(); $('sWin').classList.remove('on');
-    var n=Game.cur()+1;
+    var done=Game.cur(), n=done+1;
+    /* каждые 5 тапсырм — разбор ошибок перед следующим уровнем */
+    if(done%5===0&&Drill.open(Game.errTopics(),done*31+7,function(){ afterNext(n); })) return;
+    afterNext(n);
+  });
+  function afterNext(n){
     if(n>BIOME_NODES){
       $('bStars').textContent=Save.total();
       $('bNodes').textContent=BIOME_NODES;
@@ -1776,7 +2024,7 @@ var Game=(function(){
       return;
     }
     Game.start(n);
-  });
+  }
   $('biomeBtn').addEventListener('click',function(){
     Sound.click(); $('sBiome').classList.remove('on'); Game.map();
   });
@@ -1796,7 +2044,9 @@ var Game=(function(){
         durationSec: Math.round((Date.now()-t0)/1000),
         difficulty:  'medium',
         details:     { arena:'logic', game:'egg_sort', nodes:s.nodes, stars:s.stars,
-                       moves:s.moves, progress:Save.data.cur-1, biome:1 }
+                       moves:s.moves, progress:Save.data.cur-1, biome:1,
+                       daysThisWeek:Save.daysThisWeek(),
+                       errorTopics:Game.errTopics() }
       });
     }catch(e){}
   }
