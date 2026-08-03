@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>StudyLine · Табиғат аренасы 🌿</title>
+<script src="../bridge/studyline-bridge.js"></script>
+<script src="arena_kit.js"></script>
+<style>
+  :root{
+    --ink:#0b1437;--violet:#6d4bff;--cyan:#21d4fd;--lime:#9be870;--gold:#ffce4a;--red:#ff4d6d;
+    --ak-bg:#0d2a22;--ak-accent:#9be870;--ak-dim:#9fd6b6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{background:#070b1e;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+       display:flex;align-items:center;justify-content:center;color:#fff;overflow:hidden}
+  #wrap{position:relative;width:100%;max-width:460px;height:100svh;max-height:920px;overflow:hidden;
+        background:#123a2c;user-select:none;box-shadow:0 0 80px rgba(0,0,0,.6)}
+  canvas{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;z-index:1}
+
+  #hud{position:absolute;top:0;left:0;right:0;z-index:4;display:flex;align-items:center;gap:7px;
+       padding:calc(9px + env(safe-area-inset-top)) 11px 9px;
+       background:linear-gradient(180deg,rgba(6,26,20,.45),rgba(6,26,20,0))}
+  .pill{display:inline-flex;align-items:center;gap:5px;background:rgba(9,32,26,.55);border:1px solid rgba(255,255,255,.28);
+        border-radius:999px;padding:6px 12px;font-size:13px;font-weight:900;color:#fff;
+        text-shadow:0 1px 3px rgba(0,0,0,.45);backdrop-filter:blur(6px);white-space:nowrap}
+  #hudRight{margin-left:auto;display:flex;gap:7px}
+  .ibtn{background:rgba(9,32,26,.55);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:12px;
+        width:36px;height:36px;cursor:pointer;font-size:15px;backdrop-filter:blur(6px);flex:none}
+  .ibtn:active{transform:scale(.93)}
+
+  .btn{border:none;cursor:pointer;font-family:inherit;font-weight:900;color:#0b2c14;width:100%;
+       background:linear-gradient(180deg,#a6e86f,#6fbf3f);border-radius:16px;padding:16px 20px;font-size:18px;
+       box-shadow:0 6px 0 #4d8f2b,0 12px 26px rgba(0,0,0,.3);letter-spacing:.2px}
+  .btn:active{transform:translateY(3px);box-shadow:0 3px 0 #4d8f2b,0 8px 18px rgba(0,0,0,.3)}
+  .btn.ghost{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.34);box-shadow:none}
+  .btn.ghost:active{transform:translateY(2px);box-shadow:none}
+  .btn.sm{font-size:15px;padding:13px 16px}
+
+  #tools{position:absolute;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:5;display:none;gap:9px}
+  #tools.on{display:flex}
+  .tool{width:58px;border:none;background:none;cursor:pointer;font-family:inherit;
+        display:flex;flex-direction:column;align-items:center;gap:4px}
+  .tool i{width:52px;height:52px;border-radius:17px;display:grid;place-items:center;font-size:22px;font-style:normal;
+          color:#0d2a18;background:linear-gradient(180deg,#ffe9a8,#f4c14e);
+          box-shadow:0 5px 0 #b8862a,0 10px 18px rgba(0,0,0,.4)}
+  .tool.blue i{background:linear-gradient(180deg,#a8dcff,#4fa8f0);box-shadow:0 5px 0 #2a6ba8,0 10px 18px rgba(0,0,0,.4)}
+  .tool.green i{background:linear-gradient(180deg,#c7f59a,#7fce4c);box-shadow:0 5px 0 #4d8f2b,0 10px 18px rgba(0,0,0,.4)}
+  .tool b{font-size:10.5px;font-weight:900;color:#eaffe9;text-shadow:0 1px 4px rgba(0,0,0,.7)}
+  .tool:active i{transform:translateY(3px)}
+  .tool[disabled]{opacity:.4}
+
+  .screen{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;
+          padding:26px 22px;background:rgba(5,22,17,.72);backdrop-filter:blur(7px)}
+  .screen.on{display:flex}
+  .card{width:100%;max-width:340px;background:linear-gradient(170deg,#1b3a2c,#0f2620);
+        border:1px solid rgba(255,255,255,.16);border-radius:26px;padding:24px 22px 20px;text-align:center;
+        box-shadow:0 26px 60px rgba(0,0,0,.5);animation:pop .34s cubic-bezier(.2,1.4,.5,1)}
+  @keyframes pop{0%{transform:scale(.82) translateY(14px);opacity:0}100%{transform:none;opacity:1}}
+  .card h2{font-size:25px;font-weight:900;letter-spacing:-.4px}
+  .card p{font-size:14px;color:#bfe6cf;margin-top:8px;line-height:1.55}
+  .stars{display:flex;justify-content:center;gap:10px;margin:16px 0 6px;font-size:40px;line-height:1}
+  .stars span{filter:grayscale(1) brightness(.6);transform:scale(.72);transition:.36s cubic-bezier(.2,1.5,.4,1)}
+  .stars span.on{filter:none;transform:scale(1)}
+  .row{display:flex;gap:9px;margin-top:16px}
+  .row .btn{flex:1}
+  .stat{display:flex;justify-content:center;gap:20px;margin-top:12px;font-size:12.5px;color:#9fd6b6;font-weight:800}
+  .stat b{display:block;font-size:19px;color:#fff;margin-top:2px}
+  .hint{font-size:12px;color:#8fc7a8;margin-top:14px;line-height:1.5}
+  .learned{margin-top:12px;max-height:22vh;overflow:auto;text-align:center}
+  .chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);
+        border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:5px 10px;margin:3px;font-size:12px}
+  .chip b{color:var(--lime)}
+</style>
+</head>
+<body>
+
+<!-- Входа нет: ребёнок уже авторизован в приложении StudyLine (bridge/studyline-bridge.js).
+     Прогресс по карте — localStorage, как и у sort_arena. -->
+
+<div id="wrap">
+  <canvas id="cv"></canvas>
+
+  <div id="hud">
+    <button class="ibtn" id="backBtn" title="Картаға">🗺</button>
+    <div class="pill" id="pTitle">Табиғат аренасы</div>
+    <div id="hudRight">
+      <button class="ibtn" id="muteBtn">🔊</button>
+      <button class="ibtn" id="slCloseBtn" style="display:none">✕</button>
+    </div>
+  </div>
+
+  <div id="tools">
+    <button class="tool blue" id="undoBtn"><i>↩</i><b>АРТҚА</b></button>
+    <button class="tool green" id="hintBtn"><i>💡</i><b>КЕҢЕС</b></button>
+    <button class="tool" id="resetBtn"><i>⟲</i><b>ҚАЙТА</b></button>
+  </div>
+
+  <div class="screen" id="sWin">
+    <div class="card">
+      <h2 id="winTitle">Жарайсың!</h2>
+      <div class="stars"><span id="st1">★</span><span id="st2">★</span><span id="st3">★</span></div>
+      <p id="winSub">Барлық жұп қосылды.</p>
+      <div class="stat">
+        <div>Сызық<b id="wDraws">0</b></div>
+        <div>Ең азы<b id="wPar">0</b></div>
+        <div>Қате<b id="wErr">0</b></div>
+      </div>
+      <div class="learned" id="wLearn"></div>
+      <div class="row">
+        <button class="btn ghost sm" id="againBtn">Қайталау</button>
+        <button class="btn sm" id="nextBtn">Келесі</button>
+      </div>
+      <div class="hint" id="winHint"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="sBiome">
+    <div class="card">
+      <h2>🦔 Табиғат биомы бітті!</h2>
+      <p>17 тапсырманың бәрін шештің. Келесі биом жаңа атақпен ашылады.</p>
+      <div class="stat">
+        <div>Жинаған жұлдыз<b id="bStars">0</b></div>
+        <div>Тапсырма<b id="bNodes">17</b></div>
+      </div>
+      <div class="row"><button class="btn" id="biomeBtn">Картаға</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   StudyLine · Табиғат аренасы (nature_flow)
+   ---------------------------------------------------------------------------
+   ТЗ: studyline/games/АРЕНА_2.0_ТЗ_RU.md, раздел 1.
+   Предмет: жаратылыстану, 5–6 сынып. Механика: Flow Connect.
+
+   Почему не второй Water Sort: sort_arena уже занял нишу «стек с
+   ограниченным местом». Здесь то же настоящее ограничение, но выражено
+   пространством: линии не пересекаются И обязаны покрыть ВСЕ клетки,
+   поэтому неверно проведённая линия отрезает единственный путь другой паре.
+   Это не чек-лист — тупик реален, и он виден.
+
+   Учебный слой: пары соединяются не по цвету, а ПО СМЫСЛУ
+   (мұз → қатты, қоян → сүтқоректі). Доля пар без цветовой подсказки растёт
+   с 8-й тапсырмы (урок ревью sort_arena применён сразу, а не через итерацию):
+   без цвета понять, какие две точки вообще пара, можно только прочитав.
+
+   Ноль внешних файлов: всё рисуется кодом, звук синтезируется Web Audio.
+   Слово «деңгей» не используется — оно занято лестницей рангов ребёнка.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+var AK=window.ArenaKit;
+var TAU=Math.PI*2, DEG=Math.PI/180;
+function clamp(v,a,b){ return v<a?a:v>b?b:v; }
+function lerp(a,b,t){ return a+(b-a)*t; }
+
+/* ═════════════ 1. ЗВУК — Web Audio, процедурный ═════════════
+   Ни одного mp3: питч звука обязан ползти вверх на серии подряд,
+   а питч-шифт синтеза — одна строка против набора сэмплов. */
+var Sound=(function(){
+  var ACtx=window.AudioContext||window.webkitAudioContext;
+  var ctx=null,master,sfxG,ambG,noiseBuf=null,enabled=true,amb=null;
+
+  function ensure(){ if(ctx||!ACtx)return;
+    ctx=new ACtx();
+    master=ctx.createGain();master.gain.value=0.9;master.connect(ctx.destination);
+    sfxG=ctx.createGain();sfxG.gain.value=0.75;sfxG.connect(master);
+    ambG=ctx.createGain();ambG.gain.value=0.0001;ambG.connect(master);
+    var n=Math.floor(ctx.sampleRate*0.5);noiseBuf=ctx.createBuffer(1,n,ctx.sampleRate);
+    var d=noiseBuf.getChannelData(0);for(var i=0;i<n;i++)d[i]=Math.random()*2-1;
+  }
+  function T(){return ctx?ctx.currentTime:0;}
+  function tone(f,t0,dur,type,peak,dest){ if(!ctx)return;
+    var o=ctx.createOscillator(),g=ctx.createGain();o.type=type||'triangle';o.frequency.setValueAtTime(f,t0);
+    g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(peak,t0+0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    o.connect(g);g.connect(dest||sfxG);o.start(t0);o.stop(t0+dur+0.03);}
+  function sweep(f0,f1,t0,dur,type,peak){ if(!ctx)return;
+    var o=ctx.createOscillator(),g=ctx.createGain();o.type=type||'sine';
+    o.frequency.setValueAtTime(f0,t0);o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t0+dur);
+    g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(peak,t0+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    o.connect(g);g.connect(sfxG);o.start(t0);o.stop(t0+dur+0.03);}
+  function noise(t0,dur,peak,hp,dest){ if(!ctx)return;
+    var s=ctx.createBufferSource();s.buffer=noiseBuf;
+    var f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=hp||2000;
+    var g=ctx.createGain();g.gain.setValueAtTime(peak,t0);g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    s.connect(f);f.connect(g);g.connect(dest||sfxG);s.start(t0);s.stop(t0+dur+0.05);}
+  function go(fn){ if(!enabled)return;ensure();if(!ctx)return;
+    if(ctx.state==='suspended')ctx.resume();fn(T()); }
+
+  /* iOS: беззвучный луп снимает «тихий режим», иначе Web Audio молчит */
+  var __sEl=null,__SILENT='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAgD4AAAB9AAACABAAZGF0YQAAAAA=';
+  function iosUnlock(){
+    try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(e){}
+    if(!__sEl){ try{ __sEl=document.createElement('audio');__sEl.setAttribute('playsinline','');
+      __sEl.loop=true;__sEl.volume=0.02;__sEl.src=__SILENT; }catch(e){} }
+    if(__sEl){ try{ var p=__sEl.play(); if(p&&p.catch)p.catch(function(){}); }catch(e){} }
+  }
+
+  /* Атмосфера леса: шум-ветер + редкие посвисты. Фоновый mp3 не нужен. */
+  function startAmb(){
+    ensure(); if(!ctx||amb)return;
+    var s=ctx.createBufferSource();s.buffer=noiseBuf;s.loop=true;
+    var f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=460;f.Q.value=0.8;
+    var g=ctx.createGain();g.gain.value=0.05;
+    s.connect(f);f.connect(g);g.connect(ambG);s.start();
+    amb={src:s,timer:null};
+    ambG.gain.cancelScheduledValues(ctx.currentTime);
+    ambG.gain.setValueAtTime(0.0001,ctx.currentTime);
+    ambG.gain.exponentialRampToValueAtTime(enabled?0.45:0.0001,ctx.currentTime+1.4);
+    (function chirp(){
+      if(!amb)return;
+      amb.timer=setTimeout(function(){
+        if(!amb)return;
+        if(enabled&&ctx){ var t=ctx.currentTime,b=1400+Math.random()*900;
+          tone(b,t,0.07,'sine',0.045,ambG); tone(b*1.26,t+0.09,0.06,'sine',0.035,ambG); }
+        chirp();
+      }, 2800+Math.random()*5400);
+    })();
+  }
+
+  return {
+    unlock:function(){ ensure(); if(ctx&&ctx.state==='suspended')ctx.resume(); iosUnlock(); startAmb(); },
+    click: function(){ go(function(t){ tone(880,t,0.045,'square',0.16); noise(t,0.02,0.04,5200); }); },
+    grab:  function(){ go(function(t){ tone(480,t,0.05,'sine',0.16); noise(t,0.03,0.05,3000); }); },
+    /* шаг линии: тихий тик, питч чуть выше с длиной линии — тактильность */
+    step:  function(n){ go(function(t){ tone(300+Math.min(n,24)*11,t,0.028,'sine',0.075); }); },
+    /* пара сомкнулась: питч ползёт вверх с серией — главный крючок */
+    link:  function(n){ go(function(t){
+             var f=523.25*Math.pow(1.0595,Math.min(n,14)*2);
+             tone(f,t,0.11,'triangle',0.30); tone(f*1.5,t+0.045,0.13,'triangle',0.20);
+             noise(t,0.05,0.08,1600); }); },
+    /* мягкий отказ: ни жизней, ни очков — просто «не эта пара» */
+    nope:  function(){ go(function(t){ sweep(300,190,t,0.16,'sine',0.16); noise(t,0.05,0.05,900); }); },
+    erase: function(){ go(function(t){ noise(t,0.09,0.07,1800); tone(220,t,0.06,'sine',0.10); }); },
+    win:   function(){ go(function(t){ [523,659,784,1046,1318].forEach(function(f,i){
+             tone(f,t+i*0.085,0.24,'triangle',0.28); }); noise(t,0.3,0.06,900); }); },
+    star:  function(i){ go(function(t){ tone([784,988,1319][i]||1319,t,0.24,'triangle',0.26); }); },
+    unlock2:function(){ go(function(t){ sweep(400,1200,t,0.32,'triangle',0.22);
+             tone(1568,t+0.3,0.2,'triangle',0.2); }); },
+    setEnabled:function(v){ enabled=v; ensure();
+      if(ctx){ sfxG.gain.value=v?0.75:0.0;
+        try{ ambG.gain.exponentialRampToValueAtTime(v?0.45:0.0001,ctx.currentTime+0.2); }catch(e){} } },
+    toggle:function(){ this.setEnabled(!enabled); return enabled; }
+  };
+})();
+
+/* ═════════════ 2. КОНТЕНТ — пары по смыслу ═════════════
+   Правило то же, что в sort_arena: контент — ДАННЫЕ, не код. Генератор
+   строит уровни из этого массива, а не наоборот. Список — черновик под
+   программу жаратылыстану 5–6 сынып, финальную редакцию даёт контент-команда.
+
+   Ограничение по длине (обе стороны ≤ 13 символов) — не стиль, а верстка:
+   подпись обязана читаться внутри клетки 6×6 на экране 320 px. */
+var TOPIC_KK={ kuy:'Зат күйі', tirshilik:'Тірі ағзалар', qubylys:'Құбылыс',
+               agza:'Мүше — қызметі', qural:'Құрал' };
+
+var PAIRS=[
+  /* агрегатные состояния */
+  {a:'мұз',      b:'қатты',      t:'kuy'},
+  {a:'су',       b:'сұйық',      t:'kuy'},
+  {a:'бу',       b:'газ',        t:'kuy'},
+  {a:'темір',    b:'қатты',      t:'kuy'},
+  {a:'сүт',      b:'сұйық',      t:'kuy'},
+  {a:'оттегі',   b:'газ',        t:'kuy'},
+
+  /* классификация живых организмов */
+  {a:'қоян',     b:'сүтқоректі', t:'tirshilik'},
+  {a:'қарлығаш', b:'құс',        t:'tirshilik'},
+  {a:'бақа',     b:'қосмекенді', t:'tirshilik'},
+  {a:'кесіртке', b:'жорғалаушы', t:'tirshilik'},
+  {a:'ара',      b:'жәндік',     t:'tirshilik'},
+  {a:'шортан',   b:'балық',      t:'tirshilik'},
+  {a:'қарағай',  b:'өсімдік',    t:'tirshilik'},
+  {a:'жапалақ',  b:'құс',        t:'tirshilik'},
+
+  /* природные явления и причинно-следственные связи */
+  {a:'булану',   b:'бу',         t:'qubylys'},
+  {a:'қату',     b:'мұз',        t:'qubylys'},
+  {a:'еру',      b:'су',         t:'qubylys'},
+  {a:'жаңбыр',   b:'бұлт',       t:'qubylys'},
+  {a:'найзағай', b:'жарқыл',     t:'qubylys'},
+  {a:'жел',      b:'ауа',        t:'qubylys'},
+  {a:'қар',      b:'аяз',        t:'qubylys'},
+  {a:'кемпірқос',b:'жарық',      t:'qubylys'},
+
+  /* органы и их функции */
+  {a:'тамыр',    b:'су сорады',  t:'agza'},
+  {a:'жапырақ',  b:'оттегі',     t:'agza'},
+  {a:'гүл',      b:'тұқым',      t:'agza'},
+  {a:'өкпе',     b:'тыныс алу',  t:'agza'},
+  {a:'жүрек',    b:'қан',        t:'agza'},
+  {a:'ми',       b:'ойлау',      t:'agza'},
+  {a:'қанат',    b:'ұшу',        t:'agza'},
+  {a:'желбезек', b:'суда тыныс', t:'agza'},
+
+  /* приборы */
+  {a:'термометр',b:'температура',t:'qural'},
+  {a:'компас',   b:'бағыт',      t:'qural'},
+  {a:'телескоп', b:'жұлдыз',     t:'qural'},
+  {a:'таразы',   b:'масса',      t:'qural'},
+  {a:'микроскоп',b:'жасуша',     t:'qural'},
+  {a:'сағат',    b:'уақыт',      t:'qural'}
+];
+
+/* Палитра пар. Цвет — подсказка, а не канал смысла: в «слепых» парах его
+   вообще нет, поэтому дальтонизм игру не ломает (та же причина, по которой
+   у яиц в sort_arena свой узор). */
+var HUE=[
+  {c:'#ff5252',d:'#a81212'},
+  {c:'#29b6ff',d:'#0a4f85'},
+  {c:'#5ddb63',d:'#1c7a26'},
+  {c:'#ffc233',d:'#a86a00'},
+  {c:'#c264ff',d:'#6b1a9c'},
+  {c:'#ff8a3d',d:'#a84200'},
+  {c:'#22e0d0',d:'#08716a'},
+  {c:'#ff64a8',d:'#95003f'}
+];
+var BLIND={c:'#e8f0e6',d:'#8ba193'};   /* пара без цветовой подсказки */
+
+/* ═════════════ 3. КРИВАЯ БИОМА ═════════════
+   Урок ревью sort_arena применён сразу: «слепая» доля растёт с 8-й
+   тапсырмы, а не с 15-й, иначе вся учебная работа сжата в конец сессии.
+
+   1–6   түс   — только цвета, ребёнок осваивает правило: линии не
+                 пересекаются и обязаны покрыть ВСЁ поле.
+   7–14  ұғым  — на точках подписи, цвет гаснет на растущей доле пар.
+   15–17 ұғым вслепую — цвета нет совсем: какая точка кому пара,
+                 понятно только из смысла. */
+var NODES=17;
+function levelCfg(n){
+  var C=[
+    /*1*/ {size:5,pairs:3,mode:'color'},
+    /*2*/ {size:5,pairs:4,mode:'color'},
+    /*3*/ {size:5,pairs:4,mode:'color'},
+    /*4*/ {size:6,pairs:4,mode:'color'},
+    /*5*/ {size:6,pairs:5,mode:'color'},
+    /*6*/ {size:6,pairs:6,mode:'color'},
+    /*7*/ {size:5,pairs:3,mode:'term',blind:0},
+    /*8*/ {size:5,pairs:4,mode:'term',blind:0.25},
+    /*9*/ {size:6,pairs:4,mode:'term',blind:0.25},
+    /*10*/{size:6,pairs:5,mode:'term',blind:0.4},
+    /*11*/{size:6,pairs:5,mode:'term',blind:0.5},
+    /*12*/{size:6,pairs:6,mode:'term',blind:0.5},
+    /*13*/{size:7,pairs:5,mode:'term',blind:0.75},
+    /*14*/{size:7,pairs:6,mode:'term',blind:0.75},
+    /*15*/{size:6,pairs:4,mode:'term',blind:1},
+    /*16*/{size:6,pairs:5,mode:'term',blind:1},
+    /*17*/{size:7,pairs:6,mode:'term',blind:1}    /* босс биома */
+  ];
+  return C[clamp(n,1,NODES)-1];
+}
+
+/* ═════════════ 4. ГЕНЕРАТОР — от решения назад ═════════════
+   Солвер sort_arena сюда копировать нельзя: там перебором проверяется
+   готовая раскладка, здесь задача другой природы. Flow-паззлы генерируются
+   стандартным приёмом жанра — сначала выращивается решение, покрывающее
+   все клетки, потом тело линий стирается и остаются только концы пар.
+   Так «нерешаемый уровень» физически невозможен: решение существует по
+   построению, а тест проверяет это независимо. */
+
+/* Гамильтонов путь по сетке: случайный обход с бэктрекингом.
+   Две отсечки делают перебор быстрым даже на 7×7:
+   — Варнсдорф (сначала клетки с наименьшим числом свободных соседей),
+   — проверка связности остатка (отрезанный кусок поля уже не покрыть). */
+function hamiltonian(size,rnd){
+  var N=size*size, used=new Uint8Array(N), path=[], iter=0, LIMIT=120000;
+  function nb(i){
+    var r=(i/size)|0, c=i%size, out=[];
+    if(r>0) out.push(i-size);
+    if(r<size-1) out.push(i+size);
+    if(c>0) out.push(i-1);
+    if(c<size-1) out.push(i+1);
+    return out;
+  }
+  function freeDeg(i){ var k=0,n=nb(i); for(var j=0;j<n.length;j++) if(!used[n[j]])k++; return k; }
+  /* остаток поля обязан оставаться одним куском — иначе покрыть его нельзя */
+  function connected(from){
+    var seen=new Uint8Array(N), st=[from], cnt=0;
+    seen[from]=1;
+    while(st.length){
+      var v=st.pop(); cnt++;
+      var n=nb(v);
+      for(var j=0;j<n.length;j++) if(!used[n[j]]&&!seen[n[j]]){ seen[n[j]]=1; st.push(n[j]); }
+    }
+    var left=0; for(var i=0;i<N;i++) if(!used[i]) left++;
+    return cnt===left;
+  }
+  function rec(cur){
+    path.push(cur); used[cur]=1;
+    if(path.length===N) return true;
+    if(++iter>LIMIT){ path.pop(); used[cur]=0; return false; }
+    var cand=nb(cur).filter(function(x){ return !used[x]; });
+    if(!cand.length||!connected(cand[0])){ path.pop(); used[cur]=0; return false; }
+    cand.forEach(function(x){ x.__=0; });
+    cand=AK.shuffle(cand,rnd).sort(function(a,b){ return freeDeg(a)-freeDeg(b); });
+    for(var i=0;i<cand.length;i++) if(rec(cand[i])) return true;
+    path.pop(); used[cur]=0;
+    return false;
+  }
+  var starts=AK.shuffle([], rnd);
+  for(var s=0;s<N;s++) starts.push(s);
+  AK.shuffle(starts,rnd);
+  for(var k=0;k<Math.min(6,starts.length);k++){
+    path=[]; used=new Uint8Array(N); iter=0;
+    if(rec(starts[k])) return path;
+  }
+  /* Страховка: змейка по рядам — тоже гамильтонов путь, всегда существует.
+     До неё доходить не должно, но нерешаемый уровень выпускать нельзя. */
+  var snake=[];
+  for(var r=0;r<size;r++){
+    for(var c=0;c<size;c++) snake.push(r*size+(r%2?size-1-c:c));
+  }
+  return snake;
+}
+
+/* Нарезка пути на K кусков: каждый кусок ≥ MIN клеток, иначе пара
+   получается «две соседние точки» — соединяется не думая. */
+function cutPath(path,k,rnd){
+  var MIN=3, N=path.length;
+  var len=[], i;
+  for(i=0;i<k;i++) len.push(MIN);
+  var rest=N-MIN*k;
+  while(rest>0){ len[Math.floor(rnd()*k)]++; rest--; }
+  var out=[], p=0;
+  for(i=0;i<k;i++){ out.push(path.slice(p,p+len[i])); p+=len[i]; }
+  return out;
+}
+
+/* Подбор контента: пары из РАЗНЫХ тем, чтобы в одной тапсырме не оказалось
+   шести «зат күйі» подряд — иначе половина точек подписана одинаково
+   («қатты», «қатты», «сұйық») и однозначного соответствия нет. */
+function pickPairs(count,rnd){
+  var byTopic={}, topics=[];
+  PAIRS.forEach(function(p){
+    if(!byTopic[p.t]){ byTopic[p.t]=[]; topics.push(p.t); }
+    byTopic[p.t].push(p);
+  });
+  AK.shuffle(topics,rnd);
+  topics.forEach(function(t){ AK.shuffle(byTopic[t],rnd); });
+
+  var out=[], usedB={}, guard=0;
+  while(out.length<count&&guard++<400){
+    var t=topics[out.length%topics.length], list=byTopic[t];
+    for(var i=0;i<list.length;i++){
+      var p=list[i];
+      /* правая сторона обязана быть уникальной: две пары с ответом «құс»
+         на одном поле — задача без единственного соответствия */
+      if(usedB[p.b]||usedB[p.a]) continue;
+      usedB[p.b]=1; usedB[p.a]=1; out.push(p); list.splice(i,1);
+      break;
+    }
+  }
+  /* добор, если тем не хватило */
+  for(var j=0;out.length<count&&j<PAIRS.length;j++){
+    var q=PAIRS[j];
+    if(usedB[q.b]||usedB[q.a]) continue;
+    usedB[q.b]=1; usedB[q.a]=1; out.push(q);
+  }
+  return out;
+}
+
+/* Сид фиксирован номером тапсырмы: «переиграть» обязано значить ту же
+   задачу, а не новую случайную. */
+function buildTask(n){
+  var cfg=levelCfg(n), rnd=AK.rng(n*7919+13);
+  var path=hamiltonian(cfg.size,rnd);
+  var segs=cutPath(path,cfg.pairs,rnd);
+  var content=(cfg.mode==='term')?pickPairs(cfg.pairs,rnd):[];
+
+  /* «Слепых» пар ровно доля blind — округляем вверх на последних уровнях,
+     где цвета быть не должно вообще. */
+  var blindN=Math.round(cfg.pairs*(cfg.blind||0));
+  var order=[]; for(var i=0;i<cfg.pairs;i++) order.push(i);
+  AK.shuffle(order,rnd);
+  var blind={}; for(i=0;i<blindN;i++) blind[order[i]]=1;
+
+  var pairs=segs.map(function(seg,i){
+    var c=content[i]||null;
+    return { a:seg[0], b:seg[seg.length-1], hue:i%HUE.length,
+             blind:!!blind[i],
+             term:c?c.a:null, match:c?c.b:null, topic:c?c.t:null };
+  });
+
+  return { n:n, size:cfg.size, mode:cfg.mode, blind:cfg.blind||0,
+           pairs:pairs, sol:segs, par:cfg.pairs };
+}
+
+/* ═════════════ 5. МАСКОТ — кірпі ═════════════
+   Скелет из src/soz_sogysy/render.js здесь не годится: на 60 пикселях в углу
+   экрана кости складываются в пятно (проверено кадрами). Ёж рисуется одной
+   читаемой формой — купол иголок + мордочка, — а «позы» задаются тремя
+   параметрами: наклон, подпрыгивание, глаза. Балапан не подходит по смыслу:
+   он привязан к общей лестнице рангов, а не к предмету.
+
+   Ноль внешних файлов: всё рисуется кодом. */
+var HOG={ quill:'#7a6444', quillD:'#4f3f28', fur:'#e8c493', furD:'#bb9264',
+          nose:'#2f2318', eye:'#191108' };
+
+var Mascot={
+  mood:'idle', moodT:0, t:0, hop:0, hopV:0, blink:0, blinkT:1.6, say:'', sayT:0,
+
+  set:function(mood,dur,phrase){
+    if(mood!=='idle'){ this.mood=mood; this.moodT=dur||1.1; }
+    if(phrase){ this.say=phrase; this.sayT=Math.max(this.sayT,dur||2.2); }
+    if(mood==='happy'||mood==='cheer'){ if(this.hop>-2) this.hopV=-130; }
+  },
+  update:function(dt){
+    this.t+=dt;
+    if(this.moodT>0){ this.moodT-=dt; if(this.moodT<=0) this.mood='idle'; }
+    if(this.sayT>0) this.sayT-=dt;
+    this.hopV+=620*dt; this.hop+=this.hopV*dt;
+    if(this.hop>0){ this.hop=0; this.hopV=0; }
+    this.blinkT-=dt;
+    if(this.blinkT<=0){ this.blink=0.12; this.blinkT=1.4+Math.random()*3.2; }
+    if(this.blink>0) this.blink-=dt;
+  },
+  draw:function(ctx,x,y,sc){
+    var R=17*sc, t=this.t, m=this.mood;
+    var breathe=Math.sin(t*2.2)*0.6*sc;
+    var tilt=(m==='sad'?0.16:(m==='happy'||m==='cheer'?-0.13:
+              (m==='think'?Math.sin(t*1.7)*0.09:Math.sin(t*1.1)*0.03)));
+    var cy=y+this.hop-R*0.55+breathe;
+
+    /* тень сжимается в прыжке — «продаёт» отрыв от земли */
+    ctx.save();
+    ctx.globalAlpha=clamp(0.32+this.hop/90,0.08,0.32);
+    ctx.fillStyle='rgba(0,0,0,.55)';
+    ctx.beginPath(); ctx.ellipse(x,y+2*sc,R*1.05*(1+this.hop/320),R*0.26,0,0,TAU); ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(x,cy); ctx.rotate(tilt);
+    ctx.lineJoin='round'; ctx.lineWidth=Math.max(1,1.1*sc);
+    ctx.strokeStyle='rgba(22,15,8,.8)';
+
+    /* иголки: веер по верхней дуге, от затылка к хвосту */
+    for(var i=0;i<13;i++){
+      var a=Math.PI*(1.02+i*0.075);
+      var h=R*(0.44+0.1*Math.sin(i*1.7));
+      var bx=Math.cos(a)*R*0.94, by=Math.sin(a)*R*0.72;
+      ctx.beginPath();
+      ctx.moveTo(bx+Math.cos(a+0.42)*R*0.2, by+Math.sin(a+0.42)*R*0.2);
+      ctx.lineTo(bx+Math.cos(a)*h,          by+Math.sin(a)*h*0.9);
+      ctx.lineTo(bx+Math.cos(a-0.42)*R*0.2, by+Math.sin(a-0.42)*R*0.2);
+      ctx.closePath();
+      ctx.fillStyle=(i%2)?HOG.quill:HOG.quillD; ctx.fill(); ctx.stroke();
+    }
+
+    /* тело-купол */
+    var g=ctx.createLinearGradient(0,-R*0.8,0,R*0.6);
+    g.addColorStop(0,HOG.quill); g.addColorStop(0.52,HOG.quillD); g.addColorStop(1,HOG.furD);
+    ctx.beginPath(); ctx.ellipse(0,0,R,R*0.78,0,0,TAU);
+    ctx.fillStyle=g; ctx.fill(); ctx.stroke();
+
+    /* мордочка вперёд-вправо */
+    var fx=R*0.86, fy=R*0.16;
+    ctx.beginPath(); ctx.ellipse(fx,fy,R*0.46,R*0.36,0.24,0,TAU);
+    ctx.fillStyle=HOG.fur; ctx.fill(); ctx.stroke();
+    /* ухо */
+    ctx.beginPath(); ctx.ellipse(R*0.44,-R*0.3,R*0.17,R*0.2,0,0,TAU);
+    ctx.fillStyle=HOG.furD; ctx.fill(); ctx.stroke();
+    /* нос */
+    ctx.beginPath(); ctx.arc(fx+R*0.38,fy+R*0.12,R*0.13,0,TAU);
+    ctx.fillStyle=HOG.nose; ctx.fill();
+    /* глаз: моргание и грусть меняют форму, а не цвет */
+    var ex=fx-R*0.02, ey=fy-R*0.14;
+    ctx.fillStyle=HOG.eye;
+    if(this.blink>0||m==='sad'){
+      ctx.fillRect(ex-R*0.13,ey-R*0.03,R*0.26,R*0.07);
+    } else {
+      ctx.beginPath(); ctx.arc(ex,ey,R*0.11,0,TAU); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.9)';
+      ctx.beginPath(); ctx.arc(ex+R*0.04,ey-R*0.04,R*0.04,0,TAU); ctx.fill();
+    }
+    /* лапки */
+    ctx.fillStyle=HOG.furD;
+    [[R*0.5,R*0.66],[-R*0.36,R*0.7]].forEach(function(p){
+      ctx.beginPath(); ctx.ellipse(p[0],p[1],R*0.16,R*0.1,0,0,TAU); ctx.fill();
+    });
+    ctx.restore();
+  }
+};
+
+/* ═════════════ 6. ЧАСТИЦЫ ═════════════ */
+var FX=[];
+function burst(x,y,col,n,pow){
+  for(var i=0;i<(n||10);i++){
+    var a=Math.random()*TAU, sp=(40+Math.random()*130)*(pow||1);
+    FX.push({t:'p',x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,c:col,life:0.55,max:0.55,r:2+Math.random()*2.4});
+  }
+}
+function ring(x,y,col,r0,r1){ FX.push({t:'ring',x:x,y:y,c:col,r0:r0||8,r1:r1||70,life:0.42,max:0.42}); }
+function leaves(W,H){
+  for(var i=0;i<60;i++)
+    FX.push({t:'p',x:Math.random()*W,y:-20-Math.random()*H*0.5,vx:(Math.random()-0.5)*60,
+             vy:90+Math.random()*160,c:['#9be870','#ffce4a','#21d4fd','#ff8a3d'][i%4],
+             life:2.2,max:2.2,r:3+Math.random()*3});
+}
+function updateFX(dt){
+  for(var i=FX.length-1;i>=0;i--){
+    var f=FX[i]; f.life-=dt;
+    if(f.life<=0){ FX.splice(i,1); continue; }
+    if(f.t==='p'){ f.vy+=520*dt; f.x+=f.vx*dt; f.y+=f.vy*dt; }
+  }
+}
+function drawFX(ctx){
+  for(var i=0;i<FX.length;i++){
+    var f=FX[i], k=f.life/f.max;
+    ctx.globalAlpha=Math.max(0,k);
+    if(f.t==='p'){ ctx.fillStyle=f.c; ctx.beginPath(); ctx.arc(f.x,f.y,f.r*k,0,TAU); ctx.fill(); }
+    else { ctx.strokeStyle=f.c; ctx.lineWidth=3*k;
+           ctx.beginPath(); ctx.arc(f.x,f.y,lerp(f.r0,f.r1,1-k),0,TAU); ctx.stroke(); }
+  }
+  ctx.globalAlpha=1;
+}
+
+/* ═════════════ 7. ПРОГРЕСС ═════════════ */
+var Save=AK.save('sl_nature_flow_v1',NODES).load();
+
+/* ═════════════ 8. ИГРА ═════════════ */
+var Game=(function(){
+  var wrap=document.getElementById('wrap'), cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+  var G={W:0,H:0,dpr:1,mode:'map',t:0,shake:0};
+  var task=null, paths=[], owner=null, cur=null, draws=0, restarts=0, hints=0, streak=0;
+  var hist=[], errors=[], errTopics={}, learned=[], startedAt=0, wrongT=0;
+  var hintPath=null, hintT=0, idleT=0, undoOn=null;
+  var L={cell:0,x0:0,y0:0};
+  var session={nodes:0,draws:0,stars:0,errors:0};
+  var Map=null, Drill=null;
+
+  function $(id){ return document.getElementById(id); }
+
+  /* ── геометрия ─────────────────────────────────────────────────────── */
+  function resize(){
+    var r=wrap.getBoundingClientRect();
+    G.dpr=Math.min(window.devicePixelRatio||1,2.5);
+    G.W=r.width; G.H=r.height;
+    cv.width=Math.round(G.W*G.dpr); cv.height=Math.round(G.H*G.dpr);
+    ctx.setTransform(G.dpr,0,0,G.dpr,0,0);
+    bakeBg();
+    layout();
+  }
+  function layout(){
+    if(!task) return;
+    var top=Math.max(96,G.H*0.135), bottom=Math.max(120,G.H*0.16);
+    var availH=G.H-top-bottom, availW=G.W-24;
+    L.cell=Math.floor(Math.min(availW,availH)/task.size);
+    var side=L.cell*task.size;
+    L.x0=Math.round((G.W-side)/2);
+    L.y0=Math.round(top+(availH-side)/2);
+  }
+  function cellCx(i){ return L.x0+(i%task.size)*L.cell+L.cell/2; }
+  function cellCy(i){ return L.y0+Math.floor(i/task.size)*L.cell+L.cell/2; }
+  function cellAt(x,y){
+    var c=Math.floor((x-L.x0)/L.cell), r=Math.floor((y-L.y0)/L.cell);
+    if(c<0||r<0||c>=task.size||r>=task.size) return -1;
+    return r*task.size+c;
+  }
+  function adjacent(a,b){
+    var ra=(a/task.size)|0, ca=a%task.size, rb=(b/task.size)|0, cb=b%task.size;
+    return Math.abs(ra-rb)+Math.abs(ca-cb)===1;
+  }
+
+  /* ── состояние поля ────────────────────────────────────────────────── */
+  function endpointOf(i){
+    for(var p=0;p<task.pairs.length;p++){
+      if(task.pairs[p].a===i||task.pairs[p].b===i) return p;
+    }
+    return -1;
+  }
+  function rebuildOwner(){
+    owner=new Int8Array(task.size*task.size).fill(-1);
+    paths.forEach(function(p,i){ p.forEach(function(c){ owner[c]=i; }); });
+    /* концы всегда принадлежат своей паре, даже если линия не начата */
+    task.pairs.forEach(function(p,i){
+      if(owner[p.a]<0) owner[p.a]=i;
+      if(owner[p.b]<0) owner[p.b]=i;
+    });
+  }
+  function isDone(i){
+    var p=paths[i], q=task.pairs[i];
+    if(!p||p.length<2) return false;
+    var f=p[0], l=p[p.length-1];
+    return (f===q.a&&l===q.b)||(f===q.b&&l===q.a);
+  }
+  function doneCount(){ var k=0; for(var i=0;i<paths.length;i++) if(isDone(i))k++; return k; }
+  function filled(){
+    rebuildOwner();
+    var n=0, covered={};
+    paths.forEach(function(p,i){ p.forEach(function(c){ covered[c]=1; }); });
+    task.pairs.forEach(function(p){ covered[p.a]=1; covered[p.b]=1; });
+    for(var k in covered) n++;
+    return n;
+  }
+  function solved(){
+    if(doneCount()!==task.pairs.length) return false;
+    var seen=new Uint8Array(task.size*task.size);
+    for(var i=0;i<paths.length;i++) for(var j=0;j<paths[i].length;j++) seen[paths[i][j]]=1;
+    for(var c=0;c<seen.length;c++) if(!seen[c]) return false;
+    return true;
+  }
+
+  /* ── ход ───────────────────────────────────────────────────────────── */
+  function snapshot(){ hist.push(paths.map(function(p){ return p.slice(); })); if(hist.length>40) hist.shift(); }
+  function truncate(i,idx){ paths[i]=paths[i].slice(0,idx); }
+
+  function startAt(i){
+    var p=endpointOf(i);
+    if(p>=0){
+      snapshot();
+      if(paths[p].length) Sound.erase();
+      paths[p]=[i]; cur={i:p}; draws++;
+      Sound.grab();
+      rebuildOwner();
+      return true;
+    }
+    /* тап по середине уже проведённой линии — продолжаем с этого места */
+    for(var k=0;k<paths.length;k++){
+      var idx=paths[k].indexOf(i);
+      if(idx>=0){ snapshot(); truncate(k,idx+1); cur={i:k}; Sound.grab(); rebuildOwner(); return true; }
+    }
+    return false;
+  }
+
+  function tryStep(target){
+    if(!cur) return;
+    var i=cur.i, p=paths[i], last=p[p.length-1];
+    if(target===last) return;
+
+    /* шаг назад по своей линии — стираем хвост */
+    if(p.length>=2&&target===p[p.length-2]){ p.pop(); Sound.step(p.length); rebuildOwner(); return; }
+    if(!adjacent(last,target)) return;
+
+    var own=owner[target], ep=endpointOf(target);
+
+    if(ep>=0){
+      if(ep!==i){
+        /* чужая точка: пройти сквозь неё нельзя. Если это ПАРА к твоей —
+           значит смысл понят неверно; в «слепом» режиме это и есть
+           учебная ошибка, её и записываем. */
+        noteWrong(i,ep);
+        return;
+      }
+      var q=task.pairs[i];
+      var other=(p[0]===q.a)?q.b:q.a;
+      if(target!==other) return;                 /* вернулся в свой же старт */
+      p.push(target); rebuildOwner();
+      streak++;
+      Sound.link(streak);
+      burst(cellCx(target),cellCy(target),hueOf(i).c,14,1.1);
+      ring(cellCx(target),cellCy(target),hueOf(i).c,10,L.cell*1.4);
+      if(task.mode==='term'&&q.term){
+        learned.push({a:q.term,b:q.match});
+        Mascot.set('happy',1.2,q.term+' → '+q.match);
+      } else Mascot.set('happy',0.9,'Жұп қосылды!');
+      cur=null;
+      if(solved()) finishTask();
+      return;
+    }
+
+    if(own>=0&&own!==i){ truncate(own,paths[own].indexOf(target)); Sound.erase(); }
+    var mine=p.indexOf(target);
+    if(mine>=0){ truncate(i,mine+1); rebuildOwner(); return; }
+
+    p.push(target);
+    Sound.step(p.length);
+    rebuildOwner();
+  }
+
+  /* Ошибка по смыслу: ребёнок повёл линию в чужую точку. Тема идёт
+     в разбор ошибок — там его и добьём вопросом по этой теме. */
+  function noteWrong(mine,other){
+    if(G.t-wrongT<0.5) return;
+    wrongT=G.t;
+    Sound.nope(); G.shake=5; streak=0;
+    var q=task.pairs[mine];
+    if(task.mode==='term'&&q.term){
+      errors.push({topic:q.topic,term:q.term,match:q.match,level:task.n});
+      errTopics[q.topic]=(errTopics[q.topic]||0)+1;
+      session.errors++;
+      Mascot.set('sad',1.4,'«'+q.term+'» — басқа жұп');
+    } else Mascot.set('sad',1.0,'Бұл — басқа сызық');
+  }
+
+  function hueOf(i){ return task.pairs[i].blind?BLIND:HUE[task.pairs[i].hue]; }
+
+  function undo(){
+    if(!hist.length) return;
+    paths=hist.pop(); cur=null; streak=0;
+    rebuildOwner(); Sound.erase();
+    Mascot.set('think',0.9,'');
+  }
+  function restart(){
+    snapshot();
+    paths=task.pairs.map(function(){ return []; });
+    cur=null; restarts++; streak=0;
+    rebuildOwner(); Sound.erase();
+    Mascot.set('idle',1,'Қайтадан бастаймыз');
+  }
+  /* Кеңес — показываем настоящий путь из решения генератора, а не
+     «попробуй ещё». Первую несобранную пару. */
+  function askHint(){
+    if(!task||G.mode!=='play') return;
+    for(var i=0;i<task.pairs.length;i++){
+      if(!isDone(i)){ hintPath=task.sol[i]; hintT=3.2; hints++; Sound.click();
+        Mascot.set('think',3,'Мына жолмен жүр'); return; }
+    }
+  }
+
+  /* ── ввод ──────────────────────────────────────────────────────────── */
+  function pos(e){ var r=cv.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; }
+  function onDown(e){
+    if(G.mode!=='play'||!task) return;
+    idleT=0; hintT=0;
+    var p=pos(e), c=cellAt(p.x,p.y);
+    if(c<0) return;
+    startAt(c);
+  }
+  function onMove(e){
+    if(G.mode!=='play'||!cur) return;
+    idleT=0;
+    var p=pos(e), c=cellAt(p.x,p.y);
+    if(c<0) return;
+    /* палец может перескочить через клетку — доходим по одной,
+       иначе на быстром свайпе линия рвётся */
+    for(var guard=0;guard<10&&cur;guard++){
+      var path=paths[cur.i], last=path[path.length-1];
+      if(last===c) break;
+      var lr=(last/task.size)|0, lc=last%task.size, tr=(c/task.size)|0, tc=c%task.size;
+      var next;
+      if(lc!==tc) next=last+(tc>lc?1:-1);
+      else if(lr!==tr) next=last+(tr>lr?task.size:-task.size);
+      else break;
+      var before=path.length;
+      tryStep(next);
+      if(cur&&paths[cur.i].length===before&&paths[cur.i][paths[cur.i].length-1]===last) break;
+    }
+  }
+  function onUp(){ cur=null; }
+
+  /* ── жизненный цикл тапсырмы ───────────────────────────────────────── */
+  function start(n){
+    task=buildTask(n);
+    paths=task.pairs.map(function(){ return []; });
+    cur=null; hist=[]; draws=0; restarts=0; hints=0; streak=0;
+    learned=[]; startedAt=Date.now();
+    errors=errors.filter(function(e){ return e.level!==n; });
+    G.mode='play'; G.shake=0; hintPath=null; hintT=0; idleT=0;
+    rebuildOwner(); layout();
+    Map.hide();
+    $('pTitle').textContent=n+'-тапсырма';
+    $('tools').classList.add('on');
+    Mascot.set('think',3.4, task.mode==='term'
+      ? (task.blind>=1?'Түс жоқ — мағынасы бойынша қос'
+                      :'Ұғымды өз жұбымен қос')
+      : 'Бірдей түсті нүктелерді қос');
+    Sound.unlock();
+  }
+  function openMap(){
+    G.mode='map'; task=null; cur=null;
+    $('pTitle').textContent='Табиғат аренасы';
+    $('tools').classList.remove('on');
+    Map.show();
+    Mascot.set('idle',0,'Жолды тап!');
+  }
+
+  function finishTask(){
+    G.mode='win';
+    var clean=(restarts===0&&hints===0&&draws<=task.par);
+    var stars=clean?3:((restarts+hints)<=1&&draws<=task.par*2?2:1);
+    var prev=Save.starsOf(task.n);
+    Save.complete(task.n,stars);
+    var newDay=Save.markToday();
+
+    session.nodes++; session.draws+=draws; session.stars+=Math.max(0,stars-prev);
+
+    leaves(G.W,G.H); Sound.win(); G.shake=7;
+    Mascot.set('cheer',3.4,['Жарайсың!','Тамаша!','Керемет!'][Math.floor(Math.random()*3)]);
+
+    /* Результат узла в приложение. SL.finish зовётся один раз за страницу,
+       поэтому узлы уходят как progress, а finish — при выходе. */
+    try{
+      SL.progress({ level:task.n, stars:stars, draws:draws, par:task.par,
+                    hints:hints, restarts:restarts, size:task.size,
+                    pairs:task.pairs.length, mode:task.mode, blind:task.blind,
+                    durationSec:Math.round((Date.now()-startedAt)/1000),
+                    errors:errors.filter(function(e){ return e.level===task.n; }) });
+    }catch(e){}
+
+    $('winTitle').textContent=stars===3?'Мінсіз!':'Жарайсың!';
+    $('winSub').textContent=task.mode==='term'
+      ? 'Барлық ұғым өз жұбын тапты.' : 'Барлық жұп қосылды.';
+    $('wDraws').textContent=draws;
+    $('wPar').textContent=task.par;
+    $('wErr').textContent=errors.filter(function(e){ return e.level===task.n; }).length;
+
+    var box=$('wLearn'), uniq=[], seen={};
+    learned.forEach(function(w){ if(!seen[w.a]){ seen[w.a]=1; uniq.push(w); } });
+    box.innerHTML=uniq.length
+      ? uniq.map(function(w){ return '<span class="chip">'+w.a+' → <b>'+w.b+'</b></span>'; }).join('')
+      : '';
+
+    $('nextBtn').textContent=task.n>=NODES?'Аяқтау':'Келесі';
+    $('winHint').textContent=newDay
+      ? ('Осы аптада '+Save.daysThisWeek()+' күн ойнадың 🔥')
+      : (stars===3?'':'3 жұлдыз: кеңессіз және '+task.par+' сызықпен.');
+    ['st1','st2','st3'].forEach(function(id){ $(id).classList.remove('on'); });
+    $('sWin').classList.add('on');
+    $('tools').classList.remove('on');
+    for(var s=0;s<stars;s++)(function(s){
+      setTimeout(function(){ $(['st1','st2','st3'][s]).classList.add('on'); Sound.star(s); },320+s*300);
+    })(s);
+  }
+
+  /* ── рисование ─────────────────────────────────────────────────────── */
+  /* Фон печётся один раз на resize: он статичен, а пересчитывать градиент
+     и три эллипса 60 раз в секунду — самая дорогая строка кадра. */
+  function bakeBg(){
+    var c=document.createElement('canvas');
+    c.width=Math.round(G.W*G.dpr); c.height=Math.round(G.H*G.dpr);
+    var b=c.getContext('2d');
+    b.setTransform(G.dpr,0,0,G.dpr,0,0);
+    var g=b.createLinearGradient(0,0,0,G.H);
+    g.addColorStop(0,'#1b5c44'); g.addColorStop(0.55,'#123a2c'); g.addColorStop(1,'#0a2419');
+    b.fillStyle=g; b.fillRect(0,0,G.W,G.H);
+    b.fillStyle='rgba(255,255,255,.035)';
+    for(var i=0;i<3;i++){
+      b.beginPath();
+      b.ellipse(G.W*(0.2+i*0.32),G.H*(0.92+i*0.03),G.W*0.5,G.H*0.16,0,0,TAU);
+      b.fill();
+    }
+    G.bg=c;
+  }
+  function rr(x,y,w,h,r){
+    r=Math.min(r,w/2,h/2);
+    ctx.beginPath(); ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+  }
+  function fitText(text,maxW,maxSize){
+    var size=maxSize;
+    for(;size>6;size-=0.5){
+      ctx.font='900 '+size+'px Inter,Arial';
+      if(ctx.measureText(text).width<=maxW) break;
+    }
+    return size;
+  }
+  /* Подпись внутри точки: до двух строк, шрифт ужимается под клетку.
+     Экран 320 px — самый узкий, на котором игра обязана читаться. */
+  function drawLabel(text,x,y,maxW){
+    var lines=[text];
+    ctx.font='900 11px Inter,Arial';
+    if(ctx.measureText(text).width>maxW){
+      var sp=text.lastIndexOf(' ');
+      if(sp<0) sp=Math.ceil(text.length/2);
+      lines=[text.slice(0,sp).trim(),text.slice(sp).trim()];
+    }
+    var size=Math.min.apply(null,lines.map(function(l){ return fitText(l,maxW,11); }));
+    ctx.font='900 '+size+'px Inter,Arial';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    var lh=size*1.05;
+    lines.forEach(function(l,i){
+      var yy=y+(i-(lines.length-1)/2)*lh;
+      ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.strokeText(l,x,yy);
+      ctx.fillStyle='#fff'; ctx.fillText(l,x,yy);
+    });
+  }
+
+  function drawBoard(){
+    var s=L.cell, side=s*task.size, i;
+
+    /* поле */
+    ctx.save();
+    rr(L.x0-8,L.y0-8,side+16,side+16,20);
+    ctx.fillStyle='rgba(4,20,14,.55)'; ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.16)'; ctx.lineWidth=2; ctx.stroke();
+    ctx.restore();
+
+    for(i=0;i<task.size*task.size;i++){
+      var x=L.x0+(i%task.size)*s, y=L.y0+Math.floor(i/task.size)*s;
+      rr(x+2,y+2,s-4,s-4,7);
+      ctx.fillStyle=owner&&owner[i]>=0?'rgba(255,255,255,.05)':'rgba(255,255,255,.085)';
+      ctx.fill();
+    }
+
+    /* подсказка — путь из решения, полупрозрачный */
+    if(hintT>0&&hintPath){
+      ctx.save();
+      ctx.globalAlpha=clamp(hintT,0,1)*0.5;
+      ctx.strokeStyle='#ffce4a'; ctx.lineWidth=s*0.3;
+      ctx.lineCap='round'; ctx.lineJoin='round';
+      ctx.beginPath();
+      hintPath.forEach(function(c,k){ k?ctx.lineTo(cellCx(c),cellCy(c)):ctx.moveTo(cellCx(c),cellCy(c)); });
+      ctx.stroke(); ctx.restore();
+    }
+
+    /* линии */
+    paths.forEach(function(p,idx){
+      if(p.length<2) return;
+      var h=hueOf(idx), done=isDone(idx);
+      ctx.lineCap='round'; ctx.lineJoin='round';
+      ctx.strokeStyle=h.d; ctx.lineWidth=s*0.42;
+      ctx.beginPath();
+      p.forEach(function(c,k){ k?ctx.lineTo(cellCx(c),cellCy(c)):ctx.moveTo(cellCx(c),cellCy(c)); });
+      ctx.stroke();
+      ctx.strokeStyle=h.c; ctx.lineWidth=s*0.3;
+      ctx.beginPath();
+      p.forEach(function(c,k){ k?ctx.lineTo(cellCx(c),cellCy(c)):ctx.moveTo(cellCx(c),cellCy(c)); });
+      ctx.stroke();
+      if(done){
+        ctx.strokeStyle='rgba(255,255,255,'+(0.18+0.12*Math.sin(G.t*4+idx))+')';
+        ctx.lineWidth=s*0.1; ctx.stroke();
+      }
+    });
+
+    /* точки */
+    task.pairs.forEach(function(q,idx){
+      var h=hueOf(idx), done=isDone(idx);
+      [[q.a,q.term],[q.b,q.match]].forEach(function(pair){
+        var c=pair[0], text=pair[1];
+        var x=cellCx(c), y=cellCy(c), r=s*0.40;
+        ctx.save();
+        if(done){ ctx.shadowColor=h.c; ctx.shadowBlur=14; }
+        ctx.beginPath(); ctx.arc(x,y,r,0,TAU);
+        var g=ctx.createRadialGradient(x-r*0.3,y-r*0.35,r*0.1,x,y,r);
+        g.addColorStop(0,h.c); g.addColorStop(1,h.d);
+        ctx.fillStyle=g; ctx.fill();
+        ctx.restore();
+        ctx.lineWidth=2; ctx.strokeStyle='rgba(255,255,255,.4)';
+        ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.stroke();
+        if(text) drawLabel(text,x,y,s*0.78);
+      });
+    });
+  }
+
+  /* низкий экран: под облако маскота места нет, фраза уходит в баннер */
+  function tightUI(){ return G.H<720; }
+
+  function drawBanner(){
+    var b={x:12,y:Math.max(52,G.H*0.072),w:G.W-24,h:Math.max(46,G.H*0.062)};
+    ctx.save();
+    rr(b.x,b.y,b.w,b.h,b.h*0.42);
+    var g=ctx.createLinearGradient(0,b.y,0,b.y+b.h);
+    g.addColorStop(0,'rgba(12,44,32,.86)'); g.addColorStop(1,'rgba(8,30,22,.86)');
+    ctx.fillStyle=g; ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.2)'; ctx.lineWidth=1.5; ctx.stroke();
+
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillStyle='#9be870'; ctx.font='900 10.5px Inter,Arial';
+    ctx.fillText(task.mode==='term'?'МАҒЫНАСЫ БОЙЫНША ҚОС':'МАҚСАТ',b.x+16,b.y+b.h*0.32);
+    /* На низком экране (320×640) облако маскота накрывало нижний ряд поля.
+       Вместо того чтобы ужимать поле, фраза уходит в баннер — место уже есть. */
+    var line=(tightUI()&&Mascot.sayT>0&&Mascot.say)?Mascot.say:'Барлық шаршыны толтыр';
+    ctx.fillStyle='#fff'; ctx.font='900 '+Math.min(15,b.w*0.048)+'px Inter,Arial';
+    ctx.fillText(line,b.x+16,b.y+b.h*0.71);
+
+    ctx.textAlign='right';
+    ctx.fillStyle='rgba(255,255,255,.55)'; ctx.font='800 10px Inter,Arial';
+    ctx.fillText('ЖҰП',b.x+b.w-16,b.y+b.h*0.32);
+    ctx.fillStyle='#fff'; ctx.font='900 17px Inter,Arial';
+    ctx.fillText(doneCount()+' / '+task.pairs.length,b.x+b.w-16,b.y+b.h*0.71);
+    ctx.restore();
+  }
+
+  function drawBubble(x,y,text){
+    ctx.save();
+    ctx.font='800 13px Inter,Arial';
+    var w=Math.min(G.W-x-20,ctx.measureText(text).width+26), h=34;
+    var bx=x+6, by=y-h-6;
+    ctx.fillStyle='rgba(255,255,255,.96)';
+    rr(bx,by,w,h,12); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(bx+14,by+h); ctx.lineTo(bx+8,by+h+11); ctx.lineTo(bx+27,by+h);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#12351f'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(text,bx+13,by+h/2);
+    ctx.restore();
+  }
+
+  function draw(){
+    /* на карте канвас целиком закрыт DOM-оверлеем — рисовать нечего и незачем */
+    if(G.mode==='map') return;
+    ctx.clearRect(0,0,G.W,G.H);
+    ctx.save();
+    if(G.shake>0.2) ctx.translate((Math.random()-0.5)*G.shake,(Math.random()-0.5)*G.shake);
+    if(G.bg) ctx.drawImage(G.bg,0,0,G.W,G.H);
+    if(task){ drawBanner(); drawBoard(); }
+    var mx=Math.min(70,G.W*0.18), my=G.H-Math.max(46,G.H*0.062);
+    /* ёжик мельче этого читается как пятно на зелёном фоне — проверено кадром */
+    var sc=clamp(Math.min(G.W/460,G.H/920),0.72,1.12)*1.8;
+    Mascot.draw(ctx,mx,my,sc);
+    if(Mascot.sayT>0&&Mascot.say&&!tightUI()) drawBubble(mx+20,my-52*sc,Mascot.say);
+    drawFX(ctx);
+    ctx.restore();
+  }
+
+  function update(dt){
+    G.t+=dt;
+    Mascot.update(dt); updateFX(dt);
+    G.shake*=Math.pow(0.001,dt); if(G.shake<0.2) G.shake=0;
+    if(hintT>0) hintT-=dt;
+    if(G.mode!=='play') return;
+    idleT+=dt;
+    if(idleT>18&&!hintPath){ askHint(); idleT=0; }
+    /* запись в DOM только при смене состояния: присваивание каждый кадр
+       заставляет браузер пересчитывать стиль 60 раз в секунду */
+    var canUndo=hist.length>0;
+    if(canUndo!==undoOn){ undoOn=canUndo; $('undoBtn').disabled=!canUndo; }
+  }
+
+  var last=0;
+  function loop(now){
+    var dt=Math.min(0.05,(now-(last||now))/1000); last=now;
+    update(dt); draw();
+    requestAnimationFrame(loop);
+  }
+
+  cv.addEventListener('pointerdown',function(e){ e.preventDefault();
+    try{ cv.setPointerCapture(e.pointerId); }catch(err){}
+    Sound.unlock(); onDown(e); });
+  cv.addEventListener('pointermove',function(e){ e.preventDefault(); onMove(e); });
+  cv.addEventListener('pointerup',function(e){ e.preventDefault(); onUp(); });
+  cv.addEventListener('pointercancel',onUp);
+  window.addEventListener('resize',resize);
+  window.addEventListener('orientationchange',function(){ setTimeout(resize,120); });
+
+  return {
+    boot:function(m,d){
+      Map=m; Drill=d;
+      resize();
+      var q=(location.search||'').match(/[?&]level=(\d+)/);
+      var lv=q?clamp(parseInt(q[1],10),1,NODES):0;
+      if(lv){ Save.data.cur=Math.max(Save.data.cur,lv); start(lv); }
+      else openMap();
+      requestAnimationFrame(loop);
+    },
+    map:openMap, start:start, undo:undo, restart:restart, hint:askHint,
+    cur:function(){ return task?task.n:Save.data.cur; },
+    session:session,
+    errTopics:function(){ return errTopics; },
+    pause:function(){ cur=null; }
+  };
+})();
+
+/* ═════════════ 9. РАЗБОР ОШИБОК — вопросы из того же банка пар ═════════════
+   Спрашиваем только по темам, где ребёнок реально ошибся в этой сессии.
+   Отвлекающие — из ТОЙ ЖЕ темы: «құс» против «балық» правдоподобно,
+   «құс» против «термометр» — подсказка, а не вопрос. */
+function drillQuestions(topics,seed){
+  var keys=Object.keys(topics||{}).filter(function(k){ return topics[k]>0; });
+  if(!keys.length) return [];
+  keys.sort(function(a,b){ return topics[b]-topics[a]; });
+  var rnd=AK.rng(seed||1), out=[];
+  for(var i=0;i<3;i++){
+    var t=keys[i%keys.length];
+    var pool=PAIRS.filter(function(p){ return p.t===t; });
+    if(!pool.length) continue;
+    var q=pool[Math.floor(rnd()*pool.length)];
+    var wrong=AK.shuffle(pool.filter(function(p){ return p.b!==q.b; }),rnd)
+                .map(function(p){ return p.b; });
+    var uniq=[]; wrong.forEach(function(w){ if(uniq.indexOf(w)<0&&uniq.length<2) uniq.push(w); });
+    out.push({ topic:TOPIC_KK[t]||t, text:q.a, answer:q.b,
+               opts:AK.shuffle([q.b].concat(uniq),rnd) });
+  }
+  return out;
+}
+
+/* ═════════════ 10. UI + мост StudyLine ═════════════ */
+(function(){
+  function $(id){ return document.getElementById(id); }
+  var wrap=$('wrap');
+
+  SL.init({ game:'nature_flow' });
+
+  var Map=AK.map({
+    host:wrap, save:Save, nodes:NODES,
+    title:'🌿 Табиғат аренасы',
+    subtitle:'Жаратылыстану · 1-биом',
+    onPick:function(n){ Sound.unlock(); Sound.click(); Game.start(n); },
+    onLocked:function(){ Sound.nope(); }
+  });
+  var Drill=AK.drill({
+    host:wrap, ask:'Жұбы қайсы?', slow:'Асықпа, тағы ойлан',
+    hint:'Қателескен тақырыпты бекітеміз',
+    onAnswer:function(q,ok){
+      if(ok) Sound.link(2); else Sound.nope();
+      try{ SL.progress({type:'drill',topic:q.topic,term:q.text,correct:ok}); }catch(e){}
+    }
+  });
+
+  $('muteBtn').addEventListener('click',function(){
+    var on=Sound.toggle(); this.textContent=on?'🔊':'🔇';
+  });
+  $('backBtn').addEventListener('click',function(){
+    Sound.click(); $('sWin').classList.remove('on'); $('sBiome').classList.remove('on'); Game.map();
+  });
+  $('undoBtn').addEventListener('click',function(){ Game.undo(); });
+  $('resetBtn').addEventListener('click',function(){ Game.restart(); });
+  $('hintBtn').addEventListener('click',function(){ Game.hint(); });
+  $('againBtn').addEventListener('click',function(){
+    Sound.click(); $('sWin').classList.remove('on'); Game.start(Game.cur());
+  });
+  $('nextBtn').addEventListener('click',function(){
+    Sound.click(); $('sWin').classList.remove('on');
+    var done=Game.cur(), n=done+1;
+    /* каждые 5 тапсырм — разбор ошибок перед следующей */
+    if(done%5===0){
+      var qs=drillQuestions(Game.errTopics(),done*31+7);
+      if(Drill.open(qs,function(){ afterNext(n); })) return;
+    }
+    afterNext(n);
+  });
+  function afterNext(n){
+    if(n>NODES){
+      $('bStars').textContent=Save.total();
+      $('sBiome').classList.add('on');
+      Sound.unlock2();
+      return;
+    }
+    Game.start(n);
+  }
+  $('biomeBtn').addEventListener('click',function(){
+    Sound.click(); $('sBiome').classList.remove('on'); Game.map();
+  });
+
+  /* Итог сессии уходит один раз — бридж защищён от повторного finish. */
+  var t0=Date.now(), sent=false;
+  function sendSession(){
+    if(sent) return; sent=true;
+    var s=Game.session;
+    try{
+      SL.finish({
+        score:       s.stars*50+s.nodes*20,
+        correct:     s.nodes,
+        mistakes:    s.errors,
+        maxCombo:    s.stars,
+        durationSec: Math.round((Date.now()-t0)/1000),
+        difficulty:  'medium',
+        details:     { arena:'nature', game:'nature_flow', nodes:s.nodes, stars:s.stars,
+                       draws:s.draws, progress:Save.data.cur-1, biome:1,
+                       daysThisWeek:Save.daysThisWeek(), errorTopics:Game.errTopics() }
+      });
+    }catch(e){}
+  }
+
+  if(SL.isInApp){
+    var c=$('slCloseBtn');
+    c.style.display='block';
+    c.addEventListener('click',function(){ Sound.click(); sendSession(); SL.close(); });
+  }
+  SL.on('pause',function(){ try{ Game.pause(); }catch(e){} });
+  window.addEventListener('pagehide',sendSession);
+  document.addEventListener('visibilitychange',function(){ if(document.hidden) sendSession(); });
+
+  Game.boot(Map,Drill);
+  SL.ready();
+})();
+</script>
+</body>
+</html>
