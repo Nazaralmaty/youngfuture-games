@@ -222,6 +222,39 @@ create index if not exists game_sessions_level_idx
   where level is not null;
 
 
+-- ── 8. Лиды колеса фортуны (НИШ ҚТЛ логика) ──────────────────────────────
+-- Без логина: играть можно сразу, лид собирается только перед спином
+-- колеса фортуны (games/nis_ktl_logika.html). Пишет напрямую через anon-ключ,
+-- без db/games-db.js — там завязка на полноценный auth-флоу, здесь не нужна.
+
+create table if not exists public.wheel_leads (
+  id            bigint generated always as identity primary key,
+  game          text not null check (length(game) between 1 and 40),
+  parent_phone  text not null check (length(parent_phone) between 5 and 20),
+  child_name    text check (length(child_name) <= 40),
+  prize_tier    text not null check (prize_tier in ('discount','netflix','main')),
+  prize_label   text not null,
+  coins         int not null default 0,
+  correct       int not null default 0,
+  contacted     boolean not null default false,
+  created_at    timestamptz not null default now()
+);
+
+comment on table public.wheel_leads is 'Лиды с колеса фортуны — заявки на диагностику и редкие призы';
+
+-- Один номер — один спин (даже если очистить localStorage и открыть заново).
+create unique index if not exists wheel_leads_phone_uidx on public.wheel_leads (parent_phone);
+
+alter table public.wheel_leads enable row level security;
+
+drop policy if exists wheel_leads_insert_anon on public.wheel_leads;
+create policy wheel_leads_insert_anon on public.wheel_leads
+  for insert to anon with check (true);
+
+-- Никакого select для anon — лиды читает команда через Supabase-дашборд/service role.
+
+
 -- ── Готово ─────────────────────────────────────────────────────────────────
 -- Проверка: select * from public.weekly_leaderboard('math_arcade', 10);
 -- Проверка: select max(level) from public.game_sessions where game = 'sort_arena';
+-- Проверка: select * from public.wheel_leads order by created_at desc limit 5;

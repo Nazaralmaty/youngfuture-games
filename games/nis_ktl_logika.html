@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>StudyLine · ҚТЛ Логика 🧠</title>
+<style>
+  :root{
+    --ink:#0b1437;--ink2:#161c47;--violet:#6d4bff;--violet2:#8a6bff;
+    --cyan:#21d4fd;--lime:#9be870;--gold:#ffce4a;--red:#ff4d6d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{background:#070b1e;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+       display:flex;align-items:center;justify-content:center;color:#fff;overflow:hidden}
+  #wrap{position:relative;width:100%;max-width:460px;height:100svh;max-height:920px;overflow:hidden;
+        background:#0a1330;user-select:none;box-shadow:0 0 80px rgba(0,0,0,.6)}
+  canvas{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;z-index:1}
+
+  /* ── HUD ── */
+  #hud{position:absolute;top:0;left:0;right:0;z-index:4;display:none;align-items:center;justify-content:space-between;
+       padding:12px 14px;background:linear-gradient(180deg,rgba(7,11,30,.85),rgba(7,11,30,0))}
+  #hud.on{display:flex}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(11,19,48,.72);border:1px solid rgba(255,255,255,.16);
+        border-radius:999px;padding:7px 13px;font-size:14px;font-weight:900;backdrop-filter:blur(6px)}
+  .pill.coin{color:var(--gold)}
+  #muteBtn{background:rgba(11,19,48,.72);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:11px;
+           width:36px;height:36px;cursor:pointer;font-size:15px}
+  #mapLbl{position:absolute;top:58px;left:0;right:0;z-index:3;text-align:center;pointer-events:none;display:none}
+  #mapLbl.on{display:block}
+  #mapLbl span{display:inline-block;background:rgba(11,19,48,.72);border:1px solid rgba(255,255,255,.16);border-radius:999px;
+              padding:6px 16px;font-size:11.5px;font-weight:800;letter-spacing:.8px;color:#c7cdf0;backdrop-filter:blur(6px)}
+
+  /* ── overlay screens ── */
+  .screen{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;
+          padding:24px 20px;overflow-y:auto;background:rgba(7,11,30,.88);backdrop-filter:blur(6px)}
+  .screen.on{display:flex}
+  .brand{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+  .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--violet),var(--cyan));
+        display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(109,75,255,.5);font-size:20px}
+  .brand b{font-size:17px;font-weight:800}.brand b em{font-style:normal;color:var(--cyan)}
+  .htitle{font-size:25px;font-weight:900;letter-spacing:-.4px;text-align:center;margin:4px 0 6px}
+  .htitle em{font-style:normal;color:var(--lime)}
+  .hsub{font-size:13.5px;color:#9aa3d0;text-align:center;line-height:1.55;max-width:340px;margin-bottom:18px}
+
+  .btn{border:none;cursor:pointer;font-family:inherit;font-weight:900;color:var(--ink);
+       background:linear-gradient(135deg,var(--lime),#d6ff8a);border-radius:16px;padding:16px 26px;font-size:17px;
+       box-shadow:0 10px 24px rgba(155,232,112,.3);display:inline-flex;align-items:center;justify-content:center;gap:8px;
+       text-decoration:none;width:100%;max-width:320px}
+  .btn:active{transform:translateY(2px)}
+  .btn.alt{background:linear-gradient(135deg,var(--violet),var(--violet2));color:#fff;box-shadow:0 10px 24px rgba(109,75,255,.35)}
+  .btn.wa{background:linear-gradient(135deg,#25d366,#16b85a);color:#04210f;box-shadow:0 12px 26px rgba(37,211,102,.4);margin-top:14px}
+  .btn[disabled]{opacity:.5;pointer-events:none}
+
+  /* ── quiz card ── */
+  .qcard{width:100%;max-width:380px;background:linear-gradient(170deg,#161c47,#0d1230);border:1px solid rgba(255,255,255,.14);
+         border-radius:24px;padding:20px 18px;box-shadow:0 26px 60px rgba(0,0,0,.5);animation:pop .3s cubic-bezier(.2,1.4,.5,1)}
+  @keyframes pop{0%{transform:scale(.85) translateY(10px);opacity:0}100%{transform:none;opacity:1}}
+  .qbiome{font-size:11px;letter-spacing:1px;font-weight:800;color:var(--cyan);text-align:center}
+  .qnum{font-size:12px;color:#9aa3d0;text-align:center;margin-top:2px;font-weight:700}
+  .qtext{font-size:19px;font-weight:800;line-height:1.4;text-align:center;margin:14px 0 16px}
+  .qopts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .qopt{border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:15.5px;color:#fff;
+        background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px 10px;
+        transition:transform .12s,background .12s,border-color .12s}
+  .qopt:active{transform:scale(.96)}
+  .qopt[disabled]{pointer-events:none}
+  .qopt.ok{background:linear-gradient(135deg,var(--lime),#7fce4c);border-color:transparent;color:var(--ink)}
+  .qopt.bad{background:linear-gradient(135deg,var(--red),#c23a54);border-color:transparent;color:#fff}
+  .qopt.dim{opacity:.4}
+  .qfeedback{text-align:center;font-size:14px;font-weight:800;margin-top:14px;min-height:20px}
+  .qfeedback.ok{color:var(--lime)}.qfeedback.bad{color:var(--red)}
+  #qContinue{margin-top:14px;display:none}
+  #qContinue.on{display:inline-flex}
+
+  /* ── result / lead / prize ── */
+  .score-big{font-size:52px;font-weight:900;color:var(--gold);margin:6px 0 2px;text-shadow:0 4px 20px rgba(255,206,74,.4)}
+  .card{width:100%;max-width:360px;background:linear-gradient(170deg,#161c47,#0d1230);border:1px solid rgba(255,255,255,.14);
+        border-radius:24px;padding:26px 22px;text-align:center;box-shadow:0 26px 60px rgba(0,0,0,.5)}
+
+  .field{width:100%;max-width:320px;margin-top:12px;text-align:left}
+  .field label{font-size:12px;font-weight:800;color:#9aa3d0;display:block;margin-bottom:6px;letter-spacing:.3px}
+  .field input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:13px;
+               padding:14px 15px;font-size:16px;color:#fff;font-family:inherit}
+  .field input:focus{outline:none;border-color:var(--cyan)}
+  .formErr{color:var(--red);font-size:12.5px;font-weight:700;margin-top:8px;min-height:16px;max-width:320px;text-align:center}
+  .prizeEmoji{font-size:64px;margin-bottom:6px}
+
+  /* ── wheel screen ── */
+  #sWheel{justify-content:flex-end;padding-bottom:56px}
+  #wheelHint{font-size:13px;color:#9aa3d0;text-align:center;max-width:300px;min-height:18px}
+  #spinBtn{margin-top:14px;max-width:260px}
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <canvas id="cv"></canvas>
+
+  <div id="hud">
+    <span class="pill coin">🪙 <span id="hCoin">0</span></span>
+    <button id="muteBtn">🔊</button>
+  </div>
+  <div id="mapLbl"><span id="mapLblTxt">1-БИОМ · ЗАҢДЫЛЫҚ ӘЛЕМІ</span></div>
+
+  <!-- INTRO -->
+  <div class="screen on" id="sIntro">
+    <div class="brand"><div class="logo">🧠</div><b>Study<em>Line</em></b></div>
+    <div class="htitle">ҚТЛ <em>Логика</em> сыны</div>
+    <div class="hsub">5-6 сынып оқушыларына арналған. НИШ ҚТЛ форматындағы 10 логикалық тапсырманы шеш, монета жина және дөңгелекті айналдыр — жеңімпаздарды тегін диагностика мен сыйлықтар күтіп тұр! ⏱ ~5 минут</div>
+    <button class="btn" id="introBtn">Ойынды бастау ▶</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="sQuiz">
+    <div class="qcard">
+      <div class="qbiome" id="qBiome"></div>
+      <div class="qnum" id="qNum"></div>
+      <div class="qtext" id="qText"></div>
+      <div class="qopts" id="qOpts"></div>
+      <div class="qfeedback" id="qFeedback"></div>
+      <div style="text-align:center"><button class="btn alt" id="qContinue">Жалғастыру ▶</button></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="sResult">
+    <div class="card">
+      <div style="font-size:13px;letter-spacing:1px;color:#9aa3d0;font-weight:800">АЯҚТАЛДЫ 🎉</div>
+      <div id="rCorrect" style="font-size:15px;margin-top:8px;color:#c7cdf0">—</div>
+      <div class="score-big"><span id="rCoin">100</span> 🪙</div>
+      <div style="font-size:13px;color:#9aa3d0">жиналды — дөңгелекті айналдыруға жетеді!</div>
+      <button class="btn" id="toLeadBtn" style="margin-top:18px">Дөңгелекті айналдыру 🎡</button>
+    </div>
+  </div>
+
+  <!-- LEAD FORM -->
+  <div class="screen" id="sLead">
+    <div class="card">
+      <div class="htitle" style="font-size:21px">Дөңгелекті айналдыру үшін</div>
+      <div class="hsub" style="margin-bottom:4px">Ата-ана нөмірін жаз — жеңіске жеткен сыйлықтар мен тегін диагностика туралы хабарласамыз.</div>
+      <div class="field">
+        <label for="fPhone">Ата-ана нөмірі *</label>
+        <input id="fPhone" type="tel" inputmode="tel" placeholder="+7 707 123 45 67" autocomplete="tel">
+      </div>
+      <div class="field">
+        <label for="fName">Баланың аты (міндетті емес)</label>
+        <input id="fName" type="text" placeholder="Аты" autocomplete="name" maxlength="40">
+      </div>
+      <div class="formErr" id="fErr"></div>
+      <button class="btn" id="leadSubmitBtn" style="margin-top:8px">Жіберу және айналдыру 🎡</button>
+    </div>
+  </div>
+
+  <!-- WHEEL -->
+  <div class="screen" id="sWheel" style="background:rgba(7,11,30,.35);backdrop-filter:none">
+    <div id="wheelHint">Дөңгелекті айналдыр!</div>
+    <button class="btn alt" id="spinBtn">Айналдыру 🎡</button>
+  </div>
+
+  <!-- PRIZE -->
+  <div class="screen" id="sPrize">
+    <div class="card">
+      <div class="prizeEmoji" id="prizeEmoji">🎁</div>
+      <div class="htitle" id="prizeTitle" style="font-size:23px">Сыйлық!</div>
+      <div class="hsub" id="prizeDesc"></div>
+      <a class="btn wa" id="waBtn" href="#" target="_blank" rel="noopener">WhatsApp-қа жазу 🚀</a>
+    </div>
+  </div>
+
+  <!-- ALREADY PARTICIPATED -->
+  <div class="screen" id="sTaken">
+    <div class="card">
+      <div class="prizeEmoji">🙂</div>
+      <div class="htitle" style="font-size:21px">Сіз бұрын қатыстыңыз</div>
+      <div class="hsub">Бұл нөмір бұрын тіркелген — бір нөмірден бір айналдыру. Диагностика туралы ақпарат алу үшін WhatsApp-қа жазыңыз.</div>
+      <a class="btn wa" id="waBtnTaken" href="#" target="_blank" rel="noopener">WhatsApp-қа жазу 🚀</a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═════════════ 1. КОНТЕНТ: 10 ЛОГИКАЛЫҚ ТАПСЫРМА ═════════════ */
+var TASKS=[
+  {biome:1,q:'Жалғасын тап: 2, 4, 6, 8, ?',opts:['9','10','12','14'],a:1},
+  {biome:1,q:'Жалғасын тап: 1, 4, 9, 16, ?',opts:['20','22','25','30'],a:2},
+  {biome:1,q:'Жалғасын тап: 3, 6, 12, 24, ?',opts:['36','42','48','50'],a:2},
+  {biome:1,q:'Жалғасын тап: 100, 90, 81, 73, ?',opts:['64','65','66','68'],a:2},
+  {biome:1,q:'Жалғасын тап: 3, 6, 5, 10, 9, ?',opts:['16','17','18','20'],a:2},
+  {biome:2,q:'Артығын тап: Алма, Алмұрт, Банан, Үстел',opts:['Алма','Алмұрт','Банан','Үстел'],a:3},
+  {biome:2,q:'Ұқсастықты тап: Бал — тәтті, Лимон — ?',opts:['Тәтті','Қышқыл','Суық','Ыстық'],a:1},
+  {biome:2,q:'Ерлан Айдостан ұзын. Айдос Нұрланнан ұзын. Үшеуінің ішінен кім ең аласа?',opts:['Ерлан','Айдос','Нұрлан','Білмеймін'],a:2},
+  {biome:2,q:'Барлық мысықтар — жануар. Барыс — мысық тұқымдас. Онда Барыс — ?',opts:['Жануар','Өсімдік','Зат','Адам'],a:0},
+  {biome:2,q:'Таразыда: 2 алма = 1 алмұрт. 1 алмұрт = 3 өрік. Онда 2 алма неше өрікке тең?',opts:['3','5','6','9'],a:2}
+];
+var TOTAL=TASKS.length; // 10
+var COIN_PER_NODE=10;
+var WA_NUM='77077518715';
+
+/* ═════════════ 2. КОЛЕСО ФОРТУНАСЫ ═════════════
+   Тир алдымен салмақталған RNG-мен таңдалады (шынайы ықтималдық),
+   содан кейін дәл сол тирге жататын секторлардың біріне анимация жасалады —
+   секторлардың көрінетін өлшемі шынайы шансқа тең емес, тек көрініс үшін. */
+var TIER_WEIGHTS={main:0.0001,netflix:0.0199,discount:0.98};
+var SEGMENTS=[
+  {tier:'discount',label:'70%\nЖЕҢІЛДІК',emoji:'🎯',color:'#6d4bff'},
+  {tier:'discount',label:'70%\nЖЕҢІЛДІК',emoji:'🎯',color:'#21d4fd'},
+  {tier:'netflix', label:'NETFLIX', emoji:'🍿',color:'#ff4d6d'},
+  {tier:'discount',label:'70%\nЖЕҢІЛДІК',emoji:'🎯',color:'#6d4bff'},
+  {tier:'main',    label:'AIRPODS', emoji:'🎧',color:'#ffce4a'},
+  {tier:'discount',label:'70%\nЖЕҢІЛДІК',emoji:'🎯',color:'#21d4fd'},
+  {tier:'discount',label:'70%\nЖЕҢІЛДІК',emoji:'🎯',color:'#6d4bff'},
+  {tier:'discount',label:'70%\nЖЕҢІЛДІК',emoji:'🎯',color:'#21d4fd'}
+];
+var PRIZE_INFO={
+  discount:{title:'70% ЖЕҢІЛДІК!',desc:'Құттықтаймыз! Балаңызға тегін диагностика + 70% жеңілдік дайын. WhatsApp-тан жазыңыз, біз хабарласамыз.',emoji:'🎁'},
+  netflix: {title:'NETFLIX СЫЙЛЫҒЫ!',desc:'Сіз 1 айлық Netflix жазылымын ұттыңыз! WhatsApp-тан жазыңыз, сыйлықты аламыз.',emoji:'🍿'},
+  main:    {title:'СУПЕР СЫЙЛЫҚ — AIRPODS!',desc:'Құттықтаймыз! Сіз басты сыйлықты ұттыңыз. WhatsApp-тан жазыңыз, командамыз хабарласады.',emoji:'🎧'}
+};
+
+function pickPrize(){
+  var r=Math.random(), tier='discount';
+  if(r<TIER_WEIGHTS.main) tier='main';
+  else if(r<TIER_WEIGHTS.main+TIER_WEIGHTS.netflix) tier='netflix';
+  var idxs=[]; for(var i=0;i<SEGMENTS.length;i++) if(SEGMENTS[i].tier===tier) idxs.push(i);
+  var segIdx=idxs[Math.floor(Math.random()*idxs.length)];
+  return {tier:tier,segIdx:segIdx,label:PRIZE_INFO[tier].title};
+}
+
+/* ═════════════ 3. ПРОГРЕСС (localStorage) ═════════════ */
+var KEY='sl_nis_ktl_v1';
+var Save={
+  data:{node:0,answers:[],prize:null,spun:false},
+  load:function(){ try{ var r=localStorage.getItem(KEY); if(r){ var d=JSON.parse(r); if(d) this.data=d; } }catch(e){} },
+  put:function(){ try{ localStorage.setItem(KEY,JSON.stringify(this.data)); }catch(e){} },
+  unlocked:function(n){ return n<=this.data.node+1; },
+  current:function(){ return Math.min(TOTAL,this.data.node+1); },
+  completeNode:function(n,correct){
+    this.data.answers[n-1]={correct:correct};
+    if(n>this.data.node) this.data.node=n;
+    this.put();
+  },
+  coins:function(){ return this.data.node*COIN_PER_NODE; },
+  correctCount:function(){ return this.data.answers.filter(function(a){ return a&&a.correct; }).length; }
+};
+
+/* ═════════════ 4. SUPABASE: ЛИД ИНСЕРТ (авторизациясыз) ═════════════ */
+var SB_URL='https://ckayydaqncvnbecjlltf.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrYXl5ZGFxbmN2bmJlY2psbHRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2ODE1MjUsImV4cCI6MjA3NTI1NzUyNX0.o_7QJTdpkl14axm8vDfVH7NahbTvJreHAuI62dYG6U8';
+
+function normalizePhone(raw){
+  var d=(raw||'').replace(/\D/g,'');
+  if(d.length===11&&(d[0]==='7'||d[0]==='8')) return '7'+d.slice(1);
+  if(d.length===10) return '7'+d;
+  return null;
+}
+
+function submitLead(payload){
+  return fetch(SB_URL+'/rest/v1/wheel_leads',{
+    method:'POST',
+    headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},
+    body:JSON.stringify(payload)
+  }).then(function(res){
+    if(res.status===409) return {ok:true,duplicate:true};
+    if(!res.ok) return {ok:false};
+    return {ok:true,duplicate:false};
+  }).catch(function(){ return {ok:false}; });
+}
+
+/* ═════════════ 5. ЭКРАН БАСҚАРУ ═════════════ */
+function $(id){ return document.getElementById(id); }
+var allScreens=['sIntro','sQuiz','sResult','sLead','sWheel','sPrize','sTaken'];
+function showScreen(id){
+  allScreens.forEach(function(s){ $(s).classList.toggle('on',s===id); });
+  $('hud').classList.toggle('on', id===null || id==='sQuiz');
+  $('mapLbl').classList.toggle('on', id===null);
+  Wheel.active=(id==='sWheel');
+}
+function goMap(){
+  showScreen(null);
+  $('hCoin').textContent=Save.coins();
+  Map.layout(); Map.scrollToCurrent();
+}
+
+/* ═════════════ 6. КАРТА (canvas, «жылан» маршрут) ═════════════ */
+var cv=$('cv'), ctx=cv.getContext('2d');
+var G={W:0,H:0,dpr:1};
+var Map=(function(){
+  var nodes=[], scroll=0, maxScroll=0, pulse=0;
+
+  function geom(){
+    var step=Math.max(84,G.H*0.115), padB=Math.max(130,G.H*0.17);
+    return {step:step,padB:padB,maxWy:padB+(TOTAL-1)*step,
+            xAt:function(k){ return G.W*0.5+Math.sin(k*0.82)*G.W*0.26; }};
+  }
+  function layout(){
+    nodes=[];
+    var g=geom();
+    for(var i=1;i<=TOTAL;i++){
+      var k=i-1;
+      nodes.push({n:i,x:g.xAt(k),y:-(g.padB+k*g.step),r:Math.min(30,G.W*0.075)});
+    }
+    maxScroll=Math.max(0,g.maxWy-G.H*0.7);
+    scroll=Math.min(scroll,maxScroll);
+  }
+  function scrollToCurrent(){
+    var nd=nodes[Save.current()-1];
+    if(nd) scroll=Math.max(0,Math.min(maxScroll,-nd.y-G.H*0.55));
+    var biome=Save.current()<=5?1:2;
+    $('mapLblTxt').textContent=(biome===1?'1-БИОМ · ЗАҢДЫЛЫҚ ӘЛЕМІ':'2-БИОМ · ЛОГИКА ӘЛЕМІ');
+  }
+  function screenY(nd){ return G.H+nd.y+scroll; }
+
+  function draw(t){
+    var bg=ctx.createLinearGradient(0,0,0,G.H);
+    bg.addColorStop(0,'#161c47'); bg.addColorStop(1,'#0a1330');
+    ctx.fillStyle=bg; ctx.fillRect(0,0,G.W,G.H);
+    ctx.save();
+    for(var s=0;s<26;s++){
+      var sx=(s*97)%G.W, sy=((s*233)+t*8)%G.H;
+      ctx.globalAlpha=0.15+0.1*Math.sin(t*0.6+s);
+      ctx.fillStyle='#fff';
+      ctx.beginPath(); ctx.arc(sx,sy,1.4,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+
+    for(var i=0;i<nodes.length-1;i++){
+      var a=nodes[i], b=nodes[i+1];
+      ctx.strokeStyle=Save.unlocked(b.n)?'rgba(255,255,255,.5)':'rgba(255,255,255,.18)';
+      ctx.lineWidth=5; ctx.lineCap='round'; ctx.setLineDash([2,13]);
+      ctx.beginPath(); ctx.moveTo(a.x,screenY(a)); ctx.lineTo(b.x,screenY(b)); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    pulse=(pulse+0.02)%1;
+    for(i=0;i<nodes.length;i++){
+      var nd=nodes[i], y=screenY(nd), r=nd.r;
+      if(y<-60||y>G.H+60) continue;
+      var open=Save.unlocked(nd.n), done=nd.n<=Save.data.node, cur=(nd.n===Save.current());
+
+      if(cur){
+        var pw=0.5+Math.sin(pulse*Math.PI*2)*0.5;
+        ctx.save(); ctx.globalAlpha=0.3+pw*0.4;
+        ctx.strokeStyle='#fffbe6'; ctx.lineWidth=4+pw*3;
+        ctx.beginPath(); ctx.arc(nd.x,y,r*1.34+pw*4,0,Math.PI*2); ctx.stroke(); ctx.restore();
+      }
+      ctx.fillStyle=done?'#7fce4c':(open?'#8a5c25':'#3a4066');
+      ctx.beginPath(); ctx.arc(nd.x,y,r,0,Math.PI*2); ctx.fill();
+      ctx.lineWidth=2; ctx.strokeStyle='rgba(255,255,255,.28)'; ctx.stroke();
+
+      ctx.fillStyle='#fff'; ctx.font='900 '+Math.round(r*0.85)+'px -apple-system,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(done?'✓':(open?String(nd.n):'🔒'), nd.x, y+1);
+    }
+  }
+
+  var dragging=false, dragY=0, dragStart=0;
+  function pointerDown(px,py){
+    for(var i=0;i<nodes.length;i++){
+      var nd=nodes[i], y=screenY(nd);
+      var dx=px-nd.x, dy=py-y;
+      if(dx*dx+dy*dy<=nd.r*nd.r*1.7){
+        if(Save.unlocked(nd.n)) Quiz.open(nd.n);
+        return;
+      }
+    }
+    dragging=true; dragY=py; dragStart=scroll;
+  }
+  function pointerMove(px,py){
+    if(!dragging) return;
+    scroll=Math.max(0,Math.min(maxScroll,dragStart+(py-dragY)));
+  }
+  function pointerUp(){ dragging=false; }
+
+  return {layout:layout,scrollToCurrent:scrollToCurrent,draw:draw,
+          pointerDown:pointerDown,pointerMove:pointerMove,pointerUp:pointerUp};
+})();
+
+/* ═════════════ 7. СҰРАҚ КАРТОЧКАСЫ ═════════════ */
+var Quiz=(function(){
+  var node=0, task=null, answered=false;
+  function open(n){
+    node=n; task=TASKS[n-1]; answered=false;
+    $('qBiome').textContent=(task.biome===1?'1-БИОМ · ЗАҢДЫЛЫҚ ӘЛЕМІ':'2-БИОМ · ЛОГИКА ӘЛЕМІ');
+    $('qNum').textContent=n+'-тапсырма / '+TOTAL;
+    $('qText').textContent=task.q;
+    $('qFeedback').textContent=''; $('qFeedback').className='qfeedback';
+    $('qContinue').classList.remove('on');
+    var wrap=$('qOpts'); wrap.innerHTML='';
+    task.opts.forEach(function(opt,idx){
+      var b=document.createElement('button');
+      b.className='qopt'; b.textContent=opt;
+      b.onclick=function(){ pick(idx); };
+      wrap.appendChild(b);
+    });
+    showScreen('sQuiz');
+  }
+  function pick(idx){
+    if(answered) return;
+    answered=true;
+    var btns=$('qOpts').children;
+    for(var i=0;i<btns.length;i++){
+      btns[i].disabled=true;
+      if(i===task.a) btns[i].classList.add('ok');
+      else if(i===idx) btns[i].classList.add('bad');
+      else btns[i].classList.add('dim');
+    }
+    var correct=(idx===task.a);
+    $('qFeedback').textContent=correct?'✅ Дұрыс!':('❌ Дұрыс жауап: '+task.opts[task.a]);
+    $('qFeedback').className='qfeedback '+(correct?'ok':'bad');
+    Save.completeNode(node,correct);
+    $('qContinue').classList.add('on');
+  }
+  $('qContinue').onclick=function(){
+    if(node>=TOTAL){ Result.render(); showScreen('sResult'); }
+    else goMap();
+  };
+  return {open:open};
+})();
+
+/* ═════════════ 8. НӘТИЖЕ ЭКРАНЫ ═════════════ */
+var Result={
+  render:function(){
+    $('rCorrect').textContent=Save.correctCount()+'/'+TOTAL+' дұрыс жауап бердің';
+    $('rCoin').textContent=Save.coins();
+  }
+};
+$('introBtn').onclick=function(){
+  if(Save.data.node>=TOTAL){
+    if(Save.data.spun){ Prize.render(Save.data.prize); showScreen('sPrize'); }
+    else { Result.render(); showScreen('sResult'); }
+  } else goMap();
+};
+$('toLeadBtn').onclick=function(){ $('fErr').textContent=''; showScreen('sLead'); };
+
+/* ═════════════ 9. ЛИД ФОРМАСЫ ═════════════ */
+$('leadSubmitBtn').onclick=function(){
+  var phone=normalizePhone($('fPhone').value);
+  if(!phone){ $('fErr').textContent='Нөмірді толық енгізіңіз, мысалы +7 707 123 45 67'; return; }
+  $('fErr').textContent='';
+  var btn=$('leadSubmitBtn'); btn.disabled=true; btn.textContent='Жіберілуде...';
+
+  var prize=pickPrize();
+  submitLead({
+    game:'nis_ktl_logika',
+    parent_phone:phone,
+    child_name:($('fName').value||'').trim().slice(0,40)||null,
+    prize_tier:prize.tier,
+    prize_label:PRIZE_INFO[prize.tier].title,
+    coins:Save.coins(),
+    correct:Save.correctCount()
+  }).then(function(res){
+    btn.disabled=false; btn.textContent='Жіберу және айналдыру 🎡';
+    if(!res.ok){ $('fErr').textContent='Байланыс қатесі. Қайта көріңіз.'; return; }
+    if(res.duplicate){
+      $('waBtnTaken').href='https://wa.me/'+WA_NUM+'?text='+encodeURIComponent('Сәлеметсіз бе! ҚТЛ Логика ойынын ойнадым, диагностика туралы білгім келеді 🚀');
+      showScreen('sTaken');
+      return;
+    }
+    Save.data.prize=prize; Save.data.spun=true; Save.put();
+    Wheel.setTarget(prize.segIdx);
+    showScreen('sWheel');
+  });
+};
+
+/* ═════════════ 10. КОЛЕСО ФОРТУНАСЫ (canvas) ═════════════ */
+var Wheel=(function(){
+  var active=false, spinning=false, angle=0, targetAngle=0, startAngle=0, t0=0, DUR=4200;
+  function setTarget(segIdx){
+    var segA=(Math.PI*2)/SEGMENTS.length;
+    spinning=false; angle=0;
+    targetAngle=Math.PI*2*6-(segIdx+0.5)*segA;
+    $('spinBtn').disabled=false; $('spinBtn').textContent='Айналдыру 🎡'; $('wheelHint').textContent='Дөңгелекті айналдыр!';
+  }
+  function draw(){
+    var cx=G.W/2, cy=G.H*0.42, R=Math.min(G.W,G.H)*0.34;
+    ctx.fillStyle='#0a1330'; ctx.fillRect(0,0,G.W,G.H);
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(angle);
+    var segA=(Math.PI*2)/SEGMENTS.length;
+    for(var i=0;i<SEGMENTS.length;i++){
+      var a0=i*segA-Math.PI/2, a1=a0+segA;
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,R,a0,a1); ctx.closePath();
+      ctx.fillStyle=SEGMENTS[i].color; ctx.fill();
+      ctx.strokeStyle='rgba(7,11,30,.7)'; ctx.lineWidth=3; ctx.stroke();
+      ctx.save(); ctx.rotate(a0+segA/2); ctx.textAlign='center'; ctx.fillStyle='#0b1437';
+      ctx.font='900 '+Math.round(R*0.16)+'px -apple-system,sans-serif';
+      ctx.fillText(SEGMENTS[i].emoji,R*0.62,-4);
+      var lines=SEGMENTS[i].label.split('\n');
+      ctx.font='800 '+Math.round(R*0.09)+'px -apple-system,sans-serif';
+      lines.forEach(function(ln,li){ ctx.fillText(ln,R*0.62,14+li*12); });
+      ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(0,0,R*0.14,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+    ctx.restore();
+
+    ctx.save(); ctx.translate(cx,cy-R-6);
+    ctx.beginPath(); ctx.moveTo(-14,0); ctx.lineTo(14,0); ctx.lineTo(0,22); ctx.closePath();
+    ctx.fillStyle='#ffce4a'; ctx.fill();
+    ctx.restore();
+  }
+  function tick(ts){
+    if(!spinning) return;
+    if(!t0) t0=ts;
+    var p=Math.min(1,(ts-t0)/DUR);
+    var e=1-Math.pow(1-p,3);
+    angle=startAngle+(targetAngle-startAngle)*e;
+    if(p>=1){
+      spinning=false;
+      setTimeout(function(){ Prize.render(Save.data.prize); showScreen('sPrize'); },300);
+    }
+  }
+  $('spinBtn').onclick=function(){
+    if(spinning) return;
+    spinning=true; t0=0; startAngle=angle;
+    $('spinBtn').disabled=true; $('spinBtn').textContent='Айналуда...'; $('wheelHint').textContent='';
+  };
+  return {get active(){ return active; }, set active(v){ active=v; },
+          setTarget:setTarget, draw:draw, tick:tick};
+})();
+
+var Prize={
+  render:function(prize){
+    var info=PRIZE_INFO[prize.tier];
+    $('prizeEmoji').textContent=info.emoji;
+    $('prizeTitle').textContent=info.title;
+    $('prizeDesc').textContent=info.desc;
+    $('waBtn').href='https://wa.me/'+WA_NUM+'?text='+encodeURIComponent('Сәлеметсіз бе! ҚТЛ Логика ойынында дөңгелек айналдырдым, ұтысым: '+info.title+' 🎉');
+  }
+};
+
+/* ═════════════ 11. RESIZE / ЦИКЛ / ПОЙНТЕР ═════════════ */
+function resize(){
+  var r=$('wrap').getBoundingClientRect();
+  G.dpr=Math.min(window.devicePixelRatio||1,2.5);
+  G.W=r.width; G.H=r.height;
+  cv.width=Math.round(G.W*G.dpr); cv.height=Math.round(G.H*G.dpr);
+  ctx.setTransform(G.dpr,0,0,G.dpr,0,0);
+  Map.layout(); Map.scrollToCurrent();
+}
+window.addEventListener('resize',resize);
+window.addEventListener('orientationchange',resize);
+
+function xy(ev){
+  var r=cv.getBoundingClientRect();
+  var p=ev.touches?ev.touches[0]:ev;
+  return {x:p.clientX-r.left,y:p.clientY-r.top};
+}
+cv.addEventListener('pointerdown',function(ev){ if(!Wheel.active){ var p=xy(ev); Map.pointerDown(p.x,p.y); } });
+cv.addEventListener('pointermove',function(ev){ if(!Wheel.active){ var p=xy(ev); Map.pointerMove(p.x,p.y); } });
+window.addEventListener('pointerup',function(){ Map.pointerUp(); });
+
+var t=0;
+function loop(ts){
+  t+=1/60;
+  if(Wheel.active){ Wheel.tick(ts); Wheel.draw(); }
+  else { Map.draw(t); }
+  requestAnimationFrame(loop);
+}
+
+var muted=false;
+$('muteBtn').onclick=function(){ muted=!muted; $('muteBtn').textContent=muted?'🔇':'🔊'; };
+
+/* ═════════════ 12. СТАРТ ═════════════ */
+Save.load();
+resize();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
