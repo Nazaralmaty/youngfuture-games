@@ -254,6 +254,28 @@ create policy wheel_leads_insert_anon on public.wheel_leads
 -- Никакого select для anon — лиды читает команда через Supabase-дашборд/service role.
 
 
+-- ── 9. Колесо фортуны: подписки вместо AirPods (НИШ ҚТЛ логика) ───────────
+-- Клиент убрал физический приз (AirPods, тир main) и Netflix как отдельный
+-- тир — теперь редкий исход объединяет несколько подписок (Netflix,
+-- Kinopoisk, Яндекс Плюс) под одним тиром 'rare' с общим шансом ~2%.
+-- Конкретное название сервиса остаётся в prize_label (уже text, менять
+-- не нужно) — так при добавлении новой подписки constraint трогать не надо.
+
+-- Сначала снимаем старый constraint, чтобы update ниже не упирался в него.
+alter table public.wheel_leads drop constraint if exists wheel_leads_prize_tier_check;
+
+update public.wheel_leads set prize_tier = 'rare'
+  where prize_tier in ('netflix','main');
+
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'wheel_leads_prize_tier_check') then
+    alter table public.wheel_leads
+      add constraint wheel_leads_prize_tier_check check (prize_tier in ('discount','rare'));
+  end if;
+end $$;
+
+
 -- ── Готово ─────────────────────────────────────────────────────────────────
 -- Проверка: select * from public.weekly_leaderboard('math_arcade', 10);
 -- Проверка: select max(level) from public.game_sessions where game = 'sort_arena';
