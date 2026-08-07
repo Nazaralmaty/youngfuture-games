@@ -76,9 +76,11 @@
 
   .field{width:100%;max-width:320px;margin-top:12px;text-align:left}
   .field label{font-size:12px;font-weight:800;color:#9aa3d0;display:block;margin-bottom:6px;letter-spacing:.3px}
-  .field input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:13px;
+  .field input,.field select{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:13px;
                padding:14px 15px;font-size:16px;color:#fff;font-family:inherit}
-  .field input:focus{outline:none;border-color:var(--cyan)}
+  .field select{-webkit-appearance:none;appearance:none}
+  .field select option{color:#000}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--cyan)}
   .formErr{color:var(--red);font-size:12.5px;font-weight:700;margin-top:8px;min-height:16px;max-width:320px;text-align:center}
   .prizeEmoji{font-size:64px;margin-bottom:6px}
 
@@ -142,6 +144,14 @@
         <label for="fName">Баланың аты (міндетті емес)</label>
         <input id="fName" type="text" placeholder="Аты" autocomplete="name" maxlength="40">
       </div>
+      <div class="field">
+        <label for="fClass">Сынып *</label>
+        <select id="fClass">
+          <option value="">Таңдаңыз</option>
+          <option value="5">5-сынып</option>
+          <option value="6">6-сынып</option>
+        </select>
+      </div>
       <div class="formErr" id="fErr"></div>
       <button class="btn" id="leadSubmitBtn" style="margin-top:8px">Жіберу және айналдыру 🎡</button>
     </div>
@@ -194,11 +204,12 @@ var COIN_PER_NODE=10;
 var WA_NUM='77077518715';
 
 /* ═════════════ 2. ПРИЗЫ + КОЛЕСО ФОРТУНАСЫ ═════════════
-   Тир алдымен салмақталған RNG-мен таңдалады (шынайы ықтималдық),
-   содан кейін дәл сол тирге жататын секторлардың біріне анимация жасалады —
-   секторлардың көрінетін өлшемі шынайы шансқа тең емес, тек көрініс үшін.
-   «rare» тиріне бірнеше жазылым қызметі кіреді — қайсысы түскені тек
-   sPrize экранында ашылады, дөңгелекте жалпы бір ұяшық жеткілікті. */
+   Тир таңдауды енді КЛИЕНТ емес, СЕРВЕР шешеді (spin_wheel() RPC,
+   db/schema.sql раздел 10) — бұрын Math.random() браузерде жұмыс істеп,
+   anon кез келген prize_tier/prize_label жаза алатын саңылау болатын.
+   Мұнда тек көрсету үшін мәтін/эмодзи және дөңгелектің қай секторына
+   анимация жасау керектігі қалады (segIdx — таза көрініс, шешім емес).
+   Секторлардың көрінетін өлшемі шынайы шансқа тең емес, тек көрініс үшін. */
 var PRIZES={
   discount:{tier:'discount',id:'discount',title:'70% ЖЕҢІЛДІК',emoji:'🎯',
     desc:'Құттықтаймыз! Балаңызға тегін диагностика + 70% жеңілдік дайын. WhatsApp-тан жазыңыз, біз хабарласамыз.'},
@@ -220,15 +231,12 @@ var SEGMENTS=[
   {tier:'discount',label:'-70%',   emoji:'🎯',color:'#6d4bff'}
 ];
 
-function pickPrize(){
-  var i,idxs;
-  if(Math.random()<0.98){
-    idxs=[]; for(i=0;i<SEGMENTS.length;i++) if(SEGMENTS[i].tier==='discount') idxs.push(i);
-    return {tier:'discount',id:'discount',segIdx:idxs[Math.floor(Math.random()*idxs.length)]};
-  }
-  var r=PRIZES.rare[Math.floor(Math.random()*PRIZES.rare.length)];
-  idxs=[]; for(i=0;i<SEGMENTS.length;i++) if(SEGMENTS[i].tier==='rare') idxs.push(i);
-  return {tier:'rare',id:r.id,segIdx:idxs[Math.floor(Math.random()*idxs.length)]};
+/* Тек көрсету үшін: сервер шешкен тирге сай секторлардың біреуін таңдайды,
+   дөңгелек соған айналсын деп. Шешім емес — приздің өзі spin_wheel()-де. */
+function pickSegIdx(tier){
+  var idxs=[];
+  for(var i=0;i<SEGMENTS.length;i++) if(SEGMENTS[i].tier===tier) idxs.push(i);
+  return idxs[Math.floor(Math.random()*idxs.length)];
 }
 
 /* ═════════════ 3. ПРОГРЕСС (localStorage) ═════════════ */
@@ -259,17 +267,25 @@ function normalizePhone(raw){
   return null;
 }
 
-function submitLead(payload){
-  return fetch(SB_URL+'/rest/v1/wheel_leads',{
+/* Приз больше НЕ выбирается тут — только уходит запрос на spin_wheel(),
+   сервер сам решает тир/приз и пишет строку (db/schema.sql, раздел 10). */
+function spinWheel(payload){
+  return fetch(SB_URL+'/rest/v1/rpc/spin_wheel',{
     method:'POST',
-    headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},
+    headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},
     body:JSON.stringify(payload)
   }).then(function(res){
-    if(res.status===409) return {ok:true,duplicate:true};
     if(!res.ok) return {ok:false};
-    return {ok:true,duplicate:false};
+    return res.json().then(function(rows){
+      var row=rows&&rows[0];
+      if(!row) return {ok:false};
+      return {ok:true,duplicate:!!row.is_duplicate,tier:row.tier,id:row.prize_id,label:row.prize_label};
+    });
   }).catch(function(){ return {ok:false}; });
 }
+
+var UTM_SOURCE=new URLSearchParams(location.search).get('utm_source');
+var UTM_CAMPAIGN=new URLSearchParams(location.search).get('utm_campaign');
 
 /* ═════════════ 5. ЭКРАН БАСҚАРУ ═════════════ */
 function $(id){ return document.getElementById(id); }
@@ -286,6 +302,42 @@ function goMap(){
   $('hCoin').textContent=Save.coins();
   Map.layout(); Map.scrollToCurrent();
 }
+
+/* ═════════════ 5b. ДЫБЫС (Web Audio, процедуралы, файлсыз — sort_arena.html
+   Sound-модулінің қысқартылған нұсқасы: тек 5 сигнал, атмосфера жоқ) ═════════ */
+var Sound=(function(){
+  var ACtx=window.AudioContext||window.webkitAudioContext;
+  var ctx=null, sfxG=null, noiseBuf=null, enabled=true;
+  function ensure(){ if(ctx||!ACtx) return;
+    ctx=new ACtx();
+    sfxG=ctx.createGain(); sfxG.gain.value=enabled?0.75:0; sfxG.connect(ctx.destination);
+    var n=Math.floor(ctx.sampleRate*0.3); noiseBuf=ctx.createBuffer(1,n,ctx.sampleRate);
+    var d=noiseBuf.getChannelData(0); for(var i=0;i<n;i++) d[i]=Math.random()*2-1;
+  }
+  function T(){ return ctx?ctx.currentTime:0; }
+  function tone(f,t0,dur,type,peak){ if(!ctx) return;
+    var o=ctx.createOscillator(), g=ctx.createGain(); o.type=type||'triangle'; o.frequency.setValueAtTime(f,t0);
+    g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(peak,t0+0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    o.connect(g); g.connect(sfxG); o.start(t0); o.stop(t0+dur+0.03);
+  }
+  function noise(t0,dur,peak,hp){ if(!ctx) return;
+    var s=ctx.createBufferSource(); s.buffer=noiseBuf;
+    var f=ctx.createBiquadFilter(); f.type='highpass'; f.frequency.value=hp||2000;
+    var g=ctx.createGain(); g.gain.setValueAtTime(peak,t0); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    s.connect(f); f.connect(g); g.connect(sfxG); s.start(t0); s.stop(t0+dur+0.05);
+  }
+  function go(fn){ if(!enabled) return; ensure(); if(!ctx) return; if(ctx.state==='suspended') ctx.resume(); fn(T()); }
+  return {
+    unlock:function(){ ensure(); if(ctx&&ctx.state==='suspended') ctx.resume(); },
+    correct:function(){ go(function(t){ tone(880,t,0.11,'triangle',0.3); tone(1320,t+0.045,0.13,'triangle',0.2); }); },
+    wrong:  function(){ go(function(t){ tone(220,t,0.16,'sine',0.16); noise(t,0.05,0.05,900); }); },
+    coin:   function(){ go(function(t){ tone(1046,t,0.08,'square',0.16); tone(1568,t+0.05,0.09,'square',0.12); }); },
+    spin:   function(){ go(function(t){ tone(300,t,0.5,'sawtooth',0.06); }); },
+    win:    function(){ go(function(t){ [523,659,784,1046].forEach(function(f,i){ tone(f,t+i*0.09,0.24,'triangle',0.26); }); }); },
+    setEnabled:function(v){ enabled=v; if(ctx) sfxG.gain.value=v?0.75:0; }
+  };
+})();
 
 /* ═════════════ 6. ОБЩИЕ ХЕЛПЕРЫ (кости-маскот, канвас-утилиты) ═════════════ */
 var TAU=Math.PI*2, DEG=Math.PI/180;
@@ -810,8 +862,11 @@ var Bubble=(function(){
     var n=pairs.length, slot=(G.W*0.84)/n, r=Math.min(G.W,G.H)*0.09;
     bubbles=pairs.map(function(p,idx){
       var px=G.W*0.08+slot*(idx+0.5);
+      /* Шрифт мөлшерін бір рет осында есептейміз (fitFont measureText жасайды) —
+         draw() әр кадр сайын емес, дайын мәнді қолданады. */
+      var fs=fitFont(ctx,p.label,r*1.7,Math.round(r*0.5),11);
       return {x:px,bx:px,y:G.H*1.05+idx*G.H*0.10,r:r,label:p.label,correct:p.correct,
-              ph:Math.random()*TAU,col:COL[idx%COL.length],dead:false};
+              ph:Math.random()*TAU,col:COL[idx%COL.length],dead:false,font:'800 '+fs+'px Inter,Arial'};
     });
     waiting=false;
   }
@@ -859,16 +914,18 @@ var Bubble=(function(){
         b.dead=true;
         if(b.correct){
           burst(b.x,b.y,b.col,16);
+          Sound.correct();
           noteFirstTap(true);
           var isNewNode=completeRound();
           /* hCoin специально НЕ синхронизируется мгновенно тут — число должно
              расти только по прилёту монеток (CoinFX), иначе задваивается,
              когда прилетевшие монетки прибавляются поверх уже готового итога. */
-          if(isNewNode) CoinFX.spawn(b.x,b.y,COIN_PER_NODE);
+          if(isNewNode){ CoinFX.spawn(b.x,b.y,COIN_PER_NODE); Sound.coin(); }
           Mascot.set('cheer',1.2,['Жарайсың!','Керемет!','Тамаша!'][Math.floor(Math.random()*3)]);
           advance();
         } else {
           burst(b.x,b.y,'#ff4d6d',10);
+          Sound.wrong();
           noteFirstTap(false);
           Mascot.set('sad',0.8,'Тағы байқап көр!');
         }
@@ -899,8 +956,7 @@ var Bubble=(function(){
       ctx.fillStyle='rgba(255,255,255,.1)'; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,TAU); ctx.fill();
       ctx.strokeStyle=b.col; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,TAU); ctx.stroke();
       ctx.fillStyle='rgba(255,255,255,.55)'; ctx.beginPath(); ctx.ellipse(b.x-b.r*0.32,b.y-b.r*0.32,b.r*0.18,b.r*0.18,0,0,TAU); ctx.fill();
-      ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
-      fitFont(ctx,b.label,b.r*1.7,Math.round(b.r*0.5),11);
+      ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font=b.font;
       ctx.fillText(String(b.label),b.x,b.y);
     }
   }
@@ -911,7 +967,10 @@ var Bubble=(function(){
 /* ═════════════ 13. НӘТИЖЕ, ПРИЗ-ТИЗЕР ═════════════ */
 var Result={
   render:function(){
-    $('rCorrect').textContent=Save.correctCount()+'/'+TOTAL+' дұрыс жауап бердің';
+    /* "Бірден тапты" — бұл БІРІНШІ тапты санайды, өйткені қате жауаптан
+       кейін де қайта байқауға рұқсат бар (ешкім тоқтап қалмасын деп) —
+       сан соңғы бағадай көрінбесін, тек бірінші әрекетті білдіреді. */
+    $('rCorrect').textContent=Save.correctCount()+'/'+TOTAL+' бірден тапты';
     $('rCoin').textContent=Save.coins();
   }
 };
@@ -924,8 +983,9 @@ function renderPrizeTeaser(){
   });
 }
 $('introBtn').onclick=function(){
+  Sound.unlock(); /* Web Audio тек пайдаланушы тапсырмасынан кейін ашылады */
   if(Save.data.node>=TOTAL){
-    if(Save.data.spun){ Prize.render(Save.data.prize); showScreen('sPrize'); }
+    if(Save.data.spun){ if(Prize.render(Save.data.prize)) showScreen('sPrize'); }
     else { Result.render(); showScreen('sResult'); }
   } else goMap();
 };
@@ -935,19 +995,21 @@ $('toWheelBtn').onclick=function(){ $('fErr').textContent=''; showScreen('sLead'
 /* ═════════════ 14. ЛИД ФОРМАСЫ ═════════════ */
 $('leadSubmitBtn').onclick=function(){
   var phone=normalizePhone($('fPhone').value);
+  var childClass=$('fClass').value;
   if(!phone){ $('fErr').textContent='Нөмірді толық енгізіңіз, мысалы +7 707 123 45 67'; return; }
+  if(!childClass){ $('fErr').textContent='Сыныпты таңдаңыз'; return; }
   $('fErr').textContent='';
   var btn=$('leadSubmitBtn'); btn.disabled=true; btn.textContent='Жіберілуде...';
 
-  var prize=pickPrize();
-  submitLead({
-    game:'nis_ktl_logika',
-    parent_phone:phone,
-    child_name:($('fName').value||'').trim().slice(0,40)||null,
-    prize_tier:prize.tier,
-    prize_label:PRIZE_INFO[prize.id].title,
-    coins:Save.coins(),
-    correct:Save.correctCount()
+  spinWheel({
+    p_game:'nis_ktl_logika',
+    p_phone:phone,
+    p_child_name:($('fName').value||'').trim().slice(0,40)||null,
+    p_child_class:childClass,
+    p_coins:Save.coins(),
+    p_correct:Save.correctCount(),
+    p_utm_source:UTM_SOURCE,
+    p_utm_campaign:UTM_CAMPAIGN
   }).then(function(res){
     btn.disabled=false; btn.textContent='Жіберу және айналдыру 🎡';
     if(!res.ok){ $('fErr').textContent='Байланыс қатесі. Қайта көріңіз.'; return; }
@@ -956,6 +1018,7 @@ $('leadSubmitBtn').onclick=function(){
       showScreen('sTaken');
       return;
     }
+    var prize={tier:res.tier,id:res.id,segIdx:pickSegIdx(res.tier)};
     Save.data.prize=prize; Save.data.spun=true; Save.put();
     Wheel.setTarget(prize.segIdx);
     G.mode='wheel';
@@ -966,18 +1029,27 @@ $('leadSubmitBtn').onclick=function(){
 /* ═════════════ 15. КОЛЕСО ФОРТУНАСЫ (canvas) ═════════════ */
 var Wheel=(function(){
   var spinning=false, angle=0, targetAngle=0, startAngle=0, t0=0, DUR=4200;
+  var segFonts=[], lastR=0;
   function setTarget(segIdx){
     var segA=(Math.PI*2)/SEGMENTS.length;
     spinning=false; angle=0;
     targetAngle=Math.PI*2*6-(segIdx+0.5)*segA;
     $('spinBtn').disabled=false; $('spinBtn').textContent='Айналдыру 🎡'; $('wheelHint').textContent='Дөңгелекті айналдыр!';
   }
+  /* Секторлардың шрифт өлшемін бір рет R өзгергенде есептейміз — measureText
+     әр кадр сайын емес (спин ~4.2с бойы 60fps-та бұл айтарлықтай шығын). */
+  function ensureFonts(R,segA){
+    if(R===lastR && segFonts.length) return;
+    lastR=R;
+    var maxW=2*Math.sin(segA/2)*R*0.62;
+    segFonts=SEGMENTS.map(function(s){ return fitFont(ctx,s.label,maxW,Math.round(R*0.12),9); });
+  }
   function draw(){
     var cx=G.W/2, cy=G.H*0.42, R=Math.min(G.W,G.H)*0.40;
+    var segA=(Math.PI*2)/SEGMENTS.length;
+    ensureFonts(R,segA);
     ctx.fillStyle='#0a1330'; ctx.fillRect(0,0,G.W,G.H);
     ctx.save(); ctx.translate(cx,cy); ctx.rotate(angle);
-    var segA=(Math.PI*2)/SEGMENTS.length;
-    var maxW=2*Math.sin(segA/2)*R*0.62;
     for(var i=0;i<SEGMENTS.length;i++){
       var a0=i*segA-Math.PI/2, a1=a0+segA;
       ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,R,a0,a1); ctx.closePath();
@@ -991,7 +1063,7 @@ var Wheel=(function(){
       ctx.textAlign='center'; ctx.fillStyle='#0b1437';
       ctx.font='900 '+Math.round(R*0.15)+'px -apple-system,sans-serif';
       ctx.fillText(SEGMENTS[i].emoji,rx,flip?6:-6);
-      fitFont(ctx,SEGMENTS[i].label,maxW,Math.round(R*0.12),9);
+      ctx.font='800 '+segFonts[i]+'px Inter,Arial';
       ctx.fillText(SEGMENTS[i].label,rx,flip?-16:16);
       ctx.restore();
     }
@@ -1011,11 +1083,13 @@ var Wheel=(function(){
     angle=startAngle+(targetAngle-startAngle)*e;
     if(p>=1){
       spinning=false;
-      setTimeout(function(){ Prize.render(Save.data.prize); showScreen('sPrize'); },300);
+      Sound.win();
+      setTimeout(function(){ if(Prize.render(Save.data.prize)) showScreen('sPrize'); },300);
     }
   }
   $('spinBtn').onclick=function(){
     if(spinning) return;
+    Sound.spin();
     spinning=true; t0=0; startAngle=angle;
     $('spinBtn').disabled=true; $('spinBtn').textContent='Айналуда...'; $('wheelHint').textContent='';
   };
@@ -1023,18 +1097,33 @@ var Wheel=(function(){
 })();
 
 var Prize={
+  /* true/false қайтарады — шақырушы жақ содан кейін ғана showScreen('sPrize')
+     жасауы керек, әйтпесе guard төменде істемей қалады (әуелде дәл осылай
+     болды: шақырушы сыртта showScreen('sPrize')-ты СӨЗСІЗ шақыратын, guard
+     'sIntro' қойса да үстінен басып кететін). */
   render:function(prize){
-    var info=PRIZE_INFO[prize.id];
+    var info=prize&&PRIZE_INFO[prize.id];
+    if(!info){
+      /* Ескі/бүлінген сақтау (алдыңғы нұсқаның prize пішіні сәйкес келмейді) —
+         қатесіз ойынды жаңадан бастатамыз, throw жасамай. */
+      Save.data={node:0,answers:[],prize:null,spun:false}; Save.put();
+      showScreen('sIntro');
+      return false;
+    }
     $('prizeEmoji').textContent=info.emoji;
     $('prizeTitle').textContent=info.title;
     $('prizeDesc').textContent=info.desc;
     $('waBtn').href='https://wa.me/'+WA_NUM+'?text='+encodeURIComponent('Сәлеметсіз бе! ҚТЛ Логика ойынында дөңгелек айналдырдым, ұтысым: '+info.title+' 🎉');
+    return true;
   }
 };
 
 /* ═════════════ 16. RESIZE / ЦИКЛ / ПОЙНТЕР ═════════════ */
-function resize(){
+function doResize(){
   var r=$('wrap').getBoundingClientRect();
+  /* Мобильде адресбар/пернетақта resize-ты бірнеше рет қатарынан атады —
+     өлшем шынымен өзгермесе, ауыр bakeWorld()-ты қайта жасамаймыз. */
+  if(G.W===r.width && G.H===r.height) return;
   G.dpr=Math.min(window.devicePixelRatio||1,2.5);
   G.W=r.width; G.H=r.height;
   cv.width=Math.round(G.W*G.dpr); cv.height=Math.round(G.H*G.dpr);
@@ -1049,6 +1138,11 @@ function resize(){
   L.mascot={x:Math.min(66,G.W*0.16),
             s:clamp(Math.min(G.W/460,G.H/920),0.72,1.12)*1.24,
             y:G.H-Math.max(26,G.H*0.035)};
+}
+var resizeT=null;
+function resize(){
+  if(resizeT) clearTimeout(resizeT);
+  resizeT=setTimeout(doResize,200);
 }
 window.addEventListener('resize',resize);
 window.addEventListener('orientationchange',resize);
@@ -1086,11 +1180,11 @@ function loop(ts){
 }
 
 var muted=false;
-$('muteBtn').onclick=function(){ muted=!muted; $('muteBtn').textContent=muted?'🔇':'🔊'; };
+$('muteBtn').onclick=function(){ muted=!muted; Sound.setEnabled(!muted); $('muteBtn').textContent=muted?'🔇':'🔊'; };
 
 /* ═════════════ 17. СТАРТ ═════════════ */
 Save.load();
-resize();
+doResize();
 renderPrizeTeaser();
 requestAnimationFrame(loop);
 </script>

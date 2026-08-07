@@ -276,7 +276,85 @@ begin
 end $$;
 
 
+-- ── 10. Приз решает сервер, не клиент ──────────────────────────────────────
+-- Раньше игра сама кидала кубик в браузере (Math.random()) и просто постила
+-- готовый prize_tier/prize_label в таблицу — anon-политика была
+-- «with check (true)», то есть любой curl мог записать себе prize_tier:'rare'
+-- без единого сыгранного раунда. Теперь всё решает эта функция: клиент
+-- присылает только телефон/имя/класс/монеты, а тир и приз выбирает сервер.
+
+-- Новые поля: класс ребёнка (та же форма, что у players.child_class) и
+-- источник трафика — без них до сих пор нечем было сегментировать лиды.
+alter table public.wheel_leads add column if not exists child_class text check (length(child_class) <= 10);
+alter table public.wheel_leads add column if not exists utm_source text;
+alter table public.wheel_leads add column if not exists utm_campaign text;
+
+-- coins/correct клэмпятся внутри функции, но диапазон на колонке — страховка
+-- на случай, если insert-политика когда-нибудь снова приоткроется по ошибке.
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'wheel_leads_coins_range') then
+    alter table public.wheel_leads add constraint wheel_leads_coins_range check (coins between 0 and 100);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'wheel_leads_correct_range') then
+    alter table public.wheel_leads add constraint wheel_leads_correct_range check (correct between 0 and 10);
+  end if;
+end $$;
+
+-- Главное: закрываем прямой insert от анонима. Дальше строки создаёт только
+-- spin_wheel() ниже — она security definer и работает в обход RLS.
+drop policy if exists wheel_leads_insert_anon on public.wheel_leads;
+
+create or replace function public.spin_wheel(
+  p_game text, p_phone text, p_child_name text, p_child_class text,
+  p_coins int, p_correct int, p_utm_source text default null, p_utm_campaign text default null
+)
+returns table(tier text, prize_id text, prize_label text, is_duplicate boolean)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_tier text; v_id text; v_label text;
+begin
+  if random() < 0.98 then
+    v_tier := 'discount'; v_id := 'discount'; v_label := '70% ЖЕҢІЛДІК';
+  else
+    v_tier := 'rare';
+    v_id := (array['netflix','kinopoisk','yandexplus'])[floor(random()*3)+1];
+    v_label := case v_id
+      when 'netflix' then 'NETFLIX'
+      when 'kinopoisk' then 'KINOPOISK'
+      else 'ЯНДЕКС ПЛЮС'
+    end;
+  end if;
+
+  begin
+    insert into public.wheel_leads
+      (game, parent_phone, child_name, child_class, prize_tier, prize_label,
+       coins, correct, utm_source, utm_campaign)
+    values
+      (p_game, p_phone, p_child_name, p_child_class, v_tier, v_label,
+       least(greatest(coalesce(p_coins,0),0),100),
+       least(greatest(coalesce(p_correct,0),0),10),
+       p_utm_source, p_utm_campaign);
+  exception when unique_violation then
+    return query select null::text, null::text, null::text, true;
+    return;
+  end;
+
+  return query select v_tier, v_id, v_label, false;
+end;
+$$;
+
+-- Здесь наоборот, в отличие от weekly_leaderboard: доступ нужен именно anon,
+-- в игре нет логина. PUBLIC на всякий случай отзываем явно.
+revoke all on function public.spin_wheel(text,text,text,text,int,int,text,text) from public;
+grant execute on function public.spin_wheel(text,text,text,text,int,int,text,text) to anon;
+
+
 -- ── Готово ─────────────────────────────────────────────────────────────────
 -- Проверка: select * from public.weekly_leaderboard('math_arcade', 10);
 -- Проверка: select max(level) from public.game_sessions where game = 'sort_arena';
 -- Проверка: select * from public.wheel_leads order by created_at desc limit 5;
+-- Проверка: select * from public.spin_wheel('nis_ktl_logika','77000000000','Тест','5',100,10);
