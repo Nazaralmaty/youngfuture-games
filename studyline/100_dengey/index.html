@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1">
+<meta name="theme-color" content="#FFFFFF">
+<title>100 деңгей — StudyLine</title>
+<!--
+  StudyLine · 100 деңгей (5 дәуір × 20 батыр) — интерактивті прототип.
+  Бір файл, кітапхана жоқ, сілтемемен ашылады.
+
+  Ағын: Басты экран → «Практикалық тесттер» → 6 сұрақ (әр пәннен бір)
+        → нәтиже → карта (тұман көтеріледі) → батыр карточкасы / атақ.
+
+  Дәуірлер: 1 Батырлар (толық), 2–5 жабық — мазмұны HEROES-ке қосылғанда ашылады.
+  Прогресс: localStorage 'sl100_v1'. Серверсіз — бұл прототип.
+  Суреттер: 3D-иллюстрациялар орнына уақытша эмодзи (дизайнер ауыстырады).
+-->
+<style>
+:root{
+  /* Figma study_line токендері */
+  --green:#87BE4B; --green-d:#6FA53A; --green-l:#A8D46F;
+  --mint:#DFF4F1; --cream:#FDF4D8; --pink:#F5E2F9; --blue:#E2E9FD; --leaf:#EDF6E1;
+  --navy:#111543; --ink:#141728; --muted:#666C7E; --muted-c:#5C6273;
+  --green-t:#4F7724; --line:#ECEEF5;
+  --bg:#FFFFFF; --card:#FFFFFF; --paper:#FBF8F1; --paper-ink:#2C2618;
+  --red:#E0574B; --gold:#E7B744; --violet:#7B61FF;
+  /* карта әлемі */
+  --steppe:#F6F1E4; --steppe-2:#EFE8D6; --trail:#CBBFA3;
+  --fog:#DDE3EC; --fog-2:#C6CFDC;
+  --r-lg:24px; --r-md:18px; --r-sm:14px;
+  --pad:16px;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{
+  font-family:var(--font);background:#E9ECF2;color:var(--ink);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  display:flex;align-items:center;justify-content:center;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:3px solid var(--green-t);outline-offset:2px;border-radius:8px}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+
+/* ── сахна: телефонда толық экран, кең экранда 9:16 рамка ───── */
+#stage{
+  position:relative;width:100%;height:100dvh;max-width:440px;
+  background:var(--bg);overflow:hidden;display:flex;flex-direction:column;
+}
+@media (min-width:600px) and (min-height:700px){
+  #stage{height:min(94dvh,calc(440px * 16 / 9));border-radius:34px;
+    box-shadow:0 30px 80px -20px rgba(17,21,67,.45),0 2px 8px rgba(17,21,67,.12)}
+}
+
+.view{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
+.view.on{display:flex}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+        padding:0 var(--pad) 18px}
+.scroll::-webkit-scrollbar{display:none}
+
+/* ── статус жолағы (макет) ──────────────────────────────────── */
+.statusbar{
+  flex:none;display:flex;align-items:center;justify-content:space-between;
+  padding:calc(var(--safe-t) + 12px) 22px 2px;font-size:15px;font-weight:700;
+  letter-spacing:-.2px;color:var(--ink)
+}
+.statusbar .sb-r{display:flex;gap:5px;align-items:center;opacity:.9}
+.statusbar svg{display:block}
+
+/* ── шапка ──────────────────────────────────────────────────── */
+.appbar{flex:none;display:flex;align-items:center;gap:12px;padding:14px var(--pad) 10px}
+.wordmark{font-size:27px;font-weight:900;letter-spacing:-.055em;color:var(--ink);flex:1}
+.wordmark span{color:var(--ink)}
+.round-btn{
+  width:46px;height:46px;border-radius:15px;background:#fff;border:1.5px solid var(--line);
+  display:grid;place-items:center;flex:none;transition:transform .14s var(--ease)
+}
+.round-btn:active{transform:scale(.92)}
+
+/* ── басты герой карточкасы ─────────────────────────────────── */
+.hero{
+  position:relative;border-radius:var(--r-lg);overflow:hidden;isolation:isolate;
+  background:linear-gradient(122deg,#93C755 0%,var(--green) 46%,#6DA436 100%);
+  padding:18px 18px 20px;color:#fff;margin-bottom:26px
+}
+.hero::after{
+  content:"";position:absolute;right:-60px;top:-70px;width:210px;height:210px;
+  border-radius:50%;background:rgba(255,255,255,.13);z-index:-1
+}
+.hero .greet{font-size:14.5px;font-weight:600;opacity:.95;margin-bottom:8px}
+.hero h2{font-size:31px;line-height:1.08;font-weight:900;letter-spacing:-.035em;max-width:7ch}
+.hero p{font-size:14px;line-height:1.4;margin-top:9px;color:rgba(255,255,255,.92);max-width:19ch}
+.hero .cta{
+  margin-top:17px;display:inline-flex;align-items:center;gap:12px;background:#fff;
+  border-radius:15px;padding:9px 9px 9px 18px;font-size:15.5px;font-weight:800;
+  color:var(--ink);letter-spacing:-.2px;box-shadow:0 6px 16px -6px rgba(17,21,67,.35)
+}
+.hero .cta i{
+  width:34px;height:34px;border-radius:50%;background:var(--green);display:grid;
+  place-items:center;font-style:normal;color:#fff
+}
+.hero .mascot{
+  position:absolute;right:8px;bottom:6px;font-size:104px;line-height:1;
+  filter:drop-shadow(0 10px 16px rgba(17,21,67,.28))
+}
+
+/* ── бөлім тақырыбы ─────────────────────────────────────────── */
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:13px}
+.sec h3{font-size:21px;font-weight:900;letter-spacing:-.03em}
+.sec a{font-size:15px;font-weight:700;color:var(--green-t);text-decoration:none}
+
+/* ── тізім карточкалары ─────────────────────────────────────── */
+.tile{
+  position:relative;display:flex;align-items:center;gap:12px;border-radius:var(--r-lg);
+  padding:16px 16px;margin-bottom:12px;text-align:left;width:100%;overflow:hidden;
+  transition:transform .16s var(--ease),box-shadow .16s var(--ease)
+}
+.tile:active{transform:scale(.98)}
+.tile .txt{flex:1;min-width:0}
+.tile h4{font-size:17px;font-weight:800;letter-spacing:-.03em;color:var(--ink)}
+.tile p{font-size:13.5px;line-height:1.35;color:var(--muted-c);margin-top:4px}
+.tile .chip{
+  display:inline-flex;align-items:center;gap:5px;margin-top:9px;background:rgba(255,255,255,.72);
+  border-radius:8px;padding:4px 9px;font-size:11.5px;font-weight:800;color:var(--muted-c)
+}
+.tile .pic{font-size:52px;line-height:1;flex:none;filter:drop-shadow(0 6px 10px rgba(17,21,67,.18))}
+.tile .go{
+  width:38px;height:38px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none;
+  box-shadow:0 3px 8px rgba(17,21,67,.1)
+}
+.tile.mint{background:var(--mint)}
+.tile.cream{background:var(--cream)}
+.tile.live{box-shadow:0 10px 26px -12px rgba(231,183,68,.85),0 0 0 2px rgba(231,183,68,.5) inset}
+.tile.live .go{background:#fff}
+.tile.live .go svg{stroke:#B9821A}
+
+.half-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.half{border-radius:var(--r-lg);padding:14px;display:flex;align-items:center;gap:9px}
+.half .pic{font-size:34px;flex:none}
+.half h4{font-size:14.5px;font-weight:800;letter-spacing:-.03em;line-height:1.15}
+.half p{font-size:11.5px;color:var(--muted-c);margin-top:3px;line-height:1.25}
+.half.pink{background:var(--pink)} .half.blue{background:var(--blue)}
+
+/* ── прогресс (navy) ────────────────────────────────────────── */
+.progress-card{
+  position:relative;background:var(--navy);color:#fff;border-radius:var(--r-lg);
+  padding:18px;overflow:hidden;margin-bottom:12px
+}
+.progress-card .lbl{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:700;opacity:.92}
+.progress-card .cols{display:grid;grid-template-columns:1fr 1fr;margin-top:16px}
+.progress-card .cols>div+div{border-left:1px solid rgba(255,255,255,.16);padding-left:18px}
+.progress-card .big{font-size:40px;font-weight:900;letter-spacing:-.05em;line-height:1}
+.progress-card .big em{font-size:15px;font-weight:700;font-style:normal;letter-spacing:-.02em;margin-left:6px}
+.progress-card .sub{font-size:13px;opacity:.78;margin-top:11px;display:flex;align-items:center;gap:8px}
+.progress-card .up{background:var(--green);border-radius:999px;padding:3px 9px;font-size:12px;font-weight:800}
+.progress-card::after{
+  content:"";position:absolute;right:-10px;bottom:-30px;width:150px;height:130px;
+  border-radius:22px 22px 0 0;border:2px solid rgba(255,255,255,.11);border-bottom:0
+}
+
+/* ── төменгі навигация ──────────────────────────────────────── */
+.tabbar{
+  flex:none;display:flex;background:#fff;border-top:1px solid var(--line);
+  padding:9px 4px calc(var(--safe-b) + 9px)
+}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  font-size:11.5px;font-weight:700;color:#A8ADBC;letter-spacing:-.01em}
+.tabbar button[aria-current="page"]{color:var(--ink)}
+.tabbar svg{width:23px;height:23px}
+
+/* ══ ТЕСТ ═════════════════════════════════════════════════════ */
+.qbar{flex:none;display:flex;align-items:center;gap:12px;padding:calc(var(--safe-t) + 12px) var(--pad) 12px}
+.qbar .title{flex:1;font-size:16px;font-weight:800;letter-spacing:-.03em}
+.qbar .count{font-size:14px;font-weight:800;color:var(--muted)}
+.qprog{flex:none;height:7px;margin:0 var(--pad) 12px;background:var(--line);border-radius:99px;overflow:hidden}
+.qprog i{display:block;height:100%;background:var(--green);border-radius:99px;
+  transition:width .5s var(--ease)}
+/* тест не бос кеңістікте тұрмасын: мазмұн тік ортада */
+#v-test .scroll{display:flex;flex-direction:column;justify-content:center}
+.goal{
+  flex:none;display:flex;align-items:center;gap:9px;margin:0 var(--pad) 4px;
+  background:var(--paper);border:1px solid #EFE8D6;border-radius:13px;padding:10px 13px;
+  font-size:13px;font-weight:700;color:#6B6350;line-height:1.3
+}
+.goal b{color:var(--paper-ink)}
+.goal .dot{width:9px;height:9px;border-radius:50%;background:var(--green);flex:none}
+.subject{
+  display:inline-flex;align-items:center;gap:7px;background:var(--leaf);color:var(--green-t);
+  border-radius:10px;padding:6px 12px;font-size:12.5px;font-weight:800;letter-spacing:.01em;
+  align-self:flex-start   /* flex-контейнерде созылып кетпеуі үшін */
+}
+#qtext{font-size:23px;font-weight:800;line-height:1.25;letter-spacing:-.035em;margin:16px 0 22px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{
+  display:flex;align-items:center;gap:12px;text-align:left;width:100%;
+  border:2px solid var(--line);border-radius:var(--r-md);padding:15px 15px;
+  font-size:16px;font-weight:650;letter-spacing:-.02em;background:#fff;
+  transition:border-color .16s,background .16s,transform .14s var(--ease)
+}
+.opt:active{transform:scale(.985)}
+.opt .k{
+  width:28px;height:28px;border-radius:9px;background:#F3F5F9;color:var(--muted);
+  display:grid;place-items:center;font-size:13px;font-weight:800;flex:none;transition:.16s
+}
+.opt[aria-checked="true"]{border-color:var(--green);background:#F7FBF1}
+.opt[aria-checked="true"] .k{background:var(--green);color:#fff}
+.opt.right{border-color:var(--green);background:#F2F9E9}
+.opt.right .k{background:var(--green);color:#fff}
+.opt.wrong{border-color:var(--red);background:#FDF1F0}
+.opt.wrong .k{background:var(--red);color:#fff}
+.opt[disabled]{cursor:default}
+.verdict{margin-top:16px;font-size:14.5px;font-weight:650;line-height:1.4;color:var(--muted-c);
+  min-height:42px;opacity:0;transform:translateY(6px);transition:.3s var(--ease)}
+.verdict.on{opacity:1;transform:none}
+.verdict b{color:var(--ink)}
+
+.footbtn{flex:none;padding:12px var(--pad) calc(var(--safe-b) + 14px);background:#fff;
+  border-top:1px solid var(--line)}
+.btn{
+  width:100%;border-radius:16px;padding:16px;font-size:16.5px;font-weight:800;letter-spacing:-.02em;
+  background:var(--green);color:#fff;transition:transform .14s var(--ease),opacity .2s;
+  box-shadow:0 8px 18px -8px rgba(111,165,58,.9)
+}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{background:var(--line);color:#A8ADBC;box-shadow:none}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none}
+
+/* ══ НӘТИЖЕ ═══════════════════════════════════════════════════ */
+#v-result .scroll{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding-top:24px}
+.score-ring{
+  position:relative;width:168px;height:168px;display:grid;place-items:center;margin-bottom:22px
+}
+.score-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.score-ring .n{font-size:52px;font-weight:900;letter-spacing:-.06em;line-height:1;
+  display:flex;align-items:baseline;gap:4px}
+.score-ring .n em{font-size:20px;font-style:normal;color:var(--muted);font-weight:800;
+  letter-spacing:-.02em}
+#r-title{font-size:26px;font-weight:900;letter-spacing:-.04em;line-height:1.15}
+#r-sub{font-size:15px;color:var(--muted-c);line-height:1.45;margin-top:10px;max-width:30ch}
+.xp-pill{margin-top:18px;display:inline-flex;align-items:center;gap:8px;background:var(--cream);
+  color:#8A6410;border-radius:999px;padding:9px 16px;font-size:15px;font-weight:800}
+.newrank{
+  margin-top:22px;width:100%;background:var(--leaf);border-radius:var(--r-lg);padding:16px;
+  display:flex;align-items:center;gap:13px;text-align:left
+}
+.newrank .med{flex:none}
+.newrank .k{font-size:11.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--green-t)}
+.newrank .t{font-size:18px;font-weight:900;letter-spacing:-.03em;margin-top:3px}
+.newrank .s{font-size:13px;color:var(--muted-c);margin-top:2px}
+
+/* ══ КАРТА ════════════════════════════════════════════════════ */
+#v-map{background:var(--steppe)}
+#v-map::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(120% 60% at 50% 108%, rgba(135,190,75,.20), transparent 62%),
+    radial-gradient(80% 40% at 12% -6%, rgba(17,21,67,.07), transparent 70%),
+    repeating-linear-gradient(115deg, rgba(203,191,163,.16) 0 1px, transparent 1px 26px);
+}
+.mapbar{flex:none;display:flex;align-items:center;gap:12px;padding:calc(var(--safe-t) + 12px) var(--pad) 4px;
+  position:relative;z-index:2}
+.mapbar .ttl{flex:1}
+.mapbar h2{font-size:19px;font-weight:900;letter-spacing:-.04em;color:var(--paper-ink)}
+.mapbar .meta{font-size:12.5px;font-weight:700;color:#8A7F66;margin-top:2px}
+.mapbar .round-btn{width:40px;height:40px;border-radius:13px;background:rgba(255,255,255,.78);
+  border-color:rgba(203,191,163,.7)}
+.mapcount{background:var(--paper-ink);color:#fff;border-radius:11px;padding:7px 11px;
+  font-size:13px;font-weight:800;letter-spacing:-.02em;flex:none}
+
+#board{position:relative;flex:1;min-height:0;margin:8px 10px 4px;z-index:2}
+#trail{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.rows{position:absolute;inset:0;display:flex;flex-direction:column-reverse}
+.rrow{flex:1;position:relative;display:flex;align-items:center;justify-content:space-around;padding:0 4px}
+.rrow.rev{flex-direction:row-reverse}
+/* Аймақ атауы соқпақтың бұрылысына түспеуі керек: жұп қатарда соқпақ оңға
+   көтеріледі — жазуды солға қоямыз, тақ қатарда керісінше. */
+.rname{
+  position:absolute;top:11px;font-size:10.5px;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:#8C826C;z-index:1
+}
+.rrow:nth-child(odd) .rname{left:10px}
+.rrow:nth-child(even) .rname{right:10px}
+.node{
+  position:relative;width:clamp(42px,12.4vw,56px);aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;font-size:17px;font-weight:900;letter-spacing:-.04em;
+  background:#fff;color:#B7AE99;border:2.5px solid #E2DAC7;z-index:2;
+  box-shadow:0 3px 0 #E2DAC7;transition:transform .16s var(--ease)
+}
+.node:active{transform:scale(.9)}
+.node .rank{
+  position:absolute;top:calc(100% + 5px);left:50%;transform:translateX(-50%);
+  font-size:9px;font-weight:800;color:#8C826C;white-space:nowrap;letter-spacing:-.01em;
+  max-width:13ch;overflow:hidden;text-overflow:ellipsis
+}
+.node.done{background:var(--green);color:#fff;border-color:var(--green-d);box-shadow:0 3px 0 var(--green-d)}
+.node.done .rank{color:var(--green-t)}
+.node.now{
+  background:#fff;color:var(--green-t);border-color:var(--green);box-shadow:0 3px 0 var(--green-d)
+}
+.node.now::after{
+  content:"";position:absolute;inset:-9px;border-radius:50%;border:2.5px solid var(--green);
+  opacity:.55;animation:ping 1.9s var(--ease) infinite
+}
+.node.now .rank{color:var(--green-t)}
+@keyframes ping{0%{transform:scale(.88);opacity:.6}70%{transform:scale(1.28);opacity:0}100%{opacity:0}}
+
+/* Тұман. inset теріс — көрші жолақтардың жігі көрінбей, бір тұтас тұман болады.
+   Мөлдірлігі әдейі толық емес: түйіндердің сұлбасы білініп тұрсын. */
+.fog{
+  position:absolute;inset:-6px 0;z-index:3;pointer-events:auto;
+  background:
+    radial-gradient(58% 84% at var(--c1,22%) 44%, rgba(255,255,255,.95), rgba(255,255,255,0) 70%),
+    radial-gradient(52% 78% at var(--c2,62%) 66%, rgba(255,255,255,.9), rgba(255,255,255,0) 72%),
+    radial-gradient(66% 92% at var(--c3,88%) 34%, rgba(255,255,255,.88), rgba(255,255,255,0) 70%),
+    /* тегіс реңк — көрші жолақтармен жігі білінбеуі үшін градиент емес */
+    linear-gradient(rgba(210,218,229,.9), rgba(210,218,229,.9));
+  backdrop-filter:blur(6px) saturate(.5);-webkit-backdrop-filter:blur(6px) saturate(.5);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  transition:opacity .9s var(--ease),transform .9s var(--ease),filter .9s var(--ease)
+}
+.fog b{
+  font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#5D6979;
+  background:rgba(255,255,255,.66);border-radius:99px;padding:5px 13px
+}
+.fog i{font-size:11.5px;font-style:normal;font-weight:700;color:#5D6979;opacity:.85}
+.fog.lift{opacity:0;transform:translateY(-16px) scale(1.1);filter:blur(10px);pointer-events:none}
+/* Ең төменгі жабық жолақтың шеті — тік сызық емес, жұмсақ шекара. */
+.fog.edge{
+  -webkit-mask-image:linear-gradient(180deg,#000 0,#000 70%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0,#000 70%,transparent 100%)
+}
+
+/* дәуірлер жолағы */
+.biomes{flex:none;display:flex;gap:9px;overflow-x:auto;padding:8px var(--pad) 12px;z-index:2;
+  scrollbar-width:none}
+.biomes::-webkit-scrollbar{display:none}
+.biome{
+  flex:none;border-radius:14px;padding:9px 13px;background:rgba(255,255,255,.72);
+  border:1.5px solid rgba(203,191,163,.7);text-align:left;transition:transform .14s var(--ease)
+}
+.biome:active{transform:scale(.95)}
+.biome b{display:block;font-size:13.5px;font-weight:800;letter-spacing:-.03em;color:var(--paper-ink)}
+.biome i{display:block;font-size:11px;font-style:normal;font-weight:700;color:#9C917A;margin-top:2px}
+.biome[aria-current="true"]{background:var(--paper-ink);border-color:var(--paper-ink)}
+.biome[aria-current="true"] b{color:#fff}
+.biome[aria-current="true"] i{color:rgba(255,255,255,.6)}
+.biome.lock{opacity:.62}
+
+/* ══ SHEET (батыр / атақ) ═════════════════════════════════════ */
+.sheet-wrap{position:absolute;inset:0;z-index:40;display:none}
+.sheet-wrap.on{display:block}
+.scrim{position:absolute;inset:0;background:rgba(17,21,67,.42);opacity:0;transition:opacity .3s}
+.sheet-wrap.in .scrim{opacity:1}
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;max-height:92%;background:#fff;
+  border-radius:26px 26px 0 0;padding:10px var(--pad) calc(var(--safe-b) + 16px);
+  display:flex;flex-direction:column;transform:translateY(100%);
+  transition:transform .42s var(--ease);box-shadow:0 -14px 40px -12px rgba(17,21,67,.3)
+}
+.sheet-wrap.in .sheet{transform:none}
+.grab{width:42px;height:5px;border-radius:99px;background:#E4E7EE;margin:0 auto 12px;flex:none}
+.sheet .body{overflow-y:auto;overscroll-behavior:contain}
+.sheet .body::-webkit-scrollbar{display:none}
+
+.hcard-top{display:flex;gap:15px;align-items:flex-start;margin-bottom:16px}
+.hcard-top .info{flex:1;min-width:0;padding-top:4px}
+.hcard-top h2{font-size:24px;font-weight:900;letter-spacing:-.045em;line-height:1.1}
+.hcard-top .years{font-size:14px;font-weight:700;color:var(--muted);margin-top:5px}
+.hcard-top .place{
+  display:inline-flex;align-items:center;gap:5px;margin-top:9px;background:#F3F5F9;
+  border-radius:9px;padding:5px 10px;font-size:12px;font-weight:800;color:var(--muted-c)
+}
+.hook{
+  font-size:17px;font-weight:800;letter-spacing:-.03em;line-height:1.3;color:var(--green-t);
+  border-radius:var(--r-md);background:var(--leaf);padding:14px 16px;margin-bottom:18px
+}
+.stats{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
+.stat .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.stat .row b{font-size:13.5px;font-weight:800;letter-spacing:-.02em}
+.stat .row span{font-size:13px;font-weight:800;color:var(--muted)}
+.bar{height:9px;border-radius:99px;background:#F0F2F6;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;width:0;transition:width .9s var(--ease)}
+.stat.s1 .bar i{background:linear-gradient(90deg,#F0A03C,var(--red))}
+.stat.s2 .bar i{background:linear-gradient(90deg,#7EA8F5,#4E6DD8)}
+.stat.s3 .bar i{background:linear-gradient(90deg,var(--green-l),var(--green-d))}
+.desc{font-size:15.5px;line-height:1.55;color:#3A4055;margin-bottom:18px}
+.rank-btn{
+  width:100%;display:flex;align-items:center;gap:13px;text-align:left;background:var(--cream);
+  border-radius:var(--r-md);padding:14px;transition:transform .14s var(--ease)
+}
+.rank-btn:active{transform:scale(.98)}
+.rank-btn .k{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#A07D22}
+.rank-btn .t{font-size:17px;font-weight:900;letter-spacing:-.03em;margin-top:2px;color:var(--paper-ink)}
+.rank-btn .arr{margin-left:auto;color:#A07D22;flex:none}
+.locked-note{
+  display:flex;gap:11px;align-items:flex-start;background:#F3F5F9;border-radius:var(--r-md);
+  padding:14px;font-size:14px;line-height:1.45;color:var(--muted-c);margin-bottom:18px
+}
+.locked-note b{color:var(--ink);display:block;margin-bottom:2px;font-size:14.5px}
+
+/* ── медальон ───────────────────────────────────────────────── */
+.med{width:96px;height:96px;flex:none}
+.med.sm{width:52px;height:52px}
+
+/* ── тост ───────────────────────────────────────────────────── */
+#toast{
+  position:absolute;left:50%;bottom:calc(var(--safe-b) + 92px);transform:translate(-50%,14px);
+  background:var(--paper-ink);color:#fff;border-radius:14px;padding:12px 17px;font-size:14px;
+  font-weight:700;letter-spacing:-.02em;z-index:60;opacity:0;pointer-events:none;
+  transition:.34s var(--ease);max-width:88%;text-align:center;line-height:1.35
+}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ── ұшқындар (тұман көтерілгенде) ──────────────────────────── */
+.spark{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--green);
+  z-index:20;pointer-events:none;animation:spark .9s var(--ease) forwards}
+@keyframes spark{
+  0%{transform:translate(0,0) scale(1);opacity:1}
+  100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}
+}
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- ═══ БАСТЫ ЭКРАН ═══════════════════════════════════════ -->
+  <section class="view on" id="v-home">
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-r">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 4.2a11 11 0 0 1 15 0"/><path d="M3.8 7a7 7 0 0 1 9.4 0"/><circle cx="8.5" cy="10" r="1.1" fill="currentColor" stroke="none"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".7" y=".7" width="21" height="10.6" rx="3" stroke="currentColor" stroke-opacity=".4" stroke-width="1.2"/><rect x="2.4" y="2.4" width="17.6" height="7.2" rx="1.8" fill="currentColor"/><path d="M23.3 4.3v3.4a2 2 0 0 0 0-3.4Z" fill="currentColor" fill-opacity=".45"/></svg>
+      </span>
+    </div>
+
+    <div class="appbar">
+      <div class="wordmark">Study<span> Line</span></div>
+      <button class="round-btn" aria-label="Хабарламалар">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#141728" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      </button>
+    </div>
+
+    <div class="scroll">
+      <div class="hero">
+        <div class="greet">👋 Сәлем, Арнұр!</div>
+        <h2>Бүгінгі тапсырмалар</h2>
+        <p>Бүгінгі тапсырмаларды бірге орындайық 😊</p>
+        <div class="cta">Тапсырмаларға өту
+          <i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></i>
+        </div>
+        <div class="mascot" aria-hidden="true">🦉</div>
+      </div>
+
+      <div class="sec"><h3>Қосымша</h3><a href="#" onclick="return false">Бәрі →</a></div>
+
+      <button class="tile mint locked" onclick="toast('Бұл бөлім прототипте жабық')">
+        <div class="txt">
+          <h4>Барлық пәндер</h4>
+          <p>Барлық сабақ пен тақырыпқа қолжетімділік</p>
+          <span class="chip">📖 12 пән</span>
+        </div>
+        <div class="pic" aria-hidden="true">📚</div>
+        <div class="go"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6FA53A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></div>
+      </button>
+
+      <button class="tile cream live" onclick="startTest()">
+        <div class="txt">
+          <h4>Практикалық тесттер</h4>
+          <p>Білімінді тексер, емтиханға дайындал</p>
+          <span class="chip">🏅 120+ тест</span>
+        </div>
+        <div class="pic" aria-hidden="true">🏆</div>
+        <div class="go"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B9821A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></div>
+      </button>
+
+      <div class="half-row">
+        <div class="half pink"><div class="pic" aria-hidden="true">📋</div><div><h4>Чекап</h4><p>Білімінді тексер</p></div></div>
+        <div class="half blue"><div class="pic" aria-hidden="true">📘</div><div><h4>English start</h4><p>Ағылшын үйрен</p></div></div>
+      </div>
+
+      <div class="progress-card">
+        <div class="lbl">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M16 7h5v5"/></svg>
+          Сенің прогресің
+        </div>
+        <div class="cols">
+          <div>
+            <div class="big">3<em>орын</em></div>
+            <div class="sub">осы аптада <span class="up">▲ 2</span></div>
+          </div>
+          <div>
+            <div class="big">1<em>орын</em></div>
+            <div class="sub">Алматы қаласында</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="tabbar">
+      <button aria-current="page">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2 3.5 10v10.3h6v-6.1h5v6.1h6V10z"/></svg>Басты</button>
+      <button onclick="toast('Прототипте жабық')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="18" height="16" rx="2.5"/><rect x="6" y="8" width="7" height="2" fill="#fff"/><rect x="6" y="12" width="12" height="1.6" fill="#fff"/><rect x="6" y="15.4" width="9" height="1.6" fill="#fff"/></svg>Жаңалық</button>
+      <button onclick="toast('Прототипте жабық')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10a5 5 0 0 1 4.6 7l-.9 2A2.6 2.6 0 0 1 16 16.4L15 15H9l-1 1.4A2.6 2.6 0 0 1 3.3 16l-.9-2A5 5 0 0 1 7 7Z"/><rect x="5.6" y="10.2" width="4" height="1.6" rx=".8" fill="#fff"/><rect x="6.8" y="9" width="1.6" height="4" rx=".8" fill="#fff"/><circle cx="16" cy="10.4" r="1.1" fill="#fff"/><circle cx="17.8" cy="12.4" r="1.1" fill="#fff"/></svg>Ойын</button>
+      <button onclick="toast('Прототипте жабық')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3.5" y="12" width="4" height="8.5" rx="1.4"/><rect x="10" y="6" width="4" height="14.5" rx="1.4"/><rect x="16.5" y="9" width="4" height="11.5" rx="1.4"/></svg>Статистика</button>
+      <button onclick="toast('Прототипте жабық')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.2"/><path d="M4 21a8 8 0 0 1 16 0z"/></svg>Профиль</button>
+    </nav>
+  </section>
+
+  <!-- ═══ ТЕСТ ══════════════════════════════════════════════ -->
+  <section class="view" id="v-test">
+    <div class="qbar">
+      <button class="round-btn" style="width:40px;height:40px;border-radius:13px" onclick="quitTest()" aria-label="Артқа">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#141728" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H6M11 6l-6 6 6 6"/></svg>
+      </button>
+      <div class="title">Практикалық тест</div>
+      <div class="count" id="q-count">1 / 6</div>
+    </div>
+    <div class="qprog"><i id="q-prog" style="width:16.6%"></i></div>
+    <div class="goal"><span class="dot"></span><span id="q-goal">—</span></div>
+    <div class="scroll">
+      <span class="subject" id="q-subject">Математика</span>
+      <h2 id="qtext">—</h2>
+      <div class="opts" id="q-opts" role="radiogroup" aria-labelledby="qtext"></div>
+      <div class="verdict" id="q-verdict"></div>
+    </div>
+    <div class="footbtn"><button class="btn" id="q-btn" disabled onclick="qAction()">Тексеру</button></div>
+  </section>
+
+  <!-- ═══ НӘТИЖЕ ════════════════════════════════════════════ -->
+  <section class="view" id="v-result">
+    <div class="scroll">
+      <div class="score-ring">
+        <svg viewBox="0 0 168 168">
+          <circle cx="84" cy="84" r="74" fill="none" stroke="#F0F2F6" stroke-width="14"/>
+          <circle cx="84" cy="84" r="74" fill="none" stroke="#87BE4B" stroke-width="14"
+                  stroke-linecap="round" id="r-arc" stroke-dasharray="465" stroke-dashoffset="465"
+                  style="transition:stroke-dashoffset 1s cubic-bezier(.16,1,.3,1)"/>
+        </svg>
+        <div class="n"><span id="r-num">0</span><em>/6</em></div>
+      </div>
+      <h2 id="r-title">—</h2>
+      <p id="r-sub">—</p>
+      <div class="xp-pill" id="r-xp">⚡ +0 XP</div>
+      <div class="newrank" id="r-rank" hidden>
+        <svg class="med sm" id="r-med" viewBox="0 0 100 100"></svg>
+        <div>
+          <div class="k">Жаңа атақ</div>
+          <div class="t" id="r-rank-name">—</div>
+          <div class="s" id="r-rank-mean">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="footbtn">
+      <button class="btn" id="r-btn" onclick="afterResult()">Картаны ашу</button>
+    </div>
+  </section>
+
+  <!-- ═══ КАРТА ═════════════════════════════════════════════ -->
+  <section class="view" id="v-map">
+    <div class="mapbar">
+      <button class="round-btn" onclick="show('v-home')" aria-label="Артқа">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2C2618" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H6M11 6l-6 6 6 6"/></svg>
+      </button>
+      <div class="ttl">
+        <h2 id="m-title">Батырлар дәуірі</h2>
+        <div class="meta" id="m-meta">1–20 деңгей · Ұлы Дала қорғандары</div>
+      </div>
+      <div class="mapcount" id="m-count">0 / 20</div>
+    </div>
+
+    <div id="board">
+      <svg id="trail" aria-hidden="true"></svg>
+      <div class="rows" id="rows"></div>
+    </div>
+
+    <div class="biomes" id="biomes"></div>
+  </section>
+
+  <!-- ═══ SHEET ═════════════════════════════════════════════ -->
+  <div class="sheet-wrap" id="sheet" onclick="if(event.target.id==='sheet'||event.target.classList.contains('scrim'))closeSheet()">
+    <div class="scrim"></div>
+    <div class="sheet"><div class="grab"></div><div class="body" id="sheet-body"></div></div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+"use strict";
+
+/* ══════════════════════════════════════════════════════════════
+   1. ДЕРЕК: атақтар (1–100 тізімінен алғашқы 20-сы)
+   ══════════════════════════════════════════════════════════════ */
+const RANKS = [
+  ["Қоян Жүрек","қоян жүрек — қорыққанда да батыл"],
+  ["Түлкі Ой","түлкі ой — тапқырлық"],
+  ["Аю Тырнақ","аю тырнақ — қайсарлық"],
+  ["Жолбарыс Көз","жолбарыс көз — өткір қарау"],
+  ["Қасқыр Тіс","қасқыр тіс — жібермейтін ұстау"],
+  ["Дала Ұлы","дала ұлы — жерінің баласы"],
+  ["Жел Аяқ","жел аяқ — жүйріктік"],
+  ["От Жүрек","от жүрек — сөнбейтін ынта"],
+  ["Тас Білек","тас білек — берік қол"],
+  ["Күн Сәулесі","күн сәулесі — алғашқы жарық"],
+  ["Найза Ұстаған","найза ұстаған — алғашқы қару"],
+  ["Садақ Мерген","садақ мерген — дәл көз"],
+  ["Ту Көтерген","ту көтерген — сапты бастаушы"],
+  ["Жүрек Жалыны","жүрек жалыны — өшпейтін от"],
+  ["Ер Тұяқ","ер тұяқ — батыр жүрісі"],
+  ["Қылыш Үйрен","қылыш үйрен — шеберлікке жол"],
+  ["Жол Бастаушы","жол бастаушы — соңынан ертетін"],
+  ["Найзағай Тізе","найзағай тізе — сәттік екпін"],
+  ["Тас Қорған","тас қорған — мызғымас тірек"],
+  ["Ұлы Дала Ұлы","ұлы дала ұлы — бүкіл даланың перзенті"]
+];
+
+/* ══════════════════════════════════════════════════════════════
+   2. ДЕРЕК: 1-дәуір «Батырлар» — 20 деңгей
+   ══════════════════════════════════════════════════════════════ */
+const HEROES = [
+{n:"Қойгелді батыр",y:"1670–1755",p:"Талас · Дулат",hue:24,
+ h:"Таразды жаудан қорғаған қалқан",s:[68,58,70],
+ d:"Талас пен Қаратау өңірін жоңғар шапқыншылығынан қорғаған батыр. Жасынан ат үстінде өсіп, ауыл жасағын басқарған. Ол ірі жорықтың даңқын емес, өз елінің тыныштығын таңдаған: жау келгенде алдымен әйел мен баланы тау ішіне жеткізіп, содан кейін ғана шайқасқа кірген. Қойгелдінің есімі бүгін Тараз қаласындағы ескерткіш пен саябақ атауында сақталған — батырды халық ұмытпаған. Оның ерлігі — көзге түспейтін ерлік: даңқ емес, елдің тыныш ұйықтағаны маңызды болған."},
+{n:"Ағынтай батыр",y:"1607–1680",p:"Солтүстік · Арғын",hue:36,
+ h:"Қарасаймен қатар аталған есім",s:[71,62,64],
+ d:"Есім хан мен Салқам Жәңгір заманында өмір сүрген батыр. Солтүстік өңірдегі елді жау шабуылынан қорғап, жорықтарда Қарасай батырмен бірге жүрген — сондықтан халық екеуінің есімін әрдайым қатар атайды. Айыртау маңындағы Күлтөбе — сол екі батырдың рухына арналған жер, ел жиналып ерлікті еске алатын орын. Ағынтай тек қылышымен емес, сөзімен де жасақты бір ауызды ұстай білген. Ол үшін жасақтың бірлігі жеке ерліктен маңызды еді: бөлінген қол қаншама батыр болса да жеңілетінін білген."},
+{n:"Баян батыр",y:"1710–1757",p:"Баянауыл · Сүйіндік",hue:48,
+ h:"Атын таудың өзіне қалдырған ер",s:[74,60,66],
+ d:"Баянауыл өңірінің қорғаны болған батыр. Жоңғар шапқыншылығы жылдарында Ертіс бойындағы ауылдарды қорғап, жасақ жинаған. Аңыз бойынша, ол жараланғанда да жасағын тастамай, соңғы шайқасқа дейін ат үстінде болған. Бүгінгі Баянауыл — тау да, аудан да — сол батырдың атымен аталады. Жердің батыр есімін алуы — халық бере алатын ең үлкен марапат. Бүгін Баянауылға барған бала таудың атын естігенде, сол батырдың есімін атап тұрғанын біле бермейді. Ерлік осылай жерге сіңеді."},
+{n:"Олжабай батыр",y:"1709–1783",p:"Баянауыл · Сүйіндік",hue:96,
+ h:"Абылайдың оң қолы",s:[76,70,68],
+ d:"Абылай ханның сенімді сардарларының бірі. Ертіс пен Баянауыл өңірінде жоңғарға қарсы жорықтарға қатысып, жасақ басқарған. Оны замандастары «алдымен ақылын, содан кейін ғана қылышын сермейтін» батыр деп сипаттаған: шайқасқа шықпай тұрып жердің бедерін де, жаудың санын да өлшеп алатын. Олжабайдың есімі Павлодар өңірінің тарихымен біте қайнасқан. Абылай оны ірі жорық алдында ақылдасатын санаулы адамның бірі санаған. Оның сабағы қарапайым: жеңіс шайқас басталғанға дейін, дайындық үстінде келеді."},
+{n:"Саурық батыр",y:"1814–1854",p:"Жетісу · Шапырашты",hue:150,
+ h:"Ұзынағаш жолын ашқан ер",s:[78,64,70],
+ d:"ХІХ ғасырдағы Жетісу батыры. Қоқан бекіністерінің қысымына қарсы тұрып, Шу мен Іле аралығындағы ауылдарды қорғаған. Ол Сұраншы батырмен бірге жасақ бастап, елдің жайылымы мен көші-қон жолын қайтарған. Саурық жас кезінен ат бәйгесі мен күресте атағы шыққан — сол күш кейін елді қорғауға жұмсалды. Оның есімі Ұзынағаш ерлігінің шежіресінде Сұраншымен қатар тұр. Ол туралы «елдің жерін қайтару — бір күндік ұрыс емес, ұзақ шыдам» деген сөз қалған."},
+{n:"Сұраншы батыр",y:"1815–1864",p:"Жетісу · Дулат",hue:168,
+ h:"Ұзынағаш шайқасының қаһарманы",s:[80,66,72],
+ d:"1860 жылғы Ұзынағаш шайқасында жасақ бастаған Жетісу батыры. Қоқан әскері Алматы бағытына жақындағанда, ол қазақ жасағын жинап, тау бөктеріндегі өткелді ұстап тұрған. Сұраншы туралы «жаудың санын емес, елдің үмітін санайтын» деген сөз қалған. Ұзынағаштағы ескерткіш пен ауыл атауы — сол күндердің халық жадындағы ізі. Сұраншы жасағын рудан емес, елден жинаған: қауіп ортақ болса, бөліну жеңіліске апаратынын түсінген. Ұзынағаш бүгін де сол ерліктің атауы."},
+{n:"Малайсары батыр",y:"1700–1756",p:"Іле · Суан",hue:190,
+ h:"Іле өткелінің қожасы",s:[79,76,70],
+ d:"Абылай хан тұсындағы белгілі қолбасшы. Жоңғарға қарсы жорықтарда Іле бойындағы өткелдерді бақылап, жау жолын кескен. Малайсары шайқас алдында барлау жіберіп, жаудың күшін білмей ұрысқа кірмейтін — сондықтан оның жасағы аз шығынмен жеңіске жететін. Ол туралы «асықпайтын батыр» деген сөз қалған: асығыстықты жауға тегін берілген сый деп есептеген. Оның жолы бүгінгі балаға да түсінікті: алдымен білу, содан кейін әрекет ету. Ақпаратсыз батылдық — тәуекел ғана."},
+{n:"Отеген батыр",y:"1699–1773",p:"Жетісу · Дулат",hue:205,
+ h:"Жерін жаудан қайтарып берген",s:[78,74,78],
+ d:"Жоңғар шапқыншылығынан кейін елді Жетісудағы ата қонысына қайта қоныстандырған батыр. Оның ерлігі жалғыз шайқаста емес — жау кеткен жерге халықты қайта әкелуде, малын, суын, жайылымын қайтаруда. Отеген туралы жырда «қылышы қынға түскенде де жұмысы бітпеген ер» делінеді. Алматы облысындағы бірнеше елді мекен соның атын алып жүр. Отегеннің ерлігі бейбіт күнде де жалғасты: су арнасын тазалап, көш жолын салған. Ел үшін бұл да шайқас еді."},
+{n:"Есет батыр Көкіұлы",y:"1667–1749",p:"Ақтөбе · Тама",hue:262,
+ h:"Ақтөбе даласының қорғаны",s:[80,72,82],
+ d:"Кіші жүздің атақты сардары, Әбілқайыр ханның серігі. Жоңғар шапқыншылығы жылдарында батыс өңірдегі ауылдарды қорғап, Ырғыз бен Ойыл бойында жасақ ұстаған. Есет батыр билік пен байлықтан гөрі елдің бірлігін жоғары қойған, дау шыққанда екі жақты да тыңдамай шешім айтпаған. Ақтөбе өңірінде оның есімі ауыл, көше және ескерткіш атауында сақталған. Оның басты сабағы — билік дауды шешу үшін керек, дауды ұтып шығу үшін емес. Сол себепті шешіміне екі жақ та мойынсұнған."},
+{n:"Бөкенбай батыр Қараұлы",y:"1667–1741",p:"Кіші жүз · Табын",hue:280,
+ h:"Айтқан сөзінен қайтпаған",s:[79,75,84],
+ d:"Кіші жүздің ықпалды батыры, Әбілқайыр ханмен бірге ел тағдырына қатысты шешім қабылдаған адам. Жоңғарға қарсы жорықтарда жасақ бастаған, бейбіт кезде руаралық дауды бітістірген. Замандастары оны «бір айтқанынан қайтпайтын» деп сипаттаған: берген уәдесі жазулы құжаттан күшті саналған. Бөкенбайдың есімі Кіші жүз тарихында Есет батырмен қатар аталады. Бөкенбай үшін ант рәсім емес, жауапкершілік болатын: сөзі бұзылса, елдің сенімі бұзылатынын білген."},
+{n:"Жанқожа Нұрмұхамедұлы",y:"1774–1860",p:"Сыр бойы · Шекті",hue:312,
+ h:"Сексеннен асып семсер асынған",s:[82,74,80],
+ d:"Сыр бойының батыры. Хиуа мен Қоқан бекіністерінің қысымына қарсы тұрып, Арал маңындағы елдің жерін, суын және егінін қорғаған. Ол сексен жастан асқанда да жасақ бастаған — «жасым емес, ісім сөйлесін» деген сөз содан қалған. Жанқожа қатардағы диқанның мұңын да, ханның саясатын да бірдей түсінген сирек батырлардың бірі. Ол бекініс салдырып, егіндікті суландырған — қорғану тек қылышпен емес, шаруашылықпен де болатынын көрсеткен. Жасы емес, ісі сөйлеген батыр."},
+{n:"Қарасай батыр",y:"1598–1671",p:"Жетісу · Шапырашты",hue:0,
+ h:"Он жетінші ғасырдың айбыны",s:[85,72,76],
+ d:"Есім хан мен Салқам Жәңгір тұсындағы ең атақты батырлардың бірі. Жоңғарға қарсы ұрыстарда жасақ бастап, қазақ жерінің шығыс шекарасын ұстап тұрған. Қарасай мен Ағынтай есімі халық жадында әрқашан қатар аталады — екеуі бірге жорыққа шығып, бірге жерленген. Оның ерлігі кейінгі батырларға өлшем болды: «Қарасайдай» деген теңеу мақтаудың ең жоғарғысы саналған. Қарасай ерлікті жеке даңқ емес, ортақ міндет деп таныған — сондықтан оның есімі жалғыз емес, серігімен қатар аталады."},
+{n:"Жәнібек батыр Шақшақұлы",y:"1693–1752",p:"Сарыарқа · Арғын",hue:212,
+ h:"Қылышы да, тілі де өткір",s:[84,88,78],
+ d:"Абылай хан заманының қолбасшысы әрі елшісі. Жоңғарға қарсы ірі шайқастарда жасақ бастаған, сонымен қатар келіссөзге де барған — оған «тархан» атағы содан берілген. Жәнібек соғысты соңғы амал деп санаған: жауды қылышпен жеңгеннен гөрі сөзбен тоқтатқанды ұтымды көрген. Ол қазақ батырларының ішінде дипломатияны бірінші орынға қойған сирек тұлға. Тархан атағы — жеңістің емес, келісімнің бағасы. Сөзбен тоқтатылған соғыс та жеңіс саналады."},
+{n:"Махамбет Өтемісұлы",y:"1803–1846",p:"Батыс · Беріш",hue:348,
+ h:"Найзасы да, жыры да қаруы болған",s:[84,86,90],
+ d:"Ақын әрі батыр. Исатай Тайманұлымен бірге 1836–1838 жылдардағы көтерілісті бастаған. Махамбеттің жырлары жай ғана өлең емес — жасақты орнынан тұрғызатын үн болды. Ол жеңіліске ұшырағаннан кейін де сөзінен танбады, өлеңін жасырмады. Махамбет қаруын да, қаламын да бір мақсатқа — әділетсіздікке қарсы жұмсады. Оның жолдары бүгін де жатқа айтылады. Оның жырлары жеңілістен кейін де сақталды: қару тот басады, ал сөз ұрпаққа жетеді."},
+{n:"Исатай Тайманұлы",y:"1791–1838",p:"Бөкей ордасы · Беріш",hue:14,
+ h:"Жерін сұрап емес, талап етіп алған",s:[86,80,92],
+ d:"Бөкей ордасындағы 1836–1838 жылдардағы көтерілістің басшысы. Қарапайым шаруаның жайылымсыз қалғанына, салықтың ауырлығына қарсы шығып, хан ордасына ашық талап қойған. Исатай көтерілісті тонау мен кекке айналдырмаған: оның жасағында бейбіт ауылға тиюге қатаң тыйым болған. Ол шайқаста қаза тапты, бірақ талабы ұрпағына сөз болып жетті. Оның талабы қарапайым еді: жер шөбімен бірге, малын бағатын адамға да қалуы керек. Осы талап кейінгі буынға үлгі болды."},
+{n:"Сырым Датұлы",y:"1712–1802",p:"Кіші жүз · Байбақты",hue:44,
+ h:"Ханға да тура қараған би-батыр",s:[82,88,94],
+ d:"Кіші жүздегі 1783–1797 жылдардағы қозғалыстың басшысы, әрі батыр, әрі би. Ол шаруаның жерін қайтаруды талап етіп, хан билігіне де, отаршыл әкімшілікке де қарсы тұрған. Сырымның күші жасағында ғана емес — сөзінде болған: жиында дәлелмен сөйлеп, қарсыласын үнсіз қалдырған. Ол билікті мақсат емес, елдің мұңын жеткізетін құрал деп қараған. Сырым үшін әділдік — күштінің емес, дұрыстың жағында болу. Дәлелі жоқ сөзді ол өз жиынында айтқызбаған."},
+{n:"Наурызбай батыр",y:"1706–1781",p:"Жетісу · Шапырашты",hue:120,
+ h:"Жалғыз шауып, жау сапын бұзған",s:[90,74,80],
+ d:"Абылай хан тұсындағы Жетісудың атақты батыры. Жоңғарға қарсы ірі шайқастардың бәріне қатысқан, жекпе-жекте атағы шыққан. Аңызда оның жалғыз өзі жау сапын жарып өткені айтылады, ал шындығында басты күші жасағын дұрыс орналастыра білуінде еді. Наурызбай — Қарасай батырдың ұрпағы: бұл әулетте ерлік әкеден балаға өткен. Оның аты Алматы маңындағы ауыл мен көше атауында сақталған. Ал ең үлкен мұрасы — жеке ерлік жасақ тәртібінсіз ештеңе екенін көрсеткені."},
+{n:"Райымбек батыр",y:"1705–1785",p:"Жетісу · Албан",hue:178,
+ h:"Аруағы қолдасын деп ел бүгін де атайды",s:[88,78,86],
+ d:"Жетісу жерін жоңғар шапқыншылығынан қорғаған батыр. Он алты жасында жорыққа шығып, кейін бүкіл албан жасағын басқарған. Ол азат еткен жерін өзіне алмай, көшіп келген елге бөліп берген — байлықты емес, елді таңдаған. Райымбектің есімі бүгін Алматының ең көп аталатын атауының бірі: көше де, метро да, ескерткіш те соның атында. Бүгін оның кесенесіне келген адам тек батырды емес, «жеңгеніңді бөліс» деген қағиданы да еске алады."},
+{n:"Бөгенбай батыр",y:"1690–1775",p:"Сарыарқа · Қанжығалы",hue:232,
+ h:"Ақтабан шұбырындыны тоқтатқан қол",s:[92,86,84],
+ d:"Абылай ханның бас сардары. Ақтабан шұбырынды жылдарынан кейін қазақ жасағын қайта жинап, Аңырақай шайқасында жоңғарды тойтарған қолбасшылардың бірі. Бөгенбай шайқасты жоспармен жүргізген: жаудың санынан емес, жердің бедерінен ұтқан. Ол қайтыс болғанда Абылай хан «қазақтың қорғаны құлады» деген екен. Есімі Астана мен Сарыарқа шежіресінде сақталған. Ол жасағын ұзақ жорыққа дайындай білген: азық, жылқы, өткел — бәрі алдын ала есептелген. Жоспар — батырдың екінші қаруы."},
+{n:"Қабанбай батыр",y:"1692–1770",p:"Шығыс · Қаракерей",hue:8,
+ h:"Дарабоз — алдына жан салмаған қолбасшы",s:[95,90,88],
+ d:"Қазақ тарихындағы ең атақты қолбасшы. Абылай хан оған «Дарабоз» атағын берген — «алдына жан салмайтын» деген мағынада. Ол жоңғарға қарсы ондаған шайқасқа қатысып, бірде-бірінен жеңіліп қайтпаған. Қабанбайдың күші батылдығында ғана емес: ол жасағын рулық емес, әскери тәртіппен ұйымдастырған. Шығыс Қазақстандағы кесенесі бүгін де зиярат ететін орын. Оның тәртібі қатаң болған, бірақ әділ: батыр да, қатардағы жауынгер де бір заңға бағынған."}
+];
+
+/* карта аймақтары — әрқайсысы 4 деңгей, тұман осы бөліктермен көтеріледі */
+const REGIONS = ["Дала қақпасы","Жетісу жолы","Жайық пен Сыр","Азаттық оты","Ұлы Дала шыңы"];
+
+/* 5 дәуір. 2–5 — контент дайын болғанда HEROES-ке қосылады. */
+const BIOMES = [
+  {t:"Батырлар",       r:"1–20",   sub:"Ұлы Дала қорғандары",  open:true},
+  {t:"Хандар",         r:"21–40",  sub:"Абылай, Кенесары, Тәуке", open:false},
+  {t:"Билер",          r:"41–60",  sub:"Төле, Қазыбек, Әйтеке",  open:false},
+  {t:"Алаш зиялылары", r:"61–80",  sub:"Бөкейханов, Байтұрсынов", open:false},
+  {t:"Жаңа заман",     r:"81–100", sub:"Тоқтар, Талғат",         open:false}
+];
+
+/* ══════════════════════════════════════════════════════════════
+   3. ДЕРЕК: тест — 6 сұрақ, әр пәннен біреу
+   ══════════════════════════════════════════════════════════════ */
+const QUIZ = [
+ {s:"Математика", q:"Бір қапта 12 кг ұн бар. Оның үштен бірін алса, қанша келі қалады?",
+  o:["4 келі","6 келі","8 келі","9 келі"], a:2, w:"12 ÷ 3 = 4, ал 12 − 4 = 8 келі."},
+ {s:"Логика", q:"Қатардағы келесі сан қандай? 2, 6, 12, 20, 30, …",
+  o:["36","40","42","44"], a:2, w:"Айырмасы 4, 6, 8, 10 — келесісі 12. 30 + 12 = 42."},
+ {s:"Қазақ тілі", q:"«Кітап» сөзіне қай жалғау жалғанып, көптік мағына береді?",
+  o:["-лар","-дар","-тар","-нар"], a:2, w:"Қатаң дауыссызға (п) -тар жалғанады: кітаптар."},
+ {s:"Орыс тілі", q:"Найди лишнее слово:",
+  o:["стол","стул","шкаф","бежать"], a:3, w:"«Бежать» — глагол, остальные — существительные."},
+ {s:"Ағылшын тілі", q:"Choose the correct form: She ___ to school every day.",
+  o:["go","goes","going","gone"], a:1, w:"He / she / it — етістікке -es жалғанады: she goes."},
+ {s:"Жаратылыстану", q:"Қалыпты жағдайда су неше градуста қайнайды?",
+  o:["50 °C","80 °C","100 °C","120 °C"], a:2, w:"Теңіз деңгейінде су 100 °C-та қайнайды."}
+];
+
+/* ══════════════════════════════════════════════════════════════
+   4. ПРОГРЕСС
+   ══════════════════════════════════════════════════════════════ */
+const KEY="sl100_v1";
+let P = load();
+function load(){
+  try{
+    const o = JSON.parse(localStorage.getItem(KEY));
+    if(o && Number.isInteger(o.done)) return {done:Math.min(20,Math.max(0,o.done)), xp:o.xp|0};
+  }catch(e){}
+  return {done:0, xp:0};
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(P)); }catch(e){} }
+
+/* ── көріністер ── */
+function show(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on", v.id===id));
+  if(id==="v-map") drawMap();
+}
+let toastT;
+function toast(msg){
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.classList.add("on");
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("on"),2200);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. МЕДАЛЬОН — әр батырға бір реңк, ою-өрнек сақинасы
+   ══════════════════════════════════════════════════════════════ */
+function medallion(i, locked){
+  const hue = locked ? 220 : HEROES[i].hue;
+  const sat = locked ? "8%" : "58%";
+  const letter = locked ? "" : HEROES[i].n.trim()[0];
+  // сыртқы сақинадағы 12 «қошқар мүйіз» ізі — қарапайым қайталанатын пішін
+  let horns="";
+  for(let k=0;k<12;k++){
+    horns+=`<path d="M50 8.5c3.4 0 5.6 2 5.6 4.4 0 2-1.6 3.3-3.4 3.3-1.5 0-2.6-.9-2.6-2.1"
+      fill="none" stroke="hsl(${hue} ${sat} ${locked?"72%":"38%"} / .85)" stroke-width="1.5"
+      stroke-linecap="round" transform="rotate(${k*30} 50 50)"/>`;
+  }
+  const face = locked
+    ? `<path d="M50 34c5.5 0 9.6 4.4 9.6 9.9 0 3.7-1.9 6.9-4.6 8.6C60.8 54.7 65 60.4 65 67.5H35c0-7.1 4.2-12.8 10-15-2.7-1.7-4.6-4.9-4.6-8.6 0-5.5 4.1-9.9 9.6-9.9Z"
+        fill="hsl(220 10% 62% / .55)"/>`
+    : `<text x="50" y="50" text-anchor="middle" dominant-baseline="central"
+        font-family="-apple-system,system-ui,sans-serif" font-weight="900" font-size="34"
+        letter-spacing="-1.5" fill="hsl(${hue} 62% 26%)">${letter}</text>`;
+  return `
+   <defs><radialGradient id="mg${i}${locked?"l":""}" cx="38%" cy="30%">
+     <stop offset="0" stop-color="hsl(${hue} ${sat} ${locked?"95%":"88%"})"/>
+     <stop offset="1" stop-color="hsl(${hue} ${sat} ${locked?"86%":"70%"})"/>
+   </radialGradient></defs>
+   <circle cx="50" cy="50" r="48" fill="url(#mg${i}${locked?"l":""})"/>
+   <circle cx="50" cy="50" r="48" fill="none" stroke="hsl(${hue} ${sat} ${locked?"78%":"46%"})" stroke-width="2.5"/>
+   ${horns}
+   <circle cx="50" cy="50" r="33" fill="hsl(0 0% 100% / .55)"
+     stroke="hsl(${hue} ${sat} ${locked?"80%":"52%"})" stroke-width="1.5"/>
+   ${face}`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   6. ТЕСТ
+   ══════════════════════════════════════════════════════════════ */
+let qi=0, qPick=-1, qAnswered=false, qRight=0;
+
+function startTest(){
+  if(P.done>=20){ toast("Бірінші дәуір аяқталды! Келесі дәуір дайындалуда."); show("v-map"); return; }
+  qi=0; qRight=0; renderQ(); show("v-test");
+}
+function quitTest(){ show("v-home"); }
+
+function renderQ(){
+  const q=QUIZ[qi]; qPick=-1; qAnswered=false;
+  document.getElementById("q-count").textContent=(qi+1)+" / "+QUIZ.length;
+  document.getElementById("q-prog").style.width=((qi+1)/QUIZ.length*100)+"%";
+  document.getElementById("q-subject").textContent=q.s;
+  document.getElementById("qtext").textContent=q.q;
+  const v=document.getElementById("q-verdict"); v.className="verdict"; v.innerHTML="";
+  document.getElementById("q-goal").innerHTML =
+    "Мақсат: <b>"+(P.done+1)+"-деңгейді ашу</b> — кемінде "+PASS+" дұрыс жауап";
+  const box=document.getElementById("q-opts"); box.innerHTML="";
+  q.o.forEach((txt,k)=>{
+    const b=document.createElement("button");
+    b.className="opt"; b.type="button"; b.setAttribute("role","radio"); b.setAttribute("aria-checked","false");
+    b.innerHTML=`<span class="k">${"АБВГ"[k]}</span><span>${txt}</span>`;
+    b.onclick=()=>pick(k);
+    box.appendChild(b);
+  });
+  const btn=document.getElementById("q-btn"); btn.disabled=true; btn.textContent="Тексеру";
+  document.querySelector("#v-test .scroll").scrollTop=0;
+}
+function pick(k){
+  if(qAnswered) return;
+  qPick=k;
+  [...document.getElementById("q-opts").children].forEach((b,i)=>b.setAttribute("aria-checked", i===k?"true":"false"));
+  document.getElementById("q-btn").disabled=false;
+}
+function qAction(){
+  const q=QUIZ[qi];
+  if(!qAnswered){
+    qAnswered=true;
+    const kids=[...document.getElementById("q-opts").children];
+    kids.forEach((b,i)=>{
+      b.disabled=true; b.setAttribute("aria-checked","false");
+      if(i===q.a) b.classList.add("right");
+      else if(i===qPick) b.classList.add("wrong");
+    });
+    const ok = qPick===q.a; if(ok) qRight++;
+    const v=document.getElementById("q-verdict");
+    v.innerHTML = (ok?"<b>Дұрыс.</b> ":"<b>Дұрыс жауап: "+q.o[q.a]+".</b> ")+q.w;
+    v.classList.add("on");
+    document.getElementById("q-btn").textContent = (qi===QUIZ.length-1) ? "Нәтижені көру" : "Келесі сұрақ";
+  }else{
+    if(qi===QUIZ.length-1) finishTest(); else { qi++; renderQ(); }
+  }
+}
+
+/* ── нәтиже ── */
+const PASS=4;             // деңгей ашылу шегі
+let levelJustOpened=0;    // 0 — ашылған жоқ
+
+function finishTest(){
+  const passed = qRight>=PASS;
+  levelJustOpened = 0;
+  if(passed && P.done<20){ P.done++; levelJustOpened=P.done; }
+  const xp = qRight*10 + (passed?20:0);
+  P.xp += xp; save();
+
+  document.getElementById("r-num").textContent=qRight;
+  const arc=document.getElementById("r-arc");
+  arc.style.strokeDashoffset=465;
+  arc.setAttribute("stroke", passed ? "#87BE4B" : "#E0574B");
+  document.getElementById("r-xp").textContent="⚡ +"+xp+" XP";
+
+  const t=document.getElementById("r-title"), s=document.getElementById("r-sub");
+  const rankBox=document.getElementById("r-rank");
+  if(passed){
+    t.textContent = levelJustOpened+"-деңгей ашылды!";
+    s.textContent = HEROES[levelJustOpened-1].n+" тұманнан шықты. Картадан кім екенін көр.";
+    const [rn,rm]=RANKS[levelJustOpened-1];
+    document.getElementById("r-rank-name").textContent=rn;
+    document.getElementById("r-rank-mean").textContent=rm;
+    document.getElementById("r-med").innerHTML=medallion(levelJustOpened-1,false);
+    rankBox.hidden=false;
+    document.getElementById("r-btn").textContent="Картаны ашу";
+    document.getElementById("r-btn").className="btn";
+  }else{
+    t.textContent="Деңгей әлі ашылмады";
+    s.textContent="Деңгей ашылу үшін 6 сұрақтың кемінде "+PASS+"-еуіне дұрыс жауап керек. XP бәрібір жиналды.";
+    rankBox.hidden=true;
+    document.getElementById("r-btn").textContent="Қайта көру";
+    document.getElementById("r-btn").className="btn ghost";
+  }
+  show("v-result");
+  requestAnimationFrame(()=>{ arc.style.strokeDashoffset = 465*(1-qRight/QUIZ.length); });
+}
+function afterResult(){ if(levelJustOpened) show("v-map"); else startTest(); }
+
+/* ══════════════════════════════════════════════════════════════
+   7. КАРТА
+   ══════════════════════════════════════════════════════════════ */
+let mapBuilt=false;
+
+function buildRows(){
+  const rows=document.getElementById("rows"); rows.innerHTML="";
+  for(let r=0;r<5;r++){
+    const row=document.createElement("div");
+    row.className="rrow"+(r%2?" rev":"");
+    const nm=document.createElement("div"); nm.className="rname"; nm.textContent=REGIONS[r];
+    row.appendChild(nm);
+    for(let c=0;c<4;c++){
+      const lv=r*4+c+1;
+      const b=document.createElement("button");
+      b.className="node"; b.type="button"; b.dataset.lv=lv;
+      b.innerHTML=`<span>${lv}</span><span class="rank"></span>`;
+      b.onclick=()=>openHero(lv);
+      row.appendChild(b);
+    }
+    const fog=document.createElement("div");
+    fog.className="fog"; fog.dataset.region=r;
+    // бұлт дақтарының орны әр жолақта әртүрлі — қайталанып тұрмасын
+    fog.style.setProperty("--c1",(14+r*17)%86+"%");
+    fog.style.setProperty("--c2",(58+r*23)%92+"%");
+    fog.style.setProperty("--c3",(88+r*31)%94+"%");
+    fog.innerHTML=`<b>${REGIONS[r]}</b><i>${r*4+1}-деңгейден ашылады</i>`;
+    fog.onclick=()=>openHero(r*4+1);   // тұманның астындағы жабық карточка
+    row.appendChild(fog);
+    rows.appendChild(row);
+  }
+  mapBuilt=true;
+}
+
+/* аймақ ашық па: алдыңғы аймақ толық өтілсе ашылады */
+function regionOpen(r){ return P.done >= r*4; }
+
+function drawMap(){
+  if(!mapBuilt) buildRows();
+  document.getElementById("m-count").textContent=P.done+" / 20";
+
+  document.querySelectorAll(".node").forEach(b=>{
+    const lv=+b.dataset.lv, i=lv-1;
+    b.classList.toggle("done", lv<=P.done);
+    b.classList.toggle("now", lv===P.done+1);
+    b.querySelector(".rank").textContent =
+      lv<=P.done ? RANKS[i][0] : (lv===P.done+1 ? "сен осындасың" : "");
+    b.setAttribute("aria-label", lv<=P.done ? lv+"-деңгей, "+HEROES[i].n : lv+"-деңгей, жабық");
+  });
+
+  const firstClosed = [0,1,2,3,4].find(r=>!regionOpen(r));
+  document.querySelectorAll(".fog").forEach(f=>{
+    const r=+f.dataset.region;
+    const open=regionOpen(r);
+    f.classList.toggle("edge", r===firstClosed);
+    // ашылу сәтінде анимациямен, әйтпесе бірден
+    if(open && !f.classList.contains("lift")){
+      const newRegion = levelJustOpened && Math.floor((levelJustOpened-1)/4)===r && (levelJustOpened-1)%4===0;
+      f.style.transitionDelay = newRegion ? ".45s" : "0s";
+      f.classList.add("lift");
+    }else if(!open){
+      f.classList.remove("lift"); f.style.transitionDelay="0s";
+    }
+  });
+
+  drawBiomes();
+  requestAnimationFrame(drawTrail);
+
+  if(levelJustOpened){
+    const node=document.querySelector('.node[data-lv="'+levelJustOpened+'"]');
+    setTimeout(()=>{ if(node){ sparks(node); toast("Жаңа атақ: "+RANKS[levelJustOpened-1][0]); } }, 700);
+    levelJustOpened=0;
+  }
+}
+
+function drawBiomes(){
+  const box=document.getElementById("biomes"); box.innerHTML="";
+  BIOMES.forEach((b,i)=>{
+    const el=document.createElement("button");
+    el.className="biome"+(b.open?"":" lock"); el.type="button";
+    if(i===0) el.setAttribute("aria-current","true");
+    el.innerHTML=`<b>${b.open?"":"🔒 "}${b.t}</b><i>${b.r} деңгей</i>`;
+    el.onclick=()=> b.open ? toast("Сен осы дәуірдесің") : toast(b.t+" — "+b.r.split("–")[0]+"-деңгейден ашылады");
+    box.appendChild(el);
+  });
+}
+
+/* дала соқпағы — түйіндер арқылы өтетін сызық */
+function drawTrail(){
+  const svg=document.getElementById("trail"), board=document.getElementById("board");
+  const bb=board.getBoundingClientRect();
+  if(!bb.width) return;
+  svg.setAttribute("viewBox",`0 0 ${bb.width} ${bb.height}`);
+  const pts=[];
+  for(let lv=1;lv<=20;lv++){
+    const n=document.querySelector('.node[data-lv="'+lv+'"]');
+    const r=n.getBoundingClientRect();
+    pts.push([r.left-bb.left+r.width/2, r.top-bb.top+r.height/2]);
+  }
+  const d = pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  const cut = Math.max(1,Math.min(20,P.done));
+  const dDone = pts.slice(0,cut).map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  svg.innerHTML=
+    `<path d="${d}" fill="none" stroke="#CBBFA3" stroke-width="9" stroke-linecap="round"
+       stroke-linejoin="round" stroke-dasharray="2 17" opacity=".9"/>`+
+    (P.done>0?`<path d="${dDone}" fill="none" stroke="#87BE4B" stroke-width="9" stroke-linecap="round"
+       stroke-linejoin="round" opacity=".65"/>`:"");
+}
+addEventListener("resize", ()=>{ if(document.getElementById("v-map").classList.contains("on")) drawTrail(); });
+
+function sparks(node){
+  const board=document.getElementById("board"), bb=board.getBoundingClientRect();
+  const r=node.getBoundingClientRect();
+  const cx=r.left-bb.left+r.width/2, cy=r.top-bb.top+r.height/2;
+  for(let i=0;i<10;i++){
+    const s=document.createElement("i");
+    const a=Math.PI*2*i/10, dist=34+Math.random()*26;
+    s.className="spark";
+    s.style.left=cx+"px"; s.style.top=cy+"px";
+    s.style.setProperty("--dx",(Math.cos(a)*dist).toFixed(1)+"px");
+    s.style.setProperty("--dy",(Math.sin(a)*dist).toFixed(1)+"px");
+    s.style.animationDelay=(i*22)+"ms";
+    board.appendChild(s);
+    setTimeout(()=>s.remove(),1300);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   8. SHEET: батыр карточкасы / атақ
+   ══════════════════════════════════════════════════════════════ */
+const sheet=document.getElementById("sheet");
+function openSheet(html){
+  document.getElementById("sheet-body").innerHTML=html;
+  sheet.classList.add("on");
+  requestAnimationFrame(()=>sheet.classList.add("in"));
+}
+function closeSheet(){
+  sheet.classList.remove("in");
+  setTimeout(()=>sheet.classList.remove("on"),380);
+}
+addEventListener("keydown",e=>{ if(e.key==="Escape"&&sheet.classList.contains("in")) closeSheet(); });
+
+function openHero(lv){
+  const i=lv-1, h=HEROES[i], unlocked = lv<=P.done;
+  const [rn,rm]=RANKS[i];
+  const region=REGIONS[Math.floor(i/4)];
+
+  if(!unlocked){
+    const left = lv-P.done;
+    openSheet(`
+      <div class="hcard-top">
+        <svg class="med" viewBox="0 0 100 100" aria-hidden="true">${medallion(i,true)}</svg>
+        <div class="info">
+          <h2>???</h2>
+          <div class="years">${lv}-деңгей · ${region}</div>
+          <span class="place">🌫 Тұман астында</span>
+        </div>
+      </div>
+      <div class="locked-note">
+        <span style="font-size:20px;line-height:1">🔒</span>
+        <div><b>Ашылуға ${left} деңгей қалды</b>
+        Батырдың есімі де, атағы да, өмірбаяны да осы деңгейге жеткенде ашылады.</div>
+      </div>
+      <div class="stats">
+        ${["Батылдық","Ақыл","Әділдік"].map((t,k)=>`
+        <div class="stat s${k+1}"><div class="row"><b>${t}</b><span>?</span></div>
+        <div class="bar"><i style="width:0"></i></div></div>`).join("")}
+      </div>
+      <button class="rank-btn" style="background:#F3F5F9" onclick="toast('Атақ ${lv}-деңгейде ашылады')">
+        <div><div class="k" style="color:var(--muted)">Атақ</div><div class="t" style="color:var(--muted)">Тұман астында</div></div>
+        <span class="arr" style="color:var(--muted)">🔒</span>
+      </button>`);
+    return;
+  }
+
+  openSheet(`
+    <div class="hcard-top">
+      <svg class="med" viewBox="0 0 100 100" aria-hidden="true">${medallion(i,false)}</svg>
+      <div class="info">
+        <h2>${h.n}</h2>
+        <div class="years">${h.y}</div>
+        <span class="place">📍 ${h.p}</span>
+      </div>
+    </div>
+    <div class="hook">«${h.h}»</div>
+    <div class="stats">
+      ${["Батылдық","Ақыл","Әділдік"].map((t,k)=>`
+      <div class="stat s${k+1}"><div class="row"><b>${t}</b><span>${h.s[k]}</span></div>
+      <div class="bar"><i data-w="${h.s[k]}"></i></div></div>`).join("")}
+    </div>
+    <p class="desc">${h.d}</p>
+    <button class="rank-btn" onclick="openRank(${lv})">
+      <svg class="med sm" viewBox="0 0 100 100" aria-hidden="true">${medallion(i,false)}</svg>
+      <div><div class="k">${lv}-деңгей атағы</div><div class="t">${rn}</div></div>
+      <span class="arr">›</span>
+    </button>
+    <p style="font-size:12.5px;color:var(--muted);margin-top:14px;text-align:center">
+      «${region}» аймағы тұманнан шықты</p>`);
+
+  requestAnimationFrame(()=>{
+    document.querySelectorAll("#sheet-body .bar i[data-w]").forEach(el=>el.style.width=el.dataset.w+"%");
+  });
+}
+
+function openRank(lv){
+  const i=lv-1, unlocked = lv<=P.done;
+  if(!unlocked){ toast("Атақ "+lv+"-деңгейде ашылады"); return; }
+  const [rn,rm]=RANKS[i];
+  openSheet(`
+    <div style="text-align:center;padding:6px 0 4px">
+      <svg class="med" viewBox="0 0 100 100" style="margin:0 auto 16px" aria-hidden="true">${medallion(i,false)}</svg>
+      <div class="k" style="font-size:11.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--green-t)">${lv}-деңгей атағы</div>
+      <h2 style="font-size:28px;font-weight:900;letter-spacing:-.045em;margin-top:6px">${rn}</h2>
+      <p style="font-size:15.5px;line-height:1.5;color:#3A4055;margin-top:12px">${rm}</p>
+      <div class="hook" style="margin-top:20px;text-align:left">Иесі: ${HEROES[i].n}</div>
+      <button class="btn ghost" onclick="openHero(${lv})">Батырды көру</button>
+    </div>`);
+}
+
+/* ── іске қосу ── */
+drawBiomes();
+if(P.done>0) toast("Прогресс сақталған: "+P.done+" / 20 деңгей");
+
+/* Дизайнер мен тексеру үшін: ?go=map&done=7 — прогрессті қойып, бірден картаға. */
+(function(){
+  const p=new URLSearchParams(location.search);
+  if(p.has("done")){ P.done=Math.min(20,Math.max(0,+p.get("done")||0)); }
+  if(p.get("go")==="map") show("v-map");
+  if(p.get("go")==="test") startTest();
+  if(p.get("go")==="result"){ qRight=+(p.get("right")||5); finishTest(); }
+  if(p.get("hero")) { show("v-map"); openHero(Math.min(20,Math.max(1,+p.get("hero")))); }
+})();
+
+/* ── өзін-өзі тексеру: ?test=1 ──────────────────────────────
+   Логика бұзылса — консольде қателік көрінеді.                */
+if(location.search.indexOf("test=1")>-1){
+  const A=(c,m)=>{ if(!c) throw new Error("FAIL: "+m); console.log("ok:",m); };
+  A(HEROES.length===20,"20 батыр");
+  A(RANKS.length===20,"20 атақ");
+  A(QUIZ.length===6,"6 сұрақ");
+  A(new Set(QUIZ.map(q=>q.s)).size===6,"6 бөлек пән");
+  A(QUIZ.every(q=>q.o.length===4 && q.a>=0 && q.a<4),"әр сұрақта 4 нұсқа, жауап индексі дұрыс");
+  A(HEROES.every(h=>h.d.length>=400 && h.d.length<=600),"сипаттама 400–600 таңба (ТЗ бойынша)");
+  A(HEROES.every(h=>h.s.length===3 && h.s.every(v=>v>0&&v<=100)),"3 сипаттама 1..100");
+  A(REGIONS.length===5 && BIOMES.length===5,"5 аймақ, 5 дәуір");
+  // тұман: аймақ алдыңғысы толық өтілгенде ғана ашылады
+  const d=P.done; P.done=0;  A(regionOpen(0)&&!regionOpen(1),"0 деңгейде тек 1-аймақ ашық");
+  P.done=4;                  A(regionOpen(1)&&!regionOpen(2),"4 деңгейде 2-аймақ ашылды");
+  P.done=20;                 A(regionOpen(4),"20 деңгейде бәрі ашық");
+  P.done=d;
+  console.log("%cБарлық тексеру өтті","color:#6FA53A;font-weight:700");
+}
+</script>
+</body>
+</html>
