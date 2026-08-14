@@ -113,6 +113,31 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   filter:drop-shadow(0 10px 16px rgba(17,21,67,.28))
 }
 
+/* ── оқу әдеті: кішкене чекап-жолақ ─────────────────────────── */
+.read-card{
+  display:flex;align-items:center;gap:12px;background:var(--cream);border:1.5px solid #F0DCA4;
+  border-radius:var(--r-md);padding:13px 14px;margin-bottom:16px
+}
+.rd-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.rd-txt b{font-size:14.5px;font-weight:800;letter-spacing:-.02em;color:var(--paper-ink)}
+.rd-txt span{font-size:12.5px;font-weight:650;color:#8A7D55}
+.rd-btn{
+  flex:none;background:var(--paper-ink);color:#fff;border-radius:11px;padding:9px 15px;
+  font-size:13.5px;font-weight:800;transition:transform .14s var(--ease)
+}
+.rd-btn:active{transform:scale(.94)}
+.rd-check{
+  flex:none;width:38px;height:38px;border-radius:50%;background:#fff;border:2px solid #E7D6A0;
+  color:var(--green-d);font-size:18px;font-weight:900;display:grid;place-items:center;
+  transition:transform .14s var(--ease),background .16s,border-color .16s
+}
+.rd-check:active{transform:scale(.9)}
+.rd-check.on{background:var(--green);border-color:var(--green-d);color:#fff}
+.read-card.tree{background:var(--leaf);border-color:#CFE7B3}
+.read-card.tree .rd-txt b{color:var(--green-t)}
+.read-card.tree .rd-txt span{color:#5C7A3F}
+.read-card.tree .rd-check{border-color:#CFE7B3}
+
 /* ── бөлім тақырыбы ─────────────────────────────────────────── */
 .sec{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:13px}
 .sec h3{font-size:21px;font-weight:900;letter-spacing:-.03em}
@@ -570,12 +595,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
     <div class="appbar">
       <div class="wordmark">Study<span> Line</span></div>
-      <button class="round-btn" aria-label="Хабарламалар">
+      <button class="round-btn" aria-label="Еске салғышты қосу" onclick="enableReadNotif()">
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#141728" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
       </button>
     </div>
 
     <div class="scroll">
+      <div class="read-card" id="read-card"></div>
+      <div class="read-card" id="tree-card"></div>
+      <input type="file" id="tree-file" accept="image/*" capture="environment" hidden onchange="plantTree()">
+
       <div class="hero">
         <div class="greet">👋 Сәлем, Арнұр!</div>
         <h2>Бүгінгі тапсырмалар</h2>
@@ -978,7 +1007,8 @@ let QUIZ = QUIZ_SETS[0];
 const KEY="sl100_v2";
 let P = load();
 function load(){
-  const def = {done:0, xp:0, track:null, streak:0, last:"", best:0, perfect:{}};
+  const def = {done:0, xp:0, track:null, streak:0, last:"", best:0, perfect:{},
+    rTotal:0, rDays:0, rStreak:0, rLast:"", rBest:0, rDone:"", rNotif:false, tCount:0};
   try{
     const o = JSON.parse(localStorage.getItem(KEY));
     if(o && Number.isInteger(o.done)) return {
@@ -988,7 +1018,15 @@ function load(){
       streak:Math.max(0,o.streak|0),
       last:typeof o.last==="string" ? o.last : "",
       best:Math.max(0,o.best|0),
-      perfect:(o.perfect && typeof o.perfect==="object") ? o.perfect : {}
+      perfect:(o.perfect && typeof o.perfect==="object") ? o.perfect : {},
+      rTotal:Math.max(0,o.rTotal|0),
+      rDays:Math.max(0,o.rDays|0),
+      rStreak:Math.max(0,o.rStreak|0),
+      rLast:typeof o.rLast==="string" ? o.rLast : "",
+      rBest:Math.max(0,o.rBest|0),
+      rDone:typeof o.rDone==="string" ? o.rDone : "",
+      rNotif:!!o.rNotif,
+      tCount:Math.max(0,o.tCount|0)
     };
   }catch(e){}
   return def;
@@ -1013,6 +1051,109 @@ function bumpStreak(){
   if(P.streak>P.best) P.best=P.streak;
   return true;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   4b. ОҚУ ӘДЕТІ — «бүгін оқыдың ба?» бір батырмалы чекап.
+   Мақсат бір рет қойылады: жалпы бет саны + неше күнде оқу керек,
+   күндік норма содан шығады. Бөлек кітап экраны, кітапхана — жоқ,
+   бар болғаны басты экрандағы кішкене карточка + streak.
+   ══════════════════════════════════════════════════════════════ */
+function rPerDay(){ return P.rDays>0 ? Math.ceil(P.rTotal/P.rDays) : 0; }
+function rHasGoal(){ return P.rTotal>0 && P.rDays>0; }
+function setReadGoal(total,days){
+  P.rTotal=Math.max(1,total|0); P.rDays=Math.max(1,days|0);
+  save(); closeSheet(); renderRead();
+  toast("Мақсат қойылды: күніне "+rPerDay()+" бет");
+}
+function askReadGoal(){
+  openSheet(`
+    <h2 style="font-size:22px;font-weight:900;letter-spacing:-.04em;margin-bottom:6px">Оқу мақсаты</h2>
+    <p style="font-size:14.5px;line-height:1.45;color:var(--muted-c);margin-bottom:16px">
+      Кітапта неше бет қалды және неше күнде оқып бітіргің келеді? Күндік норма өзі есептеледі.</p>
+    <label style="display:block;font-size:13px;font-weight:800;color:var(--muted-c);margin-bottom:6px">Жалпы бет саны</label>
+    <input id="rg-total" type="number" min="1" inputmode="numeric" placeholder="мыс. 120" value="${P.rTotal||""}"
+      style="width:100%;border:2px solid var(--line);border-radius:13px;padding:13px 15px;font-size:16px;font-weight:700;margin-bottom:14px">
+    <label style="display:block;font-size:13px;font-weight:800;color:var(--muted-c);margin-bottom:6px">Неше күнде оқисың</label>
+    <input id="rg-days" type="number" min="1" inputmode="numeric" placeholder="мыс. 20" value="${P.rDays||""}"
+      style="width:100%;border:2px solid var(--line);border-radius:13px;padding:13px 15px;font-size:16px;font-weight:700;margin-bottom:18px">
+    <button class="btn" type="button" onclick="const t=+document.getElementById('rg-total').value,d=+document.getElementById('rg-days').value;
+      if(t>0&&d>0) setReadGoal(t,d); else toast('Екі санды да толтыр')">Сақтау</button>`);
+}
+function toggleRead(){
+  const t=today();
+  if(P.rDone===t){
+    // сол күні қате басып қалса — кері қайтару
+    P.rDone=""; P.rStreak=Math.max(0,P.rStreak-1); save(); renderRead(); return;
+  }
+  const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  P.rStreak = (P.rDone===y) ? P.rStreak+1 : 1;
+  P.rDone=t;
+  if(P.rStreak>P.rBest) P.rBest=P.rStreak;
+  save(); renderRead();
+  toast(P.rStreak>1 ? "🔥 "+P.rStreak+" күн қатарынан оқыдың" : "Тамаша! Ертең де оқы");
+}
+function renderRead(){
+  const el=document.getElementById("read-card"); if(!el) return;
+  if(!rHasGoal()){
+    el.innerHTML=`
+      <div class="rd-txt"><b>📖 Оқу әдеті</b><span>Күндік мақсатыңды қой</span></div>
+      <button class="rd-btn" type="button" onclick="askReadGoal()">Қою</button>`;
+    return;
+  }
+  const done = P.rDone===today();
+  el.innerHTML=`
+    <div class="rd-txt"><b>📖 Күніне ${rPerDay()} бет</b>
+      <span>${P.rStreak>0 ? "🔥 "+P.rStreak+" күн қатарынан" : "Бүгін оқыдың ба?"}</span></div>
+    <button class="rd-check${done?" on":""}" type="button" aria-pressed="${done}" onclick="toggleRead()" aria-label="Бүгін оқыдым">
+      ${done?"✓":""}</button>`;
+}
+
+/* ── еске салғыш: тек қосымша ашық тұрғанда іске асады (сервер жоқ,
+   нақты фондық push емес — ол үшін service worker + бэкенд керек). ── */
+function enableReadNotif(){
+  if(!("Notification" in window)){ toast("Бұл браузерде хабарлама қолдау жоқ"); return; }
+  if(Notification.permission==="granted"){ P.rNotif=true; save(); toast("Еске салғыш қосулы"); scheduleReadNotif(); return; }
+  Notification.requestPermission().then(perm=>{
+    P.rNotif = perm==="granted"; save();
+    toast(P.rNotif ? "Еске салғыш қосулы" : "Рұқсат берілмеді");
+    if(P.rNotif) scheduleReadNotif();
+  });
+}
+let readNotifT;
+function scheduleReadNotif(){
+  clearTimeout(readNotifT);
+  if(!P.rNotif || Notification.permission!=="granted") return;
+  const now=new Date(), at=new Date(); at.setHours(20,0,0,0);
+  if(at<=now) at.setDate(at.getDate()+1);
+  readNotifT=setTimeout(()=>{
+    if(rHasGoal() && P.rDone!==today()){
+      new Notification("Оқу уақыты",{body:"Бүгінгі "+rPerDay()+" бетті әлі белгілеген жоқсың",icon:"data:,"});
+    }
+    scheduleReadNotif();
+  }, at-now);
+}
+if(P.rNotif && "Notification" in window && Notification.permission==="granted") scheduleReadNotif();
+
+/* ══════════════════════════════════════════════════════════════
+   4c. 1000 АҒАШ — «Ағаш салдым» батырмасы, сурет камерадан бірден
+   түседі (галерея, жүктеу, рейтинг — сервер керек, прототипте жоқ).
+   Санақ жеке, тек осы құрылғыда — «мыңға дейін қанша қалды».
+   ══════════════════════════════════════════════════════════════ */
+function askTree(){ document.getElementById("tree-file").click(); }
+function plantTree(){
+  document.getElementById("tree-file").value="";   // сол суретті қайта таңдаса да іске қосылсын
+  P.tCount++; save(); renderTree();
+  toast("🌳 Ағаш саны: "+P.tCount);
+}
+function renderTree(){
+  const el=document.getElementById("tree-card"); if(!el) return;
+  el.className="read-card tree";
+  el.innerHTML=`
+    <div class="rd-txt"><b>🌳 ${P.tCount} ағаш</b>
+      <span>${P.tCount>0 ? (1000-P.tCount)+" ағаш 1000-ға дейін" : "Ағаш отырғызып, суретке түсір"}</span></div>
+    <button class="rd-btn" type="button" onclick="askTree()">Ағаш салдым</button>`;
+}
+renderTree();
 
 /* ── дыбыс пен дірілдеу: дұрыс/қате жауап ── */
 let AC=null;
@@ -1525,6 +1666,7 @@ function streakInfo(){
 }
 
 /* ── іске қосу ── */
+renderRead();
 if(P.done>0) toast("Прогресс сақталған: "+P.done+" / 20 деңгей");
 
 /* Дизайнер мен тексеру үшін: ?go=map&done=7 — прогрессті қойып, бірден картаға. */
