@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#FFFFFF">
+<title>Ана кабинеті — StudyLine</title>
+<!--
+  StudyLine · Ана кабинеті — рабочий срез «недельного уровня мамы».
+
+  Почему именно этот срез. В акте работ 1 июля — 9 августа главный вывод по
+  продукту звучал так: сегодня кабинет = отчёт об успеваемости ребёнка, то есть
+  источник тревоги, которым невозможно поделиться. Недельный уровень мамы
+  с призом — первая ценность, которую хочется показать подруге. Отсюда
+  начинается и удержание, и реферал.
+
+  Поэтому здесь первым экраном идёт уровень МАМЫ, а не оценки ребёнка.
+  Оценки — вторым экраном и без тревожных формулировок.
+
+  Один файл, localStorage (ключ sl_ana_v1), интерфейс казахский.
+  Режимы: ?week=4 · ?lvl=7 · ?xp=260 · ?empty=1 · ?test=1
+-->
+<style>
+:root{
+  --green:#87BE4B; --green-d:#6FA53A; --green-l:#A8D46F; --green-t:#4F7724; --leaf:#EDF6E1;
+  --rose:#F5E2F9; --rose-d:#B25EC4; --rose-t:#7A2E8A;
+  --cream:#FDF4D8; --gold:#E7B744; --gold-t:#7A5A11;
+  --ink:#141728; --muted:#666C7E; --muted-c:#5C6273;
+  --line:#ECEEF5; --paper:#FBF8F1; --paper-ink:#2C2618; --red:#E0574B;
+  --r-lg:24px; --r-md:18px; --r-sm:14px; --pad:16px;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;overscroll-behavior:none}
+body{font-family:var(--font);background:#fff;color:var(--ink);
+  -webkit-font-smoothing:antialiased;letter-spacing:-.011em}
+#stage{position:relative;height:100%;max-width:520px;margin:0 auto;overflow:hidden;
+  display:flex;flex-direction:column;background:#fff}
+
+.statusbar{flex:none;display:flex;justify-content:space-between;align-items:center;
+  padding:calc(var(--safe-t) + 8px) 22px 2px;font-size:15px;font-weight:650}
+.appbar{flex:none;display:flex;align-items:center;gap:10px;padding:8px var(--pad) 10px}
+.wordmark{font-size:18px;font-weight:900;letter-spacing:-.04em}
+.wordmark span{color:var(--green-t)}
+.appbar .sp{flex:1}
+.round-btn{width:40px;height:40px;border:0;background:var(--line);border-radius:13px;
+  display:grid;place-items:center;font-size:17px}
+
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:0 var(--pad) calc(var(--safe-b) + 24px)}
+
+/* ── уровень мамы: первый экран ── */
+.lvl{background:linear-gradient(160deg,#FBEAFE,#F2DDF8);border-radius:var(--r-lg);
+  padding:20px;position:relative;overflow:hidden}
+.lvl .crown{position:absolute;right:-6px;top:-14px;font-size:96px;opacity:.14;line-height:1}
+.lvl .who{display:flex;align-items:center;gap:12px}
+.lvl .av{width:52px;height:52px;border-radius:18px;background:#fff;display:grid;place-items:center;
+  font-size:26px;flex:none}
+.lvl .who b{display:block;font-size:19px;font-weight:900;letter-spacing:-.035em}
+.lvl .who i{font-style:normal;display:block;font-size:13px;font-weight:800;color:var(--rose-t);margin-top:2px}
+.lvl .bar{margin-top:16px}
+.lvl .bar .t{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:13px;font-weight:800;color:var(--rose-t)}
+.rail{height:12px;border-radius:99px;background:rgba(255,255,255,.8);margin-top:7px;overflow:hidden}
+.rail i{display:block;height:100%;border-radius:99px;background:var(--rose-d);
+  transform-origin:left;transition:transform .8s var(--ease)}
+.lvl .never{font-size:12.5px;font-weight:750;color:var(--rose-t);margin-top:11px;opacity:.9}
+
+/* ── задание недели ── */
+.task{border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;margin-top:14px;background:#fff}
+.task .kick{font-size:11.5px;font-weight:850;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.task h2{font-size:21px;font-weight:900;letter-spacing:-.035em;line-height:1.2;margin-top:8px}
+.task p{font-size:13.5px;line-height:1.45;font-weight:650;color:var(--muted-c);margin-top:8px}
+.prize{display:inline-flex;align-items:center;gap:8px;background:var(--cream);border:1px solid #EBD79A;
+  border-radius:99px;padding:8px 14px;font-size:13px;font-weight:850;color:var(--gold-t);margin-top:12px}
+.preview{width:100%;aspect-ratio:4/3;border-radius:var(--r-md);background:var(--leaf);
+  display:grid;place-items:center;font-size:46px;overflow:hidden;margin-top:14px}
+.preview img{width:100%;height:100%;object-fit:cover}
+
+.btn{width:100%;border:0;border-radius:var(--r-md);background:var(--green);color:#fff;
+  font:inherit;font-size:16px;font-weight:850;padding:16px;margin-top:12px;
+  box-shadow:0 5px 0 var(--green-d),0 13px 20px -8px rgba(60,90,20,.45);
+  transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--green-d)}
+.btn.rose{background:var(--rose-d);box-shadow:0 5px 0 #8E3EA0,0 13px 20px -8px rgba(140,40,150,.4)}
+.btn.rose:active{box-shadow:0 1px 0 #8E3EA0}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+.btn.ghost:active{transform:scale(.98)}
+.btn[disabled]{opacity:.5;box-shadow:0 5px 0 #C6CCD6}
+
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:26px 0 10px}
+.sec h2{font-size:16.5px;font-weight:850;letter-spacing:-.03em}
+.sec span{font-size:12.5px;font-weight:750;color:var(--muted)}
+
+/* ── призы ── */
+.gifts{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.gift{border:1px solid var(--line);border-radius:var(--r-sm);padding:13px 8px;text-align:center;background:#fff}
+.gift.open{background:var(--leaf);border-color:var(--green-l)}
+.gift .em{font-size:26px;line-height:1}
+.gift b{display:block;font-size:12px;font-weight:850;margin-top:6px;letter-spacing:-.01em}
+.gift i{font-style:normal;display:block;font-size:10.5px;font-weight:750;color:var(--muted);margin-top:2px}
+
+/* ── семейная галерея ── */
+.fam{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fam figure{position:relative;aspect-ratio:1;border-radius:var(--r-sm);overflow:hidden;
+  background:var(--paper);display:grid;place-items:center;font-size:28px;border:1px solid var(--line)}
+.fam img{width:100%;height:100%;object-fit:cover}
+.fam .lock{opacity:.42}
+.fam figcaption{position:absolute;left:0;right:0;bottom:0;background:rgba(20,23,40,.7);color:#fff;
+  font-size:9.5px;font-weight:800;padding:4px 6px;text-align:center}
+
+/* ── ребёнок ── */
+.kid{display:flex;align-items:center;gap:12px;border:1px solid var(--line);
+  border-radius:var(--r-md);padding:14px;background:#fff}
+.kid .av{width:44px;height:44px;border-radius:15px;background:var(--leaf);display:grid;place-items:center;font-size:22px;flex:none}
+.kid .t{flex:1;min-width:0}
+.kid .t b{display:block;font-size:16px;font-weight:850;letter-spacing:-.03em}
+.kid .t i{font-style:normal;display:block;font-size:12.5px;font-weight:750;color:var(--muted);margin-top:2px}
+.kid .v{text-align:right;flex:none}
+.kid .v b{display:block;font-size:20px;font-weight:900;letter-spacing:-.04em;color:var(--green-t)}
+.kid .v i{font-style:normal;font-size:10.5px;font-weight:750;color:var(--muted)}
+
+.week{display:flex;gap:5px;align-items:flex-end;height:78px;margin-top:14px}
+.week div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}
+.week i{display:block;width:100%;border-radius:6px 6px 3px 3px;background:var(--green);min-height:3px}
+.week span{font-size:10px;font-weight:800;color:var(--muted)}
+
+.note{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:14px 15px;margin-top:14px;display:flex;gap:11px;align-items:flex-start}
+.note.rose{background:#FCF2FE;border-color:#EBD3F2}
+.note .ic{font-size:19px;line-height:1.2;flex:none}
+.note>div>b{display:block;font-size:13.5px;font-weight:850;margin-bottom:2px}
+.note p{font-size:13px;line-height:1.45;font-weight:650;color:var(--muted-c)}
+.note p b{display:inline;font-weight:900;color:var(--ink)}
+
+/* ── шторка ── */
+.sheet-wrap{position:absolute;inset:0;z-index:40;display:none}
+.sheet-wrap.on{display:block}
+.scrim{position:absolute;inset:0;background:rgba(17,21,67,.42);opacity:0;transition:opacity .3s}
+.sheet-wrap.in .scrim{opacity:1}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:92%;background:#fff;
+  border-radius:26px 26px 0 0;padding:10px var(--pad) calc(var(--safe-b) + 16px);
+  transform:translateY(100%);transition:transform .42s var(--ease);overflow-y:auto;
+  box-shadow:0 -14px 40px -12px rgba(17,21,67,.3)}
+.sheet-wrap.in .sheet{transform:translateY(0)}
+.grab{width:42px;height:5px;border-radius:99px;background:var(--line);margin:0 auto 12px}
+.sheet h2{font-size:21px;font-weight:900;letter-spacing:-.04em;margin-bottom:6px}
+.sheet p.lead{font-size:14px;line-height:1.45;color:var(--muted-c);font-weight:650;margin-bottom:16px}
+#sharecv{width:100%;border-radius:var(--r-md);display:block;border:1px solid var(--line)}
+
+#toast{position:absolute;left:50%;bottom:calc(var(--safe-b) + 26px);transform:translate(-50%,14px);
+  background:var(--paper-ink);color:#fff;border-radius:14px;padding:12px 17px;font-size:14px;
+  font-weight:700;z-index:60;opacity:0;pointer-events:none;transition:.34s var(--ease);
+  max-width:88%;text-align:center;line-height:1.35}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div class="statusbar"><span>9:41</span><span>▰</span></div>
+  <div class="appbar">
+    <span class="wordmark">Study<span>Line</span></span>
+    <span class="sp"></span>
+    <button class="round-btn" type="button" aria-label="Хабарламалар" onclick="toast('Прототипте хабарламалар жоқ')">🔔</button>
+  </div>
+
+  <div class="scroll" id="body"></div>
+
+  <input type="file" id="file" accept="image/*" capture="environment" hidden onchange="pickPhoto(event)">
+
+  <div class="sheet-wrap" id="sheet" onclick="if(event.target.id==='sheet'||event.target.classList.contains('scrim'))closeSheet()">
+    <div class="scrim"></div>
+    <div class="sheet"><div class="grab"></div><div id="sheet-body"></div></div>
+  </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   1. ДЕРЕК
+   ══════════════════════════════════════════════════════════════ */
+const KID={name:"Алихан", cls:"5 сынып", em:"🧒"};
+const MOM={name:"Айгүл", em:"👩"};
+const XP_PER_LVL=300;
+
+/* Деңгей атаулары. Ана деңгейі — мақтаныш, сондықтан атауы да сол туралы. */
+const TITLES=["Жаңа ана","Қамқор ана","Тірек ана","Шабыт ана","Дана ана",
+              "Алтын ана","Босс ана","Аңыз ана","Ұлы ана","Жұлдыз ана"];
+
+/* Апталық тапсырмалар. Бәрі бір қағидатқа бағынады: тапсырма БАЛА туралы емес,
+   АНА мен БАЛА бірге туралы. Бақылау емес, бірге өткізген уақыт. */
+const TASKS=[
+  {t:"Балаңызбен 10 минут сөйлесіңіз", d:"Сабақ туралы емес — күні қалай өткені туралы.", g:"☕ Тегін кофе"},
+  {t:"Отбасымен паркте серуендеңіз",   d:"Бір сурет — отбасы галереясына сақталады.",     g:"🎬 Kinopoisk"},
+  {t:"Бірге кітап оқыңыз",             d:"Он бет те жеткілікті. Бірге оқығаны маңызды.",   g:"🍿 Netflix"},
+  {t:"Сүйікті тағамын бірге дайындаңыз",d:"Фото жүктеңіз — галереяға сақталады.",          g:"🧘 Sezapp"},
+  {t:"Бала кезіңіздің бір суретін көрсетіңіз", d:"Балаға ата-анасының балалығы қызық.",    g:"🏀 Спорт клуб"},
+  {t:"Балаңыздың бір ісін мақтаңыз",   d:"Нәтижесін емес, тырысқанын атап айтыңыз.",       g:"🎤 Ораторлық"}
+];
+const DAYS=["Дс","Сс","Ср","Бс","Жм","Сн","Жк"];
+const KID_WEEK=[40,55,30,80,55,0,0];          // бала жинаған XP, серверден келеді
+
+/* ══════════════════════════════════════════════════════════════
+   2. КҮЙ
+   ══════════════════════════════════════════════════════════════ */
+const KEY="sl_ana_v1";
+let P=load();
+function load(){
+  /* Әдепкі күй концепт v6-мен бірдей: 7-деңгей, 260/300 XP, үш апта өткен.
+     Босс бұрын көрген экранмен салыстыра алуы үшін. */
+  const def={week:4, xp:6*XP_PER_LVL+260, done:[1,2,3], photos:{}, shared:0};
+  try{
+    const o=JSON.parse(localStorage.getItem(KEY));
+    if(o && Number.isInteger(o.xp)) return {
+      week:clamp(o.week,1,TASKS.length),
+      xp:Math.max(0,o.xp|0),
+      done:Array.isArray(o.done)?o.done.filter(n=>Number.isInteger(n)&&n>=1&&n<=TASKS.length):[],
+      photos:(o.photos&&typeof o.photos==="object")?o.photos:{},
+      shared:Math.max(0,o.shared|0)
+    };
+  }catch(e){}
+  return def;
+}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v|0));
+let quotaWarned=false;
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(P)); return true; }
+  catch(e){
+    const had=Object.keys(P.photos).length;
+    P.photos={};
+    try{ localStorage.setItem(KEY, JSON.stringify(P)); }catch(e2){}
+    if(!quotaWarned && had){ quotaWarned=true; toast("Жады толды: деңгейіңіз сақталды, ескі суреттер өшірілді"); }
+    return false;
+  }
+}
+
+/* ── деңгей. Ең маңызды ереже: деңгей ЕШҚАШАН түспейді.
+   Бала бір апта оқымаса, ана «деңгейден құладым» деген сезім алмауы керек —
+   ол кабинетті мүлде жаппауы үшін. Өспейді, бірақ түспейді. */
+const level  = () => Math.min(TITLES.length, Math.floor(P.xp/XP_PER_LVL)+1);
+const inLvl  = () => P.xp % XP_PER_LVL;
+const toNext = () => XP_PER_LVL - inLvl();
+const title  = () => TITLES[level()-1];
+const kidWeek= () => KID_WEEK.reduce((a,b)=>a+b,0);
+
+/* ══════════════════════════════════════════════════════════════
+   3. КӨРІНІС
+   ══════════════════════════════════════════════════════════════ */
+let toastT;
+function toast(m){
+  const el=document.getElementById("toast");
+  el.textContent=m; el.classList.add("on");
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("on"),2600);
+}
+const sheet=document.getElementById("sheet");
+function openSheet(h){ document.getElementById("sheet-body").innerHTML=h;
+  sheet.classList.add("on"); requestAnimationFrame(()=>sheet.classList.add("in")); }
+function closeSheet(){ sheet.classList.remove("in"); setTimeout(()=>sheet.classList.remove("on"),340); }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+
+function render(){
+  const w=P.week, task=TASKS[w-1], done=P.done.indexOf(w)>-1, ph=P.photos[w];
+  const max=Math.max(...KID_WEEK,1);
+
+  document.getElementById("body").innerHTML=`
+  <!-- 1. Ана деңгейі — БІРІНШІ, баланың бағасы емес -->
+  <div class="lvl">
+    <div class="crown" aria-hidden="true">👑</div>
+    <div class="who">
+      <span class="av">${MOM.em}</span>
+      <span><b>${MOM.name}</b><i>👑 ${level()}-деңгей · ${title()}</i></span>
+    </div>
+    <div class="bar">
+      <div class="t"><span>Келесі деңгейге</span><span>${inLvl()} / ${XP_PER_LVL} XP</span></div>
+      <div class="rail"><i style="transform:scaleX(${(inLvl()/XP_PER_LVL).toFixed(3)})"></i></div>
+    </div>
+    <div class="never">Деңгейіңіз ешқашан түспейді — тек өседі 💛</div>
+  </div>
+
+  <!-- 2. Апта тапсырмасы -->
+  <div class="task">
+    <div class="kick">${w}-апта тапсырмасы</div>
+    <h2>${task.t}</h2>
+    <p>${task.d}</p>
+    <span class="prize">${task.g}</span>
+    ${done
+      ? `<div class="preview">${ph?`<img src="${ph}" alt="">`:"✅"}</div>
+         <div class="note rose"><span class="ic">🤍</span><div><b>Орындалды</b>
+           <p>Сурет <b>тек сіздің отбасыңызға</b> көрінеді. Ешбір рейтингке,
+           ешбір жалпы лентаға шықпайды.</p></div></div>
+         <button class="btn rose" type="button" onclick="openShare()">Деңгейімді көрсету</button>`
+      : `${ph?`<div class="preview"><img src="${ph}" alt=""></div>`:""}
+         <button class="btn" type="button" onclick="document.getElementById('file').click()">
+           ${ph?"Басқа сурет таңдау":"📷 Сурет жүктеу"}</button>
+         <button class="btn ghost" type="button" onclick="completeTask()" ${ph?"":"disabled"}>
+           Тапсырманы орындадым</button>`}
+  </div>
+
+  <!-- 3. Сыйлықтар -->
+  <div class="sec"><h2>Сыйлықтар</h2><span>аптасына бір</span></div>
+  <div class="gifts">
+    ${TASKS.map((t,i)=>{
+      const open=P.done.indexOf(i+1)>-1;
+      const [em,...rest]=t.g.split(" ");
+      return `<div class="gift${open?" open":""}"><div class="em">${em}</div>
+        <b>${rest.join(" ")}</b><i>${open?"ашылған":(i+1)+"-апта"}</i></div>`;
+    }).join("")}
+  </div>
+
+  <!-- 4. Отбасы галереясы -->
+  <div class="sec"><h2>Отбасы естеліктері</h2><span>тек сізге</span></div>
+  <div class="fam">
+    ${TASKS.map((t,i)=>{
+      const w1=i+1, p=P.photos[w1], open=P.done.indexOf(w1)>-1;
+      return `<figure${open?"":' class="lock"'}>${p?`<img src="${p}" alt="">`:(open?"🤍":"🔒")}
+        <figcaption>${w1}-апта</figcaption></figure>`;
+    }).join("")}
+  </div>
+  <div class="note"><span class="ic">🔒</span><div><b>Бұл суреттер жабық</b>
+    <p>Отбасы естеліктері басқа ата-аналарға, басқа балаларға және рейтингке
+    көрінбейді. Оларды тек сіз ашасыз.</p></div></div>
+
+  <!-- 5. Бала — ЕКІНШІ, және мазасыздандыратын тілсіз -->
+  <div class="sec"><h2>${KID.name}</h2><span>осы апта</span></div>
+  <div class="kid">
+    <span class="av">${KID.em}</span>
+    <span class="t"><b>${KID.name}</b><i>${KID.cls}</i></span>
+    <span class="v"><b>${kidWeek()}</b><i>XP осы аптада</i></span>
+  </div>
+  <div class="week">
+    ${KID_WEEK.map((v,i)=>`<div><i style="height:${Math.round(v/max*58)+3}px"></i><span>${DAYS[i]}</span></div>`).join("")}
+  </div>
+  <div class="note"><span class="ic">💡</span><div><b>Неге мұнда баға жоқ</b>
+    <p>Кабинет баланың бағасынан басталса — ол әр кіргенде мазасыздық береді
+    және оны ешкімге көрсеткіңіз келмейді. Сондықтан бірінші — сіздің деңгейіңіз,
+    ал баланың нәтижесі — толық есепте.</p></div></div>
+  <button class="btn ghost" type="button" onclick="openReport()">Толық есепті ашу</button>`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4. ТАПСЫРМА
+   ══════════════════════════════════════════════════════════════ */
+const MAXSIDE=720, QUALITY=.72;
+function pickPhoto(e){
+  const f=e.target.files && e.target.files[0]; e.target.value="";
+  if(!f) return;
+  if(!/^image\//.test(f.type)){ toast("Тек сурет файлын таңдау керек"); return; }
+  const r=new FileReader();
+  r.onerror=()=>toast("Суретті оқу мүмкін болмады");
+  r.onload=()=>shrink(r.result,d=>{ P.photos[P.week]=d; save(); render(); });
+  r.readAsDataURL(f);
+}
+function shrink(dataUrl, done){
+  const img=new Image();
+  img.onerror=()=>toast("Сурет бүлінген сияқты");
+  img.onload=()=>{
+    const k=Math.min(1, MAXSIDE/Math.max(img.width,img.height));
+    const c=document.createElement("canvas");
+    c.width=Math.round(img.width*k); c.height=Math.round(img.height*k);
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    done(c.toDataURL("image/jpeg",QUALITY));
+  };
+  img.src=dataUrl;
+}
+function completeTask(){
+  if(P.done.indexOf(P.week)>-1) return;
+  if(!P.photos[P.week]){ toast("Алдымен сурет жүктеңіз"); return; }
+  const before=level();
+  P.done.push(P.week); P.xp+=100; save(); render();
+  if(level()>before) openLevelUp(); else toast("Тапсырма орындалды · +100 XP");
+}
+function openLevelUp(){
+  openSheet(`
+    <h2>👑 ${level()}-деңгей ашылды</h2>
+    <p class="lead">Сіз енді — <b>${title()}</b>. Бұл деңгей ешқашан түспейді.</p>
+    <div class="note rose"><span class="ic">🎁</span><div><b>Сыйлық ашылды</b>
+      <p>${TASKS[P.week-1].g} — «Сыйлықтар» бөлімінен аласыз.</p></div></div>
+    <button class="btn rose" type="button" onclick="openShare()">Досыма көрсету</button>
+    <button class="btn ghost" type="button" onclick="closeSheet()">Кейінірек</button>`);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. БӨЛІСУ — рефералдың нақты нүктесі
+   Ана өз деңгейін көрсеткісі келеді, баласының бағасын емес. Сондықтан
+   картинкада БАЛАНЫҢ ЕШТЕҢЕСІ ЖОҚ: аты да, сыныбы да, бағасы да, суреті де.
+   ══════════════════════════════════════════════════════════════ */
+function shareCard(cv){
+  const W=1080,H=1350, c=cv.getContext("2d");
+  cv.width=W; cv.height=H;
+  const g=c.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,"#FBEAFE"); g.addColorStop(1,"#EFE0FA");
+  c.fillStyle=g; c.fillRect(0,0,W,H);
+  c.textAlign="center";
+  c.font="900 340px -apple-system,Inter,sans-serif"; c.fillStyle="rgba(178,94,196,.16)";
+  c.fillText("👑",W/2,360);
+  c.fillStyle="#7A2E8A"; c.font="850 40px -apple-system,Inter,sans-serif";
+  c.fillText("STUDYLINE · АНА ДЕҢГЕЙІ", W/2, 470);
+  c.fillStyle="#3B1044"; c.font="900 150px -apple-system,Inter,sans-serif";
+  c.fillText(level()+"-деңгей", W/2, 640);
+  c.font="900 76px -apple-system,Inter,sans-serif"; c.fillStyle="#B25EC4";
+  c.fillText(title(), W/2, 740);
+  c.fillStyle="#7A2E8A"; c.font="750 44px -apple-system,Inter,sans-serif";
+  c.fillText(P.done.length+" апталық тапсырма орындалды", W/2, 850);
+  // прогресс
+  c.fillStyle="rgba(255,255,255,.8)"; roundRect(c,140,930,800,34,17); c.fill();
+  c.fillStyle="#B25EC4"; roundRect(c,140,930,Math.max(34,800*inLvl()/XP_PER_LVL),34,17); c.fill();
+  c.fillStyle="#7A2E8A"; c.font="750 38px -apple-system,Inter,sans-serif";
+  c.fillText(inLvl()+" / "+XP_PER_LVL+" XP", W/2, 1030);
+  c.font="650 36px -apple-system,Inter,sans-serif"; c.fillStyle="#8A5C95";
+  c.fillText("Деңгей ешқашан түспейді — тек өседі", W/2, 1180);
+  c.font="850 42px -apple-system,Inter,sans-serif"; c.fillStyle="#5C2168";
+  c.fillText("studyline.kz", W/2, 1270);
+  return cv;
+}
+function roundRect(c,x,y,w,h,r){
+  c.beginPath(); c.moveTo(x+r,y);
+  c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r);
+  c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath();
+}
+function openShare(){
+  openSheet(`
+    <h2>Деңгейіңізді көрсету</h2>
+    <p class="lead">Суретте баланың аты да, сыныбы да, бағасы да жоқ — тек сіздің деңгейіңіз.</p>
+    <canvas id="sharecv" width="1080" height="1350"></canvas>
+    <button class="btn rose" type="button" onclick="downloadCard()">Суретті сақтау</button>
+    <button class="btn ghost" type="button" onclick="closeSheet()">Жабу</button>`);
+  shareCard(document.getElementById("sharecv"));
+}
+function downloadCard(){
+  const cv=document.getElementById("sharecv"); if(!cv) return;
+  const a=document.createElement("a");
+  a.download="studyline-ana-"+level()+".png";
+  a.href=cv.toDataURL("image/png");
+  a.click();
+  P.shared++; save();
+  toast("Сурет сақталды");
+}
+
+function openReport(){
+  openSheet(`
+    <h2>${KID.name} — толық есеп</h2>
+    <p class="lead">Мұнда нақты сандар. Оларды кабинеттің бірінші экранына шығармаймыз әдейі.</p>
+    <div class="kid"><span class="av">${KID.em}</span>
+      <span class="t"><b>${KID.name}</b><i>${KID.cls} · осы апта</i></span>
+      <span class="v"><b>${kidWeek()}</b><i>XP</i></span></div>
+    <div class="week">${KID_WEEK.map((v,i)=>`<div><i style="height:${Math.round(v/Math.max(...KID_WEEK,1)*58)+3}px"></i><span>${DAYS[i]}</span></div>`).join("")}</div>
+    <div class="note"><span class="ic">📈</span><div><b>Пәндер бойынша</b>
+      <p>Логика 82% · Математика 76% · Ағылшын 68%. Ең әлсізі — ағылшын,
+      осы аптада соған көбірек көңіл бөлген жөн.</p></div></div>
+    <div class="note"><span class="ic">🤝</span><div><b>Не істемейміз</b>
+      <p>Баланың сыныптағы орнын көрсетпейміз. Орын нөмірі мазасыздық береді,
+      бірақ не істеу керегін айтпайды. Оның орнына — қай пән әлсіз екені.</p></div></div>
+    <button class="btn ghost" type="button" onclick="closeSheet()">Жабу</button>`);
+}
+
+/* ── іске қосу ── */
+(function(){
+  const p=new URLSearchParams(location.search);
+  if(p.has("week")) P.week=clamp(+p.get("week"),1,TASKS.length);
+  if(p.has("xp"))   P.xp=Math.max(0,+p.get("xp")||0);
+  if(p.has("lvl"))  P.xp=(clamp(+p.get("lvl"),1,TITLES.length)-1)*XP_PER_LVL + (P.xp%XP_PER_LVL);
+  if(p.get("empty")==="1"){ P.week=1; P.xp=0; P.done=[]; P.photos={}; }
+  render();
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   6. ӨЗІН-ӨЗІ ТЕКСЕРУ — ?test=1
+   ══════════════════════════════════════════════════════════════ */
+if(location.search.indexOf("test=1")>-1){
+  const A=(c,m)=>{ if(!c) throw new Error("FAIL: "+m); console.log("ok:",m); };
+  const H=()=>document.getElementById("body").innerHTML;
+  const back=JSON.parse(JSON.stringify(P));
+
+  // Деңгей арифметикасы
+  P.xp=0;   A(level()===1 && inLvl()===0 && toNext()===300,"нөлден 1-деңгей");
+  P.xp=299; A(level()===1,"299 XP — әлі 1-деңгей");
+  P.xp=300; A(level()===2 && inLvl()===0,"300 XP — 2-деңгей");
+  P.xp=760; A(level()===3 && inLvl()===160,"760 XP — 3-деңгей, 160 ішінде");
+  P.xp=99999; A(level()===TITLES.length,"деңгей атаулар санынан аспайды");
+
+  // Деңгей түспейді
+  P.xp=760; const L=level(); P.week=5; render();
+  A(level()===L,"апта ауысқанда деңгей түспейді");
+  A(H().indexOf("ешқашан түспейді")>-1,"экранда «деңгей түспейді» деп жазылған");
+
+  // Ана деңгейі баланың бағасынан БҰРЫН тұр — акттегі басты ұсыныс
+  const iLvl=H().indexOf("деңгей ·"), iKid=H().indexOf(KID.name);
+  A(iLvl>-1 && iKid>-1 && iLvl<iKid,"ана деңгейі баладан бұрын тұр");
+
+  // Тапсырма суретсіз орындалмайды
+  P.week=4; P.done=[]; P.photos={}; render();
+  A(document.querySelector(".task .btn.ghost").disabled,"суретсіз «орындадым» басылмайды");
+  const xp0=P.xp; completeTask();
+  A(P.xp===xp0 && P.done.length===0,"суретсіз тапсырма есептелмейді");
+  P.photos[4]="data:image/jpeg;base64,AAAA"; completeTask();
+  A(P.done.indexOf(4)>-1 && P.xp===xp0+100,"суретпен орындалады, +100 XP");
+  completeTask(); A(P.xp===xp0+100,"екінші рет басқанда XP қосылмайды");
+
+  // Құпиялық: галереяда бөгде ештеңе жоқ, бөлісу картинкасында бала жоқ
+  render();
+  A(H().indexOf("тек сіздің отбасыңызға")>-1,"суреттің отбасына ғана көрінетіні жазылған");
+  const cv=document.createElement("canvas"); shareCard(cv);
+  A(cv.width===1080 && cv.height===1350,"бөлісу картинкасы 1080×1350");
+  const png=cv.toDataURL("image/png");
+  A(png.indexOf("data:image/png")===0,"картинка PNG болып шығады");
+  A(!/Алихан|5 сынып/.test(shareCardText()),"бөлісу картинкасында баланың аты да, сыныбы да жоқ");
+
+  // Толық есепте салыстыру жоқ
+  openReport();
+  const sb=document.getElementById("sheet-body").innerHTML;
+  A(sb.indexOf("Ағылшын")>-1,"есепте пәндер бар");
+  A(!/\d+-орын/.test(sb),"есепте сыныптағы орын жазылмайды");
+  closeSheet();
+
+  // Бүлінген қойма құламайды
+  localStorage.setItem(KEY,"{{{"); const p2=load();
+  A(p2.xp===6*XP_PER_LVL+260 && p2.week===4 && Math.floor(p2.xp/XP_PER_LVL)+1===7,
+    "бүлінген қойма әдепкі күйге түседі: 7-деңгей, 260/300");
+
+  P=back; save(); render();
+  console.log("%cБарлық тексеру өтті","color:#6FA53A;font-weight:700");
+}
+/* Бөлісу картинкасына қандай мәтін жазылатынын бір жерден аламыз — тест
+   canvas ішінен оқи алмайды, ал не жазылғанын білу керек. */
+function shareCardText(){
+  return ["STUDYLINE · АНА ДЕҢГЕЙІ", level()+"-деңгей", title(),
+          P.done.length+" апталық тапсырма орындалды",
+          inLvl()+" / "+XP_PER_LVL+" XP",
+          "Деңгей ешқашан түспейді — тек өседі", "studyline.kz"].join(" | ");
+}
+</script>
+</body>
+</html>
