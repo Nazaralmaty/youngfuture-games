@@ -1,2 +1,8 @@
 # сборочный вывод для публикации артефактом — воспроизводится из исходников
 src/tildik_kashu/dist_artifact.html
+
+# сгенерированный тестовый бандл Roblox-игры — собирается из исходников
+roblox/dala_qorgany/test/bundle.lua
+
+# сгенерированный дамп контента — собирается командой python3 export.py
+studyline/backend/seed.sql
