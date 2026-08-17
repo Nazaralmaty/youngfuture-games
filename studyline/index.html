@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<title>StudyLine — стенд прототипов</title>
+<!--
+  Одна ссылка на всё. Каждый прототип открывается на телефоне без установки.
+  Ссылки на состояния — чтобы не пришлось «доиграть до нужного экрана».
+  Карточка — div, а не a: внутри неё есть свои ссылки, а <a> в <a> невалиден.
+-->
+<style>
+:root{
+  --green:#87BE4B; --green-l:#A8D46F; --green-t:#4F7724; --leaf:#EDF6E1;
+  --ink:#141728; --muted:#666C7E; --muted-c:#5C6273;
+  --line:#ECEEF5; --paper:#FBF8F1;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font);background:#fff;color:var(--ink);-webkit-font-smoothing:antialiased;
+  letter-spacing:-.011em;max-width:640px;margin:0 auto;padding:28px 18px 70px}
+header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:6px}
+.kick{font-size:11.5px;font-weight:850;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:31px;font-weight:900;letter-spacing:-.04em;line-height:1.1;margin-top:9px}
+header p{font-size:15px;line-height:1.5;font-weight:650;color:var(--muted-c);margin-top:11px}
+h2{font-size:12px;font-weight:850;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--green-t);margin:34px 0 12px}
+
+.card{border:1px solid var(--line);border-radius:20px;padding:17px;margin-bottom:11px;background:#fff}
+.card.new{border-color:var(--green-l);background:linear-gradient(180deg,#F7FCEF,#fff)}
+.card .main{display:block;text-decoration:none;color:inherit;transition:transform .14s var(--ease)}
+.card .main:active{transform:scale(.985)}
+.card .top{display:flex;align-items:center;gap:12px}
+.card .em{font-size:30px;line-height:1;flex:none}
+.card .t{flex:1;min-width:0}
+.card .t b{display:block;font-size:17px;font-weight:850;letter-spacing:-.03em}
+.card .t i{font-style:normal;display:block;font-size:12.5px;font-weight:750;color:var(--muted);margin-top:2px}
+.card p{font-size:13.5px;line-height:1.45;font-weight:650;color:var(--muted-c);margin-top:11px}
+.card .arw{font-size:22px;color:var(--muted);flex:none}
+
+.tag{display:inline-block;font-size:10.5px;font-weight:850;letter-spacing:.05em;text-transform:uppercase;
+  border-radius:99px;padding:4px 9px;margin-left:8px;vertical-align:2px;
+  background:var(--leaf);color:var(--green-t)}
+
+.states{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.states a{font-size:12px;font-weight:800;text-decoration:none;color:var(--muted-c);
+  background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:7px 12px}
+.states a:active{background:var(--line)}
+
+.note{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:15px;
+  font-size:13.5px;line-height:1.5;font-weight:650;color:var(--muted-c);margin-top:20px}
+.note b{color:var(--ink);font-weight:850}
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);
+  font-size:12.5px;font-weight:700;color:var(--muted)}
+footer a{color:var(--green-t)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kick">StudyLine · стенд прототипов</div>
+  <h1>Всё, что можно открыть на телефоне</h1>
+  <p>Каждая ссылка открывается сразу, без установки и без логина.
+  Под карточками — прямые ссылки на состояния, чтобы не пришлось доигрывать
+  до нужного экрана.</p>
+</header>
+
+<h2>Прогресс ребёнка</h2>
+
+<div class="card new">
+  <a class="main" href="100_dengey/">
+    <div class="top"><span class="em">🗺</span>
+      <span class="t"><b>100 деңгей<span class="tag">40 из 100</span></b>
+        <i>две эпохи · 240 вопросов · дәуір сынағы</i></span><span class="arw">›</span></div>
+  </a>
+  <p>Карта с туманом войны, два пути на выбор — батыры или героини Великой степи.
+  Каждый уровень — реальная историческая личность. На 20-м и 40-м — испытание эпохи
+  из восьми вопросов.</p>
+  <div class="states">
+    <a href="100_dengey/?track=b&amp;done=7&amp;go=map">карта, 7 уровней</a>
+    <a href="100_dengey/?track=b&amp;done=19&amp;go=map">перед сынақ</a>
+    <a href="100_dengey/?track=b&amp;done=27&amp;go=map">2-я эпоха</a>
+    <a href="100_dengey/?track=q&amp;done=12&amp;go=coll">коллекция, ветка қыздар</a>
+    <a href="100_dengey/?track=b&amp;done=8&amp;go=stats">отчёт родителю</a>
+  </div>
+</div>
+
+<div class="card">
+  <a class="main" href="oqu_adeti/">
+    <div class="top"><span class="em">📖</span>
+      <span class="t"><b>Оқу әдеті</b><i>привычка чтения · 10 шагов за 39 дней</i></span><span class="arw">›</span></div>
+  </a>
+  <p>Пять книг, читалка, цепочка дней. После 18:00 предупреждает, что цепочка
+  оборвётся сегодня — с числом дней, а не «скоро».</p>
+</div>
+
+<h2>Вместе с другими</h2>
+
+<div class="card new">
+  <a class="main" href="agash/">
+    <div class="top"><span class="em">🌳</span>
+      <span class="t"><b>1000 ағаш<span class="tag">новое</span></b>
+        <i>фото с телефона · проверка куратором</i></span><span class="arw">›</span></div>
+  </a>
+  <p>Посадил дерево, снял, отправил. Куратор проверил — счётчик школы, клан и город
+  выросли вместе. Фото ребёнка не попадает в общую ленту без проверки.</p>
+  <div class="states">
+    <a href="agash/?seed=2">два дерева</a>
+    <a href="agash/?seed=3&amp;status=wait">на проверке</a>
+    <a href="agash/?seed=3&amp;status=wait&amp;curator=1">режим куратора</a>
+  </div>
+</div>
+
+<div class="card new">
+  <a class="main" href="klan/">
+    <div class="top"><span class="em">🐺</span>
+      <span class="t"><b>Клан<span class="tag">P0 исправлены</span></b>
+        <i>номинации вместо рейтинга · пустые состояния</i></span><span class="arw">›</span></div>
+  </a>
+  <p>Тот же клан, но без пяти опасных паттернов из ревью: без публичного
+  «не заходил 2 дня», без кнопки на конкретного ребёнка, без сплошного списка
+  «кто сколько принёс». И с экраном проигравшего, которого не было.</p>
+  <div class="states">
+    <a href="klan/">участник</a>
+    <a href="klan/?role=captain">капитан</a>
+    <a href="klan/?result=lose">проиграли</a>
+    <a href="klan/?result=win">выиграли</a>
+    <a href="klan/?state=empty">клан пустой</a>
+    <a href="klan/?state=solo">все вышли</a>
+    <a href="klan/?state=left">распался в раунде</a>
+  </div>
+</div>
+
+<h2>Арены — игры с учебным слоем</h2>
+
+<div class="card">
+  <a class="main" href="games/sort_arena.html">
+    <div class="top"><span class="em">🥚</span>
+      <span class="t"><b>Логика аренасы</b><i>сортировка · планирование ходов</i></span><span class="arw">›</span></div>
+  </a>
+  <p>Головоломка на планирование: 60 % яиц без цветовой подсказки — их нельзя
+  положить, не посчитав выражение.</p>
+</div>
+
+<div class="card">
+  <a class="main" href="games/flappy_english.html">
+    <div class="top"><span class="em">🐤</span>
+      <span class="t"><b>Ағылшын аренасы</b><i>55 слов · отвлекающие по смыслу</i></span><span class="arw">›</span></div>
+  </a>
+  <p>Неверные варианты берутся из той же смысловой группы — по смыслу не угадать,
+  надо знать слово.</p>
+</div>
+
+<div class="card">
+  <a class="main" href="games/nature_flow.html">
+    <div class="top"><span class="em">🌿</span>
+      <span class="t"><b>Табиғат аренасы</b><i>соединение пар · 36 пар, 5 тем</i></span><span class="arw">›</span></div>
+  </a>
+  <p>Линии без пересечений, все 17 раскладок решаемы и проверены тестом.</p>
+</div>
+
+<div class="card">
+  <a class="main" href="games/math_arcade.html">
+    <div class="top"><span class="em">🎮</span>
+      <span class="t"><b>Математика аркада</b><i>счёт на скорость</i></span><span class="arw">›</span></div>
+  </a>
+</div>
+
+<h2>Обучающее видео</h2>
+
+<div class="card">
+  <a class="main" href="video/nish_01_shashy/out/nish_01_9x16.mp4">
+    <div class="top"><span class="em">📐</span>
+      <span class="t"><b>Разбор НИШ: периметр</b><i>92 с · казахская озвучка</i></span><span class="arw">›</span></div>
+  </a>
+  <p>Три квадрата сложили в прямоугольник. Разбирается не только ответ,
+  но и почему нельзя просто сложить три периметра.</p>
+</div>
+
+<div class="card">
+  <a class="main" href="video/nish_02_paiyz/out/nish_02_9x16.mp4">
+    <div class="top"><span class="em">📉</span>
+      <span class="t"><b>Разбор НИШ: проценты</b><i>78 с · казахская озвучка</i></span><span class="arw">›</span></div>
+  </a>
+  <p>+20 %, потом −20 % — цена не вернулась. Показано, откуда берётся разница.</p>
+</div>
+
+<div class="note">
+  <b>Что это и что не это.</b> Это прототипы: они работают на телефоне по ссылке,
+  но данные лежат в браузере. Прогресс, банк вопросов, фото и списки кланов
+  уезжают на сервер отдельной работой — до этого показывать посторонним
+  «100 деңгей» нельзя: ответы видны в исходнике страницы.
+</div>
+
+<footer>StudyLine · обновлено 18 августа 2026 ·
+  <a href="https://github.com/Nazaralmaty/youngfuture-games/tree/main/studyline">исходники</a></footer>
+
+</body>
+</html>

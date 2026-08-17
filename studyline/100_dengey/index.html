@@ -2614,6 +2614,7 @@ if(P.done>0) toast("Прогресс сақталған: "+P.done+" / "+MAXLV+" 
   if(p.has("ep")){ const e=+p.get("ep")||0; epView = (e>=0 && e<EPOCHS && e<=curEp()) ? e : null; }
   if(p.get("go")==="map") show("v-map");
   if(p.get("go")==="coll"){ P.track=P.track||"b"; show("v-coll"); }
+  if(p.get("go")==="stats"){ P.track=P.track||"b"; show("v-stats"); }
   if(p.get("go")==="test") startTest();
   if(p.get("go")==="result"){ P.track=P.track||"b"; qRight=+(p.get("right")||5);
     qLog=QUIZ.map((_,k)=>k<qRight); finishTest(); }

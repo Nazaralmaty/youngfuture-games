@@ -127,6 +127,7 @@
 - `index.html?done=27&ep=0&go=map` — вернуться на карту первой эпохи
 - `index.html?track=q&done=7&go=map` — женская ветка
 - `index.html?go=coll&done=7` — экран жинақ
+- `index.html?go=stats&done=8` — отчёт родителю
 - `index.html?hero=15&done=7` — закрытая карточка героя 15
 - `index.html?go=result&right=5` — экран результата (`right=3` — провал)
 - `index.html?streak=12&go=map` — карта с длинным стриком

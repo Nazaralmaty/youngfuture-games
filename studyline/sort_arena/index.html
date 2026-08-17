@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1">
+<meta name="theme-color" content="#FFFFFF">
+<title>Логика аренасы — StudyLine</title>
+<!--
+  StudyLine · қабық (басты экран + «Ойын» қойындысы) → Логика аренасы 🥚.
+  100_dengey/index.html-мен бірдей қабық, айырмасы: карта мен тест орнына
+  ойынның өзі iframe-де ашылады (../games/sort_arena.html).
+
+  Байланыс — studyline-bridge арқылы: қабық ойынға sid береді, ойын
+  «app ішіндемін» деп түсініп ✕ батырмасын көрсетеді және postMessage-пен
+  progress / finish / close жібереді. Нәтиже localStorage 'sl_arena_shell'.
+-->
+<style>
+:root{
+  --green:#87BE4B; --green-d:#6FA53A;
+  --mint:#DFF4F1; --cream:#FDF4D8; --pink:#F5E2F9; --blue:#E2E9FD; --leaf:#EDF6E1;
+  --navy:#111543; --ink:#141728; --muted:#666C7E; --muted-c:#5C6273;
+  --green-t:#4F7724; --line:#ECEEF5;
+  --bg:#FFFFFF; --paper-ink:#2C2618;
+  --gold:#E7B744;
+  --r-lg:24px; --r-md:18px;
+  --pad:16px;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;overscroll-behavior:none}
+body{
+  font-family:var(--font);background:#E9ECF2;color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  display:flex;align-items:center;justify-content:center;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:3px solid var(--green-t);outline-offset:2px;border-radius:8px}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+
+/* ── сахна ──────────────────────────────────────────────────── */
+#stage{
+  position:relative;width:100%;height:100dvh;max-width:440px;
+  background:var(--bg);overflow:hidden;display:flex;flex-direction:column;
+}
+@media (min-width:600px) and (min-height:700px){
+  #stage{height:min(94dvh,calc(440px * 16 / 9));border-radius:34px;
+    box-shadow:0 30px 80px -20px rgba(17,21,67,.45),0 2px 8px rgba(17,21,67,.12)}
+}
+.view{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
+.view.on{display:flex}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+        padding:0 var(--pad) 18px}
+.scroll::-webkit-scrollbar{display:none}
+
+/* ── статус жолағы (макет) ──────────────────────────────────── */
+.statusbar{
+  flex:none;display:flex;align-items:center;justify-content:space-between;
+  padding:calc(var(--safe-t) + 12px) 22px 2px;font-size:15px;font-weight:700;
+  letter-spacing:-.2px;color:var(--ink)
+}
+.statusbar .sb-r{display:flex;gap:5px;align-items:center;opacity:.9}
+.statusbar svg{display:block}
+
+/* ── шапка ──────────────────────────────────────────────────── */
+.appbar{flex:none;display:flex;align-items:center;gap:12px;padding:14px var(--pad) 10px}
+.wordmark{font-size:27px;font-weight:900;letter-spacing:-.055em;color:var(--ink);flex:1}
+.round-btn{
+  width:46px;height:46px;border-radius:15px;background:#fff;border:1.5px solid var(--line);
+  display:grid;place-items:center;flex:none;transition:transform .14s var(--ease)
+}
+.round-btn:active{transform:scale(.92)}
+
+/* ── басты герой карточкасы ─────────────────────────────────── */
+.hero{
+  position:relative;border-radius:var(--r-lg);overflow:hidden;isolation:isolate;
+  background:linear-gradient(122deg,#93C755 0%,var(--green) 46%,#6DA436 100%);
+  padding:18px 18px 20px;color:#fff;margin-bottom:26px
+}
+.hero::after{
+  content:"";position:absolute;right:-60px;top:-70px;width:210px;height:210px;
+  border-radius:50%;background:rgba(255,255,255,.13);z-index:-1
+}
+.hero .greet{font-size:14.5px;font-weight:600;opacity:.95;margin-bottom:8px}
+.hero h2{font-size:31px;line-height:1.08;font-weight:900;letter-spacing:-.035em;max-width:8ch}
+.hero p{font-size:14px;line-height:1.4;margin-top:9px;color:rgba(255,255,255,.92);max-width:19ch}
+.hero .cta{
+  margin-top:17px;display:inline-flex;align-items:center;gap:12px;background:#fff;
+  border-radius:15px;padding:9px 9px 9px 18px;font-size:15.5px;font-weight:800;
+  color:var(--ink);letter-spacing:-.2px;box-shadow:0 6px 16px -6px rgba(17,21,67,.35)
+}
+.hero .cta i{
+  width:34px;height:34px;border-radius:50%;background:var(--green);display:grid;
+  place-items:center;font-style:normal;color:#fff
+}
+.hero .mascot{
+  position:absolute;right:8px;bottom:6px;font-size:104px;line-height:1;
+  filter:drop-shadow(0 10px 16px rgba(17,21,67,.28))
+}
+
+/* ── бөлім тақырыбы ─────────────────────────────────────────── */
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:13px}
+.sec h3{font-size:21px;font-weight:900;letter-spacing:-.03em}
+.sec a{font-size:15px;font-weight:700;color:var(--green-t);text-decoration:none}
+
+/* ── тізім карточкалары ─────────────────────────────────────── */
+.tile{
+  position:relative;display:flex;align-items:center;gap:12px;border-radius:var(--r-lg);
+  padding:16px;margin-bottom:12px;text-align:left;width:100%;overflow:hidden;
+  transition:transform .16s var(--ease),box-shadow .16s var(--ease)
+}
+.tile:active{transform:scale(.98)}
+.tile .txt{flex:1;min-width:0}
+.tile h4{font-size:17px;font-weight:800;letter-spacing:-.03em;color:var(--ink)}
+.tile p{font-size:13.5px;line-height:1.35;color:var(--muted-c);margin-top:4px}
+.tile .chip{
+  display:inline-flex;align-items:center;gap:5px;margin-top:9px;background:rgba(255,255,255,.72);
+  border-radius:8px;padding:4px 9px;font-size:11.5px;font-weight:800;color:var(--muted-c)
+}
+.tile .pic{font-size:52px;line-height:1;flex:none;filter:drop-shadow(0 6px 10px rgba(17,21,67,.18))}
+.tile .go{
+  width:38px;height:38px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none;
+  box-shadow:0 3px 8px rgba(17,21,67,.1)
+}
+.tile.mint{background:var(--mint)}
+.tile.cream{background:var(--cream)}
+.tile.live{box-shadow:0 10px 26px -12px rgba(231,183,68,.85),0 0 0 2px rgba(231,183,68,.5) inset}
+.tile.locked{background:#F3F5F9}
+.tile.locked h4{color:var(--muted-c)}
+.tile.locked .pic{opacity:.5;filter:none}
+.tile.locked .go{background:#E7E9F0;box-shadow:none}
+.tile.locked .go svg{display:none}
+.tile.locked .go::after{content:"🔒";font-size:14px;line-height:1}
+.tile.locked .chip{background:rgba(255,255,255,.9)}
+
+.half-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.half{border-radius:var(--r-lg);padding:14px;display:flex;align-items:center;gap:9px}
+.half .pic{font-size:34px;flex:none}
+.half h4{font-size:14.5px;font-weight:800;letter-spacing:-.03em;line-height:1.15}
+.half p{font-size:11.5px;color:var(--muted-c);margin-top:3px;line-height:1.25}
+.half.pink{background:var(--pink)} .half.blue{background:var(--blue)}
+.half.locked{background:#F3F5F9;opacity:.75}
+.half.locked .pic::after{content:" 🔒";font-size:11px}
+
+/* ── прогресс (navy) ────────────────────────────────────────── */
+.progress-card{
+  position:relative;background:var(--navy);color:#fff;border-radius:var(--r-lg);
+  padding:18px;overflow:hidden;margin-bottom:12px
+}
+.progress-card .lbl{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:700;opacity:.92}
+.progress-card .cols{display:grid;grid-template-columns:1fr 1fr;margin-top:16px}
+.progress-card .cols>div+div{border-left:1px solid rgba(255,255,255,.16);padding-left:18px}
+.progress-card .big{font-size:40px;font-weight:900;letter-spacing:-.05em;line-height:1}
+.progress-card .big em{font-size:15px;font-weight:700;font-style:normal;letter-spacing:-.02em;margin-left:6px}
+.progress-card .sub{font-size:13px;opacity:.78;margin-top:11px;display:flex;align-items:center;gap:8px}
+.progress-card .up{background:var(--green);border-radius:999px;padding:3px 9px;font-size:12px;font-weight:800}
+.progress-card::after{
+  content:"";position:absolute;right:-10px;bottom:-30px;width:150px;height:130px;
+  border-radius:22px 22px 0 0;border:2px solid rgba(255,255,255,.11);border-bottom:0
+}
+
+/* ── төменгі навигация ──────────────────────────────────────── */
+.tabbar{
+  flex:none;display:flex;background:#fff;border-top:1px solid var(--line);
+  padding:9px 4px calc(var(--safe-b) + 9px)
+}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  font-size:11.5px;font-weight:700;color:#A8ADBC;letter-spacing:-.01em}
+.tabbar button[aria-current="page"]{color:var(--ink)}
+.tabbar button.locked{opacity:.5}
+.tabbar svg{width:23px;height:23px}
+
+/* ── ойын экраны: iframe толық экранға ──────────────────────── */
+#v-game{background:#070b1e}
+#gameFrame{flex:1;width:100%;border:0;display:block;background:#070b1e}
+#gameBack{
+  position:absolute;left:10px;top:calc(var(--safe-t) + 10px);z-index:5;
+  width:40px;height:40px;border-radius:13px;background:rgba(9,32,26,.55);
+  border:1px solid rgba(255,255,255,.28);color:#fff;display:grid;place-items:center;
+  backdrop-filter:blur(6px)
+}
+#gameBack:active{transform:scale(.93)}
+
+/* ── тост ───────────────────────────────────────────────────── */
+#toast{
+  position:absolute;left:50%;bottom:calc(var(--safe-b) + 92px);transform:translate(-50%,14px);
+  background:var(--paper-ink);color:#fff;border-radius:14px;padding:12px 17px;font-size:14px;
+  font-weight:700;letter-spacing:-.02em;z-index:60;opacity:0;pointer-events:none;
+  transition:.34s var(--ease);max-width:88%;text-align:center;line-height:1.35
+}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- ═══ БАСТЫ ЭКРАН ═══════════════════════════════════════ -->
+  <section class="view on" id="v-home">
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-r">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 4.2a11 11 0 0 1 15 0"/><path d="M3.8 7a7 7 0 0 1 9.4 0"/><circle cx="8.5" cy="10" r="1.1" fill="currentColor" stroke="none"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".7" y=".7" width="21" height="10.6" rx="3" stroke="currentColor" stroke-opacity=".4" stroke-width="1.2"/><rect x="2.4" y="2.4" width="17.6" height="7.2" rx="1.8" fill="currentColor"/><path d="M23.3 4.3v3.4a2 2 0 0 0 0-3.4Z" fill="currentColor" fill-opacity=".45"/></svg>
+      </span>
+    </div>
+
+    <div class="appbar">
+      <div class="wordmark">Study<span> Line</span></div>
+      <button class="round-btn" aria-label="Хабарламалар" onclick="toast('Бұл бөлім прототипте жабық')">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#141728" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      </button>
+    </div>
+
+    <div class="scroll">
+      <div class="hero">
+        <div class="greet">👋 Сәлем, Арнұр!</div>
+        <h2>Логика аренасы</h2>
+        <p>Жұмыртқаларды түсі бойынша сұрыпта 🥚</p>
+        <div class="cta" onclick="openGame()">Ойынға өту
+          <i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></i>
+        </div>
+        <div class="mascot" aria-hidden="true">🥚</div>
+      </div>
+
+      <div class="sec"><h3>Ойындар</h3><a href="#" onclick="return false">Бәрі →</a></div>
+
+      <button class="tile cream live" onclick="openGame()">
+        <div class="txt">
+          <h4>Логика аренасы</h4>
+          <p>Әр ұяда — бір ғана түс. Ойлан да, жылжыт</p>
+          <span class="chip" id="t-chip">🥚 17 тапсырма</span>
+        </div>
+        <div class="pic" aria-hidden="true">🥚</div>
+        <div class="go"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B9821A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></div>
+      </button>
+
+      <button class="tile mint locked" onclick="toast('Бұл ойын прототипте жабық')">
+        <div class="txt">
+          <h4>Математика аркадасы</h4>
+          <p>Есепті тез шығар, ұпай жина</p>
+          <span class="chip">🔢 жақында</span>
+        </div>
+        <div class="pic" aria-hidden="true">🔢</div>
+        <div class="go"></div>
+      </button>
+
+      <div class="half-row">
+        <div class="half pink locked" onclick="toast('Бұл бөлім прототипте жабық')"><div class="pic" aria-hidden="true">🐤</div><div><h4>Flappy English</h4><p>Сөз жаттау</p></div></div>
+        <div class="half blue locked" onclick="toast('Бұл бөлім прототипте жабық')"><div class="pic" aria-hidden="true">🌿</div><div><h4>Nature Flow</h4><p>Табиғат</p></div></div>
+      </div>
+
+      <div class="progress-card">
+        <div class="lbl">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M16 7h5v5"/></svg>
+          Сенің прогресің
+        </div>
+        <div class="cols">
+          <div>
+            <div class="big" id="p-stars">0<em>жұлдыз</em></div>
+            <div class="sub">Логика аренасында</div>
+          </div>
+          <div>
+            <div class="big" id="p-nodes">0<em>/17</em></div>
+            <div class="sub">шешілген тапсырма</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="tabbar">
+      <button aria-current="page">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2 3.5 10v10.3h6v-6.1h5v6.1h6V10z"/></svg>Басты</button>
+      <button class="locked" onclick="toast('Бұл бөлім прототипте жабық')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="18" height="16" rx="2.5"/><rect x="6" y="8" width="7" height="2" fill="#fff"/><rect x="6" y="12" width="12" height="1.6" fill="#fff"/><rect x="6" y="15.4" width="9" height="1.6" fill="#fff"/></svg>Жаңалық</button>
+      <button onclick="openGame()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10a5 5 0 0 1 4.6 7l-.9 2A2.6 2.6 0 0 1 16 16.4L15 15H9l-1 1.4A2.6 2.6 0 0 1 3.3 16l-.9-2A5 5 0 0 1 7 7Z"/><rect x="5.6" y="10.2" width="4" height="1.6" rx=".8" fill="#fff"/><rect x="6.8" y="9" width="1.6" height="4" rx=".8" fill="#fff"/><circle cx="16" cy="10.4" r="1.1" fill="#fff"/><circle cx="17.8" cy="12.4" r="1.1" fill="#fff"/></svg>Ойын</button>
+      <button class="locked" onclick="toast('Бұл бөлім прототипте жабық')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3.5" y="12" width="4" height="8.5" rx="1.4"/><rect x="10" y="6" width="4" height="14.5" rx="1.4"/><rect x="16.5" y="9" width="4" height="11.5" rx="1.4"/></svg>Статистика</button>
+      <button class="locked" onclick="toast('Бұл бөлім прототипте жабық')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.2"/><path d="M4 21a8 8 0 0 1 16 0z"/></svg>Профиль</button>
+    </nav>
+  </section>
+
+  <!-- ═══ ОЙЫН ══════════════════════════════════════════════ -->
+  <section class="view" id="v-game">
+    <button id="gameBack" onclick="closeGame()" aria-label="Артқа">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H6M11 6l-6 6 6 6"/></svg>
+    </button>
+    <iframe id="gameFrame" title="Логика аренасы" allow="autoplay"></iframe>
+  </section>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+"use strict";
+
+const GAME_URL = "../games/sort_arena.html";
+const KEY = "sl_arena_shell";
+const NODES = 17;                       /* биомдағы тапсырма саны — ойындағы BIOME_NODES */
+
+/* ── экрандар ────────────────────────────────────────────────── */
+function show(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on", v.id===id));
+}
+
+let toastT;
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("on");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"), 2100);
+}
+
+/* ── ойынды ашу / жабу ───────────────────────────────────────── */
+/* sid беріледі: сонда bridge «app ішіндемін» деп есептеп, ойында ✕ шығады
+   және нәтиже postMessage-пен осы бетке келеді. */
+function openGame(){
+  show("v-game");                        /* алдымен көрсетеміз: жасырын iframe-де
+                                            ойынның canvas өлшемі 0 болып қалады */
+  const f=document.getElementById("gameFrame");
+  if(!f.src) f.src = GAME_URL + "?sid=shell&uid=1&name=" + encodeURIComponent("Арнұр") + "&cls=5&lang=kk";
+}
+function closeGame(){ show("v-home"); render(); }
+
+/* ── прогресс ────────────────────────────────────────────────── */
+function load(){
+  try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; }
+}
+function save(p){ try{ localStorage.setItem(KEY, JSON.stringify(p)); }catch(e){} }
+
+function render(){
+  const p=load();
+  const stars=p.stars|0, nodes=Math.min(p.nodes|0, NODES);
+  document.getElementById("p-stars").innerHTML = stars + "<em>жұлдыз</em>";
+  document.getElementById("p-nodes").innerHTML = nodes + "<em>/" + NODES + "</em>";
+  document.getElementById("t-chip").textContent =
+    nodes ? "🥚 " + nodes + " / " + NODES + " тапсырма" : "🥚 " + NODES + " тапсырма";
+}
+
+/* ── ойыннан келген хабарлар (studyline-bridge протоколы) ────── */
+window.addEventListener("message", ev=>{
+  let m; try{ m = typeof ev.data==="string" ? JSON.parse(ev.data) : ev.data; }catch(e){ return; }
+  if(!m || m.source!=="studyline-game") return;
+
+  if(m.type==="progress" && m.payload && m.payload.stars!=null){
+    const p=load();
+    p.stars=(p.stars|0)+m.payload.stars;
+    p.nodes=Math.max(p.nodes|0, m.payload.level|0);
+    save(p); render();
+  }
+  if(m.type==="finish" && m.payload){
+    const p=load(), d=m.payload.details||{};
+    p.stars=Math.max(p.stars|0, m.payload.maxCombo|0);
+    p.nodes=Math.max(p.nodes|0, d.progress|0);
+    save(p); render();
+  }
+  if(m.type==="close"){ closeGame(); }
+});
+
+render();
+
+/* ── өзін-өзі тексеру: ?test=1 ───────────────────────────────── */
+if(new URLSearchParams(location.search).get("test")==="1"){
+  const A=(ok,n)=>console[ok?"log":"error"]((ok?"✅":"❌")+" "+n);
+  show("v-game"); A(document.getElementById("v-game").classList.contains("on"),"ойын экраны ашылады");
+  closeGame();    A(document.getElementById("v-home").classList.contains("on"),"артқа қайтады");
+  openGame();     A(/sid=shell/.test(document.getElementById("gameFrame").src),"iframe-ге sid беріледі");
+  /* ойын ашық қалады: жасырын iframe-де canvas 0 болып, ойын қате береді */
+  const before=load();
+  window.postMessage(JSON.stringify({source:"studyline-game",type:"progress",payload:{level:3,stars:2}}),"*");
+  setTimeout(()=>{ A((load().nodes|0)>=3,"progress прогресті жаңартады"); save(before); render(); },50);
+}
+</script>
+</body>
+</html>
