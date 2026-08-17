@@ -14,7 +14,7 @@
  */
 'use strict';
 
-import { existsSync, readdirSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { execSync } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -141,13 +141,48 @@ if (want('.')) {
   rows.push(['Ссылки стенда', links.length + ' шт', dead.length ? 'битые: ' + dead.join(', ') : 'все живые']);
 }
 
+/* ── Расхождение диагностики с банком ──────────────────────────────────────
+   12 вопросов в nish/ — это копии из банка 100_dengey. Как только банк
+   правят (а его уже правили: переписывали объяснения), копии молча
+   разъезжаются, и ребёнок видит в диагностике старую формулировку.
+
+   Сверяем текст вопроса и индекс верного ответа. Объяснения НЕ сверяем
+   намеренно: в «100 деңгей» их читает ребёнок сразу после ответа, а в
+   диагностике — родитель в конце, разбирая все двенадцать. Формулировки
+   там законно разные, а вот сам вопрос и ключ обязаны совпадать. */
+if (want('nish') && want('100_dengey')) {
+  const rd = (p) => readFileSync(path.join(HERE, p), 'utf8');
+  const grab = (src, marker) => {
+    const i = src.indexOf(marker); const j = src.indexOf('\n];', i);
+    return src.slice(i, j);
+  };
+  const parse = (txt) => {
+    const out = [];
+    const re = /\{s:"((?:[^"\\]|\\.)*)",\s*(?:lvl:"[^"]*",\s*)?q:"((?:[^"\\]|\\.)*)",\s*o:\[((?:[^\]])*)\],\s*a:(\d)/g;
+    let m; while ((m = re.exec(txt))) out.push({ subject: m[1], body: m[2], a: +m[4] });
+    return out;
+  };
+  const bank = parse(grab(rd('100_dengey/index.html'), 'const QUIZ_SETS = ['));
+  const diag = parse(grab(rd('nish/index.html'), 'const Q=['));
+  const byBody = new Map(bank.map((q) => [q.body, q]));
+  const drift = [];
+  for (const d of diag) {
+    const b = byBody.get(d.body);
+    if (!b) drift.push('нет в банке: ' + d.body.slice(0, 42));
+    else if (b.a !== d.a) drift.push('разошёлся ответ: ' + d.body.slice(0, 42));
+  }
+  totalFails += drift.length;
+  rows.push(['Диагностика ↔ банк', diag.length + ' вопросов',
+    drift.length ? drift.join(' · ') : 'совпадают']);
+}
+
 await browser.close();
 
 const w0 = Math.max(...rows.map((r) => r[0].length));
 const w1 = Math.max(...rows.map((r) => r[1].length));
 console.log('');
 for (const [a, b, c] of rows) {
-  const bad = c !== 'чисто' && c !== 'все живые';
+  const bad = !['чисто','все живые','совпадают'].includes(c);
   console.log((bad ? '✗ ' : '✓ ') + a.padEnd(w0) + '  ' + b.padEnd(w1) + '  ' + c);
 }
 console.log('\n' + (totalFails ? '✗ ' : '✓ ') + totalChecks + ' проверок, ' + totalFails + ' проблем\n');
