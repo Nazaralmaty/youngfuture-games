@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  /* ── StudyLine қағаз стилі: 100 деңгей картасымен бірдей палитра ── */
+  :root{
+    --paper:#F6F1E4; --ink:#2A2419; --muted:#8A7F66;
+    --green:#87BE4B; --green-d:#6FA53A; --green-t:#456F1B; --leaf:#EAF4DA;
+    --gold:#DFA02A; --gold-l:#FBE9C0; --red:#E0574B; --red-l:#FBE0DD;
+    --line:#DDD3BC;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1080px;height:1920px;overflow:hidden;background:var(--paper)}
+  body{font-family:-apple-system,BlinkMacSystemFont,Inter,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+
+  #root{position:relative;width:1080px;height:1920px;overflow:hidden}
+  .bg{position:absolute;inset:0;background:
+      repeating-linear-gradient(45deg,rgba(0,0,0,.018) 0 34px,transparent 34px 68px),
+      repeating-linear-gradient(-45deg,rgba(0,0,0,.018) 0 34px,transparent 34px 68px),
+      var(--paper)}
+
+  .brand{position:absolute;top:64px;left:0;right:0;display:flex;justify-content:center}
+  .brand span{display:inline-flex;align-items:center;gap:14px;background:var(--ink);color:#fff;
+    border-radius:999px;padding:16px 34px;font-size:30px;font-weight:800;letter-spacing:-.01em}
+  .brand i{font-style:normal;color:var(--gold)}
+
+  .scene{position:absolute;inset:0;display:flex;flex-direction:column;
+         align-items:center;justify-content:center;padding:0 74px;text-align:center}
+
+  .kick{font-size:32px;font-weight:850;letter-spacing:.14em;text-transform:uppercase;
+        color:var(--muted);margin-bottom:26px}
+  h1{font-size:96px;line-height:1.06;letter-spacing:-.035em;font-weight:900;color:var(--ink)}
+  h2{font-size:64px;line-height:1.16;letter-spacing:-.03em;font-weight:900;color:var(--ink)}
+  .lead{font-size:46px;line-height:1.34;font-weight:650;color:#5C5340;margin-top:30px}
+
+  .form{display:inline-flex;align-items:center;gap:20px;background:#fff;border:3px solid var(--line);
+    border-radius:34px;padding:28px 44px;font-size:60px;font-weight:900;color:var(--ink);
+    letter-spacing:-.02em;box-shadow:0 18px 34px -20px rgba(60,50,20,.35)}
+  .form.ok{background:var(--leaf);border-color:var(--green);color:var(--green-t)}
+  .form.bad{background:var(--red-l);border-color:var(--red);color:#8E2B22}
+  .form.gold{background:var(--gold-l);border-color:var(--gold);color:#7A5A11}
+
+  /* баға шкаласы — үш баған */
+  .bars{display:flex;align-items:flex-end;justify-content:center;gap:44px;height:520px;margin-top:20px}
+  .bar{width:180px;border-radius:20px 20px 8px 8px;display:flex;flex-direction:column;
+       justify-content:flex-start;align-items:center;padding-top:22px;color:#fff;
+       font-size:40px;font-weight:900;position:relative}
+  .bar u{position:absolute;bottom:20px;left:0;right:0;text-decoration:none;
+         font-size:30px;font-weight:800;color:rgba(255,255,255,.82)}
+  .b1{background:var(--green-t)}
+  .b2{background:#A8791E}
+  .b3{background:#8E2B22}
+
+  .stepno{display:inline-flex;align-items:center;justify-content:center;width:78px;height:78px;
+    border-radius:26px;background:var(--green-t);color:#fff;font-size:44px;font-weight:900;
+    box-shadow:0 6px 0 #2F4F10}
+  .row{display:flex;align-items:center;gap:28px;justify-content:center;flex-wrap:wrap}
+
+  .warn{display:inline-flex;align-items:center;gap:20px;background:var(--gold-l);
+    border:3px solid var(--gold);border-radius:30px;padding:26px 38px;
+    font-size:42px;font-weight:800;color:#7A5A11;line-height:1.25;max-width:900px;text-align:left}
+
+  .sub{position:absolute;left:64px;right:64px;bottom:118px;display:flex;justify-content:center}
+  .sub span{background:rgba(42,36,25,.94);color:#fff;border-radius:26px;padding:24px 38px;
+    font-size:40px;line-height:1.3;font-weight:750;letter-spacing:-.01em;max-width:100%}
+  .sub.acc span{background:var(--green-t)}
+</style>
+</head>
+<body>
+
+<div id="root" data-composition-id="main" data-start="0" data-duration="78.1"
+     data-width="1080" data-height="1920">
+
+  <div class="bg"></div>
+  <div class="brand"><span>StudyLine <i>·</i> НИШ дайындық</span></div>
+
+  <!-- 1. Сұрақ 0–9.56 -->
+  <section class="clip" data-start="0" data-duration="9.56" data-track-index="1">
+    <div class="scene">
+      <div class="kick" id="a1k">НИШ · пайыз</div>
+      <h2 id="a1t">Тауар 20%-ға қымбаттады,<br>сосын 20%-ға арзандады</h2>
+      <div class="row" style="margin-top:56px">
+        <div class="form ok" id="a1p">+20%</div>
+        <div class="form bad" id="a1m">−20%</div>
+      </div>
+      <div class="lead" id="a1q">Бағасы бастапқы қалпына келді ме?</div>
+    </div>
+  </section>
+
+  <!-- 2. Қате жауап 9.56–20.64 -->
+  <section class="clip" data-start="9.56" data-duration="11.08" data-track-index="1">
+    <div class="scene">
+      <div class="kick">Көпшіліктің жауабы</div>
+      <div class="form" id="a2f" style="font-size:74px">+20 − 20 = 0</div>
+      <h2 id="a2t" style="margin-top:46px;color:#8E2B22">Логикасы дұрыс сияқты.<br>Бірақ жауап қате.</h2>
+    </div>
+  </section>
+
+  <!-- 3. 100 теңге 20.64–28.24 -->
+  <section class="clip" data-start="20.64" data-duration="7.6" data-track-index="1">
+    <div class="scene">
+      <div class="row" id="a3h"><div class="stepno">1</div><h2>Санмен тексереміз</h2></div>
+      <div class="form gold" id="a3f" style="margin-top:54px;font-size:88px">100 ₸</div>
+      <div class="lead" id="a3l">Жүзбен санау ең оңай</div>
+    </div>
+  </section>
+
+  <!-- 4. +20% 28.24–36.76 -->
+  <section class="clip" data-start="28.24" data-duration="8.52" data-track-index="1">
+    <div class="scene">
+      <div class="row" id="a4h"><div class="stepno">2</div><h2>20%-ға қымбаттады</h2></div>
+      <div class="form" id="a4a" style="margin-top:50px">100-дің 20%-ы = 20</div>
+      <div class="form ok" id="a4b" style="margin-top:26px;font-size:74px">100 + 20 = 120 ₸</div>
+    </div>
+  </section>
+
+  <!-- 5. −20% қайдан 36.76–49.44 -->
+  <section class="clip" data-start="36.76" data-duration="12.68" data-track-index="1">
+    <div class="scene">
+      <div class="row" id="a5h"><div class="stepno">3</div><h2>20%-ға арзандады</h2></div>
+      <div class="warn" id="a5w" style="margin-top:44px">
+        <span style="font-size:52px">⚠</span>
+        <span>Енді 20% жүзден емес, <b>120-дан</b> алынады</span>
+      </div>
+      <div class="form bad" id="a5f" style="margin-top:34px">120-ның 20%-ы = 24</div>
+    </div>
+  </section>
+
+  <!-- 6. Нәтиже 49.44–54.8 -->
+  <section class="clip" data-start="49.44" data-duration="5.36" data-track-index="1">
+    <div class="scene">
+      <div class="form" id="a6a" style="font-size:72px">120 − 24</div>
+      <div class="form gold" id="a6b" style="margin-top:30px;font-size:96px">= 96 ₸</div>
+    </div>
+  </section>
+
+  <!-- 7. Ереже 54.8–68.32 -->
+  <section class="clip" data-start="54.8" data-duration="13.52" data-track-index="1">
+    <div class="scene">
+      <div class="kick">Жауабы</div>
+      <h2 id="a7t">Тауар 4%-ға арзан болды</h2>
+      <div class="bars" id="a7b">
+        <div class="bar b1" style="height:340px">100 ₸<u>басы</u></div>
+        <div class="bar b2" style="height:408px">120 ₸<u>+20%</u></div>
+        <div class="bar b3" style="height:326px">96 ₸<u>−20%</u></div>
+      </div>
+      <div class="lead" id="a7l" style="margin-top:40px">Пайыз әрдайым сол сәттегі саннан алынады</div>
+    </div>
+  </section>
+
+  <!-- 8. CTA 68.32–74.62 -->
+  <section class="clip" data-start="68.32" data-duration="6.3" data-track-index="1">
+    <div class="scene">
+      <div class="kick" id="a8k">Бұл ереже жыл сайын кездеседі</div>
+      <h1 id="a8t">100 деңгей</h1>
+      <div class="lead" id="a8l">StudyLine қосымшасында — 240 сұрақ, алты пән</div>
+      <div class="form ok" id="a8f" style="margin-top:44px">studyline.kz</div>
+    </div>
+  </section>
+
+  <!-- субтитрлер -->
+  <div class="sub clip" data-start="0" data-duration="9.56" data-track-index="2"><span>+20%, сосын −20%. Баға қалпына келді ме?</span></div>
+  <div class="sub clip" data-start="9.56" data-duration="11.08" data-track-index="2"><span>«Плюс жиырма, минус жиырма — нөл» деу қате</span></div>
+  <div class="sub clip" data-start="20.64" data-duration="7.6" data-track-index="2"><span>Бастапқы бағаны 100 теңге деп аламыз</span></div>
+  <div class="sub clip" data-start="28.24" data-duration="8.52" data-track-index="2"><span>100 + 20% = 120 ₸</span></div>
+  <div class="sub acc clip" data-start="36.76" data-duration="12.68" data-track-index="2"><span>20% енді 120-дан алынады, жүзден емес</span></div>
+  <div class="sub clip" data-start="49.44" data-duration="5.36" data-track-index="2"><span>120 − 24 = 96 ₸</span></div>
+  <div class="sub acc clip" data-start="54.8" data-duration="13.52" data-track-index="2"><span>Тауар 4%-ға арзандады</span></div>
+  <div class="sub clip" data-start="68.32" data-duration="6.3" data-track-index="2"><span>StudyLine · 100 деңгей</span></div>
+
+  <!-- дауыс -->
+  <audio id="vo01" src="assets/vo/vo_01.wav" data-start="0"     data-duration="9.50"  data-track-index="10" data-volume="1"></audio>
+  <audio id="vo02" src="assets/vo/vo_02.wav" data-start="9.56"  data-duration="11.02" data-track-index="10" data-volume="1"></audio>
+  <audio id="vo03" src="assets/vo/vo_03.wav" data-start="20.64" data-duration="7.54"  data-track-index="10" data-volume="1"></audio>
+  <audio id="vo04" src="assets/vo/vo_04.wav" data-start="28.24" data-duration="8.46"  data-track-index="10" data-volume="1"></audio>
+  <audio id="vo05" src="assets/vo/vo_05.wav" data-start="36.76" data-duration="12.62" data-track-index="10" data-volume="1"></audio>
+  <audio id="vo06" src="assets/vo/vo_06.wav" data-start="49.44" data-duration="5.30"  data-track-index="10" data-volume="1"></audio>
+  <audio id="vo07" src="assets/vo/vo_07.wav" data-start="54.8"  data-duration="13.46" data-track-index="10" data-volume="1"></audio>
+  <audio id="vo08" src="assets/vo/vo_08.wav" data-start="68.32" data-duration="9.06"  data-track-index="10" data-volume="1"></audio>
+</div>
+
+<script>
+  window.__timelines = window.__timelines || {};
+  const tl = gsap.timeline({ paused: true });
+  const E = "power3.out";
+
+  tl.from("#a1k",{opacity:0,y:-22,duration:.45,ease:E},0.05)
+    .from("#a1t",{opacity:0,y:32,duration:.6,ease:E},0.3)
+    .from("#a1p",{opacity:0,scale:.7,duration:.5,ease:"back.out(1.7)"},1.2)
+    .from("#a1m",{opacity:0,scale:.7,duration:.5,ease:"back.out(1.7)"},1.6)
+    .from("#a1q",{opacity:0,y:22,duration:.5,ease:E},2.3);
+
+  tl.from("#a2f",{opacity:0,scale:.8,duration:.55,ease:"back.out(1.6)"},9.8)
+    .from("#a2t",{opacity:0,y:26,duration:.55,ease:E},11.6);
+
+  tl.from("#a3h",{opacity:0,y:24,duration:.5,ease:E},20.85)
+    .fromTo("#a3f",{opacity:0,scale:.72},{opacity:1,scale:1,duration:.6,ease:"back.out(1.8)"},21.6)
+    .from("#a3l",{opacity:0,y:20,duration:.45,ease:E},22.6);
+
+  tl.from("#a4h",{opacity:0,y:24,duration:.5,ease:E},28.45)
+    .from("#a4a",{opacity:0,y:24,duration:.45,ease:E},29.3)
+    .fromTo("#a4b",{opacity:0,scale:.82},{opacity:1,scale:1,duration:.55,ease:"back.out(1.6)"},31.2);
+
+  tl.from("#a5h",{opacity:0,y:24,duration:.5,ease:E},36.95)
+    .from("#a5w",{opacity:0,x:-40,duration:.55,ease:E},38.0)
+    .to("#a5w",{scale:1.04,duration:.4,ease:"power2.inOut",yoyo:true,repeat:1},39.4)
+    .fromTo("#a5f",{opacity:0,scale:.82},{opacity:1,scale:1,duration:.55,ease:"back.out(1.6)"},42.6);
+
+  tl.from("#a6a",{opacity:0,y:24,duration:.45,ease:E},49.6)
+    .fromTo("#a6b",{opacity:0,scale:.7},{opacity:1,scale:1,duration:.6,ease:"back.out(1.9)"},50.9);
+
+  tl.from("#a7t",{opacity:0,y:28,duration:.55,ease:E},55.0)
+    .from("#a7b .bar",{opacity:0,scaleY:0,transformOrigin:"50% 100%",duration:.5,stagger:.22,ease:"power3.out"},55.8)
+    .from("#a7l",{opacity:0,y:22,duration:.5,ease:E},58.4);
+
+  tl.from("#a8k",{opacity:0,y:-20,duration:.45,ease:E},68.5)
+    .fromTo("#a8t",{opacity:0,scale:.8},{opacity:1,scale:1,duration:.6,ease:"back.out(1.7)"},68.7)
+    .from("#a8l",{opacity:0,y:24,duration:.5,ease:E},69.5)
+    .from("#a8f",{opacity:0,y:24,duration:.5,ease:E},70.1);
+
+  window.__timelines["main"] = tl;
+</script>
+</body>
+</html>
