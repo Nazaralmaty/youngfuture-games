@@ -67,7 +67,7 @@ code{font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:#0a120
 
 <div class="top">
   <div class="kick">StudyLine · ночь на 18 августа</div>
-  <h1>Шесть прототипов, которые можно открыть с телефона прямо сейчас</h1>
+  <h1>Семь прототипов, которые можно открыть с телефона прямо сейчас</h1>
   <p class="lede">Всё ниже — не макеты. Это работающие экраны по ссылке,
   без установки и без логина. Под каждым блоком — что было и что стало.</p>
   <div class="links">
@@ -82,8 +82,8 @@ code{font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:#0a120
 <div class="kpi">
   <div><b>40</b><span>уровней из 100</span></div>
   <div><b>240</b><span>вопросов, 6 предметов</span></div>
-  <div><b>6</b><span>рабочих прототипов</span></div>
-  <div><b>204</b><span>автопроверки</span></div>
+  <div><b>7</b><span>рабочих прототипов</span></div>
+  <div><b>231</b><span>автопроверка</span></div>
 </div>
 
 <h2>1 · 100 деңгей — вторая эпоха и финал эпохи</h2>
@@ -208,6 +208,27 @@ code{font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:#0a120
   без неё ребёнок запоминает ответ, а не правило.</p>
 </div>
 
+<h2>7 · НИШ-диагностика — вторая половина воронки</h2>
+
+<div class="card">
+  <h3>Лендинг обещал диагностику, а её не существовало</h3>
+  <p>Каждый предмет проверяется дважды: школьной программой и форматом НИШ.
+  «Не знает предмет» и «знает предмет, но не тянет формат» — разные диагнозы
+  и противоположные советы, а общий процент их смешивает.</p>
+  <div class="ba">
+    <div class="was"><b>было</b>Форма заявки и обещание «покажем реальный уровень».
+      За формой ничего не было.</div>
+    <div class="now"><b>стало</b>12 вопросов из проверенного банка, разбор каждого
+      с объяснением, таблица «база / НИШ» по шести предметам и картинка,
+      которую можно отправить куратору.</div>
+  </div>
+  <div class="shots">
+    <figure><img src="img/nish_start.jpg" alt="Старт диагностики"><figcaption>Таймера нет: он мерит спешку, а не знание</figcaption></figure>
+    <figure><img src="img/nish_gap.jpg" alt="Результат: формат не тянет"><figcaption>База ✓, НИШ ✗ по всем шести — главная находка диагностики</figcaption></figure>
+    <figure><img src="img/nish_card.jpg" alt="Карточка результата"><figcaption>Результат сохраняется картинкой для куратора</figcaption></figure>
+  </div>
+</div>
+
 <h2>Что честно не сделано</h2>
 
 <div class="card">
@@ -222,6 +243,8 @@ code{font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:#0a120
     <li><b>Фото и данные лежат в браузере.</b> Всё, что здесь работает,
       работает на одном устройстве — сервер это отдельная работа недели.</li>
   </ul>
+  <p style="margin-top:12px">Перед показом всё это проверяется одной командой
+  <code>node studyline/check.mjs</code> — сейчас 231 проверка, 0 проблем.</p>
 </div>
 
 <div class="foot">
