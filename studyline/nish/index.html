@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#FFFFFF">
+<title>НИШ диагностикасы — StudyLine</title>
+<!--
+  StudyLine · НИШ-диагностика — то, что лендинг обещал, но чего не существовало.
+
+  Лендинг `StudyLine/nish_diagnostika_lending.html` собирает заявки словами
+  «5 минут, диагностика, карта подготовки». Самой диагностики не было — воронка
+  обрывалась на форме. Это её вторая половина.
+
+  Главная идея измерения: каждый предмет проверяется ДВАЖДЫ — базовым вопросом
+  и вопросом в формате НИШ. Родителю важно различить два разных диагноза:
+  «ребёнок не знает предмет» и «ребёнок знает предмет, но не тянет формат».
+  Это разные планы подготовки, и обычный процент правильных ответов их смешивает.
+
+  Вопросы — из того же проверенного банка, что и «100 деңгей».
+  Один файл, localStorage (sl_nish_v1). Режимы: ?go=res&right=8 · ?test=1
+-->
+<style>
+:root{
+  --green:#87BE4B; --green-d:#6FA53A; --green-l:#A8D46F; --green-t:#4F7724; --leaf:#EDF6E1;
+  --blue:#5B7CD8; --blue-l:#E2E9FD; --blue-t:#2E4691;
+  --cream:#FDF4D8; --gold:#E7B744; --gold-t:#7A5A11;
+  --ink:#141728; --muted:#666C7E; --muted-c:#5C6273;
+  --line:#ECEEF5; --bg:#FFFFFF; --paper:#FBF8F1; --paper-ink:#2C2618;
+  --red:#E0574B; --red-l:#FDEAE8;
+  --r-lg:24px; --r-md:18px; --r-sm:14px; --pad:16px;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;overscroll-behavior:none}
+body{font-family:var(--font);background:#fff;color:var(--ink);
+  -webkit-font-smoothing:antialiased;letter-spacing:-.011em}
+#stage{position:relative;height:100%;max-width:520px;margin:0 auto;overflow:hidden;
+  display:flex;flex-direction:column;background:#fff}
+.view{display:none;flex:1;min-height:0;flex-direction:column}
+.view.on{display:flex}
+
+.statusbar{flex:none;display:flex;justify-content:space-between;align-items:center;
+  padding:calc(var(--safe-t) + 8px) 22px 2px;font-size:15px;font-weight:650}
+.appbar{flex:none;display:flex;align-items:center;gap:12px;padding:8px var(--pad) 10px}
+.appbar h1{font-size:18px;font-weight:900;letter-spacing:-.035em}
+.appbar .sub{font-size:12px;font-weight:750;color:var(--muted);margin-top:1px}
+.back{width:40px;height:40px;flex:none;border:0;background:var(--line);border-radius:13px;
+  display:grid;place-items:center}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:0 var(--pad) calc(var(--safe-b) + 20px)}
+
+/* ── старт ── */
+.hero{background:linear-gradient(160deg,#EEF3FF,#E1E9FD);border-radius:var(--r-lg);
+  padding:24px 20px;position:relative;overflow:hidden}
+.hero .em{font-size:56px;line-height:1}
+.hero h2{font-size:27px;font-weight:900;letter-spacing:-.04em;line-height:1.15;margin-top:12px}
+.hero p{font-size:15px;line-height:1.45;font-weight:650;color:#4B5B84;margin-top:10px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px}
+.facts div{background:rgba(255,255,255,.8);border-radius:var(--r-sm);padding:12px 8px;text-align:center}
+.facts b{display:block;font-size:20px;font-weight:900;letter-spacing:-.04em;color:var(--blue-t)}
+.facts span{display:block;font-size:11px;font-weight:750;color:#5B6A87;margin-top:2px}
+
+.btn{width:100%;border:0;border-radius:var(--r-md);background:var(--green);color:#fff;
+  font:inherit;font-size:17px;font-weight:850;padding:17px;margin-top:14px;
+  box-shadow:0 5px 0 var(--green-d),0 13px 20px -8px rgba(60,90,20,.45);
+  transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--green-d)}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+.btn.ghost:active{transform:scale(.98)}
+.btn[disabled]{opacity:.5;box-shadow:0 5px 0 #C6CCD6}
+
+.note{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:14px 15px;margin-top:14px;display:flex;gap:11px;align-items:flex-start}
+.note.warn{background:var(--cream);border-color:#EBD79A}
+.note .ic{font-size:19px;line-height:1.2;flex:none}
+.note>div>b{display:block;font-size:13.5px;font-weight:850;margin-bottom:2px}
+.note p{font-size:13px;line-height:1.45;font-weight:650;color:var(--muted-c)}
+.note p b{display:inline;font-weight:900;color:var(--ink)}
+
+/* ── тест ── */
+.qprog{flex:none;height:5px;background:var(--line);margin:0 var(--pad)}
+.qprog i{display:block;height:100%;background:var(--green);transform-origin:left;
+  transition:transform .4s var(--ease)}
+.qhead{display:flex;align-items:center;justify-content:space-between;margin:16px 0 4px}
+.subject{display:inline-block;font-size:11.5px;font-weight:850;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--blue-t);background:var(--blue-l);
+  border-radius:99px;padding:6px 12px}
+.count{font-size:13px;font-weight:800;color:var(--muted)}
+.qtext{font-size:22px;font-weight:850;letter-spacing:-.03em;line-height:1.28;margin-top:12px}
+.opts{margin-top:16px;display:grid;gap:9px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;border:1.5px solid var(--line);
+  background:#fff;border-radius:var(--r-md);padding:15px 16px;font:inherit;font-size:16px;
+  font-weight:700;text-align:left;color:var(--ink);transition:transform .12s var(--ease)}
+.opt:active{transform:scale(.985)}
+.opt .k{width:28px;height:28px;flex:none;border-radius:9px;background:var(--line);
+  display:grid;place-items:center;font-size:13px;font-weight:900;color:var(--muted)}
+.opt[aria-checked="true"]{border-color:var(--green);background:var(--leaf)}
+.opt[aria-checked="true"] .k{background:var(--green);color:#fff}
+.footbtn{flex:none;padding:12px var(--pad) calc(var(--safe-b) + 14px);background:#fff;
+  border-top:1px solid var(--line)}
+.footbtn .btn{margin-top:0}
+
+/* ── нәтиже ── */
+.score{background:linear-gradient(160deg,#F1F9E6,#E4F3D4);border-radius:var(--r-lg);
+  padding:22px 20px;text-align:center}
+.score.mid{background:linear-gradient(160deg,#FFF6DE,#FBEDC4)}
+.score.low{background:linear-gradient(160deg,#FDEEEC,#FADCD8)}
+.score .n{font-size:62px;font-weight:900;letter-spacing:-.05em;line-height:1;color:var(--green-t)}
+.score.mid .n{color:#7A5A11} .score.low .n{color:#8E2B22}
+.score .n em{font-style:normal;font-size:24px;color:var(--muted)}
+.score h2{font-size:22px;font-weight:900;letter-spacing:-.035em;margin-top:10px}
+.score p{font-size:14px;line-height:1.45;font-weight:650;color:var(--muted-c);margin-top:8px}
+
+.srow{display:flex;align-items:center;gap:11px;border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:12px;margin-bottom:8px;background:#fff}
+.srow .t{flex:1;min-width:0}
+.srow .t b{display:block;font-size:14.5px;font-weight:850;letter-spacing:-.02em}
+.srow .t i{font-style:normal;display:block;font-size:11.5px;font-weight:750;color:var(--muted);margin-top:2px}
+.dots{display:flex;gap:5px;flex:none}
+.dot{width:15px;height:15px;border-radius:5px;background:var(--line)}
+.dot.ok{background:var(--green)} .dot.no{background:var(--red)}
+.srow.weak{background:var(--red-l);border-color:#F3C6C1}
+
+.rev{border:1px solid var(--line);border-radius:var(--r-md);padding:14px;margin-bottom:9px}
+.rev.ok{border-color:var(--green-l);background:var(--leaf)}
+.rev.no{border-color:#F3C6C1;background:var(--red-l)}
+.rev .h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.rev .h b{font-size:11.5px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.rev .h .v{font-size:12px;font-weight:850}
+.rev.ok .h .v{color:var(--green-t)} .rev.no .h .v{color:#8E2B22}
+.rev .q{font-size:14.5px;font-weight:800;line-height:1.35;margin-top:8px}
+.rev .a{font-size:13.5px;font-weight:750;margin-top:7px}
+.rev .w{font-size:13px;line-height:1.45;font-weight:650;color:var(--muted-c);margin-top:6px}
+
+#rescv{width:100%;border-radius:var(--r-md);display:block;border:1px solid var(--line);margin-top:14px}
+
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:26px 0 10px}
+.sec h2{font-size:16.5px;font-weight:850;letter-spacing:-.03em}
+.sec span{font-size:12.5px;font-weight:750;color:var(--muted)}
+
+#toast{position:absolute;left:50%;bottom:calc(var(--safe-b) + 26px);transform:translate(-50%,14px);
+  background:var(--paper-ink);color:#fff;border-radius:14px;padding:12px 17px;font-size:14px;
+  font-weight:700;z-index:60;opacity:0;pointer-events:none;transition:.34s var(--ease);
+  max-width:88%;text-align:center;line-height:1.35}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div class="statusbar"><span>9:41</span><span>▰</span></div>
+
+  <!-- ═══ СТАРТ ═══ -->
+  <section class="view on" id="v-start">
+    <div class="appbar"><div><h1>StudyLine</h1><div class="sub">НИШ · БИЛ · РФМШ дайындығы</div></div></div>
+    <div class="scroll">
+      <div class="hero">
+        <div class="em">🎓</div>
+        <h2>Балаң НИШ форматына дайын ба?</h2>
+        <p>Он екі сұрақ, алты пән. Әр пән екі рет тексеріледі: мектеп бағдарламасы
+        және НИШ форматы. Соңында — қай жерде олқылық бар екені нақты жазылады.</p>
+        <div class="facts">
+          <div><b>12</b><span>сұрақ</span></div>
+          <div><b>6</b><span>пән</span></div>
+          <div><b>5</b><span>минут</span></div>
+        </div>
+      </div>
+      <button class="btn" type="button" onclick="startTest()">Диагностиканы бастау</button>
+      <div class="note"><span class="ic">🎯</span><div><b>Неге әр пән екі рет</b>
+        <p>«Бала пәнді білмейді» мен «бала пәнді біледі, бірақ НИШ форматын тартпайды» —
+        екі бөлек диагноз және екі бөлек дайындық жоспары. Жалпы пайыз оларды араластырып жібереді.</p></div></div>
+      <div class="note warn"><span class="ic">✅</span><div><b>Адал боламыз</b>
+        <p>Бұл — <b>түсуге кепілдік емес</b>, дайындық диагностикасы. Түсуді нақты емтихан
+        шешеді. Біз тек деңгейді нақты көрсетеміз.</p></div></div>
+      <div class="note"><span class="ic">⏱</span><div><b>Уақыт шектеуі жоқ</b>
+        <p>Таймер балаға асығуды үйретеді, ал диагностика асығысты емес, білімді өлшеуі керек.</p></div></div>
+    </div>
+  </section>
+
+  <!-- ═══ ТЕСТ ═══ -->
+  <section class="view" id="v-test">
+    <div class="appbar">
+      <button class="back" type="button" aria-label="Шығу" onclick="quit()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141728" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      </button>
+      <div><h1>Диагностика</h1><div class="sub" id="t-sub">1 / 12</div></div>
+    </div>
+    <div class="qprog"><i id="q-prog" style="transform:scaleX(.083)"></i></div>
+    <div class="scroll">
+      <div class="qhead"><span class="subject" id="q-subj">Математика</span><span class="count" id="q-lvl">база</span></div>
+      <h2 class="qtext" id="q-text">—</h2>
+      <div class="opts" id="q-opts" role="radiogroup" aria-labelledby="q-text"></div>
+    </div>
+    <div class="footbtn"><button class="btn" id="q-btn" disabled onclick="next()">Келесі сұрақ</button></div>
+  </section>
+
+  <!-- ═══ НӘТИЖЕ ═══ -->
+  <section class="view" id="v-res">
+    <div class="appbar"><div><h1>Нәтиже</h1><div class="sub">Дайындық картасы</div></div></div>
+    <div class="scroll" id="res"></div>
+  </section>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   1. СҰРАҚТАР — «100 деңгей» банкінен алынған, тексерілген
+   ══════════════════════════════════════════════════════════════ */
+const Q=[
+ {s:"Математика", lvl:"база", q:"100-ден 37-ні азайтсақ, қанша қалады?",
+  o:["53","63","67","73"], a:1, w:"Ондыққа сүйеніп есептеу оңай: 100 − 40 = 60, бірақ 40 емес, 37 алдық — үш артық алып қойдық, сондықтан үшеуін қайтарамыз: 60 + 3 = 63."},
+ {s:"Математика", lvl:"НИШ", q:"Бір санның 3/4 бөлігі 24-ке тең. Сол сан қанша?",
+  o:["18","30","32","36"], a:2, w:"Берілген шаманы алымға бөліп бір үлесті табамыз, сосын бөлімге көбейтеміз: 24 : 3 = 8, 8 · 4 = 32. Тексеру: 32-нің 3/4 бөлігі = 24."},
+ {s:"Логика", lvl:"база", q:"Бүгін сәрсенбі болса, 3 күннен кейін қай күн болады?",
+  o:["Бейсенбі","Жұма","Сенбі","Жексенбі"], a:2, w:"Сәрсенбі → бейсенбі → жұма → сенбі."},
+ {s:"Логика", lvl:"НИШ", q:"Қатардағы келесі сан қандай? 1, 2, 4, 7, 11, 16, …",
+  o:["19","20","21","22"], a:3, w:"Сандардың айырмасы 1, 2, 3, 4, 5 — әр қадамда бірге өсіп отыр. Келесі айырма 6: 16 + 6 = 22."},
+ {s:"Қазақ тілі", lvl:"база", q:"«Ақ» сөзінің антонимі:",
+  o:["сары","қара","көк","жасыл"], a:1, w:"Антоним — қарама-қарсы мағыналы сөз. Ақ пен қара қарама-қарсы, ал сары, көк, жасыл — жай ғана басқа түстер, олар «ақ»-қа қарсы тұрмайды."},
+ {s:"Қазақ тілі", lvl:"НИШ", q:"Қай сөзде буын саны төртеу?",
+  o:["Дәптер","Оқулық","Мектебіміз","Қала"], a:2, w:"Буын саны дауысты дыбыс санына тең: дәп-тер (2), о-қу-лық (3), мек-те-бі-міз (4), қа-ла (2)."},
+ {s:"Орыс тілі", lvl:"база", q:"Как правильно?",
+  o:["в школу идти","идти в школу","школу в идти","идти школу в"], a:1, w:"Орыс тілінде етістік алдымен, сосын предлог пен зат есім тұрады: идти (не істеу?) в школу (қайда?). Қалған үш нұсқада сөздер орын ауыстырып кеткен."},
+ {s:"Орыс тілі", lvl:"НИШ", q:"Какое слово является проверочным для безударной гласной в слове «холодный»?",
+  o:["холодец","холод","холодильник","прохлада"], a:1, w:"Тексеру сөзінде екпін сол дауыстыға түсуі керек: хо́лод. «Холоде́ц» пен «холоди́льник» сөздерінде екпін басқа буында, «прохла́да» сөзінде мүлде басқа әріп тұр."},
+ {s:"Ағылшын тілі", lvl:"база", q:"What colour is the sky on a clear day?",
+  o:["green","blue","brown","black"], a:1, w:"Colour — түс. Ашық күні аспан көк, ағылшынша blue. Green — жасыл, brown — қоңыр, black — қара."},
+ {s:"Ағылшын тілі", lvl:"НИШ", q:"Сұрақ сөзін таңда: ___ do you go to school? — By bus.",
+  o:["What","Where","How","When"], a:2, w:"«By bus» — қалай баратынын айтады, ал тәсілді «How» сұрайды."},
+ {s:"Жаратылыстану", lvl:"база", q:"Адамның қаңқасы неден тұрады?",
+  o:["Бұлшық еттен","Сүйектерден","Теріден","Қаннан"], a:1, w:"Қаңқа — денені ұстап тұратын және ішкі мүшелерді қорғайтын сүйектер жүйесі. Бұлшық ет қаңқаға бекиді, бірақ қаңқаның өзі емес."},
+ {s:"Жаратылыстану", lvl:"НИШ", q:"Дұрыс құрылған қоректік тізбекті таңда:",
+  o:["Шөп → қоян → түлкі","Қоян → шөп → түлкі","Түлкі → шөп → қоян","Қоян → түлкі → шөп"], a:0, w:"Тізбек әрқашан өсімдіктен басталып, шөпқоректіге, одан кейін жыртқышқа қарай жүреді."}
+];
+const SUBJ=[...new Set(Q.map(q=>q.s))];
+
+/* ══════════════════════════════════════════════════════════════
+   2. КҮЙ
+   ══════════════════════════════════════════════════════════════ */
+const KEY="sl_nish_v1";
+let qi=0, pick=-1, log=[];
+let toastT;
+function toast(m){
+  const el=document.getElementById("toast");
+  el.textContent=m; el.classList.add("on");
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("on"),2600);
+}
+function show(id){ document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id===id)); }
+
+/* ══════════════════════════════════════════════════════════════
+   3. ТЕСТ
+   Дұрыс жауап тест ішінде КӨРСЕТІЛМЕЙДІ. Диагностика — өлшеу, ал
+   орта жолда жауапты көрсету баланың келесі сұрақтағы мінезін өзгертеді.
+   Барлық талдау соңында, түсіндірмесімен бірге беріледі.
+   ══════════════════════════════════════════════════════════════ */
+function startTest(){ qi=0; log=[]; renderQ(); show("v-test"); }
+function quit(){
+  if(qi>0 && !confirm("Диагностикадан шығасың ба? Жауаптарың сақталмайды.")) return;
+  show("v-start");
+}
+function renderQ(){
+  const q=Q[qi]; pick=-1;
+  document.getElementById("t-sub").textContent=(qi+1)+" / "+Q.length;
+  document.getElementById("q-prog").style.transform="scaleX("+((qi+1)/Q.length)+")";
+  document.getElementById("q-subj").textContent=q.s;
+  document.getElementById("q-lvl").textContent=q.lvl==="НИШ" ? "НИШ форматы" : "мектеп бағдарламасы";
+  document.getElementById("q-text").textContent=q.q;
+  const box=document.getElementById("q-opts"); box.innerHTML="";
+  q.o.forEach((t,k)=>{
+    const b=document.createElement("button");
+    b.className="opt"; b.type="button"; b.setAttribute("role","radio"); b.setAttribute("aria-checked","false");
+    b.innerHTML='<span class="k">'+"АБВГ"[k]+'</span><span>'+t+'</span>';
+    b.onclick=()=>choose(k);
+    box.appendChild(b);
+  });
+  const btn=document.getElementById("q-btn");
+  btn.disabled=true;
+  btn.textContent = qi===Q.length-1 ? "Нәтижені көру" : "Келесі сұрақ";
+  document.querySelector("#v-test .scroll").scrollTop=0;
+}
+function choose(k){
+  pick=k;
+  [...document.getElementById("q-opts").children].forEach((b,i)=>b.setAttribute("aria-checked", i===k?"true":"false"));
+  document.getElementById("q-btn").disabled=false;
+}
+function next(){
+  if(pick<0) return;
+  log[qi]=pick;
+  if(qi===Q.length-1) finish(); else { qi++; renderQ(); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4. НӘТИЖЕ
+   ══════════════════════════════════════════════════════════════ */
+const right = i => log[i]===Q[i].a;
+function score(){ return Q.reduce((a,q,i)=>a+(right(i)?1:0),0); }
+/* Пән бойынша: базалық сұрақ дұрыс па, НИШ сұрағы дұрыс па — бөлек. */
+function bySubject(){
+  return SUBJ.map(s=>{
+    const idx=Q.map((q,i)=>q.s===s?i:-1).filter(i=>i>=0);
+    const base=idx.find(i=>Q[i].lvl==="база"), nish=idx.find(i=>Q[i].lvl==="НИШ");
+    return {s, base:right(base), nish:right(nish), bi:base, ni:nish};
+  });
+}
+/* Диагноз жалпы пайызбен қойылмайды. Алты дұрыс жауап екі мүлде бөлек
+   жағдай болуы мүмкін: «базаны түгел біледі, форматты мүлде тартпайды» және
+   «бәрі жартылай». Оларға берілетін кеңес те бөлек, сондықтан база мен
+   НИШ бөлек саналады. */
+const baseRight = () => Q.reduce((a,q,i)=>a+(q.lvl==="база" && right(i)?1:0),0);
+const nishRight = () => Q.reduce((a,q,i)=>a+(q.lvl==="НИШ"  && right(i)?1:0),0);
+const HALF = 4;                      // алтыдан төртеуі — база берік деген шек
+function verdict(){
+  const b=baseRight(), n=nishRight();
+  if(b>=5 && n>=5) return {k:"top", t:"НИШ форматына дайын",
+    p:"Бала базаны да, НИШ форматын да ұстап тұр. Қазір керегі — қалыпты жаттығу, қуып жету емес."};
+  if(b>=HALF && n<HALF) return {k:"mid", t:"База берік, формат әлі жоқ",
+    p:"Мектеп бағдарламасы бойынша олқылық аз, ал НИШ форматындағы сұрақтар шықпайды. Бұл ең жақсы бастапқы жағдай: жоғалған нәрсе — білім емес, тәсіл."};
+  if(b>=HALF) return {k:"mid", t:"Жақындап қалды",
+    p:"База берік, НИШ форматы жартылай шығады. Дәл осы айырма — дайындықтың негізгі жұмысы."};
+  return {k:"low", t:"Дайындық керек",
+    p:"Әзірге базада да олқылық бар. Бұл қалыпты: диагностика дәл сол үшін жасалады — нақты қай жерден бастау керегін көрсету үшін."};
+}
+/* Ең әлсіз пән: НИШ сұрағы да, база да қате болса — ең өткір. */
+function weakest(){
+  const b=bySubject();
+  return b.find(x=>!x.base && !x.nish) || b.find(x=>!x.nish) || null;
+}
+/* Форматтық олқылық: база бар, НИШ жоқ. Диагностиканың басты табысы. */
+function formatGap(){ return bySubject().filter(x=>x.base && !x.nish); }
+
+function finish(){
+  try{ localStorage.setItem(KEY, JSON.stringify({log, ts:Date.now()})); }catch(e){}
+  drawRes(); show("v-res");
+}
+function drawRes(){
+  const n=score(), v=verdict(), w=weakest(), gap=formatGap();
+  const rows=bySubject();
+  document.getElementById("res").innerHTML=`
+  <div class="score ${v.k}">
+    <div class="n">${n}<em> / ${Q.length}</em></div>
+    <h2>${v.t}</h2>
+    <p>${v.p}</p>
+  </div>
+
+  <div class="sec"><h2>Пәндер бойынша</h2><span>база · НИШ</span></div>
+  ${rows.map(r=>`
+    <div class="srow${(!r.base&&!r.nish)?" weak":""}">
+      <span class="t"><b>${r.s}</b><i>${r.base?"база ✓":"база ✗"} · ${r.nish?"НИШ ✓":"НИШ ✗"}</i></span>
+      <span class="dots">
+        <i class="dot ${r.base?"ok":"no"}"></i><i class="dot ${r.nish?"ok":"no"}"></i>
+      </span>
+    </div>`).join("")}
+
+  ${gap.length ? `<div class="note warn"><span class="ic">🎯</span><div><b>Басты қорытынды</b>
+    <p>${gap.map(g=>g.s).join(", ")} — базаны біледі, бірақ <b>НИШ форматында сүрінеді</b>.
+    Бұл білім олқылығы емес, формат олқылығы: дәл осы жерде дайындық ең тез нәтиже береді.</p></div></div>` : ""}
+
+  ${w ? `<div class="note"><span class="ic">📌</span><div><b>Неден бастау керек</b>
+    <p><b>${w.s}</b> — осы пәннен бастаған дұрыс${(!w.base&&!w.nish)?": мұнда база да, формат та шықпады":""}.</p></div></div>` : ""}
+
+  <div class="sec"><h2>Барлық сұрақтың талдауы</h2><span>${n} дұрыс</span></div>
+  ${Q.map((q,i)=>`
+    <div class="rev ${right(i)?"ok":"no"}">
+      <div class="h"><b>${q.s} · ${q.lvl==="НИШ"?"НИШ форматы":"база"}</b>
+        <span class="v">${right(i)?"дұрыс":"қате"}</span></div>
+      <div class="q">${q.q}</div>
+      <div class="a">${right(i)?"Жауабың: ":"Дұрыс жауап: "}<b>${q.o[q.a]}</b>${
+        right(i)?"":' · сен таңдағаның: '+(log[i]!=null?q.o[log[i]]:"—")}</div>
+      <div class="w">${q.w}</div>
+    </div>`).join("")}
+
+  <div class="sec"><h2>Нәтижені сақтау</h2><span>сурет</span></div>
+  <canvas id="rescv" width="1080" height="1350"></canvas>
+  <button class="btn" type="button" onclick="downloadCard()">Суретті сақтау</button>
+  <button class="btn ghost" type="button" onclick="show('v-start')">Қайта өту</button>
+
+  <div class="note warn"><span class="ic">✅</span><div><b>Тағы да адал боламыз</b>
+    <p>Бұл нәтиже <b>түсуге кепілдік бермейді</b> және оны алмастырмайды. Ол бір нәрсені
+    ғана айтады: бүгін бала қай жерде тұр және неден бастау керек.</p></div></div>`;
+  card(document.getElementById("rescv"));
+}
+
+/* ── нәтиже картинкасы ── */
+function card(cv){
+  const W=1080,H=1350,c=cv.getContext("2d"), v=verdict(), n=score();
+  const bg = v.k==="top" ? ["#F1F9E6","#DDEFC9"] : v.k==="mid" ? ["#FFF6DE","#FAE9BC"] : ["#FDEEEC","#F8D9D4"];
+  const ink= v.k==="top" ? "#3F6318" : v.k==="mid" ? "#7A5A11" : "#8E2B22";
+  cv.width=W; cv.height=H;
+  const g=c.createLinearGradient(0,0,W,H); g.addColorStop(0,bg[0]); g.addColorStop(1,bg[1]);
+  c.fillStyle=g; c.fillRect(0,0,W,H);
+  c.textAlign="center";
+  c.fillStyle=ink; c.font="850 38px -apple-system,Inter,sans-serif";
+  c.fillText("STUDYLINE · НИШ ДИАГНОСТИКАСЫ", W/2, 150);
+  c.font="900 210px -apple-system,Inter,sans-serif";
+  c.fillText(n+" / "+Q.length, W/2, 360);
+  c.font="900 72px -apple-system,Inter,sans-serif";
+  c.fillText(v.t, W/2, 460);
+  // пәндер
+  c.font="800 40px -apple-system,Inter,sans-serif"; c.textAlign="left";
+  bySubject().forEach((r,i)=>{
+    const y=590+i*98;
+    c.fillStyle="rgba(255,255,255,.72)"; roundRect(c,110,y-52,860,76,20); c.fill();
+    c.fillStyle=ink; c.fillText(r.s, 145, y);
+    [r.base,r.nish].forEach((ok,k)=>{
+      c.fillStyle = ok ? "#6FA53A" : "#E0574B";
+      roundRect(c,845+k*52, y-36, 38, 38, 12); c.fill();
+    });
+  });
+  c.textAlign="center"; c.fillStyle=ink;
+  c.font="700 34px -apple-system,Inter,sans-serif";
+  c.fillText("сол баған — мектеп бағдарламасы, оң баған — НИШ форматы", W/2, 1215);
+  c.font="850 42px -apple-system,Inter,sans-serif";
+  c.fillText("studyline.kz", W/2, 1285);
+  return cv;
+}
+function roundRect(c,x,y,w,h,r){
+  c.beginPath(); c.moveTo(x+r,y);
+  c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r);
+  c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath();
+}
+function downloadCard(){
+  const cv=document.getElementById("rescv"); if(!cv) return;
+  const a=document.createElement("a");
+  a.download="studyline-nish-"+score()+".png"; a.href=cv.toDataURL("image/png"); a.click();
+  toast("Сурет сақталды");
+}
+
+/* ── іске қосу ── */
+(function(){
+  const p=new URLSearchParams(location.search);
+  if(p.get("go")==="res"){
+    const r=Math.max(0,Math.min(Q.length,+p.get("right")||8));
+    log=Q.map((q,i)=> i<r ? q.a : (q.a+1)%4);
+    drawRes(); show("v-res");
+  }
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   5. ӨЗІН-ӨЗІ ТЕКСЕРУ — ?test=1
+   ══════════════════════════════════════════════════════════════ */
+if(location.search.indexOf("test=1")>-1){
+  const A=(c,m)=>{ if(!c) throw new Error("FAIL: "+m); console.log("ok:",m); };
+
+  // Банк
+  A(Q.length===12,"12 сұрақ");
+  A(SUBJ.length===6,"6 пән");
+  A(SUBJ.every(s=>Q.filter(q=>q.s===s).length===2),"әр пәнде екі сұрақ");
+  A(SUBJ.every(s=>{const v=Q.filter(q=>q.s===s);return v.some(q=>q.lvl==="база")&&v.some(q=>q.lvl==="НИШ")}),
+    "әр пәнде бір база, бір НИШ сұрағы");
+  A(Q.every(q=>q.o.length===4 && new Set(q.o).size===4 && q.a>=0 && q.a<4),"4 қайталанбайтын нұсқа, индекс дұрыс");
+  A(Q.every(q=>q.w && q.w.length>15),"әр сұрақтың түсіндірмесі бар");
+  A(new Set(Q.map(q=>q.q)).size===12,"сұрақтар қайталанбайды");
+
+  // Есептеу
+  log=Q.map(q=>q.a); A(score()===12,"бәрі дұрыс — 12");
+  A(verdict().k==="top","12/12 — дайын");
+  log=Q.map((q,i)=> i<8 ? q.a : (q.a+1)%4); A(score()===8,"8 дұрыс");
+  log=Q.map((q,i)=> i<4 ? q.a : (q.a+1)%4); A(verdict().k==="low","4/12 — дайындық керек");
+
+  // Басты механика: база бар, НИШ жоқ — форматтық олқылық табылады
+  log=Q.map((q,i)=> Q[i].lvl==="база" ? q.a : (q.a+1)%4);
+  A(score()===6,"тек база дұрыс — 6");
+  A(baseRight()===6 && nishRight()===0,"база мен НИШ бөлек саналады");
+  A(verdict().k==="mid" && verdict().t.indexOf("формат әлі жоқ")>-1,
+    "база түгел дұрыс болса, диагноз «базада олқылық бар» деп жазылмайды");
+  A(verdict().p.indexOf("базада да олқылық")<0,"мәтін өзіне қайшы келмейді");
+  A(formatGap().length===6,"алты пәнде де форматтық олқылық көрінеді");
+  A(bySubject().every(r=>r.base && !r.nish),"пән кестесі базаны да, форматты да бөлек көрсетеді");
+  drawRes();
+  const H=document.getElementById("res").innerHTML;
+  A(H.indexOf("формат олқылығы")>-1,"нәтижеде формат олқылығы деп аталады");
+
+  // Кері жағдай: НИШ дұрыс, база қате — форматтық олқылық жоқ
+  log=Q.map((q,i)=> Q[i].lvl==="НИШ" ? q.a : (q.a+1)%4);
+  A(formatGap().length===0,"НИШ дұрыс болса форматтық олқылық жазылмайды");
+  A(baseRight()===0 && nishRight()===6,"кері жағдай да бөлек саналады");
+  A(verdict().k==="low","база шықпаса — қанша НИШ дұрыс болса да, диагноз базадан басталады");
+
+  // Ең әлсіз пән — екеуі де қате болғаны
+  log=Q.map((q,i)=> q.a); log[Q.findIndex(q=>q.s==="Логика"&&q.lvl==="база")]=(Q[2].a+1)%4;
+  log[Q.findIndex(q=>q.s==="Логика"&&q.lvl==="НИШ")]=(Q[3].a+1)%4;
+  A(weakest().s==="Логика","екеуі де қате болған пән ең әлсіз деп аталады");
+
+  // Тест ішінде жауап көрсетілмейді
+  startTest(); choose(Q[0].a);
+  A(document.getElementById("q-opts").innerHTML.indexOf("right")<0,"тест ішінде дұрыс жауап белгіленбейді");
+  A(document.getElementById("q-btn").disabled===false,"жауап таңдалғанда батырма ашылады");
+  renderQ(); A(document.getElementById("q-btn").disabled===true,"жаңа сұрақта батырма қайта жабылады");
+
+  // Картинка
+  log=Q.map(q=>q.a); const cv=document.createElement("canvas"); card(cv);
+  A(cv.width===1080 && cv.height===1350,"нәтиже картинкасы 1080×1350");
+  A(cv.toDataURL("image/png").indexOf("data:image/png")===0,"картинка PNG");
+
+  show("v-start");
+  console.log("%cБарлық тексеру өтті","color:#6FA53A;font-weight:700");
+}
+</script>
+</body>
+</html>
