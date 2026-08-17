@@ -356,6 +356,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .gap .art svg{height:clamp(28px,5vh,50px);width:auto;display:block}
 .gap .art.sky svg{height:clamp(13px,2.2vh,20px)}
 .gap .art.c svg{height:clamp(11px,1.8vh,17px)}   /* шөп — ұсақ */
+/* Қашықтық сезімі. Карта төменнен жоғары қарай жүреді, сондықтан жоғарғы
+   белдеулер — «алыс»: заттары кішірек, түсі бозғылт, көлеңкесі әлсіз.
+   Бір жазықтықта тұрған бес белдеу тегіс сатыға ұқсайды, ал бұлай — жол.
+   Пайыз аз: 100% → 88%, әйтпесе жоғарғы қатар ойыншық болып қалады. */
+.band:nth-of-type(5) .gap .art{transform:scale(.88);opacity:.72;
+  filter:drop-shadow(0 2px 3px rgba(92,74,38,.14))}
+.band:nth-of-type(4) .gap .art{transform:scale(.92);opacity:.82;
+  filter:drop-shadow(0 3px 4px rgba(92,74,38,.18))}
+.band:nth-of-type(3) .gap .art{transform:scale(.96);opacity:.91}
+.band .gap .art{transform-origin:bottom center}
 /* Түйіндер қатар ішінде де сәл тербеліп тұрады — жол түзу сызық емес, соқпақ. */
 .rrow{flex:1;min-height:0;position:relative;display:flex;align-items:center;
   justify-content:space-around;padding:0 4px}
@@ -396,6 +406,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   max-width:13ch;overflow:hidden;text-overflow:ellipsis;
   background:rgba(255,253,246,.72);border-radius:99px;padding:2px 7px
 }
+/* Екі сөзді тақтайша тек аттар қайталанғанда пайда болады (Жәнібек Шақшақұлы
+   мен Жәнібек хан). Ондайда қаріпті кішірейтеміз — «Жәнібек бат…» деген
+   кесілген жазудан жақсы. Қалған 76 тақтайша тиылмайды. */
+.node .who.two{font-size:8.4px;letter-spacing:-.03em;max-width:16ch;padding:2px 6px}
 .node .who:empty{display:none}   /* аты ашылмаған деңгейде бос тақтайша тұрмасын */
 /* 6/6 дұрыс жауап — жұлдызша, минимал өтуден (4/6) көрнекі ерекшеленсін */
 .node .star{
@@ -1941,12 +1955,22 @@ function medallion(i, locked){
   const sat = locked ? "8%" : "58%";
   const letter = locked ? "" : H()[i].n.trim()[0];
   const uid = (P.track||"b")+i+(locked?"l":"");
-  // сыртқы сақинадағы 12 «қошқар мүйіз» ізі — қарапайым қайталанатын пішін
+  /* Сыртқы сақинадағы ою. Бір ғана өрнек болғанда қырық медальон бір
+     шаблонның қырық түсті көшірмесіне айналады — жинақ экраны сол себепті
+     жалықтырады. Сондықтан үш ою кезектеседі: қошқар мүйіз, тұмарша, толқын.
+     Оюдың түрі деңгей нөмірінен есептеледі, кездейсоқтық жоқ — рендер
+     әрдайым бірдей шығады. */
+  const ORN=[
+    {n:12, d:"M50 8.5c3.4 0 5.6 2 5.6 4.4 0 2-1.6 3.3-3.4 3.3-1.5 0-2.6-.9-2.6-2.1", w:1.5},
+    {n:8,  d:"M50 6.5 54.6 12 50 17.5 45.4 12Z", w:1.4},
+    {n:10, d:"M44.5 13.5c2-3.4 9-3.4 11 0", w:1.8}
+  ];
+  const orn=ORN[i%ORN.length];
+  const stroke=`hsl(${hue} ${sat} ${locked?"72%":"38%"} / .85)`;
   let horns="";
-  for(let k=0;k<12;k++){
-    horns+=`<path d="M50 8.5c3.4 0 5.6 2 5.6 4.4 0 2-1.6 3.3-3.4 3.3-1.5 0-2.6-.9-2.6-2.1"
-      fill="none" stroke="hsl(${hue} ${sat} ${locked?"72%":"38%"} / .85)" stroke-width="1.5"
-      stroke-linecap="round" transform="rotate(${k*30} 50 50)"/>`;
+  for(let k=0;k<orn.n;k++){
+    horns+=`<path d="${orn.d}" fill="none" stroke="${stroke}" stroke-width="${orn.w}"
+      stroke-linecap="round" stroke-linejoin="round" transform="rotate(${k*(360/orn.n)} 50 50)"/>`;
   }
   const face = locked
     ? `<path d="M50 34c5.5 0 9.6 4.4 9.6 9.9 0 3.7-1.9 6.9-4.6 8.6C60.8 54.7 65 60.4 65 67.5H35c0-7.1 4.2-12.8 10-15-2.7-1.7-4.6-4.9-4.6-8.6 0-5.5 4.1-9.9 9.6-9.9Z"
@@ -2320,7 +2344,9 @@ function drawMap(){
     b.classList.toggle("now", lv===P.done+1);
     b.classList.toggle("perfect", !!P.perfect[P.track+"-"+lv]);
     b.classList.toggle("bossnode", isBoss(lv));
-    b.querySelector(".who").textContent = lv<=P.done ? shortName(i) : "";
+    const who=b.querySelector(".who"), nm = lv<=P.done ? shortName(i) : "";
+    who.textContent=nm;
+    who.classList.toggle("two", nm.indexOf(" ")>-1);
     b.setAttribute("aria-label", lv<=P.done ? lv+"-деңгей, "+H()[i].n : lv+"-деңгей, жабық");
   });
 
@@ -2733,6 +2759,14 @@ if(location.search.indexOf("test=1")>-1){
 
   // ── сипаттаманы абзацқа бөлу ──
   A(para(HEROES_B[0].d).split("<p>").length===3,"сипаттама екі абзацқа бөлінеді");
+
+  // ── медальон оюы: жинақ бір шаблонның көшірмесі болмауы керек ──
+  P.track="b";
+  const orn = n => (medallion(n,false).match(/<path d="M50 8\.5|<path d="M50 6\.5|<path d="M44\.5 13\.5/g)||[]).length;
+  A(orn(0)===12 && orn(1)===8 && orn(2)===10,"үш түрлі ою кезектеседі");
+  A(orn(3)===12,"төртіншісінде шеңбер қайта басталады");
+  A(medallion(5,false)===medallion(5,false),"медальон рендері детерминирленген");
+  A(medallion(5,true).indexOf(HEROES_B[5].n.trim()[0])<0,"жабық медальонда әріп жоқ");
 
   // ── тұман тосты: таймер ішінде деңгей нөмірі жоғалып қалмайды ──
   P.track="b"; P.done=3; levelJustOpened=3; drawMap();
