@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#FFFFFF">
+<title>Клан — StudyLine</title>
+<!--
+  StudyLine · Клан — рабочий прототип, в котором ПЯТЬ P0-ошибок из ревью
+  05.08 и 12.08 уже исправлены. Смысл файла не «ещё один экран», а показать
+  работающую альтернативу каждому опасному паттерну: не «не делай так»,
+  а «вот так вместо этого».
+
+  Режимы для показа (всё в адресной строке):
+    ?role=captain      — вид капитана: ему видно то, чего не видно остальным
+    ?state=empty       — клан только создан, ты один
+    ?state=solo        — все вышли, остался один
+    ?state=left        — клан распался в середине раунда
+    ?result=win|lose   — итоги раунда: победитель И проигравший
+    ?test=1            — самопроверка
+-->
+<style>
+:root{
+  --green:#87BE4B; --green-d:#6FA53A; --green-l:#A8D46F; --green-t:#4F7724;
+  --leaf:#EDF6E1; --mint:#DFF4F1; --cream:#FDF4D8; --violet:#7B61FF;
+  --ink:#141728; --muted:#666C7E; --muted-c:#5C6273;
+  --line:#ECEEF5; --bg:#FFFFFF; --paper:#FBF8F1; --paper-ink:#2C2618;
+  --red:#E0574B; --gold:#E7B744;
+  --r-lg:24px; --r-md:18px; --r-sm:14px; --pad:16px;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;overscroll-behavior:none}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;letter-spacing:-.011em}
+#stage{position:relative;height:100%;max-width:520px;margin:0 auto;overflow:hidden;
+  display:flex;flex-direction:column;background:var(--bg)}
+
+.statusbar{flex:none;display:flex;justify-content:space-between;align-items:center;
+  padding:calc(var(--safe-t) + 8px) 22px 2px;font-size:15px;font-weight:650}
+.appbar{flex:none;display:flex;align-items:center;gap:12px;padding:8px var(--pad) 10px}
+.back{width:40px;height:40px;flex:none;border:0;background:var(--line);border-radius:13px;
+  display:grid;place-items:center;transition:transform .14s var(--ease)}
+.back:active{transform:scale(.92)}
+.appbar h1{font-size:19px;font-weight:850;letter-spacing:-.035em;line-height:1.15}
+.appbar .sub{font-size:12.5px;font-weight:700;color:var(--muted);margin-top:1px}
+.rolechip{margin-left:auto;flex:none;background:var(--violet);color:#fff;border-radius:99px;
+  padding:6px 12px;font-size:11.5px;font-weight:850;letter-spacing:.02em}
+
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:0 var(--pad) calc(var(--safe-b) + 24px)}
+
+/* ── шапка клана ── */
+.hero{background:linear-gradient(160deg,#EFF6FF,#E3ECFD);border-radius:var(--r-lg);
+  padding:20px;position:relative;overflow:hidden}
+.hero .em{font-size:44px;line-height:1}
+.hero h2{font-size:26px;font-weight:900;letter-spacing:-.04em;margin-top:8px}
+.hero .meta{font-size:13.5px;font-weight:750;color:#5B6A87;margin-top:3px}
+.hero .xp{display:flex;align-items:baseline;gap:8px;margin-top:14px}
+.hero .xp b{font-size:36px;font-weight:900;letter-spacing:-.045em;color:#2B3A57}
+.hero .xp span{font-size:14px;font-weight:800;color:#5B6A87}
+
+/* ── номинации вместо сплошного рейтинга ── */
+.noms{display:grid;gap:8px;margin-top:12px}
+.nom{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:12px}
+.nom .em{font-size:22px;flex:none}
+.nom .t{flex:1;min-width:0}
+.nom .t b{display:block;font-size:14.5px;font-weight:850;letter-spacing:-.02em}
+.nom .t i{font-style:normal;display:block;font-size:11.5px;font-weight:750;color:var(--muted)}
+.nom .v{font-size:14px;font-weight:900;color:var(--green-t);flex:none}
+.nom.me{background:var(--leaf);border-color:var(--green-l)}
+
+/* ── моя строка ── */
+.mine{background:var(--leaf);border:1px solid var(--green-l);border-radius:var(--r-md);
+  padding:15px;margin-top:12px}
+.mine b{font-size:15px;font-weight:850;display:block}
+.mine p{font-size:13px;line-height:1.45;font-weight:650;color:var(--green-t);margin-top:3px}
+
+/* ── участники ── */
+.mem{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--line);
+  border-radius:var(--r-sm);margin-bottom:8px;background:#fff}
+.mem .av{width:36px;height:36px;border-radius:12px;flex:none;display:grid;place-items:center;
+  font-size:16px;font-weight:900;color:#fff}
+.mem .t{flex:1;min-width:0}
+.mem .t b{display:block;font-size:14.5px;font-weight:800;letter-spacing:-.02em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mem .t i{font-style:normal;font-size:11.5px;font-weight:750;color:var(--muted)}
+.mem .cap{background:var(--gold);color:#4A3705;font-size:10px;font-weight:850;
+  border-radius:99px;padding:3px 8px;flex:none}
+.mem .quiet{background:var(--line);color:var(--muted);font-size:10px;font-weight:800;
+  border-radius:99px;padding:3px 8px;flex:none}
+
+.btn{width:100%;border:0;border-radius:var(--r-md);background:var(--green);color:#fff;
+  font:inherit;font-size:16px;font-weight:850;padding:16px;margin-top:12px;
+  box-shadow:0 5px 0 var(--green-d),0 13px 20px -8px rgba(60,90,20,.45);
+  transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--green-d)}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+.btn.ghost:active{transform:scale(.98)}
+
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:26px 0 10px}
+.sec h2{font-size:16.5px;font-weight:850;letter-spacing:-.03em}
+.sec span{font-size:12.5px;font-weight:750;color:var(--muted)}
+
+.note{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:14px 15px;margin-top:14px;display:flex;gap:11px;align-items:flex-start}
+.note.warn{background:var(--cream);border-color:#EBD79A}
+/* Пояснительные плашки — для дизайнера и ревью, не часть детского экрана.
+   Помечены явно, чтобы в макет не уехали как обычный текст. */
+.note.annot{border-style:dashed}
+.note.annot b::before{content:"ревью · ";color:var(--muted);font-weight:750}
+.note .ic{font-size:19px;line-height:1.2;flex:none}
+.note>div>b{display:block;font-size:13.5px;font-weight:850;margin-bottom:2px}
+/* Абзац ішіндегі жуан сан жеке жолға түсіп кетпеуі керек: тақырып қана блок. */
+.note p b{display:inline;font-weight:900;color:var(--ink)}
+.note p{font-size:13px;line-height:1.45;font-weight:650;color:var(--muted-c)}
+
+/* ── пустые состояния ── */
+.empty{text-align:center;padding:44px 20px}
+.empty .em{font-size:62px;line-height:1}
+.empty h2{font-size:22px;font-weight:900;letter-spacing:-.035em;margin-top:14px}
+.empty p{font-size:14.5px;line-height:1.5;font-weight:650;color:var(--muted-c);margin-top:8px}
+
+/* ── итоги раунда ── */
+.result{border-radius:var(--r-lg);padding:22px 20px;text-align:center}
+.result.win{background:linear-gradient(160deg,#FFF6DE,#FBEDC4)}
+.result.lose{background:linear-gradient(160deg,#EFF6FF,#E3ECFD)}
+.result .em{font-size:58px;line-height:1}
+.result h2{font-size:24px;font-weight:900;letter-spacing:-.04em;margin-top:10px}
+.result p{font-size:14.5px;line-height:1.5;font-weight:650;color:var(--muted-c);margin-top:8px}
+.grew{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:16px}
+.grew div{background:rgba(255,255,255,.75);border-radius:var(--r-sm);padding:12px 8px}
+.grew b{display:block;font-size:22px;font-weight:900;letter-spacing:-.04em}
+.grew span{display:block;font-size:11px;font-weight:750;color:var(--muted);margin-top:2px}
+
+/* ── шторка ── */
+.sheet-wrap{position:absolute;inset:0;z-index:40;display:none}
+.sheet-wrap.on{display:block}
+.scrim{position:absolute;inset:0;background:rgba(17,21,67,.42);opacity:0;transition:opacity .3s}
+.sheet-wrap.in .scrim{opacity:1}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:92%;background:#fff;
+  border-radius:26px 26px 0 0;padding:10px var(--pad) calc(var(--safe-b) + 16px);
+  transform:translateY(100%);transition:transform .42s var(--ease);
+  box-shadow:0 -14px 40px -12px rgba(17,21,67,.3)}
+.sheet-wrap.in .sheet{transform:translateY(0)}
+.grab{width:42px;height:5px;border-radius:99px;background:var(--line);margin:0 auto 12px}
+.sheet h2{font-size:21px;font-weight:900;letter-spacing:-.04em;margin-bottom:6px}
+.sheet p.lead{font-size:14px;line-height:1.45;color:var(--muted-c);font-weight:650;margin-bottom:16px}
+.code{font:800 26px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;
+  background:var(--paper);border:1.5px dashed var(--line);border-radius:var(--r-sm);
+  padding:18px;text-align:center;margin-bottom:12px}
+
+#toast{position:absolute;left:50%;bottom:calc(var(--safe-b) + 26px);transform:translate(-50%,14px);
+  background:var(--paper-ink);color:#fff;border-radius:14px;padding:12px 17px;font-size:14px;
+  font-weight:700;z-index:60;opacity:0;pointer-events:none;transition:.34s var(--ease);
+  max-width:88%;text-align:center;line-height:1.35}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div class="statusbar"><span>9:41</span><span>▰</span></div>
+
+  <div class="appbar">
+    <button class="back" type="button" aria-label="Артқа" onclick="toast('Прототипте басты экран жоқ')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141728" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    </button>
+    <div><h1 id="ttl">Клан</h1><div class="sub" id="sub">3-раунд · Кубок StudyLine</div></div>
+    <span class="rolechip" id="rolechip" hidden>капитан</span>
+  </div>
+
+  <div class="scroll" id="body"></div>
+
+  <div class="sheet-wrap" id="sheet" onclick="if(event.target.id==='sheet'||event.target.classList.contains('scrim'))closeSheet()">
+    <div class="scrim"></div>
+    <div class="sheet"><div class="grab"></div><div id="sheet-body"></div></div>
+  </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   1. ДЕРЕК
+   ══════════════════════════════════════════════════════════════ */
+const CLAN={name:"Almaty Wolves", em:"🐺", code:"SL-83KA", city:"Алматы", cls:"5А"};
+/* Толық аты-жөні тек өз кланының ішінде. Сыртқа — қысқартылған түрі.
+   quiet: соңғы рет қашан кірген (күн). Бұл дерек ЖАЛПЫ тізімде көрсетілмейді. */
+const MEMBERS=[
+  {first:"Даниял", last:"Серік",   xp:1240, quiet:0, cap:true},
+  {first:"Аружан", last:"Қайрат",  xp:1180, quiet:0, best:"өсім"},
+  {first:"Санжар", last:"Бек",     xp:1020, quiet:0},
+  {first:"Мадина", last:"Тұрар",   xp:180,  quiet:2},
+  {first:"Әлия",   last:"Нұрлан",  xp:940,  quiet:0, best:"тұрақты"},
+  {first:"Ерасыл", last:"Жомарт",  xp:610,  quiet:4},
+  {first:"Камила", last:"Оспан",   xp:870,  quiet:0},
+  {first:"Нұрайым",last:"Қасым",   xp:120,  quiet:6}
+];
+const ME=6;                          // «мен» — Камила, ортадағы қатысушы
+const HUES=[8,42,86,128,170,212,256,300];
+
+/* ── P0-4: есім клан сыртында толық көрсетілмейді ──
+   Өз кланыңның ішінде — толық аты, сырттағыларға — «Даниял С.».
+   Бір функция, бір жерде: экранның бірінде ұмытып кету мүмкіндігі жоқ. */
+function nameFor(m, inside){ return inside ? m.first+" "+m.last : m.first+" "+m.last[0]+"."; }
+
+/* ══════════════════════════════════════════════════════════════
+   2. КҮЙ
+   ══════════════════════════════════════════════════════════════ */
+let ROLE="member", STATE="normal", RESULT=null;
+const isCaptain = () => ROLE==="captain";
+
+let toastT;
+function toast(m){
+  const el=document.getElementById("toast");
+  el.textContent=m; el.classList.add("on");
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("on"),2600);
+}
+const sheet=document.getElementById("sheet");
+function openSheet(h){ document.getElementById("sheet-body").innerHTML=h;
+  sheet.classList.add("on"); requestAnimationFrame(()=>sheet.classList.add("in")); }
+function closeSheet(){ sheet.classList.remove("in"); setTimeout(()=>sheet.classList.remove("on"),340); }
+
+/* ══════════════════════════════════════════════════════════════
+   3. ЭКРАНДАР
+   ══════════════════════════════════════════════════════════════ */
+const totalXP = () => MEMBERS.reduce((a,m)=>a+m.xp,0);
+const quietCount = () => MEMBERS.filter(m=>m.quiet>=2).length;
+
+function render(){
+  document.getElementById("rolechip").hidden=!isCaptain();
+  document.getElementById("ttl").textContent = STATE==="normal" ? CLAN.name : "Клан";
+  document.getElementById("sub").textContent =
+    RESULT ? "3-раунд аяқталды" : STATE==="normal" ? "3-раунд · Кубок StudyLine" : "Кубок StudyLine";
+  const b=document.getElementById("body");
+  if(RESULT) b.innerHTML=resultHTML();
+  else if(STATE==="empty") b.innerHTML=emptyHTML();
+  else if(STATE==="solo")  b.innerHTML=soloHTML();
+  else if(STATE==="left")  b.innerHTML=leftHTML();
+  else b.innerHTML=clanHTML();
+}
+
+function clanHTML(){
+  const sorted=[...MEMBERS].map((m,i)=>({...m,i})).sort((a,b)=>b.xp-a.xp);
+  const myPos=sorted.findIndex(m=>m.i===ME);
+  const ahead=myPos>0 ? sorted[myPos-1].xp - sorted[myPos].xp : 0;
+
+  /* ── P0-3: сплошного рейтинга нет. Топ-3 + номинации + своя строка ──
+     Кто внизу — не «слабое звено» на виду у класса. Полный список
+     видит только капитан, и там нет мест, там есть кому помочь. */
+  const noms=[
+    {em:"🥇", t:nameFor(sorted[0],true), i:"раундтың ең үлкен үлесі", v:sorted[0].xp+" XP", me:sorted[0].i===ME},
+    {em:"📈", t:nameFor(MEMBERS.find(m=>m.best==="өсім"),true), i:"өткен раундтан ең үлкен өсім", v:"+34%", me:false},
+    {em:"🎯", t:nameFor(MEMBERS.find(m=>m.best==="тұрақты"),true), i:"жеті күн үзбей кірген", v:"7 күн", me:false}
+  ];
+
+  return `
+  <div class="hero">
+    <div class="em">${CLAN.em}</div>
+    <h2>${CLAN.name}</h2>
+    <div class="meta">${MEMBERS.length} қатысушы · ${CLAN.city} · ${CLAN.cls}</div>
+    <div class="xp"><b>${totalXP().toLocaleString("kk-KZ")}</b><span>XP осы раундта</span></div>
+  </div>
+
+  <div class="mine">
+    <b>Сенің үлесің — ${MEMBERS[ME].xp} XP</b>
+    <p>${ahead>0
+        ? "Алдыңдағыға дейін "+ahead+" XP. Бұл шамамен "+Math.ceil(ahead/120)+" тест."
+        : "Сен кланның ең үлкен үлесін қосып тұрсың."}</p>
+  </div>
+
+  <div class="sec"><h2>Раунд номинациялары</h2><span>орын емес</span></div>
+  ${noms.map(n=>`<div class="nom${n.me?" me":""}"><span class="em">${n.em}</span>
+     <span class="t"><b>${n.t}</b><i>${n.i}</i></span><span class="v">${n.v}</span></div>`).join("")}
+
+  <div class="note annot"><span class="ic">🤝</span><div><b>Неге орын тізімі жоқ</b>
+    <p>Клан — бірге жинайтын ұпай, жарыс емес. Кім соңында тұрғанын бүкіл сыныпқа
+    көрсету ешкімді ынталандырмайды, тек кетуге итермелейді.</p></div></div>
+
+  ${isCaptain() ? captainHTML() : memberHTML()}`;
+}
+
+/* ── қатардағы қатысушының көретіні ── */
+function memberHTML(){
+  return `
+  <div class="sec"><h2>Қатысушылар</h2><span>${MEMBERS.length}</span></div>
+  <div id="memlist">${MEMBERS.map((m,i)=>`
+    <div class="mem">
+      <span class="av" style="background:hsl(${HUES[i]} 52% 46%)">${m.first[0]}</span>
+      <span class="t"><b>${nameFor(m,true)}${i===ME?" · сен":""}</b><i>${m.xp} XP</i></span>
+      ${m.cap?'<span class="cap">капитан</span>':""}
+    </div>`).join("")}</div>
+  <div class="note annot"><span class="ic">🔒</span><div><b>Мұнда не жоқ</b>
+    <p>«Екі күн кірмеді» деген белгі жалпы тізімде көрсетілмейді — оны тек капитан
+    мен куратор көреді. Балаға сыныптас алдында «мен кланды құртып жүрмін» деген
+    белгі тағылмайды.</p></div></div>
+  <button class="btn ghost" type="button" onclick="showCode()">Досыңды шақыру</button>`;
+}
+
+/* ── P0-1 және P0-2: белсенділік деректері тек капитанда,
+   және ешбір батырма НАҚТЫ балаға бағытталмаған ── */
+function captainHTML(){
+  const q=quietCount();
+  return `
+  <div class="sec"><h2>Қатысушылар</h2><span>капитанға толық</span></div>
+  <div id="memlist">${MEMBERS.map((m,i)=>`
+    <div class="mem">
+      <span class="av" style="background:hsl(${HUES[i]} 52% 46%)">${m.first[0]}</span>
+      <span class="t"><b>${nameFor(m,true)}${i===ME?" · сен":""}</b><i>${m.xp} XP</i></span>
+      ${m.cap?'<span class="cap">капитан</span>':""}
+      ${m.quiet>=2?'<span class="quiet">баяу</span>':""}
+    </div>`).join("")}</div>
+
+  <div class="note warn annot"><span class="ic">👀</span><div><b>Бұл экран тек сенде</b>
+    <p>«Баяу» белгісі қатысушының өзіне де, басқаларға да көрінбейді. Бұл — саған
+    арналған белгі, балаға тағылған таңба емес.</p></div></div>
+
+  ${q ? `<button class="btn" type="button" onclick="remindAll()">
+      Бүкіл кланға еске салу</button>
+    <div class="note annot"><span class="ic">✉️</span><div><b>Хабарлама жалпы</b>
+      <p>Еске салу ${MEMBERS.length} қатысушының бәріне бірдей барады, ешкімнің аты
+      аталмайды. Нақты балаға «түрткі» жіберетін батырма мұнда әдейі жоқ.</p></div></div>`
+   : `<div class="note"><span class="ic">✅</span><div><b>Бәрі белсенді</b>
+      <p>Осы аптада кланның бәрі кірген.</p></div></div>`}
+
+  <button class="btn ghost" type="button" onclick="showCode()">Кодты көрсету</button>`;
+}
+
+/* ── P0-5: код автоматты кірмейді, капитан растайды ── */
+function showCode(){
+  openSheet(`
+    <h2>Досыңды шақыру</h2>
+    <p class="lead">Кодты досыңа бер. Ол кодты енгізгенде — сұраныс капитанға түседі,
+      клан өзінен-өзі ашылып қалмайды.</p>
+    <div class="code">${CLAN.code}</div>
+    <div class="note"><span class="ic">🛡</span><div><b>Неге бірден кірмейді</b>
+      <p>Код мессенджерде тарап кетеді. Растаусыз кез келген бөгде адам балалар
+      тобына кіріп кетер еді. Сондықтан код — шақыру, кілт емес.</p></div></div>
+    <div class="note"><span class="ic">📍</span><div><b>Қосымша шек</b>
+      <p>Код тек ${CLAN.city} қаласындағы ${CLAN.cls} сыныбының оқушыларына жарайды.</p></div></div>
+    <button class="btn" type="button" onclick="closeSheet()">Түсінікті</button>`);
+}
+function remindAll(){
+  toast("Еске салу бүкіл кланға жіберілді — ешкімнің аты аталмады");
+}
+
+/* ── Бос күйлер: ревьюде «жоқ» деп белгіленген үшеуі ── */
+function emptyHTML(){
+  return `
+  <div class="empty">
+    <div class="em">${CLAN.em}</div>
+    <h2>Клан құрылды. Әзірге сен ғанасың</h2>
+    <p>Клан бір адамнан басталады — бұл қалыпты жағдай. Бір досыңды шақырсаң,
+      раундқа қатыса аласың.</p>
+  </div>
+  <div class="note"><span class="ic">🎯</span><div><b>Раундқа кіру шарты</b>
+    <p>Кемінде <b>3 қатысушы</b>. Қазір: 1. Жетпейді: 2.</p></div></div>
+  <div class="note"><span class="ic">💡</span><div><b>Жалғыз тұрғанда да XP жиналады</b>
+    <p>Клан толмаса да тестерің босқа кетпейді — ұпайың сақталады және клан
+    жиналған соң есепке қосылады.</p></div></div>
+  <button class="btn" type="button" onclick="showCode()">Досыңды шақыру</button>
+  <button class="btn ghost" type="button" onclick="toast('Прототипте басқа кландар тізімі жоқ')">Басқа кланға кіру</button>`;
+}
+function soloHTML(){
+  return `
+  <div class="empty">
+    <div class="em">🕊</div>
+    <h2>Кландастарың кетіп қалды</h2>
+    <p>Бұл сенің кесіріңнен емес: раунд арасында клан таралып кетеді, жиі болатын жағдай.</p>
+  </div>
+  <div class="note"><span class="ic">💾</span><div><b>Ұпайың сақталды</b>
+    <p>Осы раундта жинаған <b>${MEMBERS[ME].xp} XP</b> сенікі болып қалады —
+    жаңа кланға сонымен кіресің.</p></div></div>
+  <div class="note"><span class="ic">🤝</span><div><b>Не істеуге болады</b>
+    <p>Жаңа клан құруға немесе сыныптастарыңның кланына қосылуға болады.
+    Екеуінде де прогресс жоғалмайды.</p></div></div>
+  <button class="btn" type="button" onclick="toast('Прототипте клан құру экраны жоқ')">Жаңа клан құру</button>
+  <button class="btn ghost" type="button" onclick="toast('Прототипте кландар тізімі жоқ')">Сыныбымның кланы</button>`;
+}
+function leftHTML(){
+  return `
+  <div class="empty">
+    <div class="em">⏸</div>
+    <h2>Клан раунд ортасында таралды</h2>
+    <p>Раунд сен үшін тоқтаған жоқ — жеке ұпайың есептеле береді.</p>
+  </div>
+  <div class="note warn"><span class="ic">❓</span><div><b>Ең жиі қойылатын сұрақ</b>
+    <p>«Жинағаным жанып кете ме?» Жоқ. Клан таралса да, сенің XP-ың, күн санағың
+    және ашқан деңгейлерің тиіспейді.</p></div></div>
+  <div class="grew">
+    <div><b>${MEMBERS[ME].xp}</b><span>сенің XP</span></div>
+    <div><b>7</b><span>күн санағы</span></div>
+    <div><b>12</b><span>деңгей</span></div>
+  </div>
+  <button class="btn" type="button" onclick="toast('Прототипте кландар тізімі жоқ')">Жаңа клан табу</button>`;
+}
+
+/* ── P0: жеңілгеннің экраны. Ревьюде бұл экран мүлде жоқ еді ── */
+function resultHTML(){
+  const win = RESULT==="win";
+  return `
+  <div class="result ${win?"win":"lose"}">
+    <div class="em">${win?"🏆":"🌱"}</div>
+    <h2>${win?"3-раундты алдыңдар!":"3-раунд аяқталды"}</h2>
+    <p>${win
+      ? "Клан "+totalXP().toLocaleString("kk-KZ")+" XP жинады және келесі кезеңге өтті."
+      : "Клан "+totalXP().toLocaleString("kk-KZ")+" XP жинады. Келесі кезеңге өтпедіңдер — бірақ раунд бос кеткен жоқ."}</p>
+  </div>
+
+  <div class="grew">
+    <div><b>+${MEMBERS[ME].xp}</b><span>сенің XP</span></div>
+    <div><b>+3</b><span>жаңа деңгей</span></div>
+    <div><b>7</b><span>күн санағы</span></div>
+  </div>
+
+  ${win ? `
+    <div class="note"><span class="ic">🎉</span><div><b>Не өзгерді</b>
+      <p>Клан белгісіне жұлдыз қосылды, келесі раундқа автоматты тіркелдіңдер.</p></div></div>`
+   : `
+    <div class="note"><span class="ic">📈</span><div><b>Жеңілу дегеніміз — нөл емес</b>
+      <p>Осы раундта клан өткен раундтан <b>34% көп</b> XP жинады. Өсім сақталады,
+      келесі раунд соның үстінен басталады.</p></div></div>
+    <div class="note"><span class="ic">🎯</span><div><b>Келесі раундқа нақты мақсат</b>
+      <p>Өтуге <b>820 XP</b> жетпеді. Кланға бөлгенде — әр қатысушыға шамамен
+      <b>1 тест</b> артық. Бұл нақты сан, «көбірек тырысыңдар» емес.</p></div></div>`}
+
+  <div class="note annot"><span class="ic">🔒</span><div><b>Мұнда не жоқ</b>
+    <p>Кім қанша әкелгенінің толық тізімі жоқ, «кім кінәлі» деген экран да жоқ.
+    Жеңілген раундтан кейін ондай тізім — балалар тобындағы ең қауіпті экран.</p></div></div>
+
+  <button class="btn" type="button" onclick="toast('Прототипте келесі раунд жоқ')">Келесі раундқа дайындалу</button>`;
+}
+
+/* ── іске қосу ── */
+(function(){
+  const p=new URLSearchParams(location.search);
+  if(p.get("role")==="captain") ROLE="captain";
+  const st=p.get("state"); if(["empty","solo","left"].indexOf(st)>-1) STATE=st;
+  const r=p.get("result");  if(["win","lose"].indexOf(r)>-1) RESULT=r;
+  render();
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   4. ӨЗІН-ӨЗІ ТЕКСЕРУ — ?test=1
+   Әр тексеру ревьюдегі нақты P0-ге сілтейді. Регресс болса —
+   бұл жерде құлайды, макетте емес.
+   ══════════════════════════════════════════════════════════════ */
+if(location.search.indexOf("test=1")>-1){
+  const A=(c,m)=>{ if(!c) throw new Error("FAIL: "+m); console.log("ok:",m); };
+  const H=()=>document.getElementById("body").innerHTML;
+
+  // P0-4: толық тегі клан сыртына шықпайды
+  A(nameFor(MEMBERS[0],false)==="Даниял С.","P0-4: клан сыртында тек аты мен тегінің бірінші әрпі");
+  A(nameFor(MEMBERS[0],true)==="Даниял Серік","P0-4: өз кланының ішінде толық аты");
+
+  // P0-1: «екі күн кірмеді» қатардағы қатысушыға көрінбейді
+  ROLE="member"; STATE="normal"; RESULT=null; render();
+  const L=()=>document.getElementById("memlist").innerHTML;
+  A(L().indexOf("баяу")<0,"P0-1: белсенділік белгісі жалпы тізімде жоқ");
+  A(!/күн кірмеді|Не заходил|\d+ күн/.test(L()),"P0-1: тізімде «неше күн кірмеді» деген сан жоқ");
+  A(document.querySelectorAll(".note.annot").length>0,"түсіндірме плашкалар ревью деп белгіленген");
+  ROLE="captain"; render();
+  A(L().indexOf("баяу")>-1,"P0-1: капитан белсенділікті көреді");
+
+  // P0-2: нақты балаға бағытталған батырма жоқ
+  A([...document.querySelectorAll("button")].every(b=>!/Түрт|Толкнуть/.test(b.textContent)),
+    "P0-2: «түрту» батырмасы жоқ");
+  A(H().indexOf("Бүкіл кланға еске салу")>-1,"P0-2: орнына жалпы еске салу тұр");
+
+  // P0-3: сплошного рейтинга нет
+  ROLE="member"; render();
+  A(H().indexOf("номинация")>-1 || H().indexOf("Номинация")>-1,"P0-3: номинациялар бар");
+  A(!/\b8-орын\b|\b7-орын\b/.test(H()),"P0-3: артта тұрғанның орны жазылмайды");
+  A(H().indexOf("Сенің үлесің")>-1,"P0-3: өз үлесі бөлек жолда");
+
+  // P0-5: код бірден кіргізбейді
+  showCode();
+  const sb=document.getElementById("sheet-body").innerHTML;
+  A(sb.indexOf("сұраныс капитанға түседі")>-1,"P0-5: код капитанның растауын талап етеді");
+  A(sb.indexOf(CLAN.city)>-1 && sb.indexOf(CLAN.cls)>-1,"P0-5: код қала мен сыныппен шектелген");
+  closeSheet();
+
+  // Ревьюде «жоқ» деп белгіленген үш күй
+  STATE="empty"; render(); A(H().indexOf("сен ғанасың")>-1,"бос клан күйі бар");
+  A(H().indexOf("босқа кетпейді")>-1,"бос кланда да XP жоғалмайтыны жазылған");
+  STATE="solo";  render(); A(H().indexOf("кетіп қалды")>-1,"жалғыз қалу күйі бар");
+  A(H().indexOf("сенің кесіріңнен емес")>-1,"жалғыз қалғанда кінә балаға артылмайды");
+  STATE="left";  render(); A(H().indexOf("раунд ортасында таралды")>-1,"раунд ортасында таралу күйі бар");
+  A(H().indexOf("жанып кете ме")>-1,"ең жиі қойылатын сұраққа жауап бар");
+
+  // Жеңілгеннің экраны — ревьюде мүлде жоқ еді
+  STATE="normal"; RESULT="lose"; render();
+  A(H().indexOf("Жеңілу дегеніміз — нөл емес")>-1,"жеңілгеннің экраны бар");
+  A(/\b820 XP\b/.test(H()),"жеңілгенге нақты сан беріледі, «көбірек тырысыңдар» емес");
+  A(H().indexOf("кім кінәлі")>-1,"жеңілістен кейін кінәлі іздейтін тізім жоқ екені айтылған");
+  RESULT="win"; render(); A(H().indexOf("алдыңдар")>-1,"жеңімпаздың экраны да бар");
+
+  RESULT=null; STATE="normal"; ROLE="member"; render();
+  console.log("%cБарлық тексеру өтті","color:#6FA53A;font-weight:700");
+}
+</script>
+</body>
+</html>
