@@ -64,9 +64,10 @@ const puppeteer = await (async () => {
 
 const browser = await puppeteer.launch({ headless: 'new', executablePath: CHROME, args: ['--no-sandbox'] });
 
-async function openAndAudit(file, query) {
+async function openAndAudit(file, query, vp) {
   const p = await browser.newPage();
-  await p.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
+  await p.setViewport({ width: (vp && vp[0]) || 390, height: (vp && vp[1]) || 844,
+                        isMobile: true, hasTouch: true });
   const errs = [];
   p.on('pageerror', (e) => errs.push(e.message.split('\n')[0]));
   p.on('console', (m) => { if (m.type() === 'error') errs.push('console: ' + m.text().slice(0, 160)); });
@@ -124,6 +125,30 @@ for (const g of PAGES) {
   if (r.dom.brokenImg) problems.push('битых картинок: ' + r.dom.brokenImg);
   totalFails += problems.length;
   rows.push([g.name, 'страница', problems.length ? problems.join(' · ') : 'чисто']);
+}
+
+/* Маленький экран. 390×844 — это iPhone 14; в регионах у детей чаще
+   375×667 и уже. Вёрстка, которая держится только на большом экране,
+   на живом тесте разваливается, а увидеть это на своём телефоне нельзя. */
+const SMALL = [360, 640];
+/* Оқу әдеті и арены живут в отдельных тестах, но узкий экран им нужен так же. */
+const NARROW_EXTRA = [
+  { id: 'oqu_adeti', name: 'Оқу әдеті',       file: 'oqu_adeti/index.html' },
+  { id: 'games',     name: 'Логика аренасы',  file: 'games/sort_arena.html' },
+  { id: 'games',     name: 'Ағылшын аренасы', file: 'games/flappy_english.html' },
+  { id: 'games',     name: 'Табиғат аренасы', file: 'games/nature_flow.html' },
+  { id: 'games',     name: 'Математика аркада', file: 'games/math_arcade.html' },
+];
+for (const a of [...APPS, ...PAGES, ...NARROW_EXTRA]) {
+  const file = a.file || (a.id + '/index.html');
+  if (!want(a.id) || !existsSync(path.join(HERE, file))) continue;
+  const r = await openAndAudit(file, '', SMALL);
+  const problems = [];
+  if (r.dom.hOver > 0) problems.push('ездит вбок на ' + r.dom.hOver + 'px');
+  const fatal = r.errs.filter((e) => !/test=1/.test(e));
+  if (fatal.length) problems.push(fatal[0]);
+  totalFails += problems.length;
+  rows.push([a.name + ' · 360px', 'узкий экран', problems.length ? problems.join(' · ') : 'чисто']);
 }
 
 /* Ссылки стенда — все ли ведут в существующие файлы */
