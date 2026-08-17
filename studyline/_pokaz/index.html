@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0f0d">
+<title>StudyLine — что сделано за ночь 18 августа</title>
+<style>
+:root{
+  --bg:#0b0f0d; --card:#121815; --card2:#161e1a; --line:#22302a;
+  --ink:#e8f0eb; --dim:#8ea59a; --dim2:#5f7a6e;
+  --acc:#2fbf6b; --acc-soft:#1b3a2a; --warn:#e0a12f; --bad:#e05252;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);max-width:960px;margin:0 auto;
+  padding:24px 16px 80px;-webkit-font-smoothing:antialiased;
+  font:16px/1.55 -apple-system,BlinkMacSystemFont,Inter,Roboto,Arial,sans-serif}
+a{color:var(--acc)}
+h1{font-size:31px;line-height:1.12;letter-spacing:-.03em;font-weight:850}
+h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);
+  font-weight:800;margin:46px 0 14px}
+h3{font-size:19px;line-height:1.25;letter-spacing:-.02em;font-weight:800;margin-bottom:6px}
+p{color:var(--dim)}
+b,strong{color:var(--ink);font-weight:650}
+.kick{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim2);font-weight:800}
+.top{border-bottom:1px solid var(--line);padding-bottom:22px}
+.lede{margin-top:13px;font-size:17px;color:var(--dim)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+.card.acc{border-color:#2c5c42;background:linear-gradient(180deg,#15271d,#121815)}
+.quote{border-left:3px solid var(--acc);padding:2px 0 2px 16px;margin:6px 0 12px;
+  color:var(--ink);font-size:17px;line-height:1.4}
+
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:14px}
+figure{margin:0}
+figure img{width:100%;display:block;border-radius:12px;border:1px solid var(--line);background:#fff}
+figcaption{font-size:12px;font-weight:700;color:var(--dim2);margin-top:7px;line-height:1.35}
+
+.ba{display:grid;gap:10px;margin-top:12px}
+@media(min-width:620px){ .ba{grid-template-columns:1fr 1fr} }
+.ba div{border-radius:12px;padding:13px 15px;font-size:14px;line-height:1.45;font-weight:650}
+.ba .was{background:#211414;border:1px solid #4a2626;color:#e8b7b7}
+.ba .now{background:#122a1c;border:1px solid #2c5c42;color:#a9e5c3}
+.ba b{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:5px;opacity:.8;font-weight:800}
+
+ul{list-style:none;margin-top:10px}
+ul li{color:var(--dim);padding-left:20px;position:relative;margin-bottom:7px}
+ul li:before{content:"✓";position:absolute;left:0;top:0;color:var(--acc);font-weight:800;font-size:13px}
+ul.cross li:before{content:"✕";color:var(--bad)}
+
+.links{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.links a{font-size:13px;font-weight:800;text-decoration:none;color:var(--ink);
+  background:var(--acc-soft);border:1px solid #2c5c42;border-radius:99px;padding:8px 14px}
+code{font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:#0a120e;
+  border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:#a8d9bd;word-break:break-all}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:16px}
+.kpi div{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:15px}
+.kpi b{display:block;font-size:29px;font-weight:850;letter-spacing:-.03em;line-height:1}
+.kpi span{display:block;font-size:11.5px;font-weight:700;color:var(--dim2);margin-top:7px;
+  letter-spacing:.08em;text-transform:uppercase}
+.foot{margin-top:54px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--dim2)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="kick">StudyLine · ночь на 18 августа</div>
+  <h1>Шесть прототипов, которые можно открыть с телефона прямо сейчас</h1>
+  <p class="lede">Всё ниже — не макеты. Это работающие экраны по ссылке,
+  без установки и без логина. Под каждым блоком — что было и что стало.</p>
+  <div class="links">
+    <a href="../">Открыть стенд</a>
+    <a href="../100_dengey/">100 деңгей</a>
+    <a href="../ana/">Ана кабинеті</a>
+    <a href="../agash/">1000 ағаш</a>
+    <a href="../klan/">Клан</a>
+  </div>
+</div>
+
+<div class="kpi">
+  <div><b>40</b><span>уровней из 100</span></div>
+  <div><b>240</b><span>вопросов, 6 предметов</span></div>
+  <div><b>6</b><span>рабочих прототипов</span></div>
+  <div><b>204</b><span>автопроверки</span></div>
+</div>
+
+<h2>1 · 100 деңгей — вторая эпоха и финал эпохи</h2>
+
+<div class="card">
+  <h3>Уровней стало 40, и эпоха теперь заканчивается по-настоящему</h3>
+  <p>Добавлена эпоха «Хандар» (Жошы → Абылай) и «Ханымдар» (Зарина → Сорқақтани) —
+  сорок карточек реальных исторических личностей и ещё 120 вопросов.
+  Число эпох больше нигде не зашито: оно считается из длины списка героев,
+  и третья откроется сама, как только допишут контент.</p>
+  <div class="ba">
+    <div class="was"><b>было</b>20-й уровень — такой же тест из шести вопросов.
+      Конец эпохи ничем не отличался от середины.</div>
+    <div class="now"><b>стало</b>Дәуір сынағы: восемь вопросов, каждый из другого набора эпохи,
+      порог 6 из 8. Узел и кнопка золотые — финал видно заранее.</div>
+  </div>
+  <div class="shots">
+    <figure><img src="img/map_ep1.jpg" alt="Карта первой эпохи перед испытанием"><figcaption>Золотой 20-й узел — испытание эпохи</figcaption></figure>
+    <figure><img src="img/map_ep2.jpg" alt="Карта второй эпохи"><figcaption>Вторая эпоха: свой декор — купол, караван, свиток</figcaption></figure>
+    <figure><img src="img/coll.jpg" alt="Коллекция медальонов"><figcaption>Коллекция с разделителем эпох, три орнамента медальонов</figcaption></figure>
+    <figure><img src="img/stats.jpg" alt="Отчёт родителю"><figcaption>Отчёт родителю: слабый предмет первым</figcaption></figure>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Что нашлось при сборке и было починено</h3>
+  <ul>
+    <li><b>Айғаным ханым стояла в обеих эпохах</b> — один и тот же человек на двух уровнях.
+      Автотест не ловил: сравнивал первые слова имён.</li>
+    <li><b>Подписи узлов могли совпасть</b> у четырёх пар героев. Теперь второе слово
+      добавляется только при совпадении, остальные 76 остаются короткими.</li>
+    <li><b>Брак в новом банке вопросов</b>: четыре почти одинаковых вопроса про Present
+      Continuous, три пищевые цепи, темы вне программы 4–6 класса. Всё переписано,
+      все 40 ключей по математике и логике пересчитаны вручную.</li>
+  </ul>
+</div>
+
+<h2>2 · Ана кабинеті — уровень мамы вместо отчёта об оценках</h2>
+
+<div class="card acc">
+  <div class="quote">Кабинет, который начинается с оценок ребёнка, — это источник тревоги,
+  которым невозможно поделиться.</div>
+  <p>Это вывод из акта работ за 1 июля — 9 августа. Здесь он превращён в экран:
+  первым идёт уровень <b>мамы</b>, а не успеваемость ребёнка. Если однажды блок
+  ребёнка окажется выше — упадёт автопроверка.</p>
+  <div class="ba">
+    <div class="was"><b>было</b>Первым экраном — проценты по предметам и место в классе.
+      Показать подруге такое нельзя.</div>
+    <div class="now"><b>стало</b>Уровень мамы, задание недели, приз. Уровень никогда не падает.
+      Карточка для подруги — <b>без имени, класса и оценок ребёнка</b>.</div>
+  </div>
+  <div class="shots">
+    <figure><img src="img/ana.jpg" alt="Кабинет мамы"><figcaption>Уровень мамы первым экраном</figcaption></figure>
+    <figure><img src="img/ana_card.jpg" alt="Карточка для шеринга"><figcaption>Сохраняется картинкой 1080×1350 — точка входа реферала</figcaption></figure>
+    <figure><img src="img/ana_empty.jpg" alt="Новая семья"><figcaption>Как выглядит кабинет у новой семьи</figcaption></figure>
+  </div>
+</div>
+
+<h2>3 · 1000 ағаш — из концепт-доски в рабочий экран</h2>
+
+<div class="card">
+  <h3>Переносилось две недели. Теперь работает целиком</h3>
+  <p>Выбрать фото с телефона, отправить, дождаться проверки куратором и увидеть,
+  как выросли счётчик кампании, клан и город. Фото ужимается на клиенте
+  с 3–8 МБ до 40–80 КБ.</p>
+  <div class="ba">
+    <div class="was"><b>было</b>Раскадровка восьми экранов, которую нельзя потрогать.</div>
+    <div class="now"><b>стало</b>Любое фото сначала «тексерілуде». В общую ленту его
+      переводит только куратор — фото ребёнка не публикуется без проверки.</div>
+  </div>
+  <div class="shots">
+    <figure><img src="img/agash.jpg" alt="Экран 1000 ағаш"><figcaption>Счётчик, свой вклад, клан и город</figcaption></figure>
+    <figure><img src="img/agash_cur.jpg" alt="Режим куратора"><figcaption>Режим куратора — модерация до публикации</figcaption></figure>
+  </div>
+</div>
+
+<h2>4 · Клан — пять P0 из ревью заменены рабочими решениями</h2>
+
+<div class="card">
+  <h3>Не список «не делай так», а показ «вот так вместо этого»</h3>
+  <p>Ревью 5 и 12 августа выдало пять P0 и три отсутствующих состояния.
+  Здесь на каждый пункт стоит работающая альтернатива и автопроверка,
+  которая упадёт при регрессе.</p>
+  <div class="ba">
+    <div class="was"><b>было</b>«Не заходил 2 дня» красным на виду у класса.
+      Кнопка «Толкнуть» рядом с конкретным ребёнком. Полный список «кто сколько принёс».
+      Полные фамилии детей. Вход по коду без ограничений.</div>
+    <div class="now"><b>стало</b>Активность видит только капитан и без числа дней.
+      Напоминание уходит всему клану анонимно. Вместо рейтинга — три номинации
+      и своя строка с действием. «Даниял С.» за пределами клана.
+      Код — приглашение, а не ключ.</div>
+  </div>
+  <div class="shots">
+    <figure><img src="img/klan.jpg" alt="Клан глазами участника"><figcaption>Номинации вместо рейтинга</figcaption></figure>
+    <figure><img src="img/klan_cap.jpg" alt="Клан глазами капитана"><figcaption>Активность — только у капитана</figcaption></figure>
+    <figure><img src="img/klan_lose.jpg" alt="Экран проигравшего"><figcaption>Экран проигравшего, которого не было ни на одном макете</figcaption></figure>
+    <figure><img src="img/klan_solo.jpg" alt="Все вышли из клана"><figcaption>«Это не из-за тебя» — состояние, где ребёнок уходит</figcaption></figure>
+  </div>
+</div>
+
+<h2>5 · Оқу әдеті — цепочка перестала рваться молча</h2>
+
+<div class="card">
+  <div class="ba">
+    <div class="was"><b>было</b>Ребёнок узнавал о разрыве цепочки, когда она уже оборвалась.</div>
+    <div class="now"><b>стало</b>После 18:00 — предупреждение с <b>числом дней</b>.
+      Терять «6 дней» жалко, терять «скоро» — нет.</div>
+  </div>
+  <div class="shots" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
+    <figure><img src="img/oqu_risk.jpg" alt="Предупреждение о разрыве цепочки"><figcaption>Плашка появляется вечером и не требует разрешений</figcaption></figure>
+  </div>
+</div>
+
+<h2>6 · Видео-разборы НИШ</h2>
+
+<div class="card">
+  <p>Два готовых ролика на казахском, отрендерены со звуком:
+  <a href="../video/nish_01_shashy/out/nish_01_9x16.mp4">периметр трёх квадратов</a> (92 с) и
+  <a href="../video/nish_02_paiyz/out/nish_02_9x16.mp4">проценты +20/−20</a> (78 с).</p>
+  <p style="margin-top:10px">Формат жёсткий: хук → условие → типичная ошибка → шаги →
+  ответ → <b>почему именно так</b> → CTA. Предпоследняя сцена обязательна:
+  без неё ребёнок запоминает ответ, а не правило.</p>
+</div>
+
+<h2>Что честно не сделано</h2>
+
+<div class="card">
+  <ul class="cross">
+    <li><b>Ответы на все 240 вопросов лежат в исходнике страницы</b>, а прогресс
+      подставляется параметром в адресной строке. До выноса на сервер показывать
+      «100 деңгей» посторонним нельзя. Это фокус недели 18–24 августа.</li>
+    <li><b>Figma не проверена</b> — MCP-коннектор не подключён, скриншоты макетов
+      снять не удалось. Вместо них — лист сверки на 20 минут в ревью.</li>
+    <li><b>Третий видео-разбор без озвучки</b> — на kie.ai закончились кредиты.
+      Сценарий и тайминги готовы, нужен один прогон после пополнения.</li>
+    <li><b>Фото и данные лежат в браузере.</b> Всё, что здесь работает,
+      работает на одном устройстве — сервер это отдельная работа недели.</li>
+  </ul>
+</div>
+
+<div class="foot">
+  StudyLine · 18 августа 2026 ·
+  <a href="https://github.com/Nazaralmaty/youngfuture-games/tree/main/studyline">исходники и README по каждому прототипу</a>
+</div>
+
+</body>
+</html>
