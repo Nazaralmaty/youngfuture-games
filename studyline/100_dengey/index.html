@@ -179,6 +179,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .tile.locked .chip{background:rgba(255,255,255,.9)}
 
 .half-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+a.half{text-decoration:none;color:inherit}
 .half{border-radius:var(--r-lg);padding:14px;display:flex;align-items:center;gap:9px}
 .half .pic{font-size:34px;flex:none}
 .half h4{font-size:14.5px;font-weight:800;letter-spacing:-.03em;line-height:1.15}
@@ -201,9 +202,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .progress-card .big em{font-size:15px;font-weight:700;font-style:normal;letter-spacing:-.02em;margin-left:6px}
 .progress-card .sub{font-size:13px;opacity:.78;margin-top:11px;display:flex;align-items:center;gap:8px}
 .progress-card .up{background:var(--green);border-radius:999px;padding:3px 9px;font-size:12px;font-weight:800}
+/* Бұрышта тұратын әшекей. Бұрын ол «1 орын» деген санның үстінен өтіп,
+   әшекей емес, кездейсоқ тіктөртбұрыш болып көрінетін. Мәтінге тимеуі
+   үшін әрі шығарылып, әлсіретілді. */
 .progress-card::after{
-  content:"";position:absolute;right:-10px;bottom:-30px;width:150px;height:130px;
-  border-radius:22px 22px 0 0;border:2px solid rgba(255,255,255,.11);border-bottom:0
+  content:"";position:absolute;right:-46px;bottom:-52px;width:150px;height:130px;
+  border-radius:22px 22px 0 0;border:2px solid rgba(255,255,255,.07);border-bottom:0
 }
 
 /* ── төменгі навигация ──────────────────────────────────────── */
@@ -677,7 +681,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
       <div class="sec"><h3>Қосымша</h3><a href="#" onclick="return false">Бәрі →</a></div>
 
-      <button class="tile mint locked" onclick="toast('Бұл бөлім прототипте жабық')">
+      <button class="tile mint locked" onclick="otherApps()">
         <div class="txt">
           <h4>Барлық пәндер</h4>
           <p>Барлық сабақ пен тақырыпқа қолжетімділік</p>
@@ -691,15 +695,15 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         <div class="txt">
           <h4>Практикалық тесттер</h4>
           <p>Білімінді тексер, емтиханға дайындал</p>
-          <span class="chip">🏅 120+ тест</span>
+          <span class="chip">🏅 240 сұрақ</span>
         </div>
         <div class="pic" aria-hidden="true">🏆</div>
         <div class="go"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B9821A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></div>
       </button>
 
       <div class="half-row">
-        <div class="half pink locked" onclick="toast('Бұл бөлім прототипте жабық')"><div class="pic" aria-hidden="true">📋</div><div><h4>Чекап</h4><p>Білімінді тексер</p></div></div>
-        <div class="half blue locked" onclick="toast('Бұл бөлім прототипте жабық')"><div class="pic" aria-hidden="true">📘</div><div><h4>English start</h4><p>Ағылшын үйрен</p></div></div>
+        <a class="half pink live" href="../nish/"><div class="pic" aria-hidden="true">📋</div><div><h4>Чекап</h4><p>НИШ диагностикасы</p></div></a>
+        <a class="half blue live" href="../games/flappy_english.html"><div class="pic" aria-hidden="true">📘</div><div><h4>English start</h4><p>Ағылшын аренасы</p></div></a>
       </div>
 
       <div class="progress-card">
