@@ -187,11 +187,11 @@
   const tl = gsap.timeline({ paused: true });
   const E = "power3.out";
 
-  tl.from("#a1k",{opacity:0,y:-22,duration:.45,ease:E},0.04)
-    .from("#a1t",{opacity:0,y:32,duration:.6,ease:E},0.26)
-    .from("#a1p",{opacity:0,scale:.7,duration:.5,ease:"back.out(1.7)"},1.03)
-    .from("#a1m",{opacity:0,scale:.7,duration:.5,ease:"back.out(1.7)"},1.37)
-    .from("#a1q",{opacity:0,y:22,duration:.5,ease:E},1.97);
+  tl.from("#a1k",{opacity:0,y:-22,duration:0.34,ease:E},0.02)
+    .from("#a1t",{opacity:0,y:32,duration:0.5,ease:E},0.12)
+    .from("#a1p",{opacity:0,scale:.7,duration:.38,ease:"back.out(1.7)"},0.38)
+    .from("#a1m",{opacity:0,scale:.7,duration:.38,ease:"back.out(1.7)"},0.50)
+    .from("#a1q",{opacity:0,y:22,duration:0.36,ease:E},0.62);
 
   tl.from("#a2f",{opacity:0,scale:.8,duration:.55,ease:"back.out(1.6)"},8.53)
     .from("#a2t",{opacity:0,y:26,duration:.55,ease:E},10.05);
