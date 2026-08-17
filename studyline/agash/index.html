@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#FFFFFF">
+<title>1000 ағаш — StudyLine</title>
+<!--
+  StudyLine · 1000 ағаш — жұмыс істейтін прототип (концепт емес).
+  Бір файл, құрастыру жоқ, CDN жоқ. Прогресс — localStorage (кілт sl_agash_v1).
+
+  Не істейді: суретті телефоннан алады, қысады, жібереді, куратор тексереді,
+  содан кейін ғана санауышқа кіреді. Клан мен қала рейтингі бірге өседі.
+-->
+<style>
+:root{
+  /* Figma study_line токендері — 100 деңгеймен бірдей */
+  --green:#87BE4B; --green-d:#6FA53A; --green-l:#A8D46F; --green-t:#4F7724;
+  --leaf:#EDF6E1; --mint:#DFF4F1; --cream:#FDF4D8;
+  --navy:#111543; --ink:#141728; --muted:#666C7E; --muted-c:#5C6273;
+  --line:#ECEEF5; --bg:#FFFFFF; --paper:#FBF8F1; --paper-ink:#2C2618;
+  --red:#E0574B; --gold:#E7B744;
+  --r-lg:24px; --r-md:18px; --r-sm:14px; --pad:16px;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;overscroll-behavior:none}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;letter-spacing:-.011em}
+#stage{position:relative;height:100%;max-width:520px;margin:0 auto;overflow:hidden;
+  display:flex;flex-direction:column;background:var(--bg)}
+
+/* ── шапка ── */
+.statusbar{flex:none;display:flex;justify-content:space-between;align-items:center;
+  padding:calc(var(--safe-t) + 8px) 22px 2px;font-size:15px;font-weight:650;color:var(--ink)}
+.sb-r{display:flex;gap:6px;align-items:center;color:var(--ink)}
+.appbar{flex:none;display:flex;align-items:center;gap:12px;padding:8px var(--pad) 10px}
+.back{width:40px;height:40px;flex:none;border:0;background:var(--line);border-radius:13px;
+  display:grid;place-items:center;transition:transform .14s var(--ease)}
+.back:active{transform:scale(.92)}
+.appbar h1{font-size:19px;font-weight:850;letter-spacing:-.035em;line-height:1.15}
+.appbar .sub{font-size:12.5px;font-weight:700;color:var(--muted);margin-top:1px}
+
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:0 var(--pad) calc(var(--safe-b) + 24px)}
+
+/* ── басты санауыш ── */
+.counter{background:linear-gradient(160deg,#F1F9E6,#E4F3D4);border-radius:var(--r-lg);
+  padding:22px 20px 20px;position:relative;overflow:hidden}
+.counter .lbl{font-size:12px;font-weight:850;letter-spacing:.1em;text-transform:uppercase;color:var(--green-t)}
+.counter .big{display:flex;align-items:baseline;gap:8px;margin-top:6px}
+.counter .big b{font-size:58px;font-weight:900;letter-spacing:-.05em;line-height:1;color:var(--green-t)}
+.counter .big span{font-size:20px;font-weight:800;color:#6F8A54}
+.rail{height:12px;border-radius:99px;background:rgba(255,255,255,.72);margin-top:16px;overflow:hidden}
+.rail i{display:block;height:100%;border-radius:99px;background:var(--green-d);
+  transform-origin:left;transition:transform .8s var(--ease)}
+.counter .foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;
+  font-size:13.5px;font-weight:750;color:#5C7340}
+.counter .tree{position:absolute;right:-8px;top:-10px;font-size:96px;opacity:.14;line-height:1;pointer-events:none}
+
+/* ── басты батырма ── */
+.cta{width:100%;margin-top:14px;border:0;border-radius:var(--r-md);background:var(--green);
+  color:#fff;font:inherit;font-size:17px;font-weight:850;letter-spacing:-.02em;
+  padding:18px;display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 5px 0 var(--green-d),0 13px 20px -8px rgba(60,90,20,.45);
+  transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
+.cta:active{transform:translateY(4px);box-shadow:0 1px 0 var(--green-d)}
+.cta[disabled]{opacity:.55;box-shadow:0 5px 0 #B9C4AC}
+
+/* ── үш сан ── */
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px}
+.trio div{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:13px 10px;text-align:center}
+.trio b{display:block;font-size:25px;font-weight:900;letter-spacing:-.04em;color:var(--ink);line-height:1.1}
+.trio span{display:block;font-size:11.5px;font-weight:750;color:var(--muted);margin-top:3px}
+
+/* ── бөлім тақырыбы ── */
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:26px 0 10px}
+.sec h2{font-size:16.5px;font-weight:850;letter-spacing:-.03em}
+.sec span{font-size:12.5px;font-weight:750;color:var(--muted)}
+
+/* ── кландар ── */
+.clan{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--line);
+  border-radius:var(--r-sm);margin-bottom:8px;background:#fff}
+.clan.me{background:var(--leaf);border-color:var(--green-l)}
+.clan .n{width:26px;flex:none;font-size:14px;font-weight:900;color:var(--muted);text-align:center}
+.clan .em{font-size:22px;flex:none}
+.clan .t{flex:1;min-width:0}
+.clan .t b{display:block;font-size:14.5px;font-weight:800;letter-spacing:-.02em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clan .t i{font-style:normal;font-size:11.5px;font-weight:750;color:var(--green-t)}
+.clan .v{font-size:19px;font-weight:900;letter-spacing:-.03em;flex:none}
+
+/* ── галерея ── */
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.gal figure{position:relative;aspect-ratio:1;border-radius:var(--r-sm);overflow:hidden;
+  background:var(--leaf);display:grid;place-items:center;font-size:34px}
+.gal img{width:100%;height:100%;object-fit:cover;display:block}
+.gal .badge{position:absolute;left:6px;bottom:6px;background:rgba(20,23,40,.82);color:#fff;
+  font-size:10px;font-weight:800;border-radius:99px;padding:3px 8px;letter-spacing:.01em}
+.gal .badge.wait{background:rgba(231,183,68,.95);color:#4A3705}
+.gal .badge.no{background:rgba(224,87,75,.95)}
+.gal .mine{position:absolute;right:6px;top:6px;background:var(--green-d);color:#fff;
+  font-size:10px;font-weight:800;border-radius:99px;padding:3px 7px}
+
+/* ── ескертпе ── */
+.note{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:14px 15px;margin-top:14px;display:flex;gap:11px;align-items:flex-start}
+.note .ic{font-size:19px;line-height:1.2;flex:none}
+.note b{display:block;font-size:13.5px;font-weight:850;margin-bottom:2px}
+.note p{font-size:13px;line-height:1.45;font-weight:650;color:var(--muted-c)}
+
+/* ── шторка ── */
+.sheet-wrap{position:absolute;inset:0;z-index:40;display:none}
+.sheet-wrap.on{display:block}
+.scrim{position:absolute;inset:0;background:rgba(17,21,67,.42);opacity:0;transition:opacity .3s}
+.sheet-wrap.in .scrim{opacity:1}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:92%;background:#fff;
+  border-radius:26px 26px 0 0;padding:10px var(--pad) calc(var(--safe-b) + 16px);
+  display:flex;flex-direction:column;transform:translateY(100%);
+  transition:transform .42s var(--ease);box-shadow:0 -14px 40px -12px rgba(17,21,67,.3)}
+.sheet-wrap.in .sheet{transform:translateY(0)}
+.grab{width:42px;height:5px;border-radius:99px;background:var(--line);margin:0 auto 12px;flex:none}
+.sheet .body{overflow-y:auto}
+.sheet h2{font-size:21px;font-weight:900;letter-spacing:-.04em;margin-bottom:6px}
+.sheet p.lead{font-size:14px;line-height:1.45;color:var(--muted-c);font-weight:650;margin-bottom:16px}
+
+.preview{width:100%;aspect-ratio:4/3;border-radius:var(--r-md);background:var(--leaf);
+  display:grid;place-items:center;font-size:52px;overflow:hidden;margin-bottom:14px}
+.preview img{width:100%;height:100%;object-fit:cover}
+.pick{width:100%;border:2px dashed var(--green-l);background:var(--leaf);border-radius:var(--r-md);
+  padding:16px;font:inherit;font-size:15.5px;font-weight:800;color:var(--green-t);margin-bottom:12px}
+.pick:active{transform:scale(.98)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:9px 15px;
+  font:inherit;font-size:13.5px;font-weight:800;color:var(--muted-c)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.sheet input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:var(--r-sm);
+  padding:14px;font:inherit;font-size:15px;font-weight:650;margin-bottom:14px}
+.sheet input[type=text]:focus{outline:0;border-color:var(--green-l)}
+
+/* ── куратор режимі ── */
+.curbar{background:var(--cream);border:1px solid #EBD79A;border-radius:var(--r-sm);
+  padding:11px 13px;margin-bottom:12px;font-size:13px;font-weight:750;color:#5E4A0E}
+.curbtns{display:flex;gap:8px;margin-top:8px}
+.curbtns button{flex:1;border:0;border-radius:12px;padding:11px;font:inherit;
+  font-size:13.5px;font-weight:850;color:#fff}
+.curbtns .ok{background:var(--green-d)}
+.curbtns .no{background:var(--red)}
+
+#toast{position:absolute;left:50%;bottom:calc(var(--safe-b) + 26px);transform:translate(-50%,14px);
+  background:var(--paper-ink);color:#fff;border-radius:14px;padding:12px 17px;font-size:14px;
+  font-weight:700;z-index:60;opacity:0;pointer-events:none;transition:.34s var(--ease);
+  max-width:88%;text-align:center;line-height:1.35}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="sb-r">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" width="3" height="12" rx="1"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".7" y=".7" width="21" height="10.6" rx="3" stroke="currentColor" stroke-opacity=".4" stroke-width="1.2"/><rect x="2.4" y="2.4" width="17.6" height="7.2" rx="1.8" fill="currentColor"/><path d="M23.3 4.3v3.4a2 2 0 0 0 0-3.4Z" fill="currentColor" fill-opacity=".45"/></svg>
+    </span>
+  </div>
+
+  <div class="appbar">
+    <button class="back" type="button" aria-label="Артқа" onclick="toast('Прототипте басты экран жоқ')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141728" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    </button>
+    <div>
+      <h1>1000 ағаш</h1>
+      <div class="sub">StudyLine науқаны · 31 желтоқсанға дейін</div>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <div class="counter">
+      <div class="tree" aria-hidden="true">🌳</div>
+      <div class="lbl">Жылдық мақсат</div>
+      <div class="big"><b id="c-now">0</b><span id="c-goal">/ 1000 ағаш</span></div>
+      <div class="rail"><i id="c-rail" style="transform:scaleX(0)"></i></div>
+      <div class="foot"><span id="c-week">осы аптада +0</span><span id="c-left">1000 қалды</span></div>
+    </div>
+
+    <button class="cta" type="button" id="cta" onclick="openUpload()">📸 Мен ағаш екпін</button>
+    <input type="file" id="file" accept="image/*" capture="environment" hidden onchange="pickPhoto(event)">
+
+    <div class="trio">
+      <div><b id="t-mine">0</b><span>сенікі</span></div>
+      <div><b id="t-clan">0</b><span>кланың</span></div>
+      <div><b id="t-city">0</b><span>Алматы</span></div>
+    </div>
+
+    <div class="note" id="pending-note" hidden>
+      <span class="ic">⏳</span>
+      <div><b id="pn-title">Тексерілуде</b>
+        <p>Куратор суретті 24 сағат ішінде қарайды. Содан кейін ғана ағаш санауышқа, кланға және қалаға қосылады.</p></div>
+    </div>
+
+    <div class="sec"><h2>Кландар</h2><span id="clan-more">барлығы 24</span></div>
+    <div id="clans"></div>
+
+    <div class="sec"><h2>Соңғы суреттер</h2><span id="gal-more"></span></div>
+    <div class="gal" id="gal"></div>
+
+    <div class="note">
+      <span class="ic">🌱</span>
+      <div><b>Неге сурет керек</b>
+        <p>Сан емес, сурет есептеледі: ағашты шынымен еккенді көрсету үшін. Куратор тексереді — сондықтан санауыш шындықты көрсетеді.</p></div>
+    </div>
+  </div>
+
+  <div class="sheet-wrap" id="sheet" onclick="if(event.target.id==='sheet'||event.target.classList.contains('scrim'))closeSheet()">
+    <div class="scrim"></div>
+    <div class="sheet"><div class="grab"></div><div class="body" id="sheet-body"></div></div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   1. ДЕРЕК. Науқанның бастапқы сандары — басқа мектептердің үлесі.
+   Бэкенд келгенде осы үшеуі серверден түседі, қалғаны сол күйінде қалады.
+   ══════════════════════════════════════════════════════════════ */
+const GOAL=1000, BASE=478, BASE_WEEK=27, BASE_CLAN=32, BASE_CITY=110;
+const MYCLAN="Almaty Wolves";
+const CLANS=[
+  {n:"Astana Eagles", em:"🦅", v:41},
+  {n:"Shymkent Tigers", em:"🐯", v:38},
+  {n:MYCLAN,          em:"🐺", v:BASE_CLAN, me:true},
+  {n:"Aqtobe Bars",   em:"🐆", v:29},
+  {n:"Taraz Qyrandar",em:"🕊", v:24}
+];
+const PLACES=["Аула","Мектеп","Қала аллеясы","Дача"];
+/* Науқан суреттерінің «фоны» — басқа қатысушылардың үлгісі. Нақты сурет жоқ,
+   эмодзи: прототип суретті интернеттен тартпайды, бәрі бір файлда тұрады. */
+const DEMO=["🌳","🌲","🌱","🪴","🌴","🎋","🌿","🍀","🌵"];
+
+/* ══════════════════════════════════════════════════════════════
+   2. ПРОГРЕСС
+   ══════════════════════════════════════════════════════════════ */
+const KEY="sl_agash_v1";
+let P=load();
+function load(){
+  const def={mine:[], seen:false};
+  try{
+    const o=JSON.parse(localStorage.getItem(KEY));
+    if(o && Array.isArray(o.mine)) return {mine:o.mine.filter(validTree), seen:!!o.seen};
+  }catch(e){}
+  return def;
+}
+/* Бөгде немесе бүлінген жазба санауышты бұзбауы керек. */
+function validTree(t){
+  return t && typeof t==="object"
+    && typeof t.ts==="number" && t.ts>0
+    && ["wait","ok","no"].indexOf(t.status)>-1
+    && PLACES.indexOf(t.place)>-1;
+}
+let quotaWarned=false;
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(P)); return true; }
+  catch(e){
+    /* Сурет localStorage-ге сыймай қалды. Жазбаны жоғалтпаймыз — суретсіз
+       сақтаймыз, бірақ үнсіз емес: бала не болғанын білуі керек. */
+    const dropped=P.mine.filter(t=>t.img).length;
+    P.mine.forEach(t=>{ if(t.img) t.img=null; });
+    try{ localStorage.setItem(KEY, JSON.stringify(P)); }catch(e2){}
+    if(!quotaWarned && dropped){ quotaWarned=true;
+      toast("Жады толды: ағаштар сақталды, ескі суреттер өшірілді"); }
+    return false;
+  }
+}
+
+/* ── есептеу ── */
+const okTrees   = () => P.mine.filter(t=>t.status==="ok");
+const waitTrees = () => P.mine.filter(t=>t.status==="wait");
+const mine  = () => okTrees().length;
+const total = () => BASE + mine();
+const clanTotal = () => BASE_CLAN + mine();
+const cityTotal = () => BASE_CITY + mine();
+/* «Осы аптада» — соңғы 7 тәулік, ағымдағы уақыттан емес, ағаштың өз белгісінен */
+const WEEK = 7*864e5;
+function weekTotal(now){
+  now = now || Date.now();
+  return BASE_WEEK + okTrees().filter(t=>now-t.ts < WEEK).length;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   3. КӨРІНІС
+   ══════════════════════════════════════════════════════════════ */
+let toastT;
+function toast(m){
+  const el=document.getElementById("toast");
+  el.textContent=m; el.classList.add("on");
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("on"),2600);
+}
+function draw(){
+  const t=total();
+  document.getElementById("c-now").textContent=t;
+  document.getElementById("c-goal").textContent="/ "+GOAL+" ағаш";
+  document.getElementById("c-rail").style.transform="scaleX("+Math.min(1,t/GOAL).toFixed(3)+")";
+  document.getElementById("c-week").textContent="осы аптада +"+weekTotal();
+  document.getElementById("c-left").textContent=Math.max(0,GOAL-t)+" қалды";
+  document.getElementById("t-mine").textContent=mine();
+  document.getElementById("t-clan").textContent=clanTotal();
+  document.getElementById("t-city").textContent=cityTotal();
+
+  const w=waitTrees().length;
+  const pn=document.getElementById("pending-note");
+  pn.hidden = w===0;
+  document.getElementById("pn-title").textContent =
+    w===1 ? "Бір суретің тексерілуде" : w+" суретің тексерілуде";
+
+  drawClans(); drawGal();
+}
+function drawClans(){
+  const box=document.getElementById("clans"); box.innerHTML="";
+  const rows=CLANS.map(c=>({...c, v: c.me ? clanTotal() : c.v}))
+                  .sort((a,b)=>b.v-a.v);
+  rows.slice(0,5).forEach((c,i)=>{
+    const el=document.createElement("div");
+    el.className="clan"+(c.me?" me":"");
+    el.innerHTML=`<span class="n">${i+1}</span><span class="em">${c.em}</span>
+      <span class="t"><b>${c.n}</b>${c.me?"<i>сенің кланың</i>":""}</span>
+      <span class="v">${c.v}</span>`;
+    box.appendChild(el);
+  });
+  /* Жоғарыға дейін неше ағаш қалғаны — «сен артта тұрсың» дегеннен әлдеқайда
+     пайдалы: бала не істеу керегін көреді, кім екенін емес. */
+  const i=rows.findIndex(c=>c.me);
+  document.getElementById("clan-more").textContent =
+    i>0 ? "жоғарыға дейін "+(rows[i-1].v-rows[i].v)+" ағаш" : "кланың бірінші";
+}
+function drawGal(){
+  const g=document.getElementById("gal"); g.innerHTML="";
+  const my=[...P.mine].sort((a,b)=>b.ts-a.ts);
+  my.slice(0,9).forEach((t,idx)=>{
+    const f=document.createElement("figure");
+    const st = t.status==="ok" ? "" : t.status==="wait" ? "wait" : "no";
+    const lbl = t.status==="ok" ? "есептелді" : t.status==="wait" ? "тексерілуде" : "қабылданбады";
+    f.innerHTML=(t.img?`<img src="${t.img}" alt="Сенің ағашың">`:"🌳")
+      +`<span class="badge ${st}">${lbl}</span><span class="mine">сенікі</span>`;
+    if(CURATOR && t.status==="wait") f.onclick=()=>judge(idx===-1?0:my.indexOf(t));
+    else f.onclick=()=>openTree(t);
+    g.appendChild(f);
+  });
+  DEMO.slice(0, Math.max(0, 9-my.length)).forEach(e=>{
+    const f=document.createElement("figure");
+    f.textContent=e; f.setAttribute("aria-label","Басқа қатысушының ағашы");
+    g.appendChild(f);
+  });
+  document.getElementById("gal-more").textContent = "барлығы "+total();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4. СУРЕТ ҚОСУ
+   ══════════════════════════════════════════════════════════════ */
+let draft={img:null, place:PLACES[0], note:""};
+function openUpload(){
+  draft={img:null, place:PLACES[0], note:""};
+  openSheet(uploadHTML());
+}
+function uploadHTML(){
+  return `
+   <h2>Мен ағаш екпін</h2>
+   <p class="lead">Суретті куратор тексереді — әдетте 24 сағат ішінде. Содан кейін ағаш
+     санауышқа, кланыңа және қалаңа қосылады.</p>
+   <div class="preview" id="pv">${draft.img?`<img src="${draft.img}" alt="">`:"🌳"}</div>
+   <button class="pick" type="button" onclick="document.getElementById('file').click()">
+     ${draft.img?"Басқа сурет таңдау":"📷 Сурет түсіру немесе таңдау"}</button>
+   <div class="chips" id="places">${PLACES.map(p=>
+     `<button class="chip" type="button" aria-pressed="${p===draft.place}"
+        onclick="setPlace('${p}')">${p}</button>`).join("")}</div>
+   <input type="text" id="cap" maxlength="60" placeholder="Қолтаңба (міндетті емес)"
+     value="${esc(draft.note)}" oninput="draft.note=this.value">
+   <button class="cta" type="button" id="send" onclick="sendTree()" ${draft.img?"":"disabled"}>Жіберу</button>`;
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+function setPlace(p){
+  if(PLACES.indexOf(p)<0) return;
+  draft.place=p;
+  document.querySelectorAll("#places .chip").forEach(b=>
+    b.setAttribute("aria-pressed", b.textContent.trim()===p));
+}
+
+/* Сурет телефоннан 3–8 МБ болып келеді. localStorage-ге ондай сыймайды,
+   сондықтан жіберер алдында қысамыз: ұзын қабырғасы 720 px, JPEG 0.72.
+   Бэкенд келгенде қысу қалады — трафик те, күту де азаяды. */
+const MAXSIDE=720, QUALITY=.72;
+function pickPhoto(e){
+  const f=e.target.files && e.target.files[0];
+  e.target.value="";                       // сол файлды қайта таңдауға болсын
+  if(!f) return;
+  if(!/^image\//.test(f.type)){ toast("Тек сурет файлын таңдау керек"); return; }
+  const r=new FileReader();
+  r.onerror=()=>toast("Суретті оқу мүмкін болмады");
+  r.onload=()=>shrink(r.result, d=>{ draft.img=d; openSheet(uploadHTML()); });
+  r.readAsDataURL(f);
+}
+function shrink(dataUrl, done){
+  const img=new Image();
+  img.onerror=()=>toast("Сурет бүлінген сияқты");
+  img.onload=()=>{
+    const k=Math.min(1, MAXSIDE/Math.max(img.width,img.height));
+    const c=document.createElement("canvas");
+    c.width=Math.round(img.width*k); c.height=Math.round(img.height*k);
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    done(c.toDataURL("image/jpeg",QUALITY));
+  };
+  img.src=dataUrl;
+}
+
+function sendTree(){
+  if(!draft.img){ toast("Алдымен сурет таңдау керек"); return; }
+  P.mine.push({ts:Date.now(), img:draft.img, place:draft.place, note:draft.note.slice(0,60), status:"wait"});
+  save(); draw();
+  openSheet(`
+    <h2>Сурет жіберілді</h2>
+    <p class="lead">Куратор оны 24 сағат ішінде қарайды — содан кейін ағаш санауышқа кіреді.</p>
+    <div class="trio" style="margin-top:0">
+      <div><b>${mine()}</b><span>есептелген</span></div>
+      <div><b>${waitTrees().length}</b><span>тексерілуде</span></div>
+      <div><b>${total()}</b><span>барлығы</span></div>
+    </div>
+    <div class="note"><span class="ic">🌱</span><div><b>Не болады әрі қарай</b>
+      <p>Қабылданса — кланың да, қалаң да бір ағашқа өседі. Қабылданбаса — себебі жазылады,
+      суретті қайта жіберуге болады.</p></div></div>
+    <button class="cta" type="button" onclick="closeSheet()">Жарайды</button>`);
+}
+function openTree(t){
+  const st = t.status==="ok" ? "Есептелді" : t.status==="wait" ? "Тексерілуде" : "Қабылданбады";
+  openSheet(`
+    <h2>${st}</h2>
+    <p class="lead">${new Date(t.ts).toLocaleDateString("kk-KZ")} · ${t.place}</p>
+    <div class="preview">${t.img?`<img src="${t.img}" alt="">`:"🌳"}</div>
+    ${t.note?`<p class="lead">«${esc(t.note)}»</p>`:""}
+    ${t.status==="no"?`<div class="note"><span class="ic">↩</span><div><b>Қайта жіберуге болады</b>
+      <p>Ағаш толық көрінетін жаңа сурет таңдап, қайта жібер.</p></div></div>`:""}
+    <button class="cta" type="button" onclick="closeSheet()">Жабу</button>`);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. КУРАТОР РЕЖИМІ — ?curator=1
+   Модерация прототипте де болуы керек: баланың суреті тексерусіз жалпы
+   лентаға шықпайды. Бэкендте бұл куратордың жеке экраны болады.
+   ══════════════════════════════════════════════════════════════ */
+let CURATOR=false;
+function judge(i){
+  const t=[...P.mine].sort((a,b)=>b.ts-a.ts)[i];
+  if(!t) return;
+  openSheet(`
+    <div class="curbar">Куратор режимі: бұл экран балада көрінбейді</div>
+    <h2>Суретті тексеру</h2>
+    <p class="lead">${new Date(t.ts).toLocaleDateString("kk-KZ")} · ${t.place}${t.note?" · «"+esc(t.note)+"»":""}</p>
+    <div class="preview">${t.img?`<img src="${t.img}" alt="">`:"🌳"}</div>
+    <div class="curbtns">
+      <button class="ok" type="button" onclick="setStatus(${t.ts},'ok')">Қабылдау</button>
+      <button class="no" type="button" onclick="setStatus(${t.ts},'no')">Қабылдамау</button>
+    </div>`);
+}
+function setStatus(ts, st){
+  const t=P.mine.find(x=>x.ts===ts); if(!t) return;
+  t.status=st; save(); draw(); closeSheet();
+  toast(st==="ok" ? "Ағаш есептелді — санауыш өсті" : "Сурет қабылданбады");
+}
+
+/* ══════════════════════════════════════════════════════════════
+   6. ШТОРКА
+   ══════════════════════════════════════════════════════════════ */
+const sheet=document.getElementById("sheet");
+function openSheet(html){
+  document.getElementById("sheet-body").innerHTML=html;
+  sheet.classList.add("on");
+  requestAnimationFrame(()=>sheet.classList.add("in"));
+}
+function closeSheet(){
+  sheet.classList.remove("in");
+  setTimeout(()=>sheet.classList.remove("on"),340);
+}
+
+/* ── іске қосу ── */
+(function(){
+  const p=new URLSearchParams(location.search);
+  CURATOR = p.get("curator")==="1";
+  if(CURATOR) document.querySelector(".appbar .sub").textContent="Куратор режимі · суретті басып тексер";
+  /* Дизайнер мен тексеру үшін: ?seed=3 — үш ағаш қосады (сурет жоқ) */
+  if(p.has("seed")){
+    const n=Math.max(0,Math.min(9,+p.get("seed")||0));
+    const st=p.get("status")||"ok";
+    P.mine=Array.from({length:n},(_,i)=>({ts:Date.now()-i*36e5, img:null,
+      place:PLACES[i%PLACES.length], note:"", status:["wait","ok","no"].indexOf(st)>-1?st:"ok"}));
+  }
+  draw();
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   7. ӨЗІН-ӨЗІ ТЕКСЕРУ — ?test=1
+   ══════════════════════════════════════════════════════════════ */
+if(location.search.indexOf("test=1")>-1){
+  const A=(c,m)=>{ if(!c) throw new Error("FAIL: "+m); console.log("ok:",m); };
+  const back=JSON.parse(JSON.stringify(P));
+
+  // ── санауыш тек ҚАБЫЛДАНҒАН ағашты санайды ──
+  P.mine=[]; A(total()===BASE && mine()===0,"бос күйде санауыш науқанның базасын көрсетеді");
+  P.mine=[{ts:Date.now(),img:null,place:"Аула",note:"",status:"wait"}];
+  A(total()===BASE,"тексерілуде тұрған сурет санауышқа кірмейді");
+  A(clanTotal()===BASE_CLAN && cityTotal()===BASE_CITY,"клан мен қала да өспейді");
+  P.mine[0].status="ok";
+  A(total()===BASE+1 && clanTotal()===BASE_CLAN+1 && cityTotal()===BASE_CITY+1,
+    "қабылданған соң үшеуі де бірге өседі");
+  P.mine[0].status="no";
+  A(total()===BASE,"қабылданбаған сурет санауышты өсірмейді");
+
+  // ── «осы аптада»: ескі ағаш кірмейді ──
+  const now=Date.now();
+  P.mine=[{ts:now,img:null,place:"Аула",note:"",status:"ok"},
+          {ts:now-8*864e5,img:null,place:"Аула",note:"",status:"ok"}];
+  A(weekTotal(now)===BASE_WEEK+1,"аптаға тек соңғы 7 тәуліктегі ағаш кіреді");
+
+  // ── бүлінген жазба санауышты бұзбайды ──
+  A(!validTree(null) && !validTree({}) && !validTree({ts:1,status:"ok",place:"Марс"}),
+    "жарамсыз жазба сүзіледі: бос, толымсыз, бөгде орын");
+  A(validTree({ts:1,status:"ok",place:"Аула"}),"дұрыс жазба өтеді");
+
+  // ── клан рейтингі: орын нақты санмен ауысады ──
+  P.mine=Array.from({length:12},(_,i)=>({ts:now-i,img:null,place:"Аула",note:"",status:"ok"}));
+  drawClans();
+  const first=document.querySelector(".clan").textContent;
+  A(first.indexOf("Almaty Wolves")>-1,"12 ағаштан кейін кланың бірінші орында");
+  A(document.getElementById("clan-more").textContent.indexOf("бірінші")>-1,
+    "бірінші орында «жоғарыға дейін N» жазылмайды");
+  P.mine=[{ts:now,img:null,place:"Аула",note:"",status:"ok"}];
+  drawClans();
+  A(/жоғарыға дейін \d+ ағаш/.test(document.getElementById("clan-more").textContent),
+    "артта тұрғанда айырма ағашпен жазылады, орын нөмірімен емес");
+
+  // ── орын тізімнен ғана таңдалады ──
+  draft={img:null,place:"Аула",note:""};
+  setPlace("Мектеп"); A(draft.place==="Мектеп","орын ауысады");
+  setPlace("Марс");   A(draft.place==="Мектеп","тізімде жоқ орын қабылданбайды");
+
+  // ── галерея: жабық емес, бірақ бөгде суретті сатпайды ──
+  P.mine=[{ts:now,img:null,place:"Аула",note:"құпия",status:"wait"}];
+  drawGal();
+  A(document.getElementById("gal").innerHTML.indexOf("құпия")<0,
+    "галереяда қолтаңба көрінбейді — тек карточканы ашқанда");
+  A(document.querySelectorAll("#gal figure").length===9,"галерея әрдайым 9 ұяшық");
+
+  // ── тексерілуде жазуы ──
+  draw(); A(!document.getElementById("pending-note").hidden,"тексерілуде тұрса — ескертпе көрінеді");
+  P.mine=[]; draw(); A(document.getElementById("pending-note").hidden,"жоқ болса — ескертпе жасырылады");
+
+  // ── жады толғанда: ағаш сақталады, сурет құрбан болады ──
+  const real=localStorage.setItem.bind(localStorage);
+  P.mine=[{ts:now,img:"data:image/jpeg;base64,AAAA",place:"Аула",note:"",status:"ok"}];
+  let calls=0;
+  localStorage.setItem=function(k,v){ if(++calls===1) throw new Error("QuotaExceeded"); return real(k,v); };
+  const okSave=save();
+  localStorage.setItem=real;
+  A(okSave===false,"квота асқанда save() сәтсіздігін жасырмайды");
+  A(P.mine.length===1 && !P.mine[0].img,"ағаш жазбасы қалады, сурет өшеді");
+
+  P=back; save(); draw();
+  console.log("%cБарлық тексеру өтті","color:#6FA53A;font-weight:700");
+}
+</script>
+</body>
+</html>
