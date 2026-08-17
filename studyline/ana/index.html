@@ -292,7 +292,16 @@ function render(){
          <div class="note rose"><span class="ic">🤍</span><div><b>Орындалды</b>
            <p>Сурет <b>тек сіздің отбасыңызға</b> көрінеді. Ешбір рейтингке,
            ешбір жалпы лентаға шықпайды.</p></div></div>
-         <button class="btn rose" type="button" onclick="openShare()">Деңгейімді көрсету</button>`
+         <button class="btn rose" type="button" onclick="openShare()">Деңгейімді көрсету</button>
+         ${w<TASKS.length
+           ? `<div class="note"><span class="ic">📅</span><div><b>${w+1}-апта дүйсенбіде ашылады</b>
+              <p>Жаңа тапсырма мен жаңа сыйлық аптасына бір рет ашылады —
+              «бүгін бәрін бітіріп тастау» деген жарыс жоқ.</p></div></div>
+              <button class="btn ghost" type="button" onclick="nextWeek()">
+                Прототип: келесі аптаны көру</button>`
+           : `<div class="note"><span class="ic">🏁</span><div><b>Барлық апта өтілді</b>
+              <p>Алты тапсырма да орындалды. Прототипте одан әрі апта жоқ —
+              нақты нұсқада олар жыл бойы жалғасады.</p></div></div>`}`
       : `${ph?`<div class="preview"><img src="${ph}" alt=""></div>`:""}
          <button class="btn" type="button" onclick="document.getElementById('file').click()">
            ${ph?"Басқа сурет таңдау":"📷 Сурет жүктеу"}</button>
@@ -372,6 +381,15 @@ function completeTask(){
   const before=level();
   P.done.push(P.week); P.xp+=100; save(); render();
   if(level()>before) openLevelUp(); else toast("Тапсырма орындалды · +100 XP");
+}
+/* Прототипте апта күнтізбемен ауыспайды, сондықтан баспалдақты көрсетудің
+   жалғыз жолы — қолмен ауыстыру. Батырма «Прототип:» деп ашық жазылған,
+   өйткені демо шынайы нәрсе секілді көрінбеуі керек. */
+function nextWeek(){
+  if(P.week>=TASKS.length){ toast("Апталар бітті"); return; }
+  P.week++; save(); render();
+  document.querySelector(".scroll").scrollTop=0;
+  toast(P.week+"-апта тапсырмасы ашылды");
 }
 function openLevelUp(){
   openSheet(`
@@ -499,6 +517,16 @@ if(location.search.indexOf("test=1")>-1){
   P.photos[4]="data:image/jpeg;base64,AAAA"; completeTask();
   A(P.done.indexOf(4)>-1 && P.xp===xp0+100,"суретпен орындалады, +100 XP");
   completeTask(); A(P.xp===xp0+100,"екінші рет басқанда XP қосылмайды");
+
+  // Апта баспалдағы: орындағаннан кейін келесі аптаға жол болуы керек
+  P.week=4; P.done=[4]; P.photos={4:"data:image/jpeg;base64,AAAA"}; render();
+  A(H().indexOf("келесі аптаны көру")>-1,"орындалған соң келесі аптаға жол көрінеді");
+  nextWeek(); A(P.week===5,"апта ауысады");
+  A(document.querySelector(".task h2").textContent===TASKS[4].t,"жаңа аптаның тапсырмасы шығады");
+  P.week=TASKS.length; P.done=[TASKS.length]; P.photos={}; P.photos[TASKS.length]="data:image/gif;base64,R0lGODlhAQABAAAAACw="; render();
+  A(H().indexOf("Барлық апта өтілді")>-1,"соңғы аптада «бітті» деп жазылады");
+  A(H().indexOf("келесі аптаны көру")<0,"соңғы аптада келесіге батырма жоқ");
+  nextWeek(); A(P.week===TASKS.length,"соңғы аптадан әрі шықпайды");
 
   // Құпиялық: галереяда бөгде ештеңе жоқ, бөлісу картинкасында бала жоқ
   render();
