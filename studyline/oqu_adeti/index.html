@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1">
+<meta name="theme-color" content="#FFFFFF">
+<title>Оқу әдеті — StudyLine</title>
+<!--
+  StudyLine · Оқу әдеті — production, WebView контейнерге арналған.
+  Мост: ../bridge/studyline-bridge.js (ойындармен бірдей контракт).
+  Мазмұн: books.js. Жаңа кітап қосу үшін тек сол файлды өзгертеді.
+  Дизайн негізі: 375px (Figma study_line), контент 343, шет 16, gap 16.
+-->
+<style>
+:root{
+  /* Figma study_line-нен алынған түстер */
+  --green:#87BE4B; --green-d:#6FA53A; --green-l:#A8D46F;
+  --mint:#DFF4F1; --cream:#FDF4D8; --pink:#F5E2F9; --blue:#E2E9FD; --leaf:#EDF6E1;
+  /* --muted — ақ/қағаз фонда, --muted-c — түрлі-түсті карточкаларда.
+     --green-t — жасылдың мәтіндік нұсқасы: --green-d контрасты жетпейді. */
+  --navy:#111543; --ink:#141728; --muted:#666C7E; --muted-c:#5C6273;
+  --green-t:#4F7724; --line:#ECEEF5;
+  --bg:#FFFFFF; --card:#FFFFFF; --paper:#FBF8F1; --paper-ink:#2C2618;
+  --red:#E0574B; --gold:#E7B744;
+  --r-lg:24px; --r-md:18px; --r-sm:14px;
+  --pad:16px;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{
+  font-family:var(--font);background:#EDEFF4;color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  display:flex;align-items:center;justify-content:center;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* Пернетақтамен жүргенде фокус көрінуі керек. :focus-visible болғандықтан
+   саусақпен басқанда шықпайды — тек Tab-пен жүргенде. */
+:focus-visible{outline:3px solid var(--green-t);outline-offset:3px;border-radius:6px}
+.rzone:focus-visible{outline-offset:-8px}
+
+/* Қозғалысты азайтуды сұраған адамға анимация көрсетпейміз. */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+
+/* Сахна: телефонда бүкіл экранды алады, кең экранда 9:16 рамка */
+#stage{
+  position:relative;width:100%;height:100dvh;max-width:460px;
+  background:var(--bg);overflow:hidden;display:flex;flex-direction:column;
+}
+@media (min-width:600px) and (min-height:700px){
+  #stage{height:min(96dvh,calc(460px * 16 / 9));border-radius:28px;
+    box-shadow:0 24px 70px rgba(17,21,67,.28)}
+}
+
+/* ── көріністер ───────────────────────────────────────────── */
+.view{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
+.view.on{display:flex}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.pad{padding:0 var(--pad)}
+
+/* ── шапка ────────────────────────────────────────────────── */
+.bar{
+  display:flex;align-items:center;gap:10px;flex:none;
+  padding:calc(var(--safe-t) + 10px) var(--pad) 10px;background:var(--bg);
+}
+.ico-btn{
+  width:38px;height:38px;border-radius:12px;border:1.5px solid var(--line);
+  display:grid;place-items:center;flex:none;background:#fff;transition:transform .12s
+}
+.ico-btn:active{transform:scale(.93)}
+.bar h1{font-size:19px;font-weight:800;letter-spacing:-.4px;flex:1}
+.streak{
+  display:inline-flex;align-items:center;gap:5px;background:#FFF3E4;
+  border-radius:999px;padding:7px 12px;font-size:13.5px;font-weight:800;color:#96570C
+}
+
+/* ── герой ────────────────────────────────────────────────── */
+.hero{
+  position:relative;border-radius:var(--r-lg);overflow:hidden;
+  background:linear-gradient(135deg,var(--green-l) 0%,var(--green) 55%,var(--green-d) 100%);
+  padding:18px 18px 18px;color:var(--navy);margin-bottom:14px;isolation:isolate
+}
+.hero::after{
+  content:"";position:absolute;right:-52px;top:-52px;width:190px;height:190px;
+  border-radius:50%;background:rgba(255,255,255,.14);z-index:-1
+}
+.hero .owl{
+  position:absolute;right:-14px;bottom:-10px;width:142px;
+  pointer-events:none;filter:drop-shadow(0 6px 14px rgba(0,0,0,.18))
+}
+.hero .kicker{font-size:12.5px;font-weight:700;color:rgba(17,21,67,.78)}
+.hero h2{font-size:27px;font-weight:800;line-height:1.12;letter-spacing:-.6px;margin-top:4px}
+.hero .sub{font-size:13px;color:rgba(17,21,67,.82);margin-top:6px;max-width:60%}
+.cta{
+  display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--green-t);
+  border-radius:999px;padding:11px 12px 11px 18px;font-size:15px;font-weight:800;
+  margin-top:16px;box-shadow:0 6px 18px rgba(0,0,0,.14);transition:transform .12s
+}
+.cta:active{transform:scale(.96)}
+.cta:disabled{opacity:.5;cursor:default;transform:none}
+.cta .arw{
+  width:28px;height:28px;border-radius:50%;background:var(--green);color:var(--navy);
+  display:grid;place-items:center;font-size:15px
+}
+.hero.done{background:linear-gradient(135deg,#3FB27A,#2E9E5B)}
+
+/* ── карточкалар ──────────────────────────────────────────── */
+.card{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);
+  padding:14px;margin-bottom:12px
+}
+.sec{
+  display:flex;align-items:baseline;margin:6px 2px 10px;
+}
+.sec h3{font-size:19px;font-weight:800;letter-spacing:-.4px}
+
+.bookrow{display:flex;gap:13px;align-items:center;width:100%;text-align:left}
+/* Мұқаба — сәндік сурет: кітаптың аты қасында мәтінмен тұр. Сондықтан
+   ол DOM-да сурет элементі емес, CSS фоны — бос src мәселесі де жоқ. */
+.cov{
+  width:56px;height:78px;border-radius:10px;flex:none;
+  background:var(--line) center/cover no-repeat;
+  box-shadow:0 4px 12px rgba(17,21,67,.14)
+}
+.bookrow .t{font-size:15.5px;font-weight:800;letter-spacing:-.2px}
+.bookrow .s{font-size:12.5px;color:var(--muted);margin-top:2px}
+.pbar{height:6px;border-radius:3px;background:#EEF0F6;margin-top:9px;overflow:hidden}
+/* Ені емес, transform анимацияланады — layout қайта есептелмейді.
+   Радиусты ата-ана .pbar қиып тұр, сондықтан scaleX ештеңені бұрмаламайды. */
+.pbar i{display:block;height:100%;width:100%;background:var(--green);
+  transform-origin:left;transform:scaleX(0);transition:transform .4s cubic-bezier(.22,1,.36,1)}
+.plbl{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;color:var(--muted);margin-top:5px}
+
+.week{display:flex;gap:8px;align-items:flex-end;height:66px;margin-top:10px}
+.wk{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+.wk{position:relative}
+.wk::before{content:"";position:absolute;left:0;right:0;bottom:22px;top:0;
+  border-radius:5px;background:#F4F6FA}
+.wk i{display:block;width:100%;border-radius:5px 5px 2px 2px;background:#DDE2EE;min-height:6px;position:relative}
+.wk.on i{background:var(--green)}
+.wk small{font-size:10.5px;color:var(--muted);font-weight:700}
+
+.tiles{display:flex;gap:12px;margin-bottom:14px}
+.tile{
+  flex:1;border-radius:var(--r-md);padding:14px;text-align:left;
+  display:flex;flex-direction:column;gap:2px;transition:transform .12s
+}
+.tile:active{transform:scale(.97)}
+.tile.a{background:var(--mint)}.tile.b{background:var(--cream)}
+.tile .ti{font-size:15px;font-weight:800}
+.tile .ts{font-size:12px;color:var(--muted-c)}
+.tile img{width:44px;height:44px;object-fit:contain;margin-bottom:4px}
+
+/* ── оқушы кабинеті ───────────────────────────────────────── */
+.hm-hi{font-size:23px;font-weight:800;letter-spacing:-.5px}
+.hm-sub{font-size:13.5px;color:var(--muted);margin:5px 0 20px}
+.demo-note{font-size:12.5px;color:var(--muted);line-height:1.45;margin:0 2px 14px}
+
+/* Қолжетімсіз бөлімдер: құлып басудан БҰРЫН көрінеді, ал басу мүлде
+   жұмыс істемейді — «өлі» батырма да, алдамшы тост та болмайды. */
+.soon{pointer-events:none;position:relative}
+.soon img{opacity:.4;filter:grayscale(.65)}
+.soon::after{content:"🔒";position:absolute;right:11px;top:10px;font-size:13px;opacity:.75}
+
+.wide{border-radius:20px;padding:16px;margin-bottom:12px;position:relative;
+  display:flex;align-items:center;min-height:112px}
+.wide.a{background:var(--mint)} .wide.b{background:var(--cream)}
+.wide h4{font-size:16px;font-weight:800}
+.wide p{font-size:12.5px;color:var(--muted-c);margin-top:4px;max-width:170px;line-height:1.4}
+.chip{display:inline-block;margin-top:9px;font-size:11px;font-weight:800;color:#37766B;
+  background:#F2FBF9;border-radius:999px;padding:5px 10px}
+.wide.b .chip{color:#8C6913;background:#FEFAEF}
+.wide img{position:absolute;right:14px;bottom:10px;width:92px;height:92px;object-fit:contain}
+
+.trio{display:flex;gap:9px}
+.mini{flex:1;min-width:0;border-radius:var(--r-md);padding:12px 10px 13px;
+  display:flex;flex-direction:column;align-items:flex-start;
+  text-align:left;transition:transform .12s ease;position:relative}
+.mini:active{transform:scale(.96)}
+.mini.checkup{background:var(--pink)}
+.mini.oqu{background:var(--leaf)}
+.mini.english{background:var(--blue)}
+.mini img{width:44px;height:44px;object-fit:contain;margin-bottom:8px}
+.mini .t{font-size:13px;font-weight:800;line-height:1.2;letter-spacing:-.2px}
+.mini .s{font-size:10.5px;color:var(--muted-c);margin-top:3px;line-height:1.25}
+.mini .dot{display:none;width:7px;height:7px;border-radius:50%;background:var(--green);
+  position:absolute;top:11px;right:11px}
+.mini.new .dot{display:block}
+
+.dark{background:var(--navy);border-radius:20px;padding:16px;color:#fff;margin-top:12px}
+.dark .k{font-size:12.5px;color:#A9B2E0;font-weight:700}
+.dark .row{display:flex;gap:22px;margin-top:10px;align-items:baseline}
+.dark b{font-size:30px;font-weight:800}
+.dark small{font-size:12.5px;color:#C6CCEC;margin-left:6px}
+
+/* ── кітапхана ────────────────────────────────────────────── */
+.shelf{margin-bottom:18px}
+.shelf h4{font-size:15px;font-weight:800;margin:0 2px 10px;display:flex;align-items:baseline}
+.shelf h4 span{margin-left:auto;font-size:12px;color:var(--muted);font-weight:700}
+.strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.bcard{flex:0 0 112px;text-align:left;transition:transform .12s}
+.bcard:active{transform:scale(.96)}
+.bcard img{width:112px;height:158px;border-radius:12px;object-fit:cover;
+  box-shadow:0 6px 16px rgba(17,21,67,.16);background:var(--line)}
+.bcard .t{font-size:13px;font-weight:800;margin-top:8px;line-height:1.25}
+.bcard .d{font-size:11px;color:var(--muted);margin-top:2px}
+.bcard .badge{display:inline-block;margin-top:6px;font-size:10.5px;font-weight:800;
+  color:var(--green-t);background:#F0F8E6;border-radius:999px;padding:3px 8px}
+.bcard .badge.on{color:var(--navy);background:var(--green)}
+
+/* ── кітап беті ───────────────────────────────────────────── */
+.bhero{padding:0 var(--pad) 16px;display:flex;gap:16px;align-items:flex-end}
+.bhero .cov-lg{width:110px;height:156px;border-radius:14px;flex:none;
+  background:var(--line) center/cover no-repeat;
+  box-shadow:0 10px 26px rgba(17,21,67,.22)}
+.bhero h2{font-size:22px;font-weight:800;line-height:1.15;letter-spacing:-.5px}
+.bhero .au{font-size:12.5px;color:var(--muted);margin-top:5px}
+.facts{display:flex;gap:10px;margin-bottom:14px}
+.fact{flex:1;background:#F7F8FC;border-radius:var(--r-sm);padding:12px 8px;text-align:center}
+.fact b{display:block;font-size:18px;font-weight:800}
+.fact small{font-size:10.5px;color:var(--muted)}
+.about{font-size:14px;line-height:1.6;color:#3A4056}
+
+.btn{
+  display:block;width:100%;border-radius:16px;padding:15px;font-size:16px;font-weight:800;
+  text-align:center;transition:transform .12s
+}
+.btn:active{transform:scale(.975)}
+.btn.p{background:var(--green);color:var(--navy);box-shadow:0 8px 20px rgba(135,190,75,.4)}
+.btn.g{background:#F2F4F9;color:#4A5163}
+
+/* ── оқырман ──────────────────────────────────────────────── */
+#reader{background:var(--paper)}
+.rtop{flex:none;padding:calc(var(--safe-t) + 14px) var(--pad) 0;position:relative;z-index:4}
+.rline{height:3px;border-radius:2px;background:#E7DECD;overflow:hidden}
+.rline i{display:block;height:100%;width:100%;background:var(--green);
+  transform-origin:left;transform:scaleX(0);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.rx{
+  position:absolute;right:10px;top:calc(var(--safe-t) + 24px);width:34px;height:34px;
+  border-radius:50%;background:rgba(44,38,24,.07);display:grid;place-items:center;
+  font-size:17px;color:#6B6252;z-index:5
+}
+/* тостқа арналған орын — сондықтан ол мәтінді ешқашан жаппайды */
+.rpage{
+  flex:1;overflow-y:auto;padding:64px 22px 12px;font-size:17px;line-height:1.85;
+  color:var(--paper-ink);font-family:Georgia,"Times New Roman",serif;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain
+}
+.rpage p{margin-bottom:15px;white-space:pre-line}
+.rfoot{flex:none;padding:8px 22px calc(var(--safe-b) + 14px);
+  display:flex;justify-content:space-between;font-size:12px;color:#726751;font-weight:700}
+.rzone{position:absolute;top:56px;bottom:52px;width:32%;z-index:2}
+.rzone.l{left:0}.rzone.r{right:0}
+
+#toast{
+  position:absolute;left:12px;right:12px;top:calc(var(--safe-t) + 18px);
+  border-radius:15px;padding:12px 15px;display:flex;align-items:center;gap:10px;
+  font-size:13.5px;font-weight:800;background:#fff;color:var(--ink);
+  box-shadow:0 12px 30px rgba(17,21,67,.2);z-index:6;
+  transform:translateY(-140%);transition:transform .34s cubic-bezier(.22,1,.36,1)
+}
+#toast.show{transform:translateY(0)}
+#toast.ok{background:var(--green);color:var(--navy)}
+#toast.fire{background:linear-gradient(135deg,#FF8A3D,var(--gold));color:#3A2200}
+
+/* ── қадамдар ─────────────────────────────────────────────── */
+.step{display:flex;gap:12px;margin-bottom:10px}
+.rail{flex:0 0 36px;display:flex;flex-direction:column;align-items:center}
+.num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+  font-weight:800;font-size:14px;flex:none;background:#E5E9F3;color:#5A6172}
+.step.done .num{background:var(--green);color:var(--navy)}
+.step.now .num{background:#FF8A3D;color:var(--navy);box-shadow:0 0 0 4px rgba(255,138,61,.18)}
+.vl{flex:1;width:3px;background:var(--line);margin:4px 0;border-radius:2px}
+.step.done .vl{background:var(--green-l)}
+.sb{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:12px 13px}
+.step.now .sb{border-color:#FFD9BE;background:#FFFBF7}
+.sb .t{display:flex;align-items:center;gap:8px}
+.sb h5{font-size:14.5px;font-weight:800}
+.pg{margin-left:auto;font-size:11px;font-weight:800;color:var(--green-t);
+  background:#F0F8E6;border-radius:999px;padding:4px 9px;white-space:nowrap}
+.step.lock .pg{background:#F1F3F9;color:#61687C}
+.sb .m{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+
+/* ── күн экраны / финал ───────────────────────────────────── */
+.full{
+  position:absolute;inset:0;z-index:20;display:none;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:calc(var(--safe-t) + 24px) 24px calc(var(--safe-b) + 24px);color:#fff
+}
+.full.on{display:flex}
+#dayDone{background:linear-gradient(160deg,#3FB27A,#2E9E5B)}
+#finale{background:linear-gradient(165deg,#1B2350,#3A2F86)}
+.seal{width:104px;height:104px;border-radius:50%;background:rgba(255,255,255,.16);
+  border:2px solid rgba(255,255,255,.32);display:grid;place-items:center;margin-bottom:18px}
+.seal img{width:66px}
+.full h2{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.full p{font-size:14.5px;color:rgba(255,255,255,.88);margin-top:8px;max-width:290px}
+.pills{display:flex;gap:10px;margin-top:24px;width:100%;max-width:330px}
+.pill{flex:1;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.22);
+  border-radius:15px;padding:12px 6px}
+.pill b{display:block;font-size:19px;font-weight:800}
+.pill small{font-size:10.5px;color:rgba(255,255,255,.82)}
+.acts{width:100%;max-width:330px;margin-top:26px;display:flex;flex-direction:column;gap:10px}
+.acts .a1{background:#fff;color:#2E9E5B;font-weight:800;padding:15px;border-radius:16px;font-size:16px}
+#finale .acts .a1{color:#3A2F86}
+.acts .a2{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);
+  color:#fff;font-weight:700;padding:14px;border-radius:16px;font-size:15px}
+
+.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* ── Серия под угрозой + вечернее напоминание ──────────────────────────
+   Самый дешёвый рычаг удержания: цепочку дней жалко терять, но ребёнок
+   узнаёт о риске только когда она уже оборвалась. Вечером — предупреждаем. */
+.risk{display:flex;gap:11px;align-items:flex-start;background:#FFF4E0;border:1px solid #F0D79B;
+  border-radius:16px;padding:13px 14px;margin-bottom:14px}
+.risk .ic{font-size:20px;line-height:1.2;flex:none}
+.risk b{display:block;font-size:14px;font-weight:850;color:#5E4A0E;margin-bottom:2px}
+.risk p{font-size:12.5px;line-height:1.4;font-weight:650;color:#7A6320}
+.bell{margin-left:auto;border:0;background:transparent;font:inherit;font-size:20px;
+  padding:6px 4px;line-height:1;opacity:.55}
+.bell.on{opacity:1}
+
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- ═══ ОҚУШЫ КАБИНЕТІ ═══ -->
+  <section class="view on" id="home">
+    <div class="scroll pad" style="padding-top:calc(var(--safe-t) + 22px)">
+      <h1 class="hm-hi" id="hi">Сәлем!</h1>
+      <div class="hm-sub">Бүгін не істейміз?</div>
+
+      <div class="sec"><h3>Қосымша</h3></div>
+      <p class="demo-note">Бұл — демо нұсқа. Қазір тек «Оқу әдеті» бөлімі жұмыс істейді.</p>
+
+      <div class="wide a soon">
+        <div>
+          <h4>Барлық пәндер</h4>
+          <p>Барлық сабақтар мен тақырыптарға қолжетімділік</p>
+          <span class="chip">12 пән</span>
+        </div>
+        <img src="assets/icon_english.png" alt="">
+      </div>
+
+      <div class="wide b soon">
+        <div>
+          <h4>Практикалық тесттер</h4>
+          <p>Білімді тексер, емтиханға дайындал</p>
+          <span class="chip">120+ тест</span>
+        </div>
+        <img src="assets/icon_checkup.png" alt="">
+      </div>
+
+      <div class="trio">
+        <button class="mini checkup soon" disabled>
+          <img src="assets/icon_checkup.png" alt="">
+          <span class="t">Чекап</span>
+          <span class="s">Білімді тексер</span>
+        </button>
+        <button class="mini oqu" id="tileOqu">
+          <span class="dot"></span>
+          <img src="assets/icon_oqu.png" alt="">
+          <span class="t">Оқу әдеті</span>
+          <span class="s" id="oquSub">—</span>
+        </button>
+        <button class="mini english soon" disabled>
+          <img src="assets/icon_english.png" alt="">
+          <span class="t">English start</span>
+          <span class="s">Ағылшын тілі</span>
+        </button>
+      </div>
+
+      <div class="dark">
+        <div class="k">↗ Сенің прогресің</div>
+        <div class="row">
+          <span><b id="hmStreak">0</b><small>күн қатарынан</small></span>
+          <span><b id="hmTotal">0</b><small>бет оқылды</small></span>
+        </div>
+      </div>
+      <div style="height:24px"></div>
+    </div>
+  </section>
+
+  <!-- ═══ ХАБ ═══ -->
+  <section class="view" id="hub">
+    <div class="bar">
+      <button class="ico-btn nav-back" id="btnExit" aria-label="Артқа">‹</button>
+      <h1>Оқу әдеті</h1>
+      <div class="streak" id="streakChip">🔥 0 күн</div>
+      <button class="bell" id="btnBell" type="button" aria-label="Кешкі еске салғыш">🔔</button>
+    </div>
+    <div class="scroll pad">
+      <div class="risk" id="riskBox" hidden>
+        <span class="ic">🔥</span>
+        <div><b id="riskTitle">Серияң бүгін үзіледі</b>
+        <p id="riskSub">Бүгін оқығаныңды белгілемедің. Бір бет те есептеледі.</p></div>
+      </div>
+      <div class="hero" id="hero">
+        <img class="owl" src="assets/hero_owl.png" alt="">
+        <div class="kicker" id="heroKicker">Бүгінгі мақсат</div>
+        <h2 id="heroTitle">4 бет оқы</h2>
+        <div class="sub" id="heroSub">Бүгін тағы 4 бет — және мақсат орындалады.</div>
+        <button class="cta" id="btnRead">
+          <span id="ctaLabel">Оқуды бастау</span><span class="arw">›</span>
+        </button>
+      </div>
+
+      <div class="card" id="curCard">
+        <button class="bookrow" id="curBook">
+          <div class="cov" id="curCov"></div>
+          <div style="flex:1;min-width:0">
+            <div class="t" id="curTitle">—</div>
+            <div class="s" id="curShelf">—</div>
+            <div class="pbar"><i id="curBar"></i></div>
+            <div class="plbl"><span id="curPage">—</span><span id="curPct">0%</span></div>
+          </div>
+        </button>
+      </div>
+
+      <div class="card">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:var(--muted)">
+          АПТА БОЙЫНША БЕТТЕР</div>
+        <div class="week" id="week"></div>
+      </div>
+
+      <div class="tiles">
+        <button class="tile a" id="btnLib">
+          <img src="assets/icon_english.png" alt="">
+          <span class="ti">Кітапхана</span>
+          <span class="ts" id="libCount">—</span>
+        </button>
+        <button class="tile b" id="btnSteps">
+          <img src="assets/icon_oqu.png" alt="">
+          <span class="ti">10 қадам</span>
+          <span class="ts" id="stepLbl">—</span>
+        </button>
+      </div>
+      <div class="card" id="taskCard">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:var(--muted)">
+          ОСЫ ҚАДАМНЫҢ ТАПСЫРМАСЫ</div>
+        <div id="taskTxt" style="font-size:15px;font-weight:700;margin-top:8px;line-height:1.45">—</div>
+        <div style="font-size:12.5px;color:var(--muted);margin-top:8px">
+          Міндетті емес. Келесі қадамға өту үшін оқыған да жеткілікті.</div>
+      </div>
+      <div style="height:20px"></div>
+    </div>
+  </section>
+
+  <!-- ═══ КІТАПХАНА ═══ -->
+  <section class="view" id="library">
+    <div class="bar">
+      <button class="ico-btn nav-back" aria-label="Артқа">‹</button>
+      <h1>Кітапхана</h1>
+    </div>
+    <div class="scroll pad" id="shelves"></div>
+  </section>
+
+  <!-- ═══ КІТАП ═══ -->
+  <section class="view" id="book">
+    <div class="bar">
+      <button class="ico-btn nav-back" aria-label="Артқа">‹</button>
+      <h1></h1>
+    </div>
+    <div class="scroll">
+      <div class="bhero">
+        <div class="cov-lg" id="bkCov"></div>
+        <div><h2 id="bkTitle">—</h2><div class="au" id="bkAuthor">—</div></div>
+      </div>
+      <div class="pad">
+        <div class="facts">
+          <div class="fact"><b id="bkPages">—</b><small>бет</small></div>
+          <div class="fact"><b id="bkDays">—</b><small>күн</small></div>
+          <div class="fact"><b id="bkRead">—</b><small>оқылды</small></div>
+        </div>
+        <div class="card"><div class="about" id="bkAbout">—</div></div>
+        <button class="btn p" id="bkStart">Оқуды бастау</button>
+        <div style="height:24px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ҚАДАМДАР ═══ -->
+  <section class="view" id="steps">
+    <div class="bar">
+      <button class="ico-btn nav-back" aria-label="Артқа">‹</button>
+      <h1>10 қадам</h1>
+    </div>
+    <div class="scroll pad" id="stepList"></div>
+  </section>
+
+  <!-- ═══ ОҚЫРМАН ═══ -->
+  <section class="view" id="reader">
+    <div class="rtop"><div class="rline"><i id="rBar"></i></div></div>
+    <button class="rx" id="rClose" aria-label="Жабу">✕</button>
+    <div class="rpage" id="rPage"></div>
+    <div class="rfoot"><span id="rNum">—</span><span id="rBook">—</span></div>
+    <button class="rzone l" id="rPrev" aria-label="Алдыңғы бет"></button>
+    <button class="rzone r" id="rNext" aria-label="Келесі бет"></button>
+    <div id="toast"><span id="toastIco">✓</span><span id="toastTxt"></span></div>
+  </section>
+
+  <!-- ═══ КҮН ЭКРАНЫ ═══ -->
+  <div class="full" id="dayDone">
+    <div class="seal"><img src="assets/icon_oqu.png" alt=""></div>
+    <h2>Бүгінгі мақсат орындалды</h2>
+    <p id="ddSub">—</p>
+    <div class="pills">
+      <div class="pill"><b id="ddPages">0</b><small>бүгін оқыдың</small></div>
+      <div class="pill"><b id="ddStreak">0</b><small>күн қатарынан</small></div>
+      <div class="pill"><b id="ddTotal">0</b><small>барлығы</small></div>
+    </div>
+    <div class="acts">
+      <button class="a1" id="ddMore">Жалғастыру</button>
+      <button class="a2" id="ddClose">Дайын</button>
+    </div>
+  </div>
+
+  <!-- ═══ ФИНАЛ ═══ -->
+  <div class="full" id="finale">
+    <div class="seal"><img src="assets/icon_oqu.png" alt=""></div>
+    <h2>Әдет қалыптасты</h2>
+    <p>39 күн бойы оқыдың. Енді бұл — сенің әдетің.</p>
+    <div class="pills">
+      <div class="pill"><b id="fnDays">39</b><small>күн</small></div>
+      <div class="pill"><b id="fnPages">210</b><small>бет</small></div>
+      <div class="pill"><b id="fnBooks">0</b><small>кітап</small></div>
+    </div>
+    <div class="acts">
+      <button class="a1" id="fnOk">Кітапханаға өту</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="../bridge/studyline-bridge.js"></script>
+<script src="books.js"></script>
+<script>
+'use strict';
+(function () {
+
+/* ── тұрақтылар ───────────────────────────────────────────────────────── */
+var STEPS = [
+  { pages:1,  days:4, task:'Оқығаныңды бір сөйлеммен айтып бер' },
+  { pages:2,  days:4, task:'Ұнаған кейіпкерді сурет салып көрсет' },
+  { pages:3,  days:4, task:'Үш жаңа сөзді жаттап, мағынасын айт' },
+  { pages:4,  days:4, task:'Оқыған оқиғаны өз сөзіңмен айтып бер' },
+  { pages:5,  days:4, task:'Ұнаған сөйлемді дәптерге жаз' },
+  { pages:6,  days:4, task:'Кейіпкерге хат жаз' },
+  { pages:7,  days:4, task:'Оқиғаның жалғасын ойлап тап' },
+  { pages:8,  days:4, task:'Досыңа кітапты ұсын — неге екенін айт' },
+  { pages:9,  days:4, task:'Кітап бойынша үш сұрақ құрастыр' },
+  { pages:10, days:3, task:'Куратормен әңгіме — әдет туралы' }
+];
+/* Бетте кемінде осынша секунд болмаса, бет есептелмейді.
+   Мақсаты — парақтап шығуды нормаға жаздырмау. Балаға ескерту жазылмайды. */
+var READ_MIN_SEC = 20;
+var TOAST_EVERY  = 4;   // тосттар арасындағы ең аз бет саны
+var TOAST_MAX    = 3;   // бір сессияға
+
+/* ── мост және пайдаланушы ────────────────────────────────────────────── */
+var SL = window.SL || { init:function(){}, ready:function(){}, progress:function(){},
+                        finish:function(){}, close:function(){}, user:{}, isInApp:false };
+SL.init({ game:'oqu_adeti' });
+var UID = (SL.user && SL.user.id) || 'guest';
+
+/* ── күй ──────────────────────────────────────────────────────────────── */
+var KEY = 'sl_oqu_' + UID;
+var S;
+
+function today(){ var d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function pad(n){ return n<10 ? '0'+n : ''+n; }
+
+function blank(){
+  return { step:1, dayInStep:0, streak:0, best:0, total:0,
+           days:{}, books:{}, current:null, toasts:{}, startedAt:today(), finished:false };
+}
+function load(){
+  try { S = JSON.parse(localStorage.getItem(KEY)) || blank(); }
+  catch(e){ S = blank(); }
+  if (!S.books) S = blank();
+  return S;
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+function goal(){ return STEPS[Math.min(S.step,10)-1].pages; }
+function todayPages(){ return S.days[today()] || 0; }
+function bookState(id){
+  if (!S.books[id]) S.books[id] = { page:0, done:false };
+  return S.books[id];
+}
+function booksDone(){ var n=0; for (var k in S.books) if (S.books[k].done) n++; return n; }
+
+/* ── көріністерді ауыстыру ────────────────────────────────────────────── */
+/* Қосымшаның ішінде оқушы кабинеті бұрыннан бар — екіншісін көрсетпейміз.
+   Сілтемемен ашылғанда түбір — кабинет (#home), қосымшада — хаб (#hub). */
+var ROOT  = SL.isInApp ? 'hub' : 'home';
+var stack = [ROOT];
+function show(id){
+  var v = document.getElementById(id);
+  if (!v) return;
+  [].forEach.call(document.querySelectorAll('.view'), function(el){ el.classList.remove('on'); });
+  v.classList.add('on');
+  var sc = v.querySelector('.scroll'); if (sc) sc.scrollTop = 0;
+}
+function go(id){ if (stack[stack.length-1] !== id) stack.push(id); show(id); render(id); }
+
+/* Ашық толық экран (оверлей) бар болса — «артқа» алдымен соны жабады. */
+function closeFull(){
+  var el = document.querySelector('.full.on');
+  if (!el) return false;
+  el.classList.remove('on');
+  return true;
+}
+function back(){
+  if (closeFull()) return;
+  if (stack.length <= 1) { SL.close(); return; }   // түбір — қосымшаға шығу
+  stack.pop();
+  var id = stack[stack.length-1];
+  show(id); render(id);
+}
+/* Оқырманнан шығудың жалғыз нүктесі — қайда кірсе, сонда қайтарады. */
+function exitReader(){ if (stack[stack.length-1] === 'reader') back(); }
+
+/* ── кітаптар ─────────────────────────────────────────────────────────── */
+var BOOKS = window.BOOKS || [];
+function byId(id){ for (var i=0;i<BOOKS.length;i++) if (BOOKS[i].id===id) return BOOKS[i]; return null; }
+/* Ағымдағы кітап. Барлығы оқылып біткен болса — null (оқылған кітапты
+   «ағымдағы» деп көрсетпейміз, әйтпесе хабта бітken кітап тұрып қалады). */
+function current(){
+  if (!S.current || !byId(S.current) || bookState(S.current).done) {
+    var next = null;
+    for (var i=0;i<BOOKS.length;i++) if (!bookState(BOOKS[i].id).done) { next = BOOKS[i]; break; }
+    S.current = next ? next.id : null;
+  }
+  return S.current ? byId(S.current) : null;
+}
+
+/* ── рендер ───────────────────────────────────────────────────────────── */
+var shownBook = null;
+function openBook(b){ shownBook = b; go('book'); }
+
+function render(id){
+  if (id==='home')    renderHome();
+  if (id==='hub')     renderHub();
+  if (id==='library') renderLibrary();
+  if (id==='book')    renderBook(shownBook);
+  if (id==='steps')   renderSteps();
+}
+
+/* ── оқушы кабинеті ───────────────────────────────────────────────────── */
+function renderHome(){
+  var name = (SL.user && SL.user.name) || '';
+  document.getElementById('hi').textContent = name ? 'Сәлем, ' + name + '!' : 'Сәлем!';
+
+  /* Плиткадағы жазу — қадамның толық нормасы, қалдығы емес. */
+  document.getElementById('oquSub').textContent =
+    !BOOKS.length ? 'Жүктелмеді'
+    : todayPages() >= goal() ? 'Бүгін бітті ✓'
+    : goal() + ' бет бүгін';
+
+  /* Жасыл нүкте «жаңа» дегенді білдіреді — бір рет ашқаннан кейін сөнеді. */
+  document.getElementById('tileOqu').classList.toggle('new', !S.seenOqu);
+
+  document.getElementById('hmStreak').textContent = S.streak;
+  document.getElementById('hmTotal').textContent  = S.total;
+}
+
+function renderHub(){
+  renderRisk(); renderBell();
+  var g = goal(), tp = todayPages(), left = Math.max(0, g - tp), done = left === 0;
+  var b = current();
+  document.getElementById('streakChip').textContent = '🔥 ' + S.streak + ' күн';
+
+  var hero = document.getElementById('hero');
+  hero.classList.toggle('done', done);
+  document.getElementById('heroKicker').textContent = done ? 'Бүгін бітті' : 'Бүгінгі мақсат';
+  document.getElementById('heroTitle').textContent  =
+      !b ? 'Кітаптар бітті' : done ? 'Мақсат орындалды' : left + ' бет оқы';
+  document.getElementById('heroSub').textContent    = !b
+      ? 'Барлық кітап оқылды. Жаңалары жақында.'
+      : done ? 'Бүгін ' + tp + ' бет оқыдың. Қаласаң, жалғастыр.'
+      : (tp > 0 ? 'Бүгін ' + tp + ' бет оқыдың. Тағы ' + left + ' бет қалды.'
+                : S.step + '-қадамдасың. Күніне ' + g + ' бет.');
+  document.getElementById('ctaLabel').textContent = tp > 0 ? 'Жалғастыру' : 'Оқуды бастау';
+  document.getElementById('btnRead').disabled = !b;
+
+  /* Кітап жоқ болса — бүкіл картаны жасырамыз, әйтпесе бос жақтау қалады. */
+  var row = document.getElementById('curCard');
+  if (b) {
+    row.style.display = '';
+    var st = bookState(b.id);
+    var pct = st.done ? 100 : Math.round(st.page / b.pages.length * 100);
+    document.getElementById('curCov').style.backgroundImage = 'url("' + b.cover + '")';
+    document.getElementById('curTitle').textContent = b.title;
+    document.getElementById('curShelf').textContent = b.shelf + ' · ' + b.pages.length + ' бет';
+    document.getElementById('curBar').style.transform = 'scaleX(' + (pct/100) + ')';
+    document.getElementById('curPage').textContent  = st.done ? 'Оқылды ✓' : (st.page + 1) + '-бет';
+    document.getElementById('curPct').textContent   = pct + '%';
+  } else { row.style.display = 'none'; }
+
+  /* апталық баған: соңғы 7 күн */
+  var wk = document.getElementById('week'); wk.innerHTML = '';
+  var days = lastWeek(), max = Math.max.apply(null, days.map(function(d){ return d.v; }).concat([1]));
+  days.forEach(function(d){
+    var el = document.createElement('div');
+    el.className = 'wk' + (d.now ? ' on' : '');
+    el.innerHTML = '<i style="height:' + Math.max(4, Math.round(d.v/max*100)) + '%"></i>' +
+                   '<small>' + d.l + '</small>';
+    wk.appendChild(el);
+  });
+
+  document.getElementById('taskTxt').textContent = STEPS[Math.min(S.step,10)-1].task;
+  document.getElementById('libCount').textContent = BOOKS.length + ' кітап';
+  document.getElementById('stepLbl').textContent  = S.step + '-қадам';
+}
+
+/* Соңғы 7 күн — тақырып «АПТА БОЙЫНША БЕТТЕР» дәл соны уәде етеді. */
+var DOW = ['Жк','Дс','Сс','Ср','Бс','Жм','Сн'];
+function lastWeek(){
+  var out = [];
+  for (var i = 6; i >= 0; i--){
+    var d = new Date(Date.now() - i*86400000);
+    var k = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+    out.push({ v: S.days[k] || 0, l: DOW[d.getDay()], now: i === 0 });
+  }
+  return out;
+}
+
+function renderLibrary(){
+  var host = document.getElementById('shelves'); host.innerHTML = '';
+  if (!BOOKS.length){ host.innerHTML = '<div class="empty">Кітапхана әзірге бос.</div>'; return; }
+  var groups = {}, order = [];
+  BOOKS.forEach(function(b){
+    var k = bookState(b.id).done ? 'Оқылған' : b.shelf;
+    if (!groups[k]) { groups[k] = []; order.push(k); }
+    groups[k].push(b);
+  });
+  order.forEach(function(name){
+    var sh = document.createElement('div'); sh.className = 'shelf';
+    var strip = '';
+    groups[name].forEach(function(b){
+      var st = bookState(b.id);
+      var days = Math.max(1, Math.ceil(b.pages.length / goal()));
+      var badge = st.done ? '<span class="badge">бітті</span>'
+                : st.page > 0 ? '<span class="badge on">жалғасы</span>'
+                : '<span class="badge">' + days + ' күн</span>';
+      strip += '<button class="bcard" data-book="' + b.id + '">' +
+               '<img src="' + b.cover + '" alt="">' +
+               '<div class="t">' + esc(b.title) + '</div>' +
+               '<div class="d">' + b.pages.length + ' бет</div>' + badge + '</button>';
+    });
+    sh.innerHTML = '<h4>' + esc(name) + '<span>' + groups[name].length + '</span></h4>' +
+                   '<div class="strip">' + strip + '</div>';
+    host.appendChild(sh);
+  });
+  if (!current()) host.insertAdjacentHTML('beforeend',
+    '<div class="empty">Барлық кітап оқылды. Жаңалары жақында.</div>');
+  host.insertAdjacentHTML('beforeend', '<div style="height:20px"></div>');
+}
+
+function renderBook(b){
+  if (!b) return;
+  var st = bookState(b.id);
+  document.getElementById('bkCov').style.backgroundImage = 'url("' + b.cover + '")';
+  document.getElementById('bkTitle').textContent  = b.title;
+  document.getElementById('bkAuthor').textContent = b.author;
+  document.getElementById('bkPages').textContent  = b.pages.length;
+  document.getElementById('bkDays').textContent   = Math.max(1, Math.ceil(b.pages.length/goal()));
+  document.getElementById('bkRead').textContent   = st.done ? b.pages.length : st.page;
+  document.getElementById('bkAbout').textContent  = b.about;
+  document.getElementById('bkStart').textContent  =
+    st.done ? 'Қайта оқу' : (st.page > 0 ? 'Жалғастыру · ' + (st.page+1) + '-бет' : 'Оқуды бастау');
+  document.getElementById('bkStart').onclick = function(){
+    S.current = b.id; save(); openReader(b, st.done ? 0 : st.page);
+  };
+  document.getElementById('book').querySelector('.bar h1').textContent = b.title;
+}
+
+function renderSteps(){
+  var host = document.getElementById('stepList'); host.innerHTML = '';
+  STEPS.forEach(function(s, i){
+    var n = i + 1;
+    var over = n < S.step || (n === 10 && S.finished);
+    var cls = over ? 'done' : (n === S.step ? 'now' : 'lock');
+    var meta = over ? 'Аяқталды ✓'
+             : n === S.step ? S.dayInStep + '/' + s.days + ' күн орындалды. Тапсырма: ' + s.task +
+                              ' <b style="color:var(--muted);font-weight:700">Міндетті емес.</b>'
+             : '🔒 Тапсырма: ' + s.task;
+    var d = document.createElement('div');
+    d.className = 'step ' + cls;
+    d.innerHTML = '<div class="rail"><div class="num">' + (n===10 ? '★' : n) + '</div>' +
+                  (n<10 ? '<div class="vl"></div>' : '') + '</div>' +
+                  '<div class="sb"><div class="t"><h5>' + n + '-қадам' +
+                  (n===S.step ? ' · қазір' : '') + '</h5>' +
+                  '<span class="pg">' + s.pages + ' бет × ' + s.days + ' күн</span></div>' +
+                  '<div class="m">' + meta + '</div></div>';
+    host.appendChild(d);
+  });
+  host.insertAdjacentHTML('beforeend', '<div style="height:20px"></div>');
+}
+
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+/* ── оқырман ──────────────────────────────────────────────────────────── */
+var R = { book:null, idx:0, since:0, counted:false, toastsShown:0, sincePages:0, sessionPages:0 };
+
+function openReader(book, page){
+  var b = book || current(); if (!b) return;
+  R.book = b;
+  R.idx = Math.min(typeof page === 'number' ? page : bookState(b.id).page, b.pages.length - 1);
+  R.toastsShown = 0; R.sincePages = TOAST_EVERY; R.sessionPages = 0;
+  go('reader');
+  paint();
+  SL.progress({ event:'reader_open', book:b.id, page:R.idx });
+}
+
+function paint(){
+  var b = R.book;
+  document.getElementById('rPage').innerHTML = '<p>' + esc(b.pages[R.idx]) + '</p>';
+  document.getElementById('rPage').scrollTop = 0;
+  document.getElementById('rNum').textContent  = (R.idx + 1) + ' / ' + b.pages.length;
+  document.getElementById('rBook').textContent = b.title;
+  document.getElementById('rBar').style.transform = 'scaleX(' + ((R.idx + 1) / b.pages.length) + ')';
+  R.since = Date.now(); R.counted = false;
+}
+
+function turn(dir){
+  var b = R.book, next = R.idx + dir;
+  if (next < 0) return;
+
+  if (dir > 0) countPage();
+
+  if (next >= b.pages.length){ finishBook(); return; }
+  R.idx = next;
+  var st = bookState(b.id);
+  if (R.idx > st.page) st.page = R.idx;
+  save(); paint();
+}
+
+/* Бет тек нақты оқылса ғана есептеледі. Парақтаса — үнсіз есептелмейді. */
+function countPage(){
+  if (R.counted) return;
+  /* Бұрын оқылған бет қайта есептелмейді — әйтпесе алға-артқа парақтап
+     нормаңды шексіз көтеруге болар еді. */
+  if (R.idx < bookState(R.book.id).page) return;
+  if ((Date.now() - R.since) / 1000 < READ_MIN_SEC) return;
+  R.counted = true;
+
+  var d = today(), before = todayPages();
+  S.days[d] = before + 1;
+  S.total += 1;
+  R.sessionPages += 1; R.sincePages += 1;
+  save();
+
+  SL.progress({ event:'page', book:R.book.id, page:R.idx + 1, todayPages:S.days[d] });
+
+  var g = goal();
+  if (before + 1 === g) { completeDay(); return; }
+  pickToast();
+}
+
+function pickToast(){
+  if (R.toastsShown >= TOAST_MAX || R.sincePages < TOAST_EVERY) return;
+  var b = R.book, pct = Math.round((R.idx + 1) / b.pages.length * 100);
+  var t = null;
+  /* Рекорд туралы хабар мұнда емес — ол «күн бітті» экранында айтылады. */
+  if (pct >= 75 && pct < 100) t = { k:'p75', ico:'📖', cls:'', txt:'75%. Аз қалды.' };
+  else if (pct >= 50 && pct < 75)  t = { k:'p50', ico:'📖', cls:'', txt:'Жартысы оқылды. Күшті!' };
+  else if (pct >= 25 && pct < 50)  t = { k:'p25', ico:'📖', cls:'', txt:'Кітаптың ¼ бөлігі артта' };
+  else if (R.sessionPages === 3)   t = { k:'run', ico:'👏', cls:'', txt:'Тоқтамай оқып жатырсың' };
+  if (!t) return;
+
+  var key = b.id + ':' + t.k;
+  if (S.toasts[key]) return;
+  S.toasts[key] = 1; save();
+  toast(t.txt, t.ico, t.cls);
+}
+
+var toastTimer;
+function toast(text, ico, cls){
+  var el = document.getElementById('toast');
+  document.getElementById('toastTxt').textContent = text;
+  document.getElementById('toastIco').textContent = ico || '✓';
+  el.className = cls || '';
+  void el.offsetWidth;
+  el.classList.add('show');
+  R.toastsShown += 1; R.sincePages = 0;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2200);
+}
+
+function completeDay(){
+  var d = today();
+  if (S.lastDay === d) return;
+  var prev = S.lastDay;
+  S.lastDay = d;
+
+  var y = new Date(Date.now() - 86400000);
+  var yk = y.getFullYear() + '-' + pad(y.getMonth()+1) + '-' + pad(y.getDate());
+  S.streak = (prev === yk) ? S.streak + 1 : 1;
+  if (S.streak > S.best) S.best = S.streak;
+
+  if (!S.finished) {
+    S.dayInStep += 1;
+    if (S.dayInStep >= STEPS[S.step-1].days && S.step < 10){ S.step += 1; S.dayInStep = 0; }
+    else if (S.dayInStep >= STEPS[9].days && S.step === 10){ S.finished = true; }
+  }
+  save();
+
+  /* Шикі нәтиже қосымшаға кетеді. XP-ды бэкенд санайды, біз емес.
+     Ескерту: көпір finish-ті бір рет қана жібереді (бет жүктелген сайын).
+     Түн ортасынан кейін қосымша WebView-ды қайта жүктеуі керек. */
+  SL.finish({ goalPages:goal(), pagesToday:S.days[d], totalPages:S.total,
+              streak:S.streak, step:S.step, book:R.book ? R.book.id : null });
+
+  /* 39 күн бітті — «күн бітті» емес, финал экраны көрсетіледі. */
+  if (S.finished) { showFinale(); return; }
+
+  document.getElementById('ddSub').textContent =
+    'Бүгін ' + S.days[d] + ' бет оқыдың. ' + S.streak + '-күн қатарынан.';
+  document.getElementById('ddPages').textContent  = S.days[d];
+  document.getElementById('ddStreak').textContent = S.streak;
+  document.getElementById('ddTotal').textContent  = S.total;
+  document.getElementById('dayDone').classList.add('on');
+}
+
+function finishBook(){
+  var st = bookState(R.book.id);
+  st.done = true; st.page = R.book.pages.length - 1;
+  S.current = null; save();
+  toast('Кітап бітті!', '🎉', 'ok');
+  setTimeout(function(){
+    /* Толық экран ашық болса (күн нормасы дәл осы бетте бітті) — навигацияны
+       сол экранның батырмасы жасайды, әйтпесе екі рет артқа кетеді. */
+    if (document.querySelector('.full.on')) return;
+    /* Күн нормасы әлі бітпесе — келесі кітапты таңдау керек, хабта тұрып
+       қалмау үшін бірден кітапханаға апарамыз. */
+    if (current() && todayPages() < goal()) { stack = [ROOT, 'hub']; go('library'); return; }
+    exitReader();
+  }, 1400);
+}
+
+function showFinale(){
+  document.getElementById('fnDays').textContent  = Object.keys(S.days).length;
+  document.getElementById('fnPages').textContent = S.total;
+  document.getElementById('fnBooks').textContent = booksDone();
+  document.getElementById('finale').classList.add('on');
+}
+
+/* ── оқиғалар ─────────────────────────────────────────────────────────── */
+function on(id, fn){ var el = document.getElementById(id); if (el) el.addEventListener('click', fn); }
+
+on('tileOqu',  function(){ S.seenOqu = 1; save(); go('hub'); });
+on('btnRead',  function(){ openReader(); });
+on('btnLib',   function(){ go('library'); });
+on('btnSteps', function(){ go('steps'); });
+on('curBook',  function(){ var b = current(); if (b) openBook(b); });
+
+[].forEach.call(document.querySelectorAll('.nav-back'), function(el){
+  el.addEventListener('click', back);
+});
+
+document.getElementById('shelves').addEventListener('click', function(e){
+  var t = e.target.closest('[data-book]'); if (!t) return;
+  var b = byId(t.getAttribute('data-book')); if (b) openBook(b);
+});
+
+on('rNext',  function(){ turn(1); });
+on('rPrev',  function(){ turn(-1); });
+on('rClose', function(){ countPage(); exitReader(); });
+
+on('ddMore',  function(){ closeFull(); });
+on('ddClose', function(){ closeFull(); exitReader(); });
+/* 39 күннен кейін норма сол күйі қалады — бұл әлдеқашан «еркін оқу».
+   Бөлек режим құрмаймыз, батырма шын істейтін нәрсені атайды. */
+on('fnOk', function(){ closeFull(); stack = [ROOT]; go('library'); });
+
+/* свайп — тек оқырманда */
+(function(){
+  var x0 = null, y0 = null;
+  var page = document.getElementById('reader');
+  page.addEventListener('touchstart', function(e){
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+  }, { passive:true });
+  page.addEventListener('touchend', function(e){
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.6) turn(dx < 0 ? 1 : -1);
+    x0 = y0 = null;
+  }, { passive:true });
+})();
+
+/* аппараттық «артқа» — қосымша жіберетін оқиға */
+if (SL.on) SL.on('back', back);
+
+/* Күн ауысқанда серияны тексереміз: кеше де, бүгін де оқымаса — серия үзілген.
+   Онсыз бала бір апта оқымай келіп «🔥 5 күн» деген өтірікті көреді. */
+function rollover(){
+  if (!S.lastDay) return;
+  var y = new Date(Date.now() - 86400000);
+  var yk = y.getFullYear() + '-' + pad(y.getMonth()+1) + '-' + pad(y.getDate());
+  if (S.lastDay !== today() && S.lastDay !== yk && S.streak !== 0) { S.streak = 0; save(); }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   ЕСКЕ САЛҒЫШ. Екі бөлек нәрсе, оларды шатастырмау керек:
+
+   1) Қосымша ІШІНДЕГІ ескерту — кешкі 18:00-ден кейін, бүгін белгіленбесе
+      және серия үзілуге жақын болса, хабта сары жолақ шығады. Бұл әрдайым
+      жұмыс істейді, ешқандай рұқсат керек емес.
+
+   2) Браузер ХАБАРЛАМАСЫ — 20:00-де. Бұл прототип шектеуі: бет ашық тұрғанда
+      ғана атады. Нағыз пуш үшін сервер мен service worker керек, ол бэкендпен
+      бірге келеді. Сондықтан батырманың астында осы шындық жазылған.
+   ══════════════════════════════════════════════════════════════════════ */
+var RISK_HOUR = 18, NOTIF_HOUR = 20;
+
+/* Бүгін оқылмаған және серия жоғалатын болса — қауіп бар. hour параметрі
+   тексеру үшін: сағатты сырттан беруге болады, шынайы уақытқа тәуелді емес. */
+function streakAtRisk(hour, pages){
+  if (hour === undefined) hour = new Date().getHours();
+  if (pages === undefined) pages = todayPages();
+  return S.streak > 0 && pages === 0 && hour >= RISK_HOUR;
+}
+function renderRisk(){
+  var box = document.getElementById('riskBox');
+  if (!box) return;
+  var risk = streakAtRisk();
+  box.hidden = !risk;
+  if (risk){
+    document.getElementById('riskTitle').textContent =
+      S.streak + ' күндік серияң бүгін үзіледі';
+    document.getElementById('riskSub').textContent =
+      'Бүгін оқығаныңды белгілемедің. Бір бет те есептеледі — рекордың ' + S.best + ' күн.';
+  }
+}
+
+function bellOn(){
+  return !!S.notif && typeof Notification !== 'undefined' && Notification.permission === 'granted';
+}
+function renderBell(){
+  var b = document.getElementById('btnBell');
+  if (!b) return;
+  b.classList.toggle('on', bellOn());
+  b.setAttribute('aria-pressed', bellOn() ? 'true' : 'false');
+}
+function toggleBell(){
+  if (typeof Notification === 'undefined'){ alert('Бұл браузерде хабарлама жоқ'); return; }
+  if (bellOn()){ S.notif = false; save(); renderBell(); clearTimeout(notifT); return; }
+  if (Notification.permission === 'granted'){ S.notif = true; save(); renderBell(); scheduleNotif(); return; }
+  Notification.requestPermission().then(function(p){
+    S.notif = (p === 'granted'); save(); renderBell();
+    if (S.notif) scheduleNotif();
+  });
+}
+var notifT;
+function scheduleNotif(){
+  clearTimeout(notifT);
+  if (!bellOn()) return;
+  var now = new Date(), at = new Date();
+  at.setHours(NOTIF_HOUR, 0, 0, 0);
+  if (at <= now) at.setDate(at.getDate() + 1);
+  notifT = setTimeout(function(){
+    if (todayPages() === 0){
+      new Notification('Оқу уақыты', {
+        body: S.streak > 0 ? S.streak + ' күндік серияң бүгін үзіледі' : 'Бүгін әлі оқымадың',
+        icon: 'data:,'
+      });
+    }
+    scheduleNotif();
+  }, at - now);
+}
+
+
+/* Тексеру ілмегі. Бүкіл скрипт IIFE ішінде тұр, сондықтан smoke-тест ішке
+   кіре алмайды. Бір нүкте ашамыз — логика емес, тек оқу үшін. */
+window.__oqu = {
+  streakAtRisk: streakAtRisk,
+  bellOn: bellOn,
+  get streak(){ return S.streak; },
+  set streak(v){ S.streak = v; },
+  get best(){ return S.best; }
+};
+
+/* ── старт ────────────────────────────────────────────────────────────── */
+load();
+rollover();
+document.getElementById('btnBell').addEventListener('click', toggleBell);
+if (bellOn()) scheduleNotif();
+if (!BOOKS.length) {
+  document.getElementById('hub').querySelector('.scroll').innerHTML =
+    '<div class="empty">Кітапхана жүктелмеді. Интернетті тексеріп, қайта кіріңіз.</div>';
+} else {
+  current(); save();
+}
+show(ROOT); render(ROOT);
+SL.ready();
+
+})();
+</script>
+</body>
+</html>
