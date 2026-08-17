@@ -93,6 +93,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);
   border-radius:99px;padding:3px 8px;flex:none}
 .mem .quiet{background:var(--line);color:var(--muted);font-size:10px;font-weight:800;
   border-radius:99px;padding:3px 8px;flex:none}
+.reqbtn{flex:none;border:0;border-radius:11px;padding:9px 14px;font:inherit;
+  font-size:12.5px;font-weight:850;color:#fff}
+.reqbtn.ok{background:var(--green-t)}
 
 .btn{width:100%;border:0;border-radius:var(--r-md);background:var(--green);color:#fff;
   font:inherit;font-size:16px;font-weight:850;padding:16px;margin-top:12px;
@@ -212,6 +215,15 @@ function nameFor(m, inside){ return inside ? m.first+" "+m.last : m.first+" "+m.
    2. КҮЙ
    ══════════════════════════════════════════════════════════════ */
 let ROLE="member", STATE="normal", RESULT=null;
+/* Заявки по коду. P0-5 говорит: код — приглашение, а не ключ. Значит петля
+   должна быть видна целиком: кто-то ввёл код → у капитана появилась заявка →
+   капитан принял или отклонил. Пока это только описано словами, дизайнер
+   не увидит, что заявка вообще существует как экран. */
+let REQS=[
+  {first:"Аяулым", last:"Сәрсен", cls:"5А", city:"Алматы", ok:true},
+  {first:"Тимур",  last:"Жақсы",  cls:"6Б", city:"Алматы", ok:false, why:"басқа сынып"},
+  {first:"Айша",   last:"Нұрлан", cls:"5А", city:"Астана", ok:false, why:"басқа қала"}
+];
 const isCaptain = () => ROLE==="captain";
 
 let toastT;
@@ -306,6 +318,22 @@ function memberHTML(){
 function captainHTML(){
   const q=quietCount();
   return `
+  ${REQS.length ? `
+    <div class="sec"><h2>Кодпен кіргісі келеді</h2><span>${REQS.length}</span></div>
+    ${REQS.map((r,i)=>`
+      <div class="mem">
+        <span class="av" style="background:hsl(${(i*70+20)%360} 52% 46%)">${r.first[0]}</span>
+        <span class="t"><b>${nameFor(r,true)}</b><i>${r.cls} · ${r.city}${r.ok?"":" · "+r.why}</i></span>
+        ${r.ok
+          ? `<button class="reqbtn ok" type="button" onclick="decide(${i},true)">Қабылдау</button>`
+          : `<span class="quiet">сәйкес емес</span>`}
+      </div>`).join("")}
+    <div class="note annot"><span class="ic">🛡</span><div><b>Мұнда не жоқ</b>
+      <p>Кодты білген кез келген адам кланға өзі кіріп кете алмайды. Ал басқа
+      қаладан немесе басқа сыныптан келген сұраныс қабылдау батырмасынсыз тұр —
+      оны кездейсоқ басу мүмкін емес.</p></div></div>` : `
+    <div class="note"><span class="ic">📭</span><div><b>Жаңа сұраныс жоқ</b>
+      <p>Кодпен кіргісі келгендер осында шығады.</p></div></div>`}
   <div class="sec"><h2>Қатысушылар</h2><span>капитанға толық</span></div>
   <div id="memlist">${MEMBERS.map((m,i)=>`
     <div class="mem">
@@ -327,7 +355,16 @@ function captainHTML(){
    : `<div class="note"><span class="ic">✅</span><div><b>Бәрі белсенді</b>
       <p>Осы аптада кланның бәрі кірген.</p></div></div>`}
 
+
   <button class="btn ghost" type="button" onclick="showCode()">Кодты көрсету</button>`;
+}
+
+/* Капитан шешеді. Прототипте базаға жазбаймыз — тізімнен алып тастаймыз,
+   маңыздысы — шешім капитанда екенін көрсету. */
+function decide(i, yes){
+  const r=REQS[i]; if(!r || !r.ok) return;
+  REQS.splice(i,1); render();
+  toast(yes ? r.first+" кланға қосылды" : "Сұраныс қабылданбады");
 }
 
 /* ── P0-5: код автоматты кірмейді, капитан растайды ── */
@@ -342,6 +379,12 @@ function showCode(){
       тобына кіріп кетер еді. Сондықтан код — шақыру, кілт емес.</p></div></div>
     <div class="note"><span class="ic">📍</span><div><b>Қосымша шек</b>
       <p>Код тек ${CLAN.city} қаласындағы ${CLAN.cls} сыныбының оқушыларына жарайды.</p></div></div>
+    ${isCaptain()
+      ? `<div class="note"><span class="ic">📬</span><div><b>Сұраныстар саған келеді</b>
+         <p>Қазір күтіп тұрғаны: ${REQS.length}. Оларды осы экраннан төменнен көресің.</p></div></div>`
+      : `<div class="note"><span class="ic">📬</span><div><b>Одан әрі не болады</b>
+         <p>Досың кодты енгізгенде — сұраныс капитанға барады, саған емес.
+         Ол қабылдағаннан кейін ғана клан тізіміне қосылады.</p></div></div>`}
     <button class="btn" type="button" onclick="closeSheet()">Түсінікті</button>`);
 }
 function remindAll(){
@@ -483,6 +526,22 @@ if(location.search.indexOf("test=1")>-1){
   A(sb.indexOf("сұраныс капитанға түседі")>-1,"P0-5: код капитанның растауын талап етеді");
   A(sb.indexOf(CLAN.city)>-1 && sb.indexOf(CLAN.cls)>-1,"P0-5: код қала мен сыныппен шектелген");
   closeSheet();
+
+  // P0-5 петлясы толық: сұраныс капитанда көрінеді және шешімді ол қабылдайды
+  ROLE="captain"; STATE="normal"; RESULT=null; render();
+  A(H().indexOf("Кодпен кіргісі келеді")>-1,"P0-5: капитанда сұраныстар тізімі бар");
+  A(H().indexOf("басқа қала")>-1,"P0-5: басқа қаладан келген сұраныс белгіленген");
+  const btns=[...document.querySelectorAll(".reqbtn")];
+  A(btns.length===1,"P0-5: қабылдау батырмасы тек сәйкес келетінінде");
+  ROLE="member"; render();
+  A(H().indexOf("Кодпен кіргісі келеді")<0,"P0-5: қатардағы қатысушыға сұраныстар көрінбейді");
+  ROLE="captain"; render();
+  const was=REQS.length; decide(0,true);
+  A(REQS.length===was-1,"P0-5: капитан қабылдағанда сұраныс тізімнен кетеді");
+  decide(0,true); A(REQS.length===was-1,"P0-5: сәйкес келмейтінді қабылдау мүмкін емес");
+  REQS=[]; render();
+  A(H().indexOf("Жаңа сұраныс жоқ")>-1,"P0-5: бос күй бар");
+  ROLE="member";
 
   // Ревьюде «жоқ» деп белгіленген үш күй
   STATE="empty"; render(); A(H().indexOf("сен ғанасың")>-1,"бос клан күйі бар");
