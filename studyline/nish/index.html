@@ -49,7 +49,7 @@ body{font-family:var(--font);background:#fff;color:var(--ink);
 .appbar h1{font-size:18px;font-weight:900;letter-spacing:-.035em}
 .appbar .sub{font-size:12px;font-weight:750;color:var(--muted);margin-top:1px}
 .back{width:40px;height:40px;flex:none;border:0;background:var(--line);border-radius:13px;
-  display:grid;place-items:center}
+  display:grid;place-items:center;text-decoration:none}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
   padding:0 var(--pad) calc(var(--safe-b) + 20px)}
 
@@ -156,7 +156,7 @@ body{font-family:var(--font);background:#fff;color:var(--ink);
 
   <!-- ═══ СТАРТ ═══ -->
   <section class="view on" id="v-start">
-    <div class="appbar"><div><h1>StudyLine</h1><div class="sub">НИШ · БИЛ · РФМШ дайындығы</div></div></div>
+    <div class="appbar"><a class="back" href="../" aria-label="Барлық бөлімге"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141728" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></a><div><h1>StudyLine</h1><div class="sub">НИШ · БИЛ · РФМШ дайындығы</div></div></div>
     <div class="scroll">
       <div class="hero">
         <div class="em">🎓</div>
@@ -200,7 +200,7 @@ body{font-family:var(--font);background:#fff;color:var(--ink);
 
   <!-- ═══ НӘТИЖЕ ═══ -->
   <section class="view" id="v-res">
-    <div class="appbar"><div><h1>Нәтиже</h1><div class="sub">Дайындық картасы</div></div></div>
+    <div class="appbar"><a class="back" href="../" aria-label="Барлық бөлімге"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141728" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></a><div><h1>Нәтиже</h1><div class="sub">Дайындық картасы</div></div></div>
     <div class="scroll" id="res"></div>
   </section>
 

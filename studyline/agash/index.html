@@ -39,7 +39,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);
 .sb-r{display:flex;gap:6px;align-items:center;color:var(--ink)}
 .appbar{flex:none;display:flex;align-items:center;gap:12px;padding:8px var(--pad) 10px}
 .back{width:40px;height:40px;flex:none;border:0;background:var(--line);border-radius:13px;
-  display:grid;place-items:center;transition:transform .14s var(--ease)}
+  display:grid;place-items:center;text-decoration:none;transition:transform .14s var(--ease)}
 .back:active{transform:scale(.92)}
 .appbar h1{font-size:19px;font-weight:850;letter-spacing:-.035em;line-height:1.15}
 .appbar .sub{font-size:12.5px;font-weight:700;color:var(--muted);margin-top:1px}
@@ -170,9 +170,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);
   </div>
 
   <div class="appbar">
-    <button class="back" type="button" aria-label="Артқа" onclick="toast('Прототипте басты экран жоқ')">
+    <a class="back" href="../" aria-label="Барлық бөлімге">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141728" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
-    </button>
+    </a>
     <div>
       <h1>1000 ағаш</h1>
       <div class="sub">StudyLine науқаны · 31 желтоқсанға дейін</div>

@@ -46,6 +46,8 @@ body{font-family:var(--font);background:#fff;color:var(--ink);
 .wordmark{font-size:18px;font-weight:900;letter-spacing:-.04em}
 .wordmark span{color:var(--green-t)}
 .appbar .sp{flex:1}
+.back{width:40px;height:40px;flex:none;border:0;background:var(--line);border-radius:13px;
+  display:grid;place-items:center;text-decoration:none}
 .round-btn{width:40px;height:40px;border:0;background:var(--line);border-radius:13px;
   display:grid;place-items:center;font-size:17px}
 
@@ -163,6 +165,7 @@ body{font-family:var(--font);background:#fff;color:var(--ink);
 <div id="stage">
   <div class="statusbar"><span>9:41</span><span>▰</span></div>
   <div class="appbar">
+    <a class="back" href="../" aria-label="Барлық бөлімге"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141728" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></a>
     <span class="wordmark">Study<span>Line</span></span>
     <span class="sp"></span>
     <button class="round-btn" type="button" aria-label="Хабарламалар" onclick="toast('Прототипте хабарламалар жоқ')">🔔</button>
