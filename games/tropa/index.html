@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Тропа">
+<meta name="theme-color" content="#0C1412">
+<title>Тропа</title>
+<!--
+  THESIS. Игра на двоих, где нет счёта «кто кого»: одна фишка, одна тропа, один фонарь на двоих.
+  Отказывается от сетки одинаковых карточек и таблицы результатов — экран занимает сама тропа.
+
+  OWN-WORLD. Ночной поход по карте: почти чёрный хвойный фон, горизонтали топосхемы,
+  тёплая нить пути цвета фонаря (#F2A34A), мох (#8FB89C) для тихого и спокойного,
+  узелки на нити вместо очков. Один рисованный холст, никаких иконок-заглушек.
+
+  STORY. Заходишь в любой момент → видишь, докуда дошли вдвоём → если твой ход,
+  выбираешь риск шага → нить прорастает вперёд, фонарь качается.
+
+  FIRST VIEWPORT. Сверху строка похода (пройдено · глава · фонари). Ниже 46vh холста:
+  нить снизу вверх, узелки прошлых ходов, фонарь на текущей точке, впереди пунктир.
+  Под холстом — три шага-выбора, главное действие в нижней трети, под большим пальцем.
+
+  FORM. Карта ночного маршрута, выбрана как единственная форма, несущая «идём вместе».
+  Без розыгрыша направлений: направление задано брифом «кооп, ход за ходом».
+-->
+<style>
+:root{
+  --ink:#0C1412; --ink-2:#111C19; --ink-3:#16241F;
+  --line:#22332C;
+  --tx:#E7EFEA; --mut:#8FA79A;
+  --amber:#F2A34A; --amber-dim:#7A5A2E;
+  --moss:#8FB89C; --moss-dim:#3A5348;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:var(--ink); color:var(--tx); font-family:var(--sans); font-size:16px; line-height:1.45;
+  overscroll-behavior:none;
+}
+#app{max-width:560px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 16px
+  calc(env(safe-area-inset-bottom) + 18px)}
+
+/* ── строка похода ── */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px}
+.dist{font-size:34px;font-weight:600;letter-spacing:-.035em;line-height:1}
+.dist span{font-size:13px;font-weight:400;letter-spacing:0;color:var(--mut);margin-left:7px}
+.chapter{font-size:12.5px;color:var(--mut);margin-top:5px;letter-spacing:.01em}
+.lamps{display:flex;gap:7px;align-items:center;flex:none}
+.lamp{width:11px;height:11px;border-radius:50%;background:var(--amber);
+  box-shadow:0 0 0 1px rgba(242,163,74,.35), 0 2px 14px rgba(242,163,74,.55);
+  transition:background .5s, box-shadow .5s, opacity .5s}
+.lamp.out{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line);opacity:.9}
+
+/* ── холст ── */
+.map{position:relative;border-radius:20px;overflow:hidden;background:var(--ink-2);
+  border:1px solid var(--line);margin-bottom:14px}
+.map canvas{display:block;width:100%;height:46vh;min-height:250px;max-height:400px}
+.mapfade{position:absolute;inset:0 0 auto 0;height:70px;pointer-events:none;
+  background:linear-gradient(#111C19,rgba(17,28,25,0))}
+.mapfoot{position:absolute;left:0;right:0;bottom:0;height:76px;pointer-events:none;
+  background:linear-gradient(rgba(17,28,25,0),rgba(17,28,25,.88) 66%)}
+.goal{position:absolute;left:14px;bottom:12px;right:14px;display:flex;align-items:center;gap:9px;
+  font-size:11.5px;color:var(--mut);pointer-events:none}
+.bar{flex:1;height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--moss);border-radius:2px;
+  transition:width .8s cubic-bezier(.16,1,.3,1)}
+.bar i.full{background:var(--amber)}
+
+/* ── ход ── */
+.turn{font-size:12.5px;color:var(--mut);margin:0 2px 9px;display:flex;justify-content:space-between;gap:10px}
+.turn b{color:var(--tx);font-weight:500}
+
+.hint{font-size:12px;color:var(--mut);margin:0 2px 11px;line-height:1.4;max-width:46ch}
+.steps{display:flex;flex-direction:column;gap:9px}
+.step{display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;
+  border:1px solid var(--line);background:var(--ink-2);color:var(--tx);font:inherit;
+  border-radius:16px;padding:14px 16px;transition:transform .12s cubic-bezier(.16,1,.3,1),
+  border-color .18s, background .18s}
+.step:active{transform:scale(.985)}
+.step:disabled{opacity:.38;cursor:default}
+.step .nm{flex:1;min-width:0}
+.step .nm b{display:block;font-weight:500;font-size:16.5px;letter-spacing:-.01em}
+.step .nm span{display:block;font-size:12px;color:var(--mut);margin-top:2px}
+.step .gain{flex:none;font-size:19px;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.step .odds{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  font-size:10.5px;color:var(--mut);border:1px solid var(--line)}
+.step.calm{border-color:var(--moss-dim)} .step.calm .gain{color:var(--moss)}
+.step.wind{border-color:#4A5A3C} .step.wind .gain{color:#C9CE7E}
+.step.leap{border-color:var(--amber-dim);background:linear-gradient(180deg,#1D1A12,#16241F)}
+.step.leap .gain{color:var(--amber)}
+.step:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+/* ── ожидание ── */
+.wait{border:1px dashed var(--line);border-radius:16px;padding:20px 18px;text-align:center}
+.wait b{display:block;font-size:17px;font-weight:500;margin-bottom:5px}
+.wait p{margin:0;font-size:13.5px;color:var(--mut)}
+.wait button{margin-top:14px;border:1px solid var(--line);background:none;color:var(--tx);
+  font:inherit;font-size:14px;padding:11px 18px;border-radius:12px;cursor:pointer}
+
+/* ── лента ── */
+.feed{margin-top:20px;border-top:1px solid var(--line);padding-top:14px}
+.feed div{display:flex;gap:9px;align-items:baseline;font-size:13px;color:var(--mut);padding:4px 2px}
+.feed div i{width:6px;height:6px;border-radius:50%;flex:none;background:var(--moss-dim);
+  transform:translateY(-1px)}
+.feed div.hit i{background:var(--amber);box-shadow:0 0 9px rgba(242,163,74,.7)}
+.feed div b{color:var(--tx);font-weight:500}
+.feed .camp{color:var(--amber)}
+
+/* ── выбор игрока ── */
+.picker{padding:16vh 0 0}
+.picker h1{font-size:40px;font-weight:600;letter-spacing:-.04em;margin:0 0 10px}
+.picker p{color:var(--mut);margin:0 0 30px;font-size:15px;max-width:32ch}
+.picker button{width:100%;padding:17px;border-radius:16px;border:1px solid var(--line);
+  background:var(--ink-2);color:var(--tx);font:inherit;font-size:18px;margin-bottom:10px;cursor:pointer}
+
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 22px);
+  transform:translateX(-50%);background:var(--ink-3);border:1px solid var(--line);color:var(--tx);
+  padding:11px 17px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;
+  transition:opacity .2s;z-index:9;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+'use strict';
+
+/* ═══════ настройки ═══════ */
+var SB  = 'https://ckayydaqncvnbecjlltf.supabase.co/rest/v1/tropa';
+var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrYXl5ZGFxbmN2bmJlY2psbHRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2ODE1MjUsImV4cCI6MjA3NTI1NzUyNX0.o_7QJTdpkl14axm8vDfVH7NahbTvJreHAuI62dYG6U8';
+
+var NAMES  = { e: 'Елжан', d: 'Диана' };
+var SHE    = { e: false, d: true };
+var LAMPS  = 3;          // фонарей на двоих
+var HEAL   = 12;         // столько удачных шагов подряд возвращают фонарь
+var GOAL   = 10;         // шагов в день, чтобы день засчитался
+var SOLO_MS = 60 * 60 * 1000;  // час без партнёра — можно сходить за двоих
+var CHAPTER = 25;        // длина главы в шагах
+
+var KINDS = {
+  calm: { name: 'Тихий шаг',  note: 'по тропе, ничего не случится', gain: 2,  risk: 0    },
+  wind: { name: 'На ветер',   note: 'срежем через гребень',          gain: 6,  risk: 0.35 },
+  leap: { name: 'В темноту',  note: 'напрямик, без тропы',           gain: 14, risk: 0.60 }
+};
+var ORDER = ['calm', 'wind', 'leap'];
+var FAIL_GAIN = 1;       // даже сорвавшийся шаг всё равно шаг
+
+var CHAPTERS = ['Опушка','Мостик','Роса','Каменка','Ольховый брод','Ветреный гребень',
+  'Тихий распадок','Сухое русло','Голубика','Стрекозы','Перевал','Сосновый бор','Ночной дождь',
+  'Оленья тропа','Лисий крюк','Ключ','Старая гать','Полынь','Гроза стороной','Черничник',
+  'Малый водопад','Кедрач','Птичий базар','Последний подъём'];
+
+/* ═══════ чистая логика (проверяется в ?test=1) ═══════ */
+
+function gainOf(kind, ok) { return ok ? KINDS[kind].gain : FAIL_GAIN; }
+
+// Свернуть журнал ходов в состояние похода.
+function fold(rows) {
+  var s = { dist: 0, lamps: LAMPS, since: 0, camps: 0, marks: [] };
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i], g = gainOf(r.kind, r.ok);
+    s.dist += g;
+    if (r.ok) {
+      s.since++;
+      if (s.since % HEAL === 0 && s.lamps < LAMPS) s.lamps++;
+    } else {
+      s.lamps--;
+      if (s.lamps <= 0) { s.lamps = LAMPS; s.since = 0; s.camps++; }
+    }
+    s.marks.push({ d: s.dist, ok: r.ok, kind: r.kind, player: r.player });
+  }
+  return s;
+}
+
+// Чей ход. Никто не ходит дважды подряд — кроме случая, когда партнёр пропал на час.
+function turnOf(rows, nowMs) {
+  if (!rows.length) return { who: 'e', solo: false };
+  var last = rows[rows.length - 1];
+  var idle = nowMs - +new Date(last.created_at) > SOLO_MS;
+  return { who: last.player === 'e' ? 'd' : 'e', solo: idle };
+}
+
+function canMove(rows, me, nowMs) {
+  var t = turnOf(rows, nowMs);
+  return t.who === me || t.solo;
+}
+
+function dayKey(ts) {
+  var d = new Date(ts);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' +
+         String(d.getDate()).padStart(2, '0');
+}
+
+function movesToday(rows, today) {
+  var n = 0;
+  for (var i = 0; i < rows.length; i++) if (dayKey(rows[i].created_at) === today) n++;
+  return n;
+}
+
+// Дни, в которые пройдена дневная цель.
+function goalDays(rows) {
+  var by = {}, i, k, out = [];
+  for (i = 0; i < rows.length; i++) {
+    k = dayKey(rows[i].created_at);
+    by[k] = (by[k] || 0) + 1;
+  }
+  for (k in by) if (by[k] >= GOAL) out.push(k);
+  return out.sort();
+}
+
+// Дней подряд; сегодняшний день ещё не обязателен — серию держит вчерашний.
+function streakOf(days, today) {
+  var set = {}, i;
+  for (i = 0; i < days.length; i++) set[days[i]] = 1;
+  var cur = new Date(today + 'T12:00:00');
+  if (!set[dayKey(cur)]) cur.setDate(cur.getDate() - 1);
+  var n = 0;
+  while (set[dayKey(cur)]) { n++; cur.setDate(cur.getDate() - 1); }
+  return n;
+}
+
+function chapterOf(dist) { return CHAPTERS[Math.floor(dist / CHAPTER) % CHAPTERS.length]; }
+
+function plural(n, one, few, many) {
+  var a = Math.abs(n) % 100, b = a % 10;
+  if (a > 10 && a < 20) return many;
+  if (b > 1 && b < 5) return few;
+  if (b === 1) return one;
+  return many;
+}
+
+/* ═══════ геометрия тропы ═══════ */
+var PX = 7;              // пикселей на шаг
+
+function pathX(d, w) {
+  return w / 2 + Math.sin(d * 0.09) * w * 0.26 + Math.sin(d * 0.031 + 1.7) * w * 0.13;
+}
+
+/* ═══════ состояние ═══════ */
+var me = null, rows = [], busy = false, anim = null;
+
+/* ═══════ сеть ═══════ */
+function api(path, opts) {
+  opts = opts || {};
+  opts.headers = {
+    apikey: KEY, Authorization: 'Bearer ' + KEY,
+    'Content-Type': 'application/json', Prefer: 'return=representation'
+  };
+  return fetch(SB + path, opts).then(function (r) {
+    if (!r.ok) return r.text().then(function (t) { throw new Error(t); });
+    return r.status === 204 ? null : r.json();
+  });
+}
+function load() {
+  return api('?select=*&order=step.asc').then(function (d) { rows = d || []; });
+}
+
+/* ═══════ мелочи ═══════ */
+var other = function () { return me === 'e' ? 'd' : 'e'; };
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  });
+}
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(toast.tm);
+  toast.tm = setTimeout(function () { t.classList.remove('on'); }, 2400);
+}
+function did(row) {
+  return SHE[row.player] ? (row.ok ? 'прошла' : 'сорвалась') : (row.ok ? 'прошёл' : 'сорвался');
+}
+
+/* ═══════ отрисовка ═══════ */
+function render() {
+  var app = document.getElementById('app');
+  if (!me) { app.innerHTML = pickerHtml(); return; }
+
+  var now = Date.now(), s = fold(rows), today = dayKey(now);
+  var t = turnOf(rows, now), mine = t.who === me || t.solo;
+  var done = movesToday(rows, today), streak = streakOf(goalDays(rows), today);
+
+  var lamps = '';
+  for (var i = 0; i < LAMPS; i++) lamps += '<i class="lamp' + (i < s.lamps ? '' : ' out') + '"></i>';
+
+  var pct = Math.min(100, done / GOAL * 100);
+
+  app.innerHTML =
+    '<div class="top">' +
+      '<div><div class="dist">' + s.dist + '<span>' +
+        plural(s.dist, 'шаг пройден', 'шага пройдено', 'шагов пройдено') + '</span></div>' +
+        '<div class="chapter">Глава ' + (Math.floor(s.dist / CHAPTER) + 1) + ' · ' +
+          esc(chapterOf(s.dist)) + (s.camps ? ' · привалов: ' + s.camps : '') + '</div></div>' +
+      '<div class="lamps" title="фонари">' + lamps + '</div>' +
+    '</div>' +
+
+    '<div class="map"><canvas id="cv"></canvas><div class="mapfade"></div><div class="mapfoot"></div>' +
+      '<div class="goal"><span>сегодня ' + done + ' из ' + GOAL + '</span>' +
+        '<span class="bar"><i class="' + (pct >= 100 ? 'full' : '') + '" style="width:' + pct + '%"></i></span>' +
+        '<span>' + (streak ? streak + ' ' + plural(streak, 'день', 'дня', 'дней') + ' подряд' : 'новый поход') +
+      '</span></div></div>' +
+
+    '<div class="turn"><span>' + (mine ? 'Твой ход' : 'Ход ' + (SHE[t.who] ? 'Дианы' : 'Елжана')) +
+      '</span><button id="switch" style="background:none;border:none;color:var(--mut);font:inherit;' +
+      'font-size:12.5px;cursor:pointer;padding:0">я — ' + NAMES[me] + '</button></div>' +
+
+    (mine ? stepsHtml(t.solo) : waitHtml(t)) +
+    feedHtml();
+
+  drawMap(s);
+}
+
+function pickerHtml() {
+  return '<div class="picker"><h1>Тропа</h1>' +
+    '<p>Одна фишка на двоих, один фонарь на двоих. Идём по очереди, ' +
+    'счёт только общий. Кто ты?</p>' +
+    '<button data-me="e">' + NAMES.e + '</button>' +
+    '<button data-me="d">' + NAMES.d + '</button></div>';
+}
+
+function stepsHtml(solo) {
+  return (solo ? '<div class="turn" style="margin-top:-4px;color:var(--amber)">' +
+      NAMES[other()] + ' давно не заходил' + (SHE[other()] ? 'а' : '') +
+      ' — можно сходить за двоих</div>' : '') +
+    '<div class="hint">Справа — шанс пройти. Сорвёшься — погаснет один фонарь на двоих, ' +
+      'но шаг всё равно засчитается.</div>' +
+    '<div class="steps">' + ORDER.map(function (k) {
+      var v = KINDS[k];
+      return '<button class="step ' + k + '" data-kind="' + k + '">' +
+        '<span class="nm"><b>' + v.name + '</b><span>' + v.note + '</span></span>' +
+        '<span class="gain">+' + v.gain + '</span>' +
+        '<span class="odds">' + (v.risk ? Math.round((1 - v.risk) * 100) + '%' : '—') + '</span>' +
+      '</button>';
+    }).join('') + '</div>';
+}
+
+function waitHtml(t) {
+  var name = SHE[t.who] ? 'Диану' : 'Елжана';
+  var left = Math.max(0, SOLO_MS - (Date.now() - +new Date(rows[rows.length - 1].created_at)));
+  var mins = Math.ceil(left / 60000);
+  return '<div class="wait"><b>Ждём ' + name + '</b>' +
+    '<p>Ты только что сходил' + (SHE[me] ? 'а' : '') + '. Тропа никуда не денется.</p>' +
+    '<button id="refresh">Обновить</button>' +
+    '<p style="margin-top:10px;font-size:12px">Если не ответ' + (SHE[t.who] ? 'ит' : 'ит') +
+    ' — через ' + mins + ' ' + plural(mins, 'минуту', 'минуты', 'минут') + ' сможешь сходить за двоих.</p></div>';
+}
+
+function feedHtml() {
+  if (!rows.length) {
+    return '<div class="feed"><div><i></i><span>Тропа ещё не начата. Первый шаг за Елжаном.</span></div></div>';
+  }
+  var last = rows.slice(-6).reverse();
+  return '<div class="feed">' + last.map(function (r) {
+    return '<div class="' + (r.ok ? 'hit' : '') + '"><i></i><span><b>' + NAMES[r.player] + '</b> · ' +
+      esc(KINDS[r.kind].name.toLowerCase()) + ' · ' + did(r) + ' · +' + gainOf(r.kind, r.ok) + '</span></div>';
+  }).join('') + '</div>';
+}
+
+/* ═══════ холст ═══════ */
+function drawMap(s, headD) {
+  var cv = document.getElementById('cv');
+  if (!cv) return;
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  var w = cv.clientWidth, h = cv.clientHeight;
+  cv.width = w * dpr; cv.height = h * dpr;
+  var c = cv.getContext('2d');
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  var head = headD === undefined ? s.dist : headD;
+  var headY = h * 0.38;                       // где на экране стоит фонарь
+  var toY = function (d) { return headY - (d - head) * PX; };
+
+  c.fillStyle = '#111C19'; c.fillRect(0, 0, w, h);
+
+  // горизонтали топосхемы — «рельеф», ползущий вместе с походом
+  c.lineWidth = 1;
+  for (var k = 0; k < 9; k++) {
+    var y0 = ((k * 46) - ((head * PX * 0.35) % 414) + 414) % 414 - 40;
+    c.strokeStyle = 'rgba(143,184,156,' + (0.075 + (k % 3) * 0.022) + ')';
+    c.beginPath();
+    for (var x = 0; x <= w; x += 8) {
+      var y = y0 + Math.sin(x * 0.013 + k * 1.7) * 13 + Math.sin(x * 0.031 + k) * 5;
+      x === 0 ? c.moveTo(x, y) : c.lineTo(x, y);
+    }
+    c.stroke();
+  }
+
+  // тропа впереди — пунктиром
+  c.setLineDash([2, 7]); c.lineCap = 'round';
+  c.strokeStyle = 'rgba(143,184,156,.34)'; c.lineWidth = 2;
+  c.beginPath();
+  for (var d = head; d <= head + (headY / PX) + 8; d += 1) {
+    var px = pathX(d, w), py = toY(d);
+    d === head ? c.moveTo(px, py) : c.lineTo(px, py);
+  }
+  c.stroke();
+  c.setLineDash([]);
+
+  // пройденная нить
+  var from = Math.max(0, head - (h - headY) / PX - 8);
+  var grad = c.createLinearGradient(0, h, 0, 0);
+  grad.addColorStop(0, 'rgba(122,90,46,.35)');
+  grad.addColorStop(1, 'rgba(242,163,74,.95)');
+  c.strokeStyle = grad; c.lineWidth = 3;
+  c.beginPath();
+  for (var d2 = from; d2 <= head; d2 += 1) {
+    var qx = pathX(d2, w), qy = toY(d2);
+    d2 === from ? c.moveTo(qx, qy) : c.lineTo(qx, qy);
+  }
+  c.stroke();
+
+  // границы глав — засечка поперёк тропы
+  var first = Math.ceil(from / CHAPTER) * CHAPTER;
+  for (var m = first; m <= head + (headY / PX); m += CHAPTER) {
+    if (m === 0) continue;
+    var mx = pathX(m, w), my = toY(m);
+    if (my < -20 || my > h + 20) continue;
+    c.strokeStyle = 'rgba(231,239,234,.28)'; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(mx - 11, my); c.lineTo(mx + 11, my); c.stroke();
+    c.fillStyle = 'rgba(231,239,234,.42)';
+    c.font = '10px ' + getComputedStyle(document.body).fontFamily;
+    var lab = CHAPTERS[(Math.floor(m / CHAPTER) - 1) % CHAPTERS.length];
+    var lw = c.measureText(lab).width;
+    c.fillText(lab, mx + 16 + lw > w - 10 ? mx - 16 - lw : mx + 16, my + 3.5);
+  }
+
+  // узелки прошлых ходов
+  for (var i = 0; i < s.marks.length; i++) {
+    var mk = s.marks[i];
+    if (mk.d < from || mk.d > head) continue;
+    var nx = pathX(mk.d, w), ny = toY(mk.d);
+    c.beginPath(); c.arc(nx, ny, mk.ok ? 3.6 : 3, 0, 6.284);
+    if (mk.ok) { c.fillStyle = '#F2A34A'; c.fill(); }
+    else { c.strokeStyle = 'rgba(143,167,154,.75)'; c.lineWidth = 1.4; c.stroke(); }
+  }
+
+  // фонарь
+  var hx = pathX(head, w), hy = headY;
+  var glow = c.createRadialGradient(hx, hy, 0, hx, hy, 62);
+  glow.addColorStop(0, 'rgba(242,163,74,.42)');
+  glow.addColorStop(1, 'rgba(242,163,74,0)');
+  c.fillStyle = glow; c.beginPath(); c.arc(hx, hy, 62, 0, 6.284); c.fill();
+  c.beginPath(); c.arc(hx, hy, 6, 0, 6.284); c.fillStyle = '#FFD9A3'; c.fill();
+  c.beginPath(); c.arc(hx, hy, 10.5, 0, 6.284);
+  c.strokeStyle = 'rgba(242,163,74,.85)'; c.lineWidth = 1.4; c.stroke();
+}
+
+// один авторский момент: нить прорастает вперёд, фонарь доезжает до новой точки
+function animateTo(fromD, toD, then) {
+  cancelAnimationFrame(anim);
+  var s = fold(rows), t0 = null, dur = 620;
+  (function frame(ts) {
+    if (t0 === null) t0 = ts;
+    var p = Math.min(1, (ts - t0) / dur);
+    var e = 1 - Math.pow(1 - p, 3);
+    drawMap(s, fromD + (toD - fromD) * e);
+    if (p < 1) anim = requestAnimationFrame(frame); else then && then();
+  })(performance.now());
+}
+
+/* ═══════ события ═══════ */
+document.addEventListener('click', function (ev) {
+  var el = ev.target.closest('button');
+  if (!el || busy) return;
+
+  if (el.dataset.me) {
+    me = el.dataset.me; localStorage.setItem('tr_me', me);
+    history.replaceState(null, '', '?p=' + me);
+    render(); load().then(render).catch(netFail);
+    return;
+  }
+  if (el.id === 'switch') { localStorage.removeItem('tr_me'); me = null; render(); return; }
+  if (el.id === 'refresh') { load().then(render).catch(netFail); return; }
+  if (el.dataset.kind) move(el.dataset.kind, el);
+});
+
+function netFail(e) { toast('Нет связи с базой'); console.error(e); }
+
+function move(kind, btn) {
+  if (!canMove(rows, me, Date.now())) { toast('Сейчас не твой ход'); return; }
+  busy = true;
+  Array.prototype.forEach.call(document.querySelectorAll('.step'), function (b) { b.disabled = true; });
+
+  var before = fold(rows).dist;
+  var ok = Math.random() >= KINDS[kind].risk;
+
+  api('', { method: 'POST', body: JSON.stringify({
+    step: rows.length, player: me, kind: kind, ok: ok
+  }) })
+    .then(load)
+    .then(function () {
+      var after = fold(rows).dist;
+      animateTo(before, after, function () {
+        busy = false; render();
+        toast(ok ? 'Прошли · +' + KINDS[kind].gain : 'Сорвались · фонарь погас, но шаг сделан');
+      });
+    })
+    .catch(function (e) {
+      busy = false;
+      // чаще всего это гонка: партнёр сходил в ту же секунду и занял номер шага
+      load().then(render).catch(function () {});
+      toast('Ход не прошёл — тропа обновилась, попробуй ещё раз');
+      console.error(e);
+    });
+}
+
+/* ═══════ самопроверка: ?test=1 ═══════ */
+function selfTest() {
+  var out = [], ok = 0, fail = 0;
+  function is(name, a, b) {
+    var good = JSON.stringify(a) === JSON.stringify(b);
+    good ? ok++ : fail++;
+    out.push((good ? '✅ ' : '❌ ') + name + (good ? '' : ' → ' + JSON.stringify(a) + ' ≠ ' + JSON.stringify(b)));
+  }
+  var R = function (kind, o, p) { return { kind: kind, ok: o, player: p || 'e', created_at: new Date().toISOString() }; };
+
+  is('пустой поход', [fold([]).dist, fold([]).lamps], [0, 3]);
+  is('тихий шаг +2', fold([R('calm', true)]).dist, 2);
+  is('прыжок удался +14', fold([R('leap', true)]).dist, 14);
+  is('срыв тоже двигает на 1', fold([R('leap', false)]).dist, 1);
+  is('срыв гасит фонарь', fold([R('leap', false)]).lamps, 2);
+  is('три срыва — привал, фонари вернулись',
+    [fold([R('leap', false), R('leap', false), R('leap', false)]).lamps,
+     fold([R('leap', false), R('leap', false), R('leap', false)]).camps], [3, 1]);
+
+  var twelve = [];
+  for (var i = 0; i < 12; i++) twelve.push(R('calm', true));
+  is('12 удач не поднимают фонарь выше трёх', fold(twelve).lamps, 3);
+  is('фонарь возвращается после срыва и 12 удач',
+    fold([R('leap', false)].concat(twelve)).lamps, 3);
+  is('второй фонарь так просто не вернуть',
+    fold([R('leap', false), R('leap', false)].concat(twelve)).lamps, 2);
+
+  var t = new Date().toISOString();
+  is('первый ход — за Елжаном', turnOf([], Date.now()).who, 'e');
+  is('дважды подряд нельзя',
+    turnOf([{ player: 'e', created_at: t }], Date.now()).who, 'd');
+  is('свежий ход — не соло', turnOf([{ player: 'e', created_at: t }], Date.now()).solo, false);
+  is('час без партнёра — соло',
+    turnOf([{ player: 'e', created_at: new Date(Date.now() - 2 * 3600e3).toISOString() }], Date.now()).solo, true);
+  is('в соло ходит и тот, кто ходил последним',
+    canMove([{ player: 'e', created_at: new Date(Date.now() - 2 * 3600e3).toISOString() }], 'e', Date.now()), true);
+  is('не в свой ход — нельзя',
+    canMove([{ player: 'e', created_at: t }], 'e', Date.now()), false);
+
+  var day = function (d, n) { var a = [], i; for (i = 0; i < n; i++) a.push({ created_at: d + 'T10:00:00' }); return a; };
+  is('день засчитан только при 10 ходах', goalDays(day('2026-08-19', 9)), []);
+  is('десятый ход закрывает день', goalDays(day('2026-08-19', 10)), ['2026-08-19']);
+  is('streak: пусто', streakOf([], '2026-08-20'), 0);
+  is('streak: вчера — серия жива', streakOf(['2026-08-19'], '2026-08-20'), 1);
+  is('streak: три подряд', streakOf(['2026-08-18', '2026-08-19', '2026-08-20'], '2026-08-20'), 3);
+  is('streak: позавчера — серия мертва', streakOf(['2026-08-18'], '2026-08-20'), 0);
+  is('главы по 25 шагов', [chapterOf(0), chapterOf(24), chapterOf(25)],
+    [CHAPTERS[0], CHAPTERS[0], CHAPTERS[1]]);
+  is('склонения', [plural(1, 'шаг', 'шага', 'шагов'), plural(3, 'шаг', 'шага', 'шагов'),
+    plural(11, 'шаг', 'шага', 'шагов'), plural(21, 'шаг', 'шага', 'шагов'), plural(25, 'шаг', 'шага', 'шагов')],
+    ['шаг', 'шага', 'шагов', 'шаг', 'шагов']);
+  is('тропа не сходит с экрана', [pathX(0, 360) > 20, pathX(137, 360) < 340], [true, true]);
+
+  document.getElementById('app').innerHTML =
+    '<div style="padding:20px 0"><h1 style="font-size:22px;margin:0 0 14px">Самопроверка</h1>' +
+    '<pre style="white-space:pre-wrap;font-size:13px;line-height:1.7;color:var(--tx)">' +
+    out.join('\n') + '\n\n' + ok + ' ок, ' + fail + ' провалено</pre></div>';
+  console.log(out.join('\n'));
+}
+
+/* ═══════ старт ═══════ */
+(function () {
+  if (new URLSearchParams(location.search).get('test')) { selfTest(); return; }
+
+  var p = new URLSearchParams(location.search).get('p') || localStorage.getItem('tr_me');
+  if (p === 'e' || p === 'd') { me = p; localStorage.setItem('tr_me', p); }
+
+  render();
+  if (me) load().then(render).catch(netFail);
+
+  window.addEventListener('resize', function () { if (me) render(); });
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && me && !busy) load().then(render).catch(function () {});
+  });
+})();
+</script>
+</body>
+</html>
