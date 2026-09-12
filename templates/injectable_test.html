@@ -65,7 +65,8 @@
   /* TEST */
   #ev .top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
   #ev .bar{flex:1;height:6px;border-radius:99px;background:#dfe4ed;overflow:hidden}
-  #ev .bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
+  #ev .bar i{display:block;height:100%;width:100%;background:var(--accent);border-radius:99px;
+      transform:scaleX(0);transform-origin:left;transition:transform .3s}
   #ev .count{font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
   #ev .qcard{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:22px 18px}
   #ev .qtag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;
@@ -451,7 +452,7 @@
   }
   function hud(){
     $('h-count').textContent=(i+1)+' / '+seq.length;
-    $('h-bar').style.width=(i/seq.length*100)+'%';
+    $('h-bar').style.transform='scaleX('+(i/seq.length)+')';
   }
   var KEYS=['A','B','C','D'];
   function render(){
@@ -539,7 +540,7 @@
     return 'beginner';
   }
   function finish(){
-    $('h-bar').style.width='100%';
+    $('h-bar').style.transform='scaleX(1)';
     var p=[0,pct(band[1]),pct(band[2]),pct(band[3]),pct(band[4])];
     var key=levelOf(p[1],p[2],p[3],p[4]), L=LEVELS[key];
     var correct=band[1].c+band[2].c+band[3].c+band[4].c, total=seq.length;
