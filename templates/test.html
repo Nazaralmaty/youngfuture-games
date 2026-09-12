@@ -505,8 +505,10 @@
   function takeOne(d,usedTypes){
     var pool=BANK.filter(function(x){return x.d===d && !used[x._id] && (TTS||x.type!=='listen');});
     if(!pool.length)pool=BANK.filter(function(x){return x.d===d && (TTS||x.type!=='listen');});
+    // алғашқы екі сұрақта форматты әдейі ауыстырамыз, қалғаны — толық пулдан,
+    // әйтпесе сирек форматтар (жұп, cloze, тыңдалым) бәріне бірдей түсіп қалады
     var fresh=pool.filter(function(x){return usedTypes.indexOf(x.type||'mcq')<0;});
-    var src=fresh.length?fresh:pool;
+    var src=(usedTypes.length<2&&fresh.length)?fresh:pool;
     var raw=src[Math.floor(Math.random()*src.length)];
     used[raw._id]=1;
     usedTypes.push(raw.type||'mcq');
@@ -724,9 +726,11 @@
   /* ===== НӘТИЖЕ ===== */
   function pct(b){return b.t?Math.round(b.c/b.t*100):0;}
   function levelOf(p1,p2,p3,p4,t4,t3,t2){
-    // деңгей = ең жоғары жолақ, онда кемі 2 сұрақ және 60%+ дұрыс
-    if(t4>=2&&p4>=60)return 'above';
-    if(t3>=2&&p3>=60)return 'pre';
+    // деңгей = ең жоғары жолақ, онда кемі 2 сұрақ және 60%+ дұрыс,
+    // әрі төменгі жолақ та берік (әйтпесе кездейсоқ болжам деңгей көтереді)
+    var okLow=function(t,pv){return t<2||pv>=55;};
+    if(t4>=2&&p4>=60&&okLow(t3,p3)&&okLow(t2,p2))return 'above';
+    if(t3>=2&&p3>=60&&okLow(t2,p2))return 'pre';
     if(t2>=2&&p2>=60)return 'elementary';
     return 'beginner';
   }

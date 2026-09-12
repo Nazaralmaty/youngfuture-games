@@ -88,6 +88,7 @@ assert.strictEqual(T.levelOf(100, 100, 80, 20, 5, 5, 5), 'pre');
 assert.strictEqual(T.levelOf(100, 80, 20, 0, 0, 5, 5), 'elementary');
 assert.strictEqual(T.levelOf(60, 20, 0, 0, 0, 0, 5), 'beginner');
 assert.strictEqual(T.levelOf(0, 0, 0, 100, 1, 0, 0), 'beginner', 'бір ғана қиын сұрақ деңгей бермейді');
+assert.strictEqual(T.levelOf(100, 33, 62, 0, 0, 8, 6), 'beginner', 'төменгі жолақ әлсіз болса деңгей көтерілмейді');
 
 console.log(`OK · банк ${B.length} (d1 ${by(1).length}/d2 ${by(2).length}/d3 ${by(3).length}/d4 ${by(4).length}), ` +
   `форматтар: ${[...types].join(', ')}, 3 раунд × 5, екі өтуде ортақ ${same}/15`);
