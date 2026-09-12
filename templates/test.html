@@ -2,226 +2,197 @@
 <html lang="kk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#0b1a33">
-<title>1english.kz — Тест (инъектируемый v3)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f2a55">
+<title>1english.kz — Ағылшын тілі деңгейін анықтау</title>
 </head>
 <body>
 <div id="ev">
 <style>
-  #ev{--navy:#0f2a55;--navy2:#1b4a8f;--crimson:#e0214c;--crimson2:#ff3d6e;--gold:#ffc23c;--lime:#27e0a0;
-      --bg:#0b1a33;--card:#fff;--text:#0f2140;--muted:#6b7794;--line:#e3e9f3;--radius:22px;
-      --shadow:0 18px 50px rgba(7,18,40,.45);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
-  html,body{height:100%;margin:0;background:#0b1a33;-webkit-text-size-adjust:100%}
+  #ev{--navy:#0f2a55;--navy2:#1b4a8f;--accent:#e0214c;--gold:#d9a534;
+      --bg:#eef1f6;--card:#fff;--text:#111a2b;--muted:#67748c;--line:#dde3ec;
+      --shadow:0 2px 8px rgba(16,30,54,.06),0 12px 32px rgba(16,30,54,.08);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+      color:var(--text);background:var(--bg);min-height:100svh;-webkit-font-smoothing:antialiased;line-height:1.45}
   #ev *{box-sizing:border-box;margin:0;padding:0}
-  #ev .wrap{max-width:620px;margin:0 auto;padding:16px 16px 26px;position:relative;z-index:1;min-height:100svh;display:flex;flex-direction:column}
-  #ev{background:radial-gradient(1200px 600px at 50% -10%,#16315f,transparent),linear-gradient(180deg,#0b1a33,#0e2247);min-height:100svh;padding:2px}
-  #ev .screen{display:none;animation:evf .4s ease} #ev .screen.active{display:block}
-  #ev #ev-landing.active{margin:auto 0;display:flex;flex-direction:column;justify-content:center}
-  @keyframes evf{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-  @keyframes evpop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
-  @keyframes evfly{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-70px) scale(1.3);opacity:0}}
-  @keyframes evpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
-  @keyframes evglitch{0%{clip-path:inset(0 0 0 0)}20%{clip-path:inset(20% 0 30% 0);transform:translateX(-3px)}40%{clip-path:inset(50% 0 20% 0);transform:translateX(3px)}60%{clip-path:inset(10% 0 60% 0)}100%{clip-path:inset(0 0 0 0);transform:none}}
-  @keyframes evfall{to{transform:translateY(110vh) rotate(540deg);opacity:0}}
-  @keyframes evbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  #ev button{font-family:inherit}
+  #ev .wrap{max-width:560px;margin:0 auto;padding:14px 16px 40px;display:flex;flex-direction:column;min-height:100svh}
 
-  #ev .brand{display:flex;align-items:center;gap:10px;justify-content:center;margin:4px 0 8px}
-  #ev .brand b{font-size:18px;color:#fff;font-weight:800} #ev .brand b span{color:var(--gold)}
-  #ev .brand .lg{width:42px;height:42px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
-  #ev .brand .lg svg{width:26px;height:26px}
+  #ev .brand{display:flex;align-items:center;gap:9px;padding:4px 0 14px}
+  #ev .brand .lg{width:30px;height:30px;border-radius:9px;background:var(--navy);display:flex;align-items:center;justify-content:center;flex:0 0 30px}
+  #ev .brand .lg svg{width:18px;height:18px}
+  #ev .brand b{font-size:15px;font-weight:700;color:var(--navy);letter-spacing:-.2px}
+  #ev .brand b span{color:var(--accent)}
 
-  /* LANDING — bento 2026 */
-  #ev .hero{border-radius:26px;overflow:hidden;position:relative;background:#0e2247;border:1px solid #1d3a6b;box-shadow:var(--shadow)}
-  #ev .heroimg{height:200px;background:linear-gradient(135deg,#16315f,#0e2247);background-size:cover;background-position:center;position:relative;display:flex;align-items:flex-end;padding:16px}
-  #ev .heroimg .mas{position:absolute;right:12px;bottom:-6px;font-size:84px;animation:evbob 3s ease-in-out infinite;filter:drop-shadow(0 8px 12px rgba(0,0,0,.4))}
-  #ev .heroimg img.mas{width:120px;height:120px;font-size:0;bottom:-8px}
-  #ev .heroimg.hasvid{height:300px;justify-content:center;align-items:center;background:#06101f}
-  #ev .introvid{height:100%;aspect-ratio:9/16;border:none;border-radius:14px;box-shadow:0 8px 26px rgba(0,0,0,.5);position:relative;z-index:1}
-  #ev video.introvid{object-fit:cover}
-  #ev .heroimg.hasvid .mas{right:6px;bottom:2px;z-index:2;width:80px;height:80px;font-size:48px}
-  #ev .heroimg.hasvid .schooltag{z-index:3}
-  #ev .schooltag{position:absolute;top:14px;left:14px;background:var(--gold);color:var(--navy);padding:6px 13px;border-radius:999px;font-size:12px;font-weight:900;z-index:2}
-  #ev .herobody{padding:20px 20px 22px;color:#fff}
-  #ev .kick{display:inline-block;background:rgba(224,33,76,.2);border:1px solid var(--crimson);color:#ffd0db;font-weight:800;font-size:12px;padding:6px 13px;border-radius:999px;margin-bottom:10px}
-  #ev .hero h1{font-size:30px;line-height:1.1;font-weight:900;letter-spacing:-.5px;margin-bottom:8px}
-  #ev .hero h1 em{font-style:normal;color:var(--gold)}
-  #ev .hero p{font-size:15px;opacity:.92;line-height:1.5}
-  #ev .bento{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
-  #ev .bt{background:#0e2247;border:1px solid #1d3a6b;border-radius:16px;padding:14px 10px;text-align:center;color:#fff}
-  #ev .bt .e{font-size:24px} #ev .bt b{display:block;font-size:14px;margin-top:4px} #ev .bt small{color:#9fb2d6;font-size:11px}
-  #ev .joke{margin-top:12px;background:#0e2247;border:1px dashed #2a4a82;border-radius:16px;padding:12px 14px;color:#cdd9f2;font-size:13.5px;display:flex;gap:10px;align-items:center}
-  #ev .joke .e{font-size:26px}
+  #ev .screen{display:none} #ev .screen.active{display:block;animation:evf .28s ease}
+  @keyframes evf{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-  #ev .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:900;font-size:18px;color:#fff;background:linear-gradient(135deg,var(--crimson),var(--crimson2));padding:18px 24px;border-radius:16px;box-shadow:0 14px 30px rgba(224,33,76,.4);transition:transform .15s,box-shadow .15s;margin-top:14px;letter-spacing:.3px}
-  #ev .btn:hover{transform:translateY(-2px)} #ev .btn:active{transform:translateY(0)} #ev .btn[disabled]{opacity:.5;cursor:not-allowed}
-  #ev .btn.sm{width:auto;font-size:15px;padding:13px 24px;margin-top:0}
-  #ev .btn.dark{background:linear-gradient(135deg,#16315f,#1b4a8f)}
-  #ev .hintw{font-size:12.5px;color:#9fb2d6;text-align:center;margin-top:12px}
+  /* LANDING */
+  #ev .hero{border-radius:18px;overflow:hidden;background:var(--card);box-shadow:var(--shadow)}
+  #ev .heropic{aspect-ratio:16/9;background:#0b1a33 center/cover no-repeat;position:relative}
+  #ev .schooltag{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.92);color:var(--navy);
+      padding:5px 11px;border-radius:8px;font-size:12px;font-weight:700}
+  #ev .herobody{padding:20px 18px 22px}
+  #ev .kick{display:inline-block;color:var(--accent);font-weight:700;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:9px}
+  #ev h1{font-size:26px;line-height:1.18;font-weight:800;letter-spacing:-.6px;color:var(--navy);margin-bottom:9px}
+  #ev .lead{font-size:15px;color:var(--muted)}
 
-  #ev .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 22px;margin-top:14px}
+  #ev .facts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+  #ev .fact{background:var(--card);border-radius:14px;padding:14px 10px;text-align:center;box-shadow:var(--shadow)}
+  #ev .fact b{display:block;font-size:19px;color:var(--navy);font-weight:800}
+  #ev .fact small{font-size:11.5px;color:var(--muted);display:block;margin-top:2px}
+
+  #ev .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;cursor:pointer;
+      font-weight:700;font-size:17px;color:#fff;background:var(--accent);padding:17px 22px;border-radius:14px;
+      margin-top:14px;transition:filter .15s,transform .1s;min-height:56px}
+  #ev .btn:hover{filter:brightness(1.07)} #ev .btn:active{transform:scale(.99)}
+  #ev .btn[disabled]{background:var(--line);color:var(--muted);cursor:default}
+  #ev .btn.ghost{background:transparent;color:var(--navy);border:1.5px solid var(--line);font-size:15.5px;min-height:50px}
+  #ev .note{font-size:12.5px;color:var(--muted);text-align:center;margin-top:11px}
+
+  /* CARD / FORM */
+  #ev .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:22px 18px}
+  #ev .card h2{font-size:20px;color:var(--navy);font-weight:800;margin-bottom:4px;letter-spacing:-.3px}
+  #ev .card .sub{font-size:14px;color:var(--muted);margin-bottom:18px}
   #ev .field{margin-bottom:14px}
-  #ev .field label{display:block;font-size:14px;font-weight:700;margin-bottom:6px;color:var(--navy)}
-  #ev .field label .req{color:var(--crimson)}
-  #ev .field input{width:100%;border:2px solid var(--line);border-radius:13px;padding:14px 16px;font-size:16px;font-family:inherit;color:var(--text)}
-  #ev .field input:focus{outline:none;border-color:var(--navy2);box-shadow:0 0 0 4px rgba(27,74,143,.14)}
-  #ev .field .err{color:var(--crimson);font-size:13px;margin-top:5px;display:none}
-  #ev .field.invalid input{border-color:var(--crimson)} #ev .field.invalid .err{display:block}
-  #ev .privacy{font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px}
-  #ev .stepdots{display:flex;gap:6px;justify-content:center;margin-bottom:18px}
-  #ev .stepdots i{width:8px;height:8px;border-radius:50%;background:var(--line);transition:.2s}
-  #ev .stepdots i.on{background:var(--crimson);width:22px;border-radius:4px}
-  #ev .stepdots i.done{background:var(--lime)}
-  #ev .stepq{font-size:21px;font-weight:900;color:var(--navy);text-align:center;margin-bottom:4px}
-  #ev .stepq .em{font-size:34px;display:block;margin-bottom:6px}
-  #ev .stepsub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px}
-  #ev .stepin{width:100%;border:2px solid var(--line);border-radius:14px;padding:16px;font-size:18px;text-align:center;font-family:inherit;color:var(--text)}
-  #ev .stepin:focus{outline:none;border-color:var(--navy2);box-shadow:0 0 0 4px rgba(27,74,143,.14)}
-  #ev .steperr{color:var(--crimson);font-size:13px;text-align:center;min-height:18px;margin-top:6px}
-  #ev .choices{display:grid;gap:10px}
-  #ev .choice{border:2px solid var(--line);border-radius:14px;padding:15px 16px;font-size:16px;font-weight:700;color:var(--navy);background:#fff;cursor:pointer;font-family:inherit;text-align:left;transition:.12s}
-  #ev .choice:hover{border-color:var(--crimson);background:#fff0f4;transform:translateX(2px)}
+  #ev .field label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px}
+  #ev .field input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:15px 14px;font-size:16px;
+      font-family:inherit;color:var(--text);background:#fbfcfe;min-height:52px}
+  #ev .field input:focus{outline:none;border-color:var(--navy2);background:#fff}
+  #ev .field.bad input{border-color:var(--accent)}
+  #ev .err{color:var(--accent);font-size:13px;min-height:18px;margin-top:4px}
 
-  /* HUD */
-  #ev .hud{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
-  #ev .pill{display:inline-flex;align-items:center;gap:5px;background:#0e2247;border:1px solid #1d3a6b;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:900;color:#fff}
-  #ev .pill.xp{color:var(--gold)} #ev .pill.combo{color:var(--crimson2)} #ev .pill.combo.hot{animation:evpulse .4s}
-  #ev .mute{margin-left:auto;background:#0e2247;border:1px solid #1d3a6b;color:#fff;border-radius:999px;width:34px;height:34px;cursor:pointer;font-size:15px}
-  #ev .vibewrap{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-  #ev .vibe{flex:1;height:10px;border-radius:999px;background:#0e2247;border:1px solid #1d3a6b;overflow:hidden}
-  #ev .vibe i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--lime),var(--gold),var(--crimson2));transition:width .35s}
-  #ev .vibe.full i{animation:evpulse .5s}
-  #ev .vlabel{font-size:11px;color:#9fb2d6;font-weight:800}
-  #ev .progress{height:8px;border-radius:999px;background:#0e2247;border:1px solid #1d3a6b;overflow:hidden;margin-bottom:4px}
-  #ev .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--navy2),var(--crimson));transition:width .4s}
-  #ev .speedbar{height:6px;border-radius:999px;background:#3a1020;overflow:hidden;margin:6px 0 0;display:none}
-  #ev .speedbar.on{display:block} #ev .speedbar i{display:block;height:100%;background:var(--crimson2);width:100%}
+  /* TEST */
+  #ev .top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  #ev .bar{flex:1;height:6px;border-radius:99px;background:#dfe4ed;overflow:hidden}
+  #ev .bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
+  #ev .count{font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+  #ev .qcard{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:22px 18px}
+  #ev .qtag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;
+      color:var(--muted);margin-bottom:10px}
+  #ev .passage{background:#f4f7fc;border-radius:12px;padding:14px;font-size:15px;line-height:1.6;color:#243a5e;margin-bottom:14px}
+  #ev .qtext{font-size:20px;font-weight:700;line-height:1.35;color:var(--navy);letter-spacing:-.3px}
+  #ev .qhint{font-size:13.5px;color:var(--muted);margin-top:6px}
+  #ev .opts{display:grid;gap:9px;margin-top:18px}
+  #ev .opt{display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);border-radius:13px;
+      padding:14px 15px;font-size:16.5px;font-weight:500;cursor:pointer;background:#fff;text-align:left;
+      color:var(--text);transition:border-color .12s,background .12s;min-height:56px}
+  #ev .opt:hover{border-color:var(--navy2);background:#f8fafd}
+  #ev .opt .key{flex:0 0 26px;height:26px;border-radius:8px;background:#eef2f8;color:var(--navy);
+      display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  #ev .opt.pick{border-color:var(--navy);background:#eef2f8}
+  #ev .opt.pick .key{background:var(--navy);color:#fff}
+  #ev .opts.lock .opt{pointer-events:none}
+  #ev .tin{width:100%;border:1.5px solid var(--line);border-radius:13px;padding:15px;font-size:18px;
+      text-align:center;font-weight:600;font-family:inherit;color:var(--text);background:#fbfcfe;margin-top:18px;min-height:56px}
+  #ev .tin:focus{outline:none;border-color:var(--navy2);background:#fff}
+  #ev .line{min-height:56px;border:1.5px dashed var(--line);border-radius:13px;padding:9px;display:flex;
+      flex-wrap:wrap;gap:7px;align-content:flex-start;margin-top:18px;background:#fbfcfe}
+  #ev .bank{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+  #ev .chip{background:#fff;border:1.5px solid var(--navy2);color:var(--navy);border-radius:10px;
+      padding:10px 13px;font-size:16px;font-weight:600;cursor:pointer;user-select:none;min-height:42px}
+  #ev .chip.used{opacity:.25;pointer-events:none}
+  #ev .chip.inline{background:#eef2f8;border-color:transparent}
 
-  #ev .qcard{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 18px;margin-top:6px;position:relative;overflow:hidden}
-  #ev .qcard.glitch{animation:evglitch .35s}
-  #ev .qtag{display:inline-block;font-size:11px;font-weight:900;color:var(--navy);background:#eaf0fb;border-radius:999px;padding:5px 11px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
-  #ev .qtag.speed{color:#fff;background:var(--crimson)}
-  #ev .qmas{position:absolute;right:12px;top:10px;font-size:30px} #ev .qmas img{width:46px;height:46px;border-radius:12px;background:#0e2247;padding:3px;box-shadow:0 4px 10px rgba(0,0,0,.2)}
-  #ev .ovl .em img{border-radius:18px;background:#0e2247;padding:6px}
-  #ev .medal img{border-radius:18px;background:#0b1a33;padding:4px}
-  #ev .qimg{width:100%;max-height:170px;object-fit:cover;border-radius:14px;margin-bottom:12px;display:none}
-  #ev .qbig{font-size:46px;text-align:center;margin:2px 0 8px}
-  #ev .passage{background:#f0f5fc;border-left:4px solid var(--navy2);border-radius:12px;padding:14px 15px;font-size:14.5px;line-height:1.65;margin-bottom:14px;color:#243a5e}
-  #ev .qtext{font-size:20px;font-weight:800;line-height:1.32;color:var(--navy);margin-bottom:6px}
-  #ev .qsub{font-size:13.5px;color:var(--muted);margin-bottom:14px}
-  #ev .scaffold{font-size:28px;font-weight:900;letter-spacing:7px;text-align:center;color:var(--navy);margin:4px 0 12px}
-  #ev .opts{display:grid;gap:10px}
-  #ev .opt{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:14px;padding:14px 16px;font-size:17px;font-weight:600;cursor:pointer;background:#fff;transition:.12s;text-align:left}
-  #ev .opt:hover{border-color:var(--navy2);background:#f7faff;transform:translateX(2px)}
-  #ev .opt .key{flex:0 0 26px;height:26px;border-radius:8px;background:#eaf0fb;color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px}
-  #ev .opt.pick{border-color:var(--gold);background:#fff7e0} #ev .opt.pick .key{background:var(--gold);color:var(--navy)}
-  #ev .opt.lock{pointer-events:none;opacity:.92}
-  #ev .tin{width:100%;border:2px solid var(--line);border-radius:14px;padding:15px;font-size:20px;text-align:center;font-weight:800;letter-spacing:1px;font-family:inherit;color:var(--text)}
-  #ev .tin:focus{outline:none;border-color:var(--navy2);box-shadow:0 0 0 4px rgba(27,74,143,.14)}
-  #ev .answerline{min-height:52px;border:2px dashed var(--line);border-radius:14px;padding:9px;display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px;background:#fafbff}
-  #ev .bank{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px}
-  #ev .chip{background:#fff;border:2px solid var(--navy2);color:var(--navy);border-radius:11px;padding:9px 13px;font-size:16px;font-weight:800;cursor:pointer;user-select:none}
-  #ev .chip:hover{background:#eef3fb} #ev .chip.used{opacity:.3;pointer-events:none} #ev .chip.inline{background:#eef3fb}
-  #ev .match{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-  #ev .mcol{display:grid;gap:9px}
-  #ev .mbtn{border:2px solid var(--line);border-radius:12px;padding:13px;font-size:15px;font-weight:800;background:#fff;cursor:pointer;font-family:inherit;color:var(--navy)}
-  #ev .mbtn.sel{border-color:var(--crimson);background:#fff0f4}
-  #ev .mbtn.paired{border-color:var(--gold);background:#fff7e0;color:var(--navy);pointer-events:none;opacity:.95}
-  #ev .listenbtn{display:inline-flex;align-items:center;gap:9px;background:var(--navy);color:#fff;border:none;border-radius:14px;padding:15px 24px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;margin:0 auto 14px}
-  #ev .center{text-align:center}
+  /* FINISH */
+  #ev .lvl{background:var(--navy);color:#fff;border-radius:18px;padding:26px 20px;text-align:center}
+  #ev .lvl small{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#9fb2d6;font-weight:700}
+  #ev .lvl b{display:block;font-size:30px;font-weight:800;letter-spacing:-.6px;margin:8px 0 10px}
+  #ev .lvl p{font-size:14.5px;color:#cfd9ea;line-height:1.55}
+  #ev .scores{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+  #ev .sc{background:var(--card);border-radius:12px;padding:12px 6px;text-align:center;box-shadow:var(--shadow)}
+  #ev .sc b{display:block;font-size:17px;color:var(--navy);font-weight:800}
+  #ev .sc small{font-size:10.5px;color:var(--muted)}
+  #ev .next{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:20px 18px;margin-top:12px}
+  #ev .next h3{font-size:17px;color:var(--navy);margin-bottom:6px}
+  #ev .next p{font-size:14px;color:var(--muted)}
 
-  #ev .xpfly{position:fixed;font-size:22px;font-weight:900;color:var(--gold);pointer-events:none;z-index:80;animation:evfly 1s ease forwards;text-shadow:0 2px 6px rgba(0,0,0,.4)}
-  #ev .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120px);background:#0f2a55;color:#fff;padding:12px 20px;border-radius:14px;font-weight:900;font-size:15px;box-shadow:0 14px 30px rgba(0,0,0,.4);transition:transform .35s;z-index:70;border:1px solid #2a4a82}
-  #ev .toast.show{transform:translateX(-50%) translateY(0)}
-  #ev .ovl{position:fixed;inset:0;background:rgba(7,18,40,.7);display:none;align-items:center;justify-content:center;z-index:90;backdrop-filter:blur(4px)}
-  #ev .ovl.show{display:flex}
-  #ev .ovl .box{background:#fff;border-radius:24px;padding:28px 24px;text-align:center;max-width:330px;animation:evpop .4s}
-  #ev .ovl .em{font-size:60px;animation:evbob 2s infinite} #ev .ovl .em img{width:96px;height:96px}
-  #ev .ovl h3{color:var(--navy);font-size:22px;margin:6px 0 6px} #ev .ovl p{color:var(--muted);font-size:14px;margin-bottom:14px}
+  #ev .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,140px);background:var(--navy);color:#fff;
+      padding:13px 20px;border-radius:12px;font-weight:600;font-size:14.5px;transition:transform .3s;z-index:70;max-width:90vw;text-align:center}
+  #ev .toast.show{transform:translate(-50%,0)}
+  #ev .foot{text-align:center;color:#8d99ae;font-size:12px;margin-top:auto;padding-top:22px}
 
-  #ev .finish{text-align:center;padding:8px 4px;color:#fff}
-  #ev .fcard{background:#0e2247;border:1px solid #2a4a82;border-radius:24px;padding:26px 20px}
-  #ev .medal{font-size:64px;animation:evpop .5s} #ev .medal img{width:110px;height:110px}
-  #ev .finish h2{font-size:24px;margin:8px 0 6px}
-  #ev .xpbox{display:inline-flex;gap:16px;background:#0b1a33;border:1px solid #2a4a82;border-radius:16px;padding:13px 20px;margin:12px 0}
-  #ev .xpbox div b{display:block;font-size:24px;color:var(--gold)} #ev .xpbox div small{color:#9fb2d6;font-size:11px}
-  #ev .badge2{font-weight:900;font-size:18px;color:var(--gold)}
-  #ev .finish p{font-size:14.5px;color:#cdd9f2;line-height:1.55;max-width:420px;margin:6px auto}
-  #ev .foot{text-align:center;color:#7e8db0;font-size:12px;margin:18px 0 8px}
-  #ev .clozeSlot{color:var(--crimson);font-weight:900;border-bottom:2px solid var(--crimson);padding:0 5px;cursor:default}
-  #ev .listenbtn.rec{animation:evpulse .6s infinite}
-  #ev .catDrop{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
-  @media(max-width:560px){#ev .hero h1{font-size:24px}#ev .bento{grid-template-columns:1fr 1fr}#ev .qtext{font-size:18px}}
+  @media(min-width:600px){
+    #ev .wrap{max-width:640px;padding:22px 24px 50px}
+    #ev h1{font-size:31px} #ev .qtext{font-size:22px} #ev .herobody{padding:26px 24px 28px}
+    #ev .card,#ev .qcard{padding:26px 24px}
+  }
+  @media(min-width:1024px){
+    #ev .wrap{max-width:720px;padding:34px 24px 60px}
+    #ev h1{font-size:34px} #ev .opt{font-size:17px}
+  }
 </style>
 
 <div class="wrap">
-  <div class="brand"><div class="lg"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="28" r="11" fill="#e0214c"/><rect x="44" y="45" width="9" height="38" rx="3" fill="#0f2a55"/><path d="M44 45 h9 v10 h-1 a8 8 0 0 1 -8 -8 z" fill="#0f2a55"/></svg></div><b>1english<span>.kz</span></b></div>
+  <div class="brand">
+    <div class="lg"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="26" r="12" fill="#e0214c"/><rect x="43" y="44" width="11" height="40" rx="4" fill="#fff"/></svg></div>
+    <b>1english<span>.kz</span></b>
+  </div>
 
-  <!-- LANDING -->
+  <!-- 1. LANDING -->
   <section class="screen active" id="ev-landing">
     <div class="hero">
-      <div class="heroimg" id="heroImg">
-        <div class="schooltag" id="schoolTag" style="display:none"></div>
-        <div class="mas" id="heroMas">🦉</div>
-      </div>
+      <div class="heropic" id="heroPic"><div class="schooltag" id="schoolTag" style="display:none"></div></div>
       <div class="herobody">
-        <span class="kick">☀️ ЖАЗҒЫ ЧЕЛЛЕНДЖ · ~18 мин</span>
-        <h1>Жазда миың <em>балқып кетпесін</em> 🧠☀️</h1>
-        <p>Ағылшыннан ойын-тест. Сұрақтар саған қарай бейімделеді — жеңілден B2-ге дейін. XP жина, комбо жаса, vibe-ті толтыр. Дұрыс/бұрыс деп айтпаймыз 🤫 — тек ойна!</p>
+        <span class="kick">Деңгейді анықтау</span>
+        <h1>Ағылшын тіліндегі деңгейіңді 7 минутта біл</h1>
+        <p class="lead">15 сұрақ: грамматика, сөздік қор және оқылым. Нәтижесінде нақты деңгейің мен келесі қадам.</p>
       </div>
     </div>
 
-    <div class="bento">
-      <div class="bt"><div class="e">🎚️</div><b>Адаптив</b><small>саған бейімделеді</small></div>
-      <div class="bt"><div class="e">⚡</div><b>Speed</b><small>темп раунд</small></div>
-      <div class="bt"><div class="e">🎁</div><b>Сюрприз</b><small>сандықтар</small></div>
+    <div class="facts">
+      <div class="fact"><b>15</b><small>сұрақ</small></div>
+      <div class="fact"><b>~7</b><small>минут</small></div>
+      <div class="fact"><b>150+</b><small>сұрақ базасы</small></div>
     </div>
-    <div class="joke"><span class="e">💀</span><div id="jokeText">Жаз ғой… бәрі демалып жатыр, ал біз сені тестілеп жатырмыз. Кешір, бауырым 😎 Бірақ XP бар — кеттік!</div></div>
 
-    <button class="btn" id="go-form">Челленджді бастау 🚀</button>
-    <p class="hintw">Нәтижең мұғаліміңе жетеді. Саған — XP мен вайб 🔥</p>
+    <button class="btn" id="go-form">Тестті бастау</button>
+    <p class="note">Әр адамға сұрақтар кездейсоқ таңдалады — қайталанбайды.</p>
   </section>
 
-  <!-- FORM — бір сұрақ бір экранда -->
+  <!-- 2. FORM -->
   <section class="screen" id="ev-form">
     <div class="card">
-      <div class="stepdots" id="stepDots"></div>
-      <div id="stepBox"></div>
-      <div class="privacy" style="margin-top:14px">🔒 Нәтиже тек оқу деңгейін талдау үшін</div>
+      <h2>Өзің туралы</h2>
+      <p class="sub">Нәтижені саған жіберу үшін ғана керек.</p>
+      <div class="field" id="f-name">
+        <label for="in-name">Аты-жөнің</label>
+        <input id="in-name" type="text" placeholder="Алихан" autocomplete="name">
+      </div>
+      <div class="field" id="f-cls">
+        <label for="in-cls">Сынып немесе топ</label>
+        <input id="in-cls" type="text" placeholder="9А" autocomplete="off">
+      </div>
+      <div class="err" id="formErr"></div>
+      <button class="btn" id="go-test">Бастау</button>
     </div>
+    <p class="note">🔒 Деректер тек оқу деңгейін талдауға қолданылады.</p>
   </section>
 
-  <!-- TEST -->
+  <!-- 3. TEST -->
   <section class="screen" id="ev-test">
-    <div class="hud">
-      <span class="pill xp">⭐ <span id="h-xp">0</span></span>
-      <span class="pill combo" id="h-combopill">🔥 <span id="h-combo">0</span></span>
-      <span class="pill" id="h-prog">1/20</span>
-      <button class="mute" id="h-mute" title="Дыбыс">🔊</button>
+    <div class="top">
+      <div class="bar"><i id="h-bar"></i></div>
+      <span class="count" id="h-count">1 / 15</span>
     </div>
-    <div class="vibewrap"><span class="vlabel">VIBE</span><div class="vibe" id="h-vibewrap"><i id="h-vibe"></i></div></div>
-    <div class="progress"><i id="h-bar"></i></div>
-    <div class="speedbar" id="h-speed"><i id="h-speedi"></i></div>
     <div class="qcard" id="qcard"></div>
   </section>
 
-  <!-- FINISH -->
+  <!-- 4. FINISH -->
   <section class="screen" id="ev-finish">
-    <div class="finish"><div class="fcard">
-      <div class="medal" id="f-medal">🏆</div>
-      <h2>Бітті! Сен — легендасың 🎉</h2>
-      <div class="xpbox"><div><b id="f-xp">0</b><small>XP</small></div><div><b id="f-combo">0</b><small>макс комбо 🔥</small></div></div>
-      <p class="badge2" id="f-badge"></p>
-      <p>Жақсы ойнадың! Нәтижең мұғаліміңе жетті 📨</p>
-      <p><b>Толық деңгейің мен кеңес мұғаліміңде.</b> Келесі сабақта талдаймыз 😎📚</p>
-      <p style="color:#7e8db0;font-size:12px;margin-top:10px">1english.kz · рахмет 💙</p>
-    </div></div>
+    <div class="lvl">
+      <small>Сенің деңгейің</small>
+      <b id="f-level">—</b>
+      <p id="f-desc"></p>
+    </div>
+    <div class="scores" id="f-scores"></div>
+    <div class="next" id="f-next"></div>
+    <button class="btn ghost" id="f-again">Тағы бір рет өту</button>
   </section>
 
-  <div class="foot">© 1english.kz · Жазғы ойын-тест</div>
+  <div class="foot">© 1english.kz</div>
 </div>
-<div class="toast" id="toast"></div>
-<div class="ovl" id="ovl"><div class="box"><div class="em" id="ovlEm">🚀</div><h3 id="ovlT"></h3><p id="ovlP"></p><button class="btn sm dark" id="ovlGo" style="margin:0 auto">Жалғастыру →</button></div></div>
+<div class="toast" id="ev-toast"></div>
 </div>
 
 <script>
@@ -230,399 +201,385 @@
   var CONFIG = {
     APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycby6B4sJ4Jcx3ZgAhAUj4jn8fPhCMAb6JrJ-RkQNDDt1XyvV7AItD9eM8pUctS__VDPN/exec",
     SUBJECT: "English",
-    ASSETS: {
-      mascot:{normal:"https://optim.tildacdn.pro/tild3861-3534-4331-b033-653333353863/-/format/webp/file_0000000036a0722.png.webp",hype:"https://optim.tildacdn.pro/tild3831-3238-4532-b136-323232373266/-/format/webp/file_00000000bdfc71f.png.webp",think:"https://optim.tildacdn.pro/tild6435-3361-4937-a636-366362613934/-/format/webp/file_00000000838871f.png.webp",cool:"https://optim.tildacdn.pro/tild3164-6538-4363-b765-336466663861/-/format/webp/file_00000000fca0720.png.webp",dead:"https://optim.tildacdn.pro/tild6563-6332-4938-a563-366130373864/-/format/webp/file_000000001a24720.png.webp"},
-      hero:"https://optim.tildacdn.pro/tild3332-3432-4866-b333-663864356331/-/format/webp/file_00000000d3dc722.png.webp", intro_youtube:"", intro_mp4:"",
-      q:{school:"https://optim.tildacdn.pro/tild3437-3534-4131-b135-373737663636/-/format/webp/file_000000004428722.png.webp",travel:"https://optim.tildacdn.pro/tild3637-6461-4934-b562-343666343935/-/format/webp/file_000000008248722.png.webp",food:"https://optim.tildacdn.pro/tild3262-3561-4561-b030-346138653663/-/format/webp/file_00000000c928722.png.webp",sport:"https://optim.tildacdn.pro/tild3939-3331-4639-b661-386466663731/-/format/webp/file_000000005168722.png.webp",family:"https://optim.tildacdn.pro/tild3633-3439-4561-a361-613830656134/-/format/webp/file_00000000ba88720.png.webp",city:"https://optim.tildacdn.pro/tild3361-3634-4166-b135-633437383334/-/format/webp/file_000000002218720.png.webp",nature:"https://optim.tildacdn.pro/tild3130-3634-4663-a236-346566373537/-/format/webp/file_00000000ba5471f.png.webp",tech:""},
-      stickers:["https://optim.tildacdn.pro/tild3965-3665-4561-b763-346164343666/-/format/webp/2.jpg.webp","https://optim.tildacdn.pro/tild3363-6537-4931-b134-643935663861/-/format/webp/1.jpg.webp","https://optim.tildacdn.pro/tild6534-3866-4364-b966-363266363666/-/format/webp/3.jpg.webp","https://optim.tildacdn.pro/tild3961-6530-4034-b134-366638353536/-/format/webp/4.jpg.webp"]
-    },
-    /* ===== WHITE-LABEL: меняешь эту секцию под любой бренд ===== */
-    BRAND:{ name:'1english', tld:'.kz', primary:'', accent:'', navy:'', collectPhone:false }
+    HERO: "https://nazaralmaty.github.io/youngfuture-games/assets/test_hero.png",
+    PICK: {1:4, 2:4, 3:4, 4:3},              // қай деңгейден нешеу алынады
+    ADVANCED_URL: ""                          // Intermediate+ тесті дайын болғанда сілтеме
   };
-  var TTS=('speechSynthesis' in window);
-  var P=new URLSearchParams(location.search), SCHOOL=P.get('school')||'';
+
+  /* ===== СҰРАҚ БАЗАСЫ =====
+     d: 1 Beginner · 2 Elementary · 3 Pre-Intermediate · 4 Pre-Intermediate-тен жоғары
+     type: mcq (әдепкі) | gap (жауапты жазу) | order (сөйлем құрау)            */
+  var BANK = [
+  /* ---------- d1 · Beginner ---------- */
+  {d:1,sk:'grammar',q:'I ___ a student.',o:['am','is','are','be'],c:0},
+  {d:1,sk:'grammar',q:'She ___ my sister.',o:['is','am','are','be'],c:0},
+  {d:1,sk:'grammar',q:'They ___ from Kazakhstan.',o:['are','is','am','be'],c:0},
+  {d:1,sk:'grammar',q:'Sara and I ___ friends.',o:['are','is','am','be'],c:0},
+  {d:1,sk:'grammar',q:'___ is my book.',o:['This','These','Those','Them'],c:0},
+  {d:1,sk:'grammar',q:'___ are my friends.',o:['These','This','That','It'],c:0},
+  {d:1,sk:'grammar',q:'I have ___ apple.',o:['an','a','the','some'],c:0},
+  {d:1,sk:'grammar',q:'He has got two ___.',o:['children','childs','child','childrens'],c:0},
+  {d:1,sk:'grammar',q:'My father ___ a car.',o:['has','have','haves','having'],c:0},
+  {d:1,sk:'grammar',q:'I ___ got a bike.',o:['have','has','am','does'],c:0},
+  {d:1,sk:'grammar',q:'We ___ TV every evening.',o:['watch','watches','watching','watched'],c:0},
+  {d:1,sk:'grammar',q:'___ you like pizza?',o:['Do','Does','Is','Are'],c:0},
+  {d:1,sk:'grammar',q:'I ___ like coffee.',o:["don't","doesn't","not","am not"],c:0},
+  {d:1,sk:'grammar',q:'There ___ a cat on the sofa.',o:['is','are','am','be'],c:0},
+  {d:1,sk:'grammar',q:'She can ___ English.',o:['speak','speaks','speaking','spoke'],c:0},
+  {d:1,sk:'grammar',q:'This is ___ book. (менің)',o:['my','me','I','mine'],c:0},
+  {d:1,sk:'grammar',q:'He is a teacher. ___ name is Adil.',o:['His','Her','Its','He'],c:0},
+  {d:1,sk:'grammar',q:'___ old are you?',o:['How','What','Where','Who'],c:0},
+  {d:1,sk:'grammar',q:'What time ___ it?',o:['is','are','does','do'],c:0},
+  {d:1,sk:'grammar',q:'I go to school ___ Monday.',o:['on','in','at','to'],c:0},
+  {d:1,sk:'grammar',q:'The lesson starts ___ 9 o’clock.',o:['at','in','on','to'],c:0},
+  {d:1,sk:'grammar',q:'I live ___ Almaty.',o:['in','on','at','to'],c:0},
+  {d:1,sk:'grammar',q:'We are ___ the classroom.',o:['in','on','of','about'],c:0},
+  {d:1,sk:'vocab',q:'«мектеп» — ағылшынша?',o:['school','street','shop','spoon'],c:0},
+  {d:1,sk:'vocab',q:'«дәрігер» — ағылшынша?',o:['doctor','driver','teacher','worker'],c:0},
+  {d:1,sk:'vocab',q:'«сәрсенбі» — ағылшынша?',o:['Wednesday','Tuesday','Thursday','Sunday'],c:0},
+  {d:1,sk:'vocab',q:'«жасыл» — ағылшынша?',o:['green','grey','blue','brown'],c:0},
+  {d:1,sk:'vocab',q:'«нан» — ағылшынша?',o:['bread','butter','meat','milk'],c:0},
+  {d:1,sk:'vocab',q:'«тоғыз» — ағылшынша?',o:['nine','five','seven','eleven'],c:0},
+  {d:1,sk:'vocab',q:'«күн» (аспандағы) — ағылшынша?',o:['sun','sky','star','moon'],c:0},
+  {d:1,sk:'vocab',q:'«терезе» — ағылшынша?',o:['window','door','wall','floor'],c:0},
+  {d:1,sk:'vocab',q:'«ағаш» — ағылшынша?',o:['tree','grass','flower','leaf'],c:0},
+  {d:1,sk:'vocab',q:'Which word is a colour?',o:['yellow','table','happy','run'],c:0},
+  {d:1,sk:'vocab',type:'gap',q:'«үстел» — ағылшынша жаз:',a:'table'},
+  {d:1,sk:'vocab',type:'gap',q:'«сегіз» — ағылшынша жаз:',a:'eight'},
+  {d:1,sk:'grammar',type:'gap',q:'My mother ___ (be) a nurse. Жетіспейтін сөзді жаз:',a:'is'},
+  {d:1,sk:'grammar',type:'order',q:'Сөйлем құра:',a:'My name is Aisel'},
+  {d:1,sk:'grammar',type:'order',q:'Сөйлем құра:',a:'I am fifteen years old'},
+  {d:1,sk:'grammar',type:'order',q:'Сөйлем құра:',a:'She has a red bag'},
+
+  /* ---------- d2 · Elementary ---------- */
+  {d:2,sk:'grammar',q:'Yesterday I ___ to the cinema.',o:['went','go','goes','gone'],c:0},
+  {d:2,sk:'grammar',q:'She ___ her homework last night.',o:['did','does','do','done'],c:0},
+  {d:2,sk:'grammar',q:'They ___ at home yesterday.',o:['were','was','are','be'],c:0},
+  {d:2,sk:'grammar',q:'I didn’t ___ the answer.',o:['know','knew','known','knows'],c:0},
+  {d:2,sk:'grammar',q:'Did he ___ the film?',o:['like','liked','likes','liking'],c:0},
+  {d:2,sk:'grammar',q:'Look! They ___ football.',o:['are playing','play','played','plays'],c:0},
+  {d:2,sk:'grammar',q:'What ___ you doing now?',o:['are','is','do','does'],c:0},
+  {d:2,sk:'grammar',q:'I ___ not going to the party.',o:['am','is','are','do'],c:0},
+  {d:2,sk:'grammar',q:'We ___ to visit Turkey next summer.',o:['are going','go','went','will going'],c:0},
+  {d:2,sk:'grammar',q:'Astana is ___ than Almaty in winter.',o:['colder','coldest','more cold','cold'],c:0},
+  {d:2,sk:'grammar',q:'My brother is ___ than me.',o:['taller','tall','more tall','tallest'],c:0},
+  {d:2,sk:'grammar',q:'This is the ___ film I know.',o:['best','better','good','well'],c:0},
+  {d:2,sk:'grammar',q:'There ___ four chairs in the room.',o:['are','is','was','be'],c:0},
+  {d:2,sk:'grammar',q:'Have you got ___ milk?',o:['any','some','a','much'],c:0},
+  {d:2,sk:'grammar',q:'I bought ___ new shoes.',o:['some','a','any','much'],c:0},
+  {d:2,sk:'grammar',q:'How ___ money have you got?',o:['much','many','long','old'],c:0},
+  {d:2,sk:'grammar',q:'I ___ go swimming on Sundays.',o:['usually','using','used','use'],c:0},
+  {d:2,sk:'grammar',q:'He never ___ late.',o:['is','are','be','being'],c:0},
+  {d:2,sk:'grammar',q:'You ___ wear a uniform at school. It is a rule.',o:['must','musts','to must','are must'],c:0},
+  {d:2,sk:'grammar',q:'My sister ___ swim very well.',o:['can','cans','is can','can to'],c:0},
+  {d:2,sk:'grammar',q:'She ___ like fish.',o:["doesn't","don't","isn't","not"],c:0},
+  {d:2,sk:'grammar',q:'___ did you go last weekend?',o:['Where','What','Who','Which'],c:0},
+  {d:2,sk:'grammar',q:'Whose bag is this? — It’s ___.',o:['mine','my','me','I'],c:0},
+  {d:2,sk:'grammar',q:'She is good ___ maths.',o:['at','in','on','for'],c:0},
+  {d:2,sk:'grammar',q:'We arrived ___ the airport at six.',o:['at','in','to','on'],c:0},
+  {d:2,sk:'vocab',q:'«дүкен» — ағылшынша?',o:['shop','shelf','ship','sheep'],c:0},
+  {d:2,sk:'vocab',q:'«көрші» — ағылшынша?',o:['neighbour','relative','stranger','partner'],c:0},
+  {d:2,sk:'vocab',q:'«оңай» — ағылшынша?',o:['easy','busy','early','empty'],c:0},
+  {d:2,sk:'vocab',q:'«кешігу» — ағылшынша?',o:['be late','be early','be busy','be free'],c:0},
+  {d:2,sk:'vocab',q:'«ауа райы» — ағылшынша?',o:['weather','whether','water','wetter'],c:0},
+  {d:2,sk:'vocab',q:'Which word is the opposite of "cheap"?',o:['expensive','cheaper','free','low'],c:0},
+  {d:2,sk:'vocab',type:'gap',q:'"expensive" сөзінің антонимін жаз:',a:['cheap']},
+  {d:2,sk:'grammar',type:'gap',q:'I ___ (go) to Turkey last year. Дұрыс формасын жаз:',a:'went'},
+  {d:2,sk:'grammar',type:'gap',q:'She ___ (buy) a new phone yesterday. Дұрыс формасын жаз:',a:'bought'},
+  {d:2,sk:'grammar',type:'gap',q:'It is r___ now. (жаңбыр жауып тұр) Сөзді толық жаз:',a:'raining'},
+  {d:2,sk:'grammar',type:'order',q:'Сөйлем құра:',a:'We went to the park yesterday'},
+  {d:2,sk:'grammar',type:'order',q:'Сөйлем құра:',a:'She is listening to music'},
+  {d:2,sk:'reading',passage:'Timur is 16. He lives in Shymkent with his parents and his little brother. Every Saturday he plays basketball with his friends. He does not like getting up early, but on Saturday he never sleeps late.',
+   q:'When does Timur play basketball?',o:['On Saturdays','Every morning','After school','On Sundays'],c:0},
+  {d:2,sk:'reading',passage:'The shop opens at 9 a.m. and closes at 8 p.m. On Sunday it opens later, at 11 a.m. The shop is closed on holidays.',
+   q:'What time does the shop open on Sunday?',o:['At 11 a.m.','At 9 a.m.','At 8 p.m.','It is closed'],c:0},
+
+  /* ---------- d3 · Pre-Intermediate ---------- */
+  {d:3,sk:'grammar',q:'I have ___ in Almaty since 2019.',o:['lived','live','living','lives'],c:0},
+  {d:3,sk:'grammar',q:'She ___ finished her homework yet.',o:["hasn't","haven't","didn't","isn't"],c:0},
+  {d:3,sk:'grammar',q:'Have you ever ___ to London?',o:['been','go','went','being'],c:0},
+  {d:3,sk:'grammar',q:'We ___ each other for ten years.',o:['have known','know','knew','are knowing'],c:0},
+  {d:3,sk:'grammar',q:'She has been to Paris, ___ she?',o:["hasn't",'has',"isn't","didn't"],c:0},
+  {d:3,sk:'grammar',q:'While I ___ dinner, the phone rang.',o:['was cooking','cooked','cook','am cooking'],c:0},
+  {d:3,sk:'grammar',q:'It ___ raining an hour ago.',o:['stopped','stop','stops','has stopped'],c:0},
+  {d:3,sk:'grammar',q:'If it rains, we ___ at home.',o:['will stay','stay will','would stay','stayed'],c:0},
+  {d:3,sk:'grammar',q:'I’ll call you when I ___ home.',o:['get','will get','got','getting'],c:0},
+  {d:3,sk:'grammar',q:'I promise I ___ tell anyone.',o:["won't","don't","am not","didn't"],c:0},
+  {d:3,sk:'grammar',q:'You ___ to wear a helmet here. It’s a rule.',o:['have','has','having','must to'],c:0},
+  {d:3,sk:'grammar',q:'I ___ play tennis when I was a child, but now I don’t.',o:['used to','use to','used','using'],c:0},
+  {d:3,sk:'grammar',q:'This coffee is too ___ to drink.',o:['hot','hotter','hottest','heat'],c:0},
+  {d:3,sk:'grammar',q:'He isn’t old ___ to drive.',o:['enough','too','very','so'],c:0},
+  {d:3,sk:'grammar',q:'The man ___ lives next door is a doctor.',o:['who','which','what','whose'],c:0},
+  {d:3,sk:'grammar',q:'It’s the ___ interesting book I’ve read.',o:['most','more','much','many'],c:0},
+  {d:3,sk:'grammar',q:'She’s much better ___ me at chess.',o:['than','then','that','as'],c:0},
+  {d:3,sk:'grammar',q:'There isn’t ___ sugar left.',o:['much','many','a lot','few'],c:0},
+  {d:3,sk:'grammar',q:'She speaks English ___.',o:['fluently','fluent','fluency','fluenty'],c:0},
+  {d:3,sk:'grammar',q:'Would you like ___ come with us?',o:['to','for','that','-'],c:0},
+  {d:3,sk:'grammar',q:'Let’s go out, ___?',o:['shall we','will we','do we','are we'],c:0},
+  {d:3,sk:'grammar',q:'Do you mind ___ the window?',o:['opening','to open','open','opened'],c:0},
+  {d:3,sk:'vocab',q:'I’m looking ___ my keys. I can’t find them.',o:['for','at','after','up'],c:0},
+  {d:3,sk:'vocab',q:'Please turn ___ the lights when you leave.',o:['off','of','out of','down'],c:0},
+  {d:3,sk:'vocab',q:'I’m thinking ___ changing my job.',o:['about','on','for','in'],c:0},
+  {d:3,sk:'vocab',q:'«шешім қабылдау» — ағылшынша?',o:['make a decision','do a decision','take a decision','give a decision'],c:0},
+  {d:3,sk:'vocab',q:'«тәжірибе» — ағылшынша?',o:['experience','experiment','expert','expense'],c:0},
+  {d:3,sk:'vocab',q:'«кеңес беру» — ағылшынша?',o:['give advice','give advise','make advice','do advice'],c:0},
+  {d:3,sk:'vocab',q:'«өзіне сенімді» — ағылшынша?',o:['confident','confused','comfortable','convenient'],c:0},
+  {d:3,sk:'vocab',q:'Which word means "not on time"?',o:['late','early','quick','slow'],c:0},
+  {d:3,sk:'grammar',type:'gap',q:'She has ___ (write) three letters today. Дұрыс формасын жаз:',a:['written']},
+  {d:3,sk:'grammar',type:'gap',q:'We ___ ___ him since May. (not / see) Екі сөзбен жаз:',a:["haven't seen",'have not seen']},
+  {d:3,sk:'vocab',type:'gap',q:'"borrow" сөзінің қарама-қарсысын жаз (біреуге беру):',a:['lend']},
+  {d:3,sk:'vocab',type:'gap',q:'He gave ___ smoking two years ago. Жетіспейтін сөзді жаз:',a:['up']},
+  {d:3,sk:'grammar',type:'order',q:'Сөйлем құра:',a:'I have never been to London'},
+  {d:3,sk:'grammar',type:'order',q:'Сөйлем құра:',a:'She was watching TV when I called'},
+  {d:3,sk:'reading',passage:'Dana started learning English three years ago. At first she only studied grammar, and she could not speak at all. Then she joined a speaking club and began to watch films without subtitles. Now she says her speaking is much better than her writing.',
+   q:'What helped Dana most with speaking?',o:['A speaking club and films','Grammar books','Writing letters','Subtitles in Kazakh'],c:0},
+  {d:3,sk:'reading',passage:'Most students say they have no time for reading. But research shows that reading only fifteen minutes a day adds about a million words a year. The problem is not time — it is the phone next to the book.',
+   q:'What is the real problem, according to the text?',o:['The phone, not the time','Bad books','Reading speed','Teachers'],c:0},
+
+  /* ---------- d4 · Pre-Intermediate-тен жоғары ---------- */
+  {d:4,sk:'grammar',q:'If I had known, I ___ you.',o:['would have told','would tell','will tell','told'],c:0},
+  {d:4,sk:'grammar',q:'If I ___ you, I’d apologise.',o:['were','am','was being','will be'],c:0},
+  {d:4,sk:'grammar',q:'The bridge ___ in 1998.',o:['was built','built','is built','has built'],c:0},
+  {d:4,sk:'grammar',q:'The report ___ by tomorrow.',o:['will be finished','will finish','finishes','is finishing'],c:0},
+  {d:4,sk:'grammar',q:'He said he ___ busy.',o:['was','is','will be','be'],c:0},
+  {d:4,sk:'grammar',q:'I wish I ___ more time.',o:['had','have','will have','having'],c:0},
+  {d:4,sk:'grammar',q:'She ___ waiting for two hours.',o:['has been','is','was','has'],c:0},
+  {d:4,sk:'grammar',q:'He must ___ forgotten about the meeting.',o:['have','has','had','having'],c:0},
+  {d:4,sk:'grammar',q:'By the time we arrived, the film ___ started.',o:['had','has','was','have'],c:0},
+  {d:4,sk:'grammar',q:'It’s the first time I ___ here.',o:['have been','am','was','be'],c:0},
+  {d:4,sk:'grammar',q:'Unless you hurry, you ___ the bus.',o:['will miss','miss','would miss','missed'],c:0},
+  {d:4,sk:'grammar',q:'I look forward to ___ from you.',o:['hearing','hear','heard','be hearing'],c:0},
+  {d:4,sk:'grammar',q:'She denied ___ the money.',o:['taking','to take','take','taken'],c:0},
+  {d:4,sk:'grammar',q:'She suggested ___ a taxi.',o:['taking','to take','take','takes'],c:0},
+  {d:4,sk:'grammar',q:'I can’t help ___ about it.',o:['thinking','to think','think','thought'],c:0},
+  {d:4,sk:'grammar',q:'Despite ___ tired, he kept working.',o:['being','be','was','he was'],c:0},
+  {d:4,sk:'grammar',q:'I’m not used to ___ up so early.',o:['getting','get','got','gets'],c:0},
+  {d:4,sk:'grammar',q:'He’s used to ___ in a big city.',o:['living','live','lived','lives'],c:0},
+  {d:4,sk:'grammar',q:'He’s the person ___ advice I trust.',o:['whose','who','which','whom'],c:0},
+  {d:4,sk:'grammar',q:'I’d rather you ___ smoke here.',o:["didn't","don't",'not',"aren't"],c:0},
+  {d:4,sk:'grammar',q:'You’d better ___ now, it’s late.',o:['leave','to leave','leaving','left'],c:0},
+  {d:4,sk:'grammar',q:'The more you practise, the ___ you get.',o:['better','best','good','more better'],c:0},
+  {d:4,sk:'vocab',q:'The meeting was called ___ because of the storm.',o:['off','out','in','over'],c:0},
+  {d:4,sk:'vocab',q:'We ran ___ of petrol on the way.',o:['out','off','away','over'],c:0},
+  {d:4,sk:'vocab',q:'She takes ___ her mother — same eyes, same voice.',o:['after','on','up','over'],c:0},
+  {d:4,sk:'vocab',q:'Which verb goes with "progress"?',o:['make','do','take','get'],c:0},
+  {d:4,sk:'vocab',q:'«мойындау» — ағылшынша?',o:['admit','deny','refuse','avoid'],c:0},
+  {d:4,sk:'vocab',q:'«күмәндану» — ағылшынша?',o:['doubt','trust','prove','claim'],c:0},
+  {d:4,sk:'vocab',q:'«тәуекел» — ағылшынша?',o:['risk','rick','rise','reach'],c:0},
+  {d:4,sk:'vocab',q:'Which word means "almost the same"?',o:['similar','opposite','equal','strange'],c:0},
+  {d:4,sk:'grammar',type:'gap',q:'The letter ___ ___ yesterday. (send · passive) Екі сөзбен жаз:',a:['was sent']},
+  {d:4,sk:'grammar',type:'gap',q:'He has been ___ (work) here since 2010. Дұрыс формасын жаз:',a:['working']},
+  {d:4,sk:'vocab',type:'gap',q:'"increase" сөзінің антонимін жаз:',a:['decrease','reduce']},
+  {d:4,sk:'grammar',type:'order',q:'Сөйлем құра:',a:'I would have helped you'},
+  {d:4,sk:'grammar',type:'order',q:'Сөйлем құра:',a:'The book was written by a Kazakh author'},
+  {d:4,sk:'reading',passage:'Whenever a new technology appears, people argue about it in the same way. Some say it will destroy education; others promise it will replace teachers completely. In practice neither happens. The tool changes what is worth teaching, and the argument starts again ten years later with a different tool.',
+   q:'What does the writer say usually happens?',o:['Neither the fears nor the promises come true','Teachers are replaced','Education is destroyed','The tool is forgotten'],c:0}
+  ];
+
+  var LEVELS = {
+    beginner:{name:'Beginner (A1)',desc:'Негізгі сөздер мен қарапайым сөйлемдерді танисың. Бастапқы деңгейден жүйелі бастау керек — бұл қалыпты жағдай.'},
+    elementary:{name:'Elementary (A2)',desc:'Күнделікті тақырыптарда қарапайым сөйлемдер құрасың. Өткен шақ пен сұрақ құрылымдары әлі тұрақсыз.'},
+    pre:{name:'Pre-Intermediate (A2+/B1)',desc:'Күнделікті жағдайда еркін түсінесің және жауап бересің. Present Perfect, шартты сөйлемдер мен уақыт формаларын бекіту керек.'},
+    above:{name:'Pre-Intermediate-тен жоғары',desc:'Бұл тест сенің деңгейіңді дәл өлшей алмайды — ол Beginner мен Pre-Intermediate аралығына арналған. Нақты деңгей үшін кеңейтілген тест керек.'}
+  };
+
   var $=function(id){return document.getElementById(id);};
-  // ассеты-фоллбэк
-  var EMO={normal:'🦉',hype:'🤩',think:'🤔',cool:'😎',dead:'💀'};
-  function mascotHTML(e){var u=CONFIG.ASSETS.mascot[e];return u?'<img class="mas" src="'+u+'" alt="">':EMO[e];}
-  function parseYT(u){ if(!u) return ''; var m=String(u).match(/(?:shorts\/|watch\?v=|youtu\.be\/|embed\/|v\/)([A-Za-z0-9_-]{6,})/); return m?m[1]:(/^[A-Za-z0-9_-]{6,}$/.test(u)?u:''); }
-  function setIntro(){
-    var box=$('heroImg'), mp4=CONFIG.ASSETS.intro_mp4, yt=parseYT(CONFIG.ASSETS.intro_youtube), vid='';
-    if(mp4){ vid='<video class="introvid" autoplay muted loop playsinline src="'+mp4+'"></video>'; }
-    else if(yt){ vid='<iframe class="introvid" src="https://www.youtube.com/embed/'+yt+'?autoplay=1&mute=1&loop=1&playlist='+yt+'&controls=0&playsinline=1&modestbranding=1&rel=0" allow="autoplay; encrypted-media" frameborder="0"></iframe>'; }
-    if(vid){ box.classList.add('hasvid'); box.insertAdjacentHTML('afterbegin', vid); }
-  }
-  function setHeroAssets(){
-    if(CONFIG.ASSETS.hero) $('heroImg').style.backgroundImage='url('+CONFIG.ASSETS.hero+')';
-    var u=CONFIG.ASSETS.mascot.cool||CONFIG.ASSETS.mascot.normal;
-    $('heroMas').innerHTML = u?'<img class="mas" src="'+u+'" alt="">':'😎';
-    var jd=CONFIG.ASSETS.mascot.dead, je=document.querySelector('#ev .joke .e');
-    if(jd && je) je.innerHTML='<img src="'+jd+'" alt="" style="width:46px;height:46px;vertical-align:middle">';
-    if(SCHOOL){var s=$('schoolTag');s.style.display='inline-block';s.textContent='🏫 '+SCHOOL;}
-    setIntro();
-  }
-  setHeroAssets();
-  (function applyBrand(){ var b=CONFIG.BRAND||{}, r=$('ev'); if(!r)return;
-    if(b.primary)r.style.setProperty('--crimson',b.primary);
-    if(b.accent)r.style.setProperty('--gold',b.accent);
-    if(b.navy){r.style.setProperty('--navy',b.navy);}
-    var bn=document.querySelector('#ev .brand b'); if(bn&&b.name)bn.innerHTML=b.name+'<span>'+(b.tld||'')+'</span>';
-  })();
-
-  /* ===== БАНК — БОТ ИНЪЕКТИТ СЮДА (жалғыз var WORDS). Линейный тест. ===== */
-  var WORDS=[
-    {d:1,sk:'vocab',type:'mcq',big:'🍎',q:'Мынау ағылшынша?',o:['Apple','Orange','Banana','Grape'],c:0},
-    {d:1,sk:'vocab',en:'water',kk:'су',e:'💧'},
-    {d:2,sk:'grammar',type:'mcq',q:'She ___ to school every day.',o:['go','goes','going','went'],a:'goes'},
-    {d:2,sk:'vocab',type:'match',q:'Жұбын тап:',pairs:[['Dog','Ит'],['Book','Кітап'],['Sun','Күн'],['Red','Қызыл']]},
-    {d:3,sk:'vocab',type:'multimatch',q:'Етістік пен аудармасын қос:',left:['buy','sell','borrow'],right:['сатып алу','сату','қарызға алу','беру','табу','жоғалту','айырбастау'],map:[0,1,2]},
-    {d:2,sk:'listening',type:'listen',audio:'My brother is a doctor.',q:'Тыңда: ағасы кім?',o:['дәрігер','мұғалім','аспаз'],a:'дәрігер'},
-    {d:3,sk:'grammar',type:'gap',q:'He ___ like coffee.',a:"doesn't",kk:'he → doesn\'t'},
-    {d:2,sk:'grammar',type:'order',a:'I have two brothers',q:'Сөйлем құра:'},
-    {d:3,sk:'grammar',type:'cloze',q:'Толтыр:',passage:'Last weekend we ___ to the mountains and ___ many photos.',blanks:[{o:['went','go','goes'],c:0},{o:['took','take','taked'],c:0}]},
-    {d:4,sk:'vocab',type:'categorize',q:'Дұрыс етістікке салы:',cats:['make','do','take'],items:[{w:'a decision',c:0},{w:'homework',c:1},{w:'a photo',c:2},{w:'a mistake',c:0}]},
-    {d:3,sk:'reading',passage:'Aisha is 15. Last summer she went to London for an English course. She loves animals.',type:'reading',q:'Where did Aisha go?',o:['London','Astana','Paris'],a:'London'}
-  ];
-  var M1=WORDS,SPEED=[],M2E=[],M2C=[],M2H=[],M3E=[],M3C=[],M3H=[],P_READ='';
-  /* ===== КҮЙ ===== */
-  var lead={id:null,name:'',cls:'',phone:''};
-  var seq=[],i=0,branchDone=false,branch='';
-  var xp=0,combo=0,comboMax=0,vibe=0,startedAt=null,locked=false,muted=false,speedT=null;
+  var P=new URLSearchParams(location.search), SCHOOL=P.get('school')||'';
+  var lead={id:null,name:'',cls:''}, seq=[], i=0, answers=[], startedAt=null, locked=false;
   var band={1:{c:0,t:0},2:{c:0,t:0},3:{c:0,t:0},4:{c:0,t:0}};
-  var answers=[];
-  var BNAME={1:'a1',2:'a2',3:'b1',4:'b2'};
-  function show(n){var s=document.querySelectorAll('#ev .screen');for(var k=0;k<s.length;k++)s[k].classList.remove('active');$('ev-'+n).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
-  function toast(t){var e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(function(){e.classList.remove('show');},1300);}
-  function normPhone(r){var d=(r||'').replace(/\D/g,'');if(d.length===11&&d.charAt(0)==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d;}
-  function phoneOk(r){var d=normPhone(r);return d.length===11&&d.charAt(0)==='7';}
-  function send(p){try{fetch(CONFIG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});}catch(e){}}
+  var BNAME={1:'Beginner',2:'Elementary',3:'Pre-Intermediate',4:'Жоғары деңгей'};
+
+  function show(n){
+    var s=document.querySelectorAll('#ev .screen');
+    for(var k=0;k<s.length;k++)s[k].classList.remove('active');
+    $('ev-'+n).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function toast(t){var e=$('ev-toast');e.textContent=t;e.classList.add('show');setTimeout(function(){e.classList.remove('show');},1800);}
   function norm(s){return (s||'').toString().toLowerCase().replace(/[.,!?'’]/g,'').replace(/\s+/g,' ').trim();}
-  function speak(t){if(!TTS||muted)return;try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.92;window.speechSynthesis.speak(u);}catch(e){}}
-  if(!TTS){ for(var k=WORDS.length-1;k>=0;k--){ var w=WORDS[k]; if(w.audio||w.type==='listen'||w.type==='listen_type'||w.type==='listen_dialog') WORDS.splice(k,1); } }
+  function shuffle(a){for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var t=a[k];a[k]=a[j];a[j]=t;}return a;}
+  function send(p){try{fetch(CONFIG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});}catch(e){}}
 
-  /* ===== ЗВУК (Web Audio, файлсыз) ===== */
-  var AC=null;
-  function tone(f,d,type){if(muted)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.value=f;o.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(.12,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.start();o.stop(AC.currentTime+d);}catch(e){}}
-  function sPop(){tone(420,.12,'triangle');} function sDing(){tone(680,.18);setTimeout(function(){tone(900,.18);},90);} function sHype(){[523,659,784,1046].forEach(function(f,k){setTimeout(function(){tone(f,.2,'square');},k*70);});}
-  $('h-mute').addEventListener('click',function(){muted=!muted;this.textContent=muted?'🔇':'🔊';});
-
-  /* ===== LANDING → ПОШАГОВАЯ ФОРМА (бір сұрақ — бір экран) ===== */
-  $('go-form').addEventListener('click',function(){show('form');stepIdx=0;renderStep();});
-  var STEPS=[
-    {key:'name',type:'text',em:'🙂',q:'Атың кім?',ph:'Алихан',val:function(v){return v.trim().length>=1;},err:'Атыңды жаз'},
-    {key:'cls',type:'text',em:'🎓',q:'Сыныбың / тобың қандай?',sub:'Мысалы: 6А немесе Group B2',ph:'6А',val:function(v){return v.trim().length>=1;},err:'Сыныбыңды жаз'},
-    {key:'goal',type:'choice',em:'🎯',q:'Ағылшынды не үшін үйренесің?',options:['Мектеп бағдарламасы','Емтиханға дайындық','Еркін сөйлегім келеді','Негізден бастаймын','Басқа мақсат']}
-  ];
-  var stepIdx=0, fdata={};
-  function dots(){var h='';for(var k=0;k<STEPS.length;k++)h+='<i class="'+(k<stepIdx?'done':(k===stepIdx?'on':''))+'"></i>';$('stepDots').innerHTML=h;}
-  function renderStep(){
-    dots();var s=STEPS[stepIdx],box=$('stepBox'),h='';
-    h+='<div class="stepq"><span class="em">'+s.em+'</span>'+s.q+'</div>';
-    h+='<div class="stepsub">'+(s.sub||'')+'</div>';
-    if(s.type==='choice'){
-      h+='<div class="choices">';s.options.forEach(function(o){h+='<button class="choice" data-v="'+o+'">'+o+'</button>';});h+='</div>';
-      box.innerHTML=h;box.querySelectorAll('.choice').forEach(function(b){b.addEventListener('click',function(){fdata[s.key]=b.dataset.v;advanceStep();});});
-    } else {
-      h+='<input class="stepin" id="stepin" type="'+(s.type==='tel'?'tel':'text')+'" '+(s.type==='tel'?'inputmode="tel"':'')+' placeholder="'+s.ph+'" autocomplete="off">';
-      h+='<div class="steperr" id="steperr"></div><button class="btn" id="stepnext">Әрі қарай →</button>';
-      box.innerHTML=h;var inp=$('stepin');inp.value=fdata[s.key]||'';try{inp.focus();}catch(e){}
-      function go(){var v=inp.value.trim();if(!s.val(v)){$('steperr').textContent=s.err;return;}fdata[s.key]=v;advanceStep();}
-      $('stepnext').addEventListener('click',go);
-      inp.addEventListener('keydown',function(e){if(e.key==='Enter')go();});
-      inp.addEventListener('input',function(){$('steperr').textContent='';});
-    }
+  /* ===== СҰРАҚТАРДЫ ТАҢДАУ: әр деңгейден кездейсоқ ===== */
+  function pickQuestions(){
+    var out=[];
+    [1,2,3,4].forEach(function(d){
+      var pool=shuffle(BANK.filter(function(x){return x.d===d;}));
+      out=out.concat(pool.slice(0,CONFIG.PICK[d]||0));
+    });
+    return out.map(prepare);
   }
-  function advanceStep(){stepIdx++;if(stepIdx>=STEPS.length)finishForm();else renderStep();}
-  function finishForm(){
-    lead.id='ev_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
-    lead.name=fdata.name||'';lead.cls=fdata.cls||'';lead.phone='';lead.goal=fdata.goal||'';
-    startedAt=new Date().toISOString();
-    send({action:'lead',leadId:lead.id,school:SCHOOL,subject:CONFIG.SUBJECT,name:lead.name,class:lead.cls,goal:lead.goal,parentPhone:lead.phone,startedAt:startedAt,testUrl:location.href});
-    startTest();
-  }
-
-  /* ===== ОЙЫН ===== */
-  function startTest(){ seq=(Array.isArray(WORDS)&&WORDS.length)?WORDS.slice():[{d:1,sk:'vocab',type:'mcq',q:'Дайынсың ба?',o:['Иә','Жоқ'],c:0}]; i=0;branchDone=true;branch='';xp=0;combo=0;comboMax=0;vibe=0;answers=[];band={1:{c:0,t:0},2:{c:0,t:0},3:{c:0,t:0},4:{c:0,t:0}};show('test');render();}
-  function estTotal(){return seq.length;}
-  function updHud(){$('h-xp').textContent=xp;$('h-combo').textContent=combo;$('h-prog').textContent=(i+1)+'/'+estTotal();$('h-bar').style.width=(i/estTotal()*100)+'%';$('h-vibe').style.width=vibe+'%';}
-
-  function routeAfterM1(){
-    // скрытый балл по M1 (взвешенно по сложности), консервативно
-    var pts=0,maxp=0,hard=0,hardT=0;
-    M1.forEach(function(it,k){var a=answers[k];maxp+=it.d;if(a&&a.ok)pts+=it.d;if(it.d>=3){hardT++;if(a&&a.ok)hard++;}});
-    var ratio=maxp?pts/maxp:0;
-    if(ratio>=0.72 && hard>=Math.max(1,hardT-1)) branch='hard';
-    else if(ratio>=0.42) branch='core';
-    else branch='easy';
-    var M2=branch==='hard'?M2H:branch==='core'?M2C:M2E;
-    var M3=branch==='hard'?M3H:branch==='core'?M3C:M3E;
-    seq=M1.concat(SPEED,M2,M3);branchDone=true;
-  }
-
-  function addXP(base,tag){var luck=Math.random()<0.12?(5+Math.floor(Math.random()*16)):0;var cb=combo>=6?10:combo>=3?5:0;var g=base+cb+luck;xp+=g;flyXP('+'+g+(luck?' 🍀':''));if(luck)toast('🍀 LUCKY +'+luck);else if(tag)toast(tag);return g;}
-  function flyXP(t){var e=document.createElement('div');e.className='xpfly';e.textContent=t;e.style.left=(window.innerWidth/2-20)+'px';e.style.top='42%';document.body.appendChild(e);setTimeout(function(){e.remove();},1000);}
-  function bumpCombo(){combo++;if(combo>comboMax)comboMax=combo;var p=$('h-combopill');p.classList.add('hot');setTimeout(function(){p.classList.remove('hot');},400);if(combo>0&&combo%3===0){sDing();flySticker();toast('🔥 '+combo+' КОМБО!');}}
-  function addVibe(){vibe+=13;if(vibe>=100){vibe=0;hype();}}
-  function hype(){sHype();confetti();flySticker();overlay('hype','🔥 VIBE MAX!','Қызып кеттің! Бонус XP 🎁',function(){});xp+=30;flyXP('+30 🔥');}
-  function flySticker(){var a=CONFIG.ASSETS.stickers;if(!a||!a.length)return;var u=a[Math.floor(Math.random()*a.length)];var s=document.createElement('div');s.style.cssText='position:fixed;left:50%;top:36%;transform:translate(-50%,-50%);z-index:86;pointer-events:none;animation:evpop .35s ease';s.innerHTML='<img src="'+u+'" alt="" style="width:130px;height:130px;border-radius:16px;filter:drop-shadow(0 10px 22px rgba(0,0,0,.55))">';document.body.appendChild(s);setTimeout(function(){s.style.transition='opacity .4s,transform .4s';s.style.opacity='0';s.style.transform='translate(-50%,-62%)';},750);setTimeout(function(){s.remove();},1250);}
-  function confetti(){var em=['🎉','✨','🔥','⭐','💥','🎊'];for(var k=0;k<18;k++){(function(){var s=document.createElement('div');s.textContent=em[k%em.length];s.style.cssText='position:fixed;top:-20px;left:'+(Math.random()*100)+'vw;font-size:'+(16+Math.random()*16)+'px;z-index:85;pointer-events:none;animation:evfall '+(1.2+Math.random()*1.2)+'s linear forwards';document.body.appendChild(s);setTimeout(function(){s.remove();},2600);})();}}
-
-  function overlay(emo,t,p,cb){$('ovlEm').innerHTML=mascotEl(emo);$('ovlT').textContent=t;$('ovlP').textContent=p;$('ovl').classList.add('show');$('ovlGo').onclick=function(){$('ovl').classList.remove('show');if(cb)cb();};}
-  function mascotEl(emo){var map={hype:'hype',think:'think',cool:'cool',dead:'dead',normal:'normal'};var key=map[emo]||'normal';var u=CONFIG.ASSETS.mascot[key];return u?'<img src="'+u+'" alt="">':EMO[key];}
-
-  function maybeLevelUp(it,cb){
-    if(i>0 && i%7===0){ overlay('cool','🚀 KELESI DEŃGEÝ','Жарайсың! Жалғастырамыз 🔥',cb); return; }
-    return cb();
-    /* eslint-disable */
-    var label = it.speed?'⚡ SPEED RAUND':(branchDone&&i===M1.length+SPEED.length?'🚀 KELESI DEŃGEÝ':'');
-    // показываем level-up при входе в SPEED и в M2
-    if(it.speed && (i===0 || !seq[i-1] || !seq[i-1].speed)){
-      overlay('hype','⚡ SPEED раунд!','Жылдам жауап бер — әр сұраққа уақыт аз, бонус XP көп!',cb);return;
+  function prepare(raw){
+    var it={};for(var k in raw)if(raw.hasOwnProperty(k))it[k]=raw[k];
+    if(!it.type)it.type='mcq';
+    if(it.type==='mcq'&&it.o){
+      var ans=it.o[it.c];
+      it.o=shuffle(it.o.slice());
+      it.c=it.o.indexOf(ans);
     }
-    if(branchDone && i===M1.length+SPEED.length){
-      var msg=branch==='hard'?'Сен күштісің! Қиынырақ сұрақтар 🔥':branch==='easy'?'Жалғастырамыз, сен жасайсың 💪':'Келесі деңгей! Кеттік 🚀';
-      overlay('cool','🚀 NEXT LEVEL',msg,cb);return;
-    }
-    cb();
-  }
-  /* eslint-enable */
-
-  var KEYS=['A','B','C','D'];
-  function normItem(it){
-    if(it._n) return it; it._n=1;
-    if(!it.type && it.en) it.type='vocab';
-    if(it.type==='fill'||it.type==='write') it.type='gap';
-    if(it.type==='assemble') it.type='order';
-    if(it.type==='listening') it.type='listen';
-    if(it.type==='vocab' || (it.en&&it.kk&&!it.q&&!it.o)){
-      var poolv=(typeof seq!=='undefined'?seq:WORDS).filter(function(x){return x&&x.en&&x.en!==it.en;}).map(function(x){return x.en;});
-      poolv.sort(function(){return Math.random()-0.5;}); var ov=[it.en]; for(var z=0;z<poolv.length&&ov.length<4;z++){ if(ov.indexOf(poolv[z])<0)ov.push(poolv[z]); }
-      var fb=['water','house','friend','city','apple']; for(var f=0;f<fb.length&&ov.length<3;f++){ if(ov.indexOf(fb[f])<0&&fb[f]!==it.en)ov.push(fb[f]); }
-      ov.sort(function(){return Math.random()-0.5;}); it.q=(it.e?it.e+'  ':'')+'«'+it.kk+'» — ағылшынша?'; it.o=ov; it.c=ov.indexOf(it.en); it.type='mcq';
-    }
-    if(it.type==='gap') it.type='type';                 // вписать → ввод
-    if(it.type==='order'){ it.type='build'; if(!it.words&&it.a) it.words=String(it.a).split(/\s+/); }
-    if(it.type==='listen_type') it.type='type';          // аудио + ввод
-    if(it.type==='listen') it.type='mcq';                // аудио + выбор
-    if(it.type==='reading') it.type='mcq';               // passage уже в шапке + выбор
-    // mcq/mistake: c из a
-    if((it.type==='mcq'||it.type==='mistake') && typeof it.c!=='number' && it.o && it.a!=null){
-      var ix=it.o.indexOf(it.a); it.c=(ix>=0?ix:0);
-    }
-    if(!it.d) it.d=2; if(!it.sk) it.sk='vocab';
+    if(it.type==='order')it.words=shuffle(String(it.a).split(/\s+/));
     return it;
   }
 
-  /* ===== СПИКИНГ: Web Speech API (on-device, без ключа/вебхука) ===== */
-  var SR = window.SpeechRecognition||window.webkitSpeechRecognition||null;
-  function speechScore(said,target){var a=norm(said).split(' ').filter(Boolean),b=norm(target).split(' ').filter(Boolean);if(!b.length)return said&&said.trim()?0.7:0;var hit=0,used={};b.forEach(function(w){for(var k=0;k<a.length;k++){if(!used[k]&&a[k]===w){used[k]=1;hit++;break;}}});return hit/b.length;}
-  function renderSpeak(it,c,h){
-    var target=it.text||''; var open=(it.type==='speak_answer'||it.type==='speak_image'); if(open)it.open=true;
-    if(target)h+='<div class="qbig" style="font-size:24px;font-weight:900;color:var(--navy);letter-spacing:0">«'+target+'»</div>';
-    h+='<div class="center"><button class="listenbtn" id="micBtn" style="background:var(--crimson)">🎤 Сөйле</button></div>';
-    h+='<div class="qsub center" id="heard" style="min-height:22px;margin-top:10px;font-size:16px;color:var(--navy)"></div>';
-    h+='<div id="speakFB"></div>';
-    c.innerHTML=h; var done=false;
-    function finishSpeak(said){ if(done||locked)return; done=true;
-      $('heard').innerHTML='👂 «'+(said||'—')+'»';
-      var sc=open?(norm(said).split(' ').filter(Boolean).length>=2?1:(said?0.6:0)):speechScore(said,target);
-      var ok=open?null:(sc>=0.6); it._said=said; it._score=sc;
-      setTimeout(function(){record(it,ok,said||'(no speech)');},650);
-    }
-    function fb(){ var m=$('micBtn'); if(m)m.style.display='none';
-      $('speakFB').innerHTML='<div class="qsub center">🎤 қолжетімсіз — жауабыңды жаз:</div><input class="tin" id="spin" autocomplete="off" placeholder="..."><div style="margin-top:10px"><button class="btn sm dark" id="spdone">Дайын →</button></div>';
-      $('spdone').addEventListener('click',function(){finishSpeak(($('spin').value||''));}); }
-    if(SR){ var rec=null;
-      $('micBtn').addEventListener('click',function(){ try{ rec=new SR(); rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=1;
-        $('micBtn').textContent='🎙 ...'; $('micBtn').classList.add('rec');
-        rec.onresult=function(ev){ finishSpeak(ev.results[0][0].transcript); };
-        rec.onerror=function(){ $('micBtn').textContent='🎤 Қайтала'; $('micBtn').classList.remove('rec'); };
-        rec.onend=function(){ var m=$('micBtn'); if(m){m.textContent='🎤 Сөйле';m.classList.remove('rec');} };
-        rec.start(); }catch(e){ fb(); } });
-    } else { fb(); }
+  /* ===== LANDING ===== */
+  if(CONFIG.HERO)$('heroPic').style.backgroundImage='url('+CONFIG.HERO+')';
+  if(SCHOOL){var st=$('schoolTag');st.style.display='block';st.textContent=SCHOOL;}
+  $('go-form').addEventListener('click',function(){show('form');setTimeout(function(){try{$('in-name').focus();}catch(e){}},300);});
+
+  /* ===== FORM ===== */
+  function submitForm(){
+    var n=$('in-name').value.trim(), c=$('in-cls').value.trim();
+    $('f-name').classList.toggle('bad',!n);
+    $('f-cls').classList.toggle('bad',!c);
+    if(!n||!c){$('formErr').textContent='Екі өрісті де толтыр.';return;}
+    $('formErr').textContent='';
+    lead.id='ev_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+    lead.name=n;lead.cls=c;startedAt=new Date().toISOString();
+    send({action:'lead',leadId:lead.id,school:SCHOOL,subject:CONFIG.SUBJECT,name:n,class:c,startedAt:startedAt,testUrl:location.href});
+    startTest();
   }
+  $('go-test').addEventListener('click',submitForm);
+  ['in-name','in-cls'].forEach(function(id){
+    $(id).addEventListener('keydown',function(e){if(e.key==='Enter')submitForm();});
+  });
+
+  /* ===== ТЕСТ ===== */
+  function startTest(){
+    seq=pickQuestions();i=0;answers=[];
+    band={1:{c:0,t:0},2:{c:0,t:0},3:{c:0,t:0},4:{c:0,t:0}};
+    show('test');render();
+  }
+  function hud(){
+    $('h-count').textContent=(i+1)+' / '+seq.length;
+    $('h-bar').style.width=(i/seq.length*100)+'%';
+  }
+  var KEYS=['A','B','C','D'];
   function render(){
-    locked=false;$('h-speed').classList.remove('on');if(speedT){clearInterval(speedT);speedT=null;}
     if(i>=seq.length){finish();return;}
-    var it=seq[i];
-    maybeLevelUp(it,function(){ draw(it); });
-  }
-  function draw(it){
-    it=normItem(it);
-    updHud();var c=$('qcard'),h='';c.classList.remove('glitch');void c.offsetWidth;c.classList.add('glitch');
-    var qm=it.speed?'⚡':(['hype','think','cool','dead','normal'][i%5]);
-    h+='<span class="qtag'+(it.speed?' speed':'')+'">'+(it.speed?'SPEED ⚡':(BNAME[it.d].toUpperCase()+' · '+it.sk))+'</span>';
-    h+='<span class="qmas">'+mascotEl(qm)+'</span>';
-    var img=it.img&&CONFIG.ASSETS.q[it.img];
-    h+='<img class="qimg" id="qimg" style="'+(img?'display:block':'')+'" src="'+(img||'')+'" alt="">';
+    locked=false;hud();
+    var it=seq[i], c=$('qcard'), h='';
+    h+='<div class="qtag">'+(i+1)+'-сұрақ · '+(it.sk==='vocab'?'сөздік қор':it.sk==='reading'?'оқылым':'грамматика')+'</div>';
     if(it.passage)h+='<div class="passage">'+it.passage+'</div>';
-    if(it.big)h+='<div class="qbig">'+it.big+'</div>';
     h+='<div class="qtext">'+it.q+'</div>';
-    if(it.q2)h+='<div class="qsub">'+it.q2+'</div>';
-    if(it.hint)h+='<div class="qsub">'+it.hint+'</div>';
-    if(it.display)h+='<div class="scaffold">'+it.display+'</div>';
 
-    if(it.type==='mcq'||it.type==='mistake'){
-      h+='<div class="opts">';it.o.forEach(function(t,k){h+='<button class="opt" data-k="'+k+'"><span class="key">'+KEYS[k]+'</span><span>'+t+'</span></button>';});h+='</div>';
-      c.innerHTML=h;
-      c.querySelectorAll('.opt').forEach(function(b){b.addEventListener('click',function(){pickOpt(it,parseInt(b.dataset.k,10),b);});});
-      if(it.audio){var lb=document.createElement('button');} // mcq with audio handled below
-      if(it.audio){addAudioBtn(it);}
-      if(it.speed)startSpeed(it);
-    }
-    else if(it.type==='type'){
-      if(it.audio)h+='<div class="center"><button class="listenbtn" id="lbtn">🔊 Тыңда</button></div>';
+    if(it.type==='gap'){
+      h+='<div class="qhint">Жауабыңды ағылшынша жаз.</div>';
       h+='<input class="tin" id="tin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="...">';
-      h+='<div style="margin-top:12px"><button class="btn sm dark" id="tdone" disabled>Дайын →</button></div>';
+      h+='<button class="btn" id="tdone" disabled>Жауап беру</button>';
       c.innerHTML=h;
-      if(it.audio){$('lbtn').addEventListener('click',function(){speak(it.audio);});setTimeout(function(){speak(it.audio);},300);}
-      var ti=$('tin');ti.addEventListener('input',function(){$('tdone').disabled=ti.value.trim().length<1;});
-      ti.addEventListener('keydown',function(e){if(e.key==='Enter'&&!$('tdone').disabled)pickType(it,ti.value);});
-      $('tdone').addEventListener('click',function(){if(locked)return;pickType(it,ti.value);});
+      var ti=$('tin');
+      ti.addEventListener('input',function(){$('tdone').disabled=!ti.value.trim();});
+      ti.addEventListener('keydown',function(e){if(e.key==='Enter'&&ti.value.trim())answerGap(it,ti.value);});
+      $('tdone').addEventListener('click',function(){answerGap(it,ti.value);});
+      setTimeout(function(){try{ti.focus();}catch(e){}},120);
     }
-    else if(it.type==='build'){
-      var sh=it.words.slice().sort(function(){return Math.random()-.5;});
-      h+='<div class="answerline" id="aline"></div><div class="bank" id="bank">';
-      sh.forEach(function(w,k){h+='<div class="chip" data-w="'+w+'" data-id="'+k+'">'+w+'</div>';});
-      h+='</div><button class="btn sm dark" id="bdone" disabled>Дайын →</button>';c.innerHTML=h;var picked=[];
-      function rd(){var al=$('aline');al.innerHTML='';picked.forEach(function(p,idx){var s=document.createElement('div');s.className='chip inline';s.textContent=p.w;s.addEventListener('click',function(){var b=document.querySelector('#bank .chip[data-id="'+p.id+'"]');if(b)b.classList.remove('used');picked.splice(idx,1);rd();});al.appendChild(s);});$('bdone').disabled=picked.length!==it.words.length;}
-      c.querySelectorAll('#bank .chip').forEach(function(ch){ch.addEventListener('click',function(){if(ch.classList.contains('used'))return;ch.classList.add('used');picked.push({w:ch.dataset.w,id:ch.dataset.id});rd();});});
-      $('bdone').addEventListener('click',function(){if(locked)return;var got=picked.map(function(p){return p.w;}).join(' ');record(it,norm(got)===norm(it.a),got);});
+    else if(it.type==='order'){
+      h+='<div class="line" id="aline"></div><div class="bank" id="bank"></div>';
+      h+='<button class="btn" id="bdone" disabled>Жауап беру</button>';
+      c.innerHTML=h;
+      var picked=[], bankEl=$('bank');
+      it.words.forEach(function(w,k){
+        var ch=document.createElement('div');ch.className='chip';ch.textContent=w;ch.dataset.id=k;
+        ch.addEventListener('click',function(){ch.classList.add('used');picked.push({w:w,id:k});redraw();});
+        bankEl.appendChild(ch);
+      });
+      function redraw(){
+        var al=$('aline');al.innerHTML='';
+        picked.forEach(function(p,idx){
+          var s=document.createElement('div');s.className='chip inline';s.textContent=p.w;
+          s.addEventListener('click',function(){
+            var b=bankEl.querySelector('.chip[data-id="'+p.id+'"]');if(b)b.classList.remove('used');
+            picked.splice(idx,1);redraw();
+          });
+          al.appendChild(s);
+        });
+        $('bdone').disabled=picked.length!==it.words.length;
+      }
+      $('bdone').addEventListener('click',function(){
+        if(locked)return;
+        var got=picked.map(function(p){return p.w;}).join(' ');
+        record(it,norm(got)===norm(it.a),got);
+      });
     }
-    else if(it.type==='match'){
-      var L=it.pairs.map(function(p,idx){return {t:p[0],id:idx};}).sort(function(){return Math.random()-.5;});
-      var R=it.pairs.map(function(p,idx){return {t:p[1],id:idx};}).sort(function(){return Math.random()-.5;});
-      h+='<div class="match"><div class="mcol" id="mL"></div><div class="mcol" id="mR"></div></div>';c.innerHTML=h;
-      var cL=$('mL'),cR=$('mR');
-      L.forEach(function(o){var b=document.createElement('button');b.className='mbtn';b.textContent=o.t;b.dataset.id=o.id;b.dataset.s='L';cL.appendChild(b);});
-      R.forEach(function(o){var b=document.createElement('button');b.className='mbtn';b.textContent=o.t;b.dataset.id=o.id;b.dataset.s='R';cR.appendChild(b);});
-      var selL=null,pairedCount=0,correctPairs=0;
-      c.querySelectorAll('.mbtn').forEach(function(b){b.addEventListener('click',function(){
-        if(b.classList.contains('paired'))return;
-        if(b.dataset.s==='L'){c.querySelectorAll('#mL .mbtn').forEach(function(x){x.classList.remove('sel');});b.classList.add('sel');selL=b;return;}
-        if(!selL)return;
-        // спариваем НЕЙТРАЛЬНО (не показываем верно/неверно)
-        if(selL.dataset.id===b.dataset.id)correctPairs++;
-        selL.classList.remove('sel');selL.classList.add('paired');b.classList.add('paired');selL=null;pairedCount++;sPop();
-        if(pairedCount===it.pairs.length){record(it,correctPairs===it.pairs.length,'match('+correctPairs+'/'+it.pairs.length+')');}
-      });});
+    else{
+      h+='<div class="opts" id="opts">';
+      it.o.forEach(function(t,k){h+='<button class="opt" data-k="'+k+'"><span class="key">'+KEYS[k]+'</span><span>'+t+'</span></button>';});
+      h+='</div>';
+      c.innerHTML=h;
+      c.querySelectorAll('.opt').forEach(function(b){
+        b.addEventListener('click',function(){
+          if(locked)return;locked=true;
+          $('opts').classList.add('lock');b.classList.add('pick');
+          var k=parseInt(b.dataset.k,10);
+          setTimeout(function(){record(it,k===it.c,it.o[k]);},220);
+        });
+      });
     }
-    else if(it.type==='multimatch'){
-      var Ritems=it.right.map(function(t,idx){return {t:t,id:idx};}).sort(function(){return Math.random()-.5;});
-      h+='<div class="qsub">Сол жақтағыны дұрыс оң жақпен қос (артық нұсқалар бар)</div>';
-      h+='<div class="match"><div class="mcol" id="mmL"></div><div class="mcol" id="mmR"></div></div>';c.innerHTML=h;
-      var cL=$('mmL'),cR=$('mmR');
-      it.left.forEach(function(t,li){var b=document.createElement('button');b.className='mbtn';b.textContent=t;b.dataset.li=li;b.dataset.s='L';cL.appendChild(b);});
-      Ritems.forEach(function(o){var b=document.createElement('button');b.className='mbtn';b.textContent=o.t;b.dataset.rid=o.id;b.dataset.s='R';cR.appendChild(b);});
-      var selL=null,paired=0,correct=0;
-      c.querySelectorAll('.mbtn').forEach(function(b){b.addEventListener('click',function(){
-        if(b.classList.contains('paired'))return;
-        if(b.dataset.s==='L'){c.querySelectorAll('#mmL .mbtn').forEach(function(x){x.classList.remove('sel');});b.classList.add('sel');selL=b;return;}
-        if(!selL)return; var li=parseInt(selL.dataset.li,10),rid=parseInt(b.dataset.rid,10);
-        if(it.map[li]===rid)correct++;
-        selL.classList.add('paired');b.classList.add('paired');selL.classList.remove('sel');selL=null;paired++;sPop();
-        if(paired===it.left.length){record(it,correct===it.left.length,'multimatch('+correct+'/'+it.left.length+')');}
-      });});
-    }
-    else if(it.type==='cloze'){
-      var parts=it.passage.split('___'),html='';
-      for(var bi=0;bi<parts.length;bi++){html+=parts[bi];if(bi<it.blanks.length)html+='<b class="clozeSlot" id="cz'+bi+'">___</b>';}
-      h+='<div class="passage" style="font-size:16px">'+html+'</div><div id="clozeOpts"></div><button class="btn sm dark" id="czdone" disabled style="margin-top:10px">Дайын →</button>';
-      c.innerHTML=h; var picks=new Array(it.blanks.length),oc=$('clozeOpts');
-      it.blanks.forEach(function(bl,bx){var row=document.createElement('div');row.className='opts';row.style.margin='8px 0';row.innerHTML='<div class="qsub">'+(bx+1)+')</div>';
-        bl.o.forEach(function(opt,k){var btn=document.createElement('button');btn.className='opt';btn.style.padding='10px 14px';btn.innerHTML='<span>'+opt+'</span>';btn.addEventListener('click',function(){
-          picks[bx]=k;var slot=$('cz'+bx);if(slot)slot.textContent=opt;row.querySelectorAll('.opt').forEach(function(x){x.classList.remove('pick');});btn.classList.add('pick');sPop();
-          $('czdone').disabled=picks.filter(function(x){return x!=null;}).length<it.blanks.length;});row.appendChild(btn);});
-        oc.appendChild(row);});
-      $('czdone').addEventListener('click',function(){if(locked)return;var cc=0;it.blanks.forEach(function(bl,bx){if(picks[bx]===bl.c)cc++;});record(it,cc===it.blanks.length,'cloze('+cc+'/'+it.blanks.length+')');});
-    }
-    else if(it.type==='listen_dialog'){
-      var lines=it.dialog?it.dialog.map(function(d){return d.t;}):[it.audio||''];
-      h+='<div class="center"><button class="listenbtn" id="lbtn">🔊 Тыңда (диалог)</button></div>';
-      h+='<div class="opts">';it.o.forEach(function(t,k){h+='<button class="opt" data-k="'+k+'"><span class="key">'+KEYS[k]+'</span><span>'+t+'</span></button>';});h+='</div>';c.innerHTML=h;
-      function playDialog(){var d=0;(function nx(){if(d>=lines.length)return;speak(lines[d]);var cur=lines[d];d++;setTimeout(nx,1300+cur.length*45);})();}
-      var lb=$('lbtn'); if(lb)lb.addEventListener('click',playDialog); setTimeout(playDialog,350);
-      c.querySelectorAll('.opt').forEach(function(b){b.addEventListener('click',function(){pickOpt(it,parseInt(b.dataset.k,10),b);});});
-    }
-    else if(it.type==='categorize'){
-      h+='<div class="qsub">Әр сөзді дұрыс себетке салы</div>';
-      h+='<div id="catB" style="display:grid;grid-template-columns:repeat('+it.cats.length+',1fr);gap:8px;margin-bottom:10px"></div>';
-      h+='<div class="bank" id="catPool"></div><button class="btn sm dark" id="catdone" disabled style="margin-top:6px">Дайын →</button>';c.innerHTML=h;
-      var baskets=$('catB');it.cats.forEach(function(cat,ci){var d=document.createElement('div');d.style.cssText='border:2px dashed var(--line);border-radius:12px;padding:8px;min-height:64px;cursor:pointer';d.dataset.ci=ci;d.innerHTML='<div style="font-weight:900;color:var(--navy);text-align:center;font-size:13px;margin-bottom:4px">'+cat+'</div><div class="catDrop"></div>';baskets.appendChild(d);});
-      var selW=null,placed=0;
-      it.items.forEach(function(item,ii){var w=document.createElement('div');w.className='chip';w.textContent=item.w;w.dataset.ii=ii;w.dataset.ci='';w.addEventListener('click',function(){if(w.classList.contains('used'))return;c.querySelectorAll('#catPool .chip').forEach(function(x){x.classList.remove('inline');});w.classList.add('inline');selW=w;});$('catPool').appendChild(w);});
-      c.querySelectorAll('#catB > div').forEach(function(bk){bk.addEventListener('click',function(){
-        if(!selW)return;selW.dataset.ci=bk.dataset.ci;selW.classList.add('used');selW.classList.remove('inline');
-        var clone=document.createElement('span');clone.className='chip inline';clone.style.margin='2px';clone.textContent=selW.textContent;bk.querySelector('.catDrop').appendChild(clone);
-        selW=null;placed++;sPop();$('catdone').disabled=placed<it.items.length;});});
-      $('catdone').addEventListener('click',function(){if(locked)return;var cc=0;c.querySelectorAll('#catPool .chip').forEach(function(w){var ii=parseInt(w.dataset.ii,10);if(w.dataset.ci!==''&&parseInt(w.dataset.ci,10)===it.items[ii].c)cc++;});record(it,cc===it.items.length,'categorize('+cc+'/'+it.items.length+')');});
-    }
-    else if(it.type&&it.type.indexOf('speak_')===0){ renderSpeak(it,c,h); }
-    else if(it.o){ h+='<div class="opts">';it.o.forEach(function(t,k){h+='<button class="opt" data-k="'+k+'"><span class="key">'+KEYS[k]+'</span><span>'+t+'</span></button>';});h+='</div>';c.innerHTML=h;c.querySelectorAll('.opt').forEach(function(b){b.addEventListener('click',function(){pickOpt(it,parseInt(b.dataset.k,10),b);});}); }
+    window.scrollTo({top:0,behavior:'smooth'});
   }
-  function addAudioBtn(it){var box=$('qcard');var d=document.createElement('div');d.className='center';d.style.marginBottom='12px';d.innerHTML='<button class="listenbtn" id="lbtn">🔊 Тыңда</button>';box.querySelector('.qtext').insertAdjacentElement('afterend',d);$('lbtn').addEventListener('click',function(){speak(it.audio);});setTimeout(function(){speak(it.audio);},300);}
-
-  function startSpeed(it){var dur=9000,t0=Date.now();$('h-speed').classList.add('on');$('h-speedi').style.width='100%';
-    speedT=setInterval(function(){var left=Math.max(0,dur-(Date.now()-t0));$('h-speedi').style.width=(left/dur*100)+'%';if(left<=0){clearInterval(speedT);speedT=null;if(!locked){record(it,false,'(уақыт бітті)',true);}}},80);}
-
-  /* ===== ЖАУАПТЫ ТІРКЕУ (правильность СКРЫТА) ===== */
-  function pickOpt(it,k,btn){
-    if(locked)return;locked=true;if(speedT){clearInterval(speedT);speedT=null;}
-    $('qcard').querySelectorAll('.opt').forEach(function(o){o.classList.add('lock');});btn.classList.add('pick');
-    var chosen=it.o?it.o[k]:k; var ok=(k===it.c);
-    record(it,ok,chosen);
+  function answerGap(it,val){
+    if(locked)return;locked=true;
+    var alts=Array.isArray(it.a)?it.a:[it.a];
+    var ok=alts.some(function(x){return norm(x)===norm(val);});
+    record(it,ok,val);
   }
-  function pickType(it,val){
-    locked=true;var ok=it.open?true:(norm(val)===norm(it.a)); // open — всегда «принято», оценит ИИ
-    var bd=$('tdone');if(bd)bd.disabled=true;var ti=$('tin');if(ti)ti.disabled=true;
-    record(it,it.open?null:ok,val);
-  }
-  function record(it,ok,chosen,timeout){
+  function record(it,ok,chosen){
     locked=true;
-    band[it.d].t++; if(ok===true)band[it.d].c++;
-    answers.push({n:answers.length+1,d:it.d,cefr:BNAME[it.d],sk:it.sk,type:it.type,q:it.q,chosen:chosen,ok:ok,open:!!it.open});
-    // дофамин — за УЧАСТИЕ, не за правильность
-    if(!timeout){bumpCombo();addVibe();var base=it.speed?14:(8+it.d*2);addXP(base, neutralMsg());sPop();}
-    else{combo=0;updHud();toast('⏰ Уақыт!');}
-    setTimeout(next, timeout?650:780);
+    band[it.d].t++; if(ok)band[it.d].c++;
+    answers.push({n:answers.length+1,d:it.d,level:BNAME[it.d],sk:it.sk,type:it.type,q:it.q,chosen:chosen,ok:ok});
+    i++;render();
   }
-  function neutralMsg(){var m=['Қабылданды! ⚡','Келесі 🔥','Жақсы темп!','Кеттік! 🚀','Сен machine екенсің 🤖','Vibe up! ✨'];return m[Math.floor(Math.random()*m.length)];}
-  function next(){i++;render();}
 
-  /* ===== КОНСЕРВАТИВТІ ДЕҢГЕЙ (фоллбэк) ===== */
+  /* ===== НӘТИЖЕ ===== */
   function pct(b){return b.t?Math.round(b.c/b.t*100):0;}
-  function levelOf(a1,a2,b1,b2){
-    // НАКОП. ТОЧНАЯ оценка (ближайший уровень, БЕЗ занижения)
-    if(b2>=55) return 'Upper-Intermediate';
-    if(b1>=70 || (b1>=55 && b2>=40)) return 'Intermediate';
-    if(b1>=45 || a2>=75) return 'Pre-Intermediate';
-    if(a2>=55 || a1>=75) return 'Elementary';
-    return 'Beginner';
+  function levelOf(p1,p2,p3,p4){
+    if(p4>=67&&p3>=75&&p2>=75)return 'above';
+    if(p3>=60&&p2>=60)return 'pre';
+    if(p2>=60||p3>=50)return 'elementary';
+    return 'beginner';
   }
   function finish(){
-    if(speedT){clearInterval(speedT);speedT=null;}$('h-bar').style.width='100%';
-    var a1=pct(band[1]),a2=pct(band[2]),b1=pct(band[3]),b2=pct(band[4]);
-    var lvl=levelOf(a1,a2,b1,b2);
-    var correct=band[1].c+band[2].c+band[3].c+band[4].c, total=band[1].t+band[2].t+band[3].t+band[4].t;
-    var summary=answers.map(function(x){return x.n+'. ['+x.cefr.toUpperCase()+'/'+x.sk+'] '+x.chosen+(x.open?' [ОТКР]':(x.ok?' ✓':' ✗'));}).join('\n');
-    var openA=answers.filter(function(x){return x.open;}).map(function(x){return {q:x.q,answer:x.chosen};});
-    send({action:'result',leadId:lead.id,school:SCHOOL,subject:CONFIG.SUBJECT,name:lead.name,class:lead.cls,goal:lead.goal,parentPhone:lead.phone,
-      startedAt:startedAt,finishedAt:new Date().toISOString(),branch:branch,
-      score:correct,total:total,a1_pct:a1,a2_pct:a2,b1_pct:b1,b2_pct:b2,
+    $('h-bar').style.width='100%';
+    var p=[0,pct(band[1]),pct(band[2]),pct(band[3]),pct(band[4])];
+    var key=levelOf(p[1],p[2],p[3],p[4]), L=LEVELS[key];
+    var correct=band[1].c+band[2].c+band[3].c+band[4].c, total=seq.length;
+
+    $('f-level').textContent=L.name;
+    $('f-desc').textContent=L.desc;
+    $('f-scores').innerHTML=[1,2,3,4].map(function(d){
+      return '<div class="sc"><b>'+band[d].c+'/'+band[d].t+'</b><small>'+
+        (d===1?'Beginner':d===2?'Elementary':d===3?'Pre-Int':'Жоғары')+'</small></div>';
+    }).join('');
+
+    var nx='';
+    if(key==='above'){
+      nx='<h3>Кеңейтілген тест</h3><p>Intermediate деңгейінен жоғары сұрақтар, дәлірек баға. Жақын арада ашылады.</p>'+
+         '<button class="btn" id="f-adv" style="margin-top:14px">Кеңейтілген тестті өту</button>';
+    } else {
+      nx='<h3>Келесі қадам</h3><p>Нәтижең мұғаліміңе жіберілді. Келесі сабақта қай тақырыптан бастау керегін талдайсыңдар.</p>';
+    }
+    $('f-next').innerHTML=nx;
+    if(key==='above'){
+      $('f-adv').addEventListener('click',function(){
+        if(CONFIG.ADVANCED_URL)location.href=CONFIG.ADVANCED_URL;
+        else toast('Кеңейтілген тест дайындалып жатыр — жақында ашылады.');
+      });
+    }
+
+    send({action:'result',leadId:lead.id,school:SCHOOL,subject:CONFIG.SUBJECT,name:lead.name,class:lead.cls,
+      startedAt:startedAt,finishedAt:new Date().toISOString(),
+      score:correct,total:total,level:L.name,levelKey:key,
+      a1_pct:p[1],a2_pct:p[2],b1_pct:p[3],b2_pct:p[4],
       a1:band[1].c+'/'+band[1].t,a2:band[2].c+'/'+band[2].t,b1:band[3].c+'/'+band[3].t,b2:band[4].c+'/'+band[4].t,
-      provisionalLevel:lvl,xp:xp,comboMax:comboMax,
-      answersSummary:summary,openAnswers:JSON.stringify(openA),answersJson:JSON.stringify(answers),testUrl:location.href});
-    // финиш — без уровня/правильности
-    $('f-xp').textContent=xp;$('f-combo').textContent=comboMax;
-    var badge=xp>=420?'🏆 ЛЕГЕНДА':xp>=300?'🥇 PRO ойыншы':xp>=190?'🥈 Күшті':'🥉 Жарайсың';
-    $('f-medal').innerHTML=(xp>=300&&CONFIG.ASSETS.mascot.hype)?'<img src="'+CONFIG.ASSETS.mascot.hype+'">':(xp>=420?'🏆':xp>=300?'🥇':'🏅');
-    $('f-badge').textContent=badge+' · '+xp+' XP';
-    confetti();sHype();show('finish');
+      answersSummary:answers.map(function(x){return x.n+'. ['+x.level+'/'+x.sk+'] '+x.chosen+(x.ok?' ✓':' ✗');}).join('\n'),
+      answersJson:JSON.stringify(answers),testUrl:location.href});
+
+    show('finish');
   }
-  window.__EVTEST__={ startTest:startTest, levelOf:levelOf, finish:finish, render:render,
-    get answers(){return answers;}, get band(){return band;}, get seq(){return seq;}, get idx(){return i;}, get xp(){return xp;},
-    setSeq:function(a){seq=a;branchDone=true;i=0;}, forceRecord:function(it,ok,ch){record(it,ok,ch);},
-    SR_supported:!!SR, CONFIG:CONFIG };
+  $('f-again').addEventListener('click',function(){show('landing');});
+
+  window.__EVTEST__={BANK:BANK,pickQuestions:pickQuestions,levelOf:levelOf,
+    get seq(){return seq;},get answers(){return answers;},get band(){return band;},CONFIG:CONFIG};
 })();
 </script>
 </body>
