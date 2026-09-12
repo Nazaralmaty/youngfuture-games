@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Контент-завод — производство рилсов для агентств</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Производство вертикальных роликов под вашим именем: вы ведёте клиента и пишете ТЗ, я отдаю готовый ролик за 48 часов.">
+<meta property="og:title" content="Контент-завод — рилсы для вашего агентства">
+<meta property="og:description" content="11 брендов, серии по 15–25 роликов, 48 часов на ролик, правка в тот же день. Ваше имя на ролике, моего нет.">
+<meta property="og:image" content="https://nazaralmaty.github.io/youngfuture-games/zavod/media/vizitka.jpg">
+<style>
+:root{
+  --ink:#0B0C0A;--surface:#131510;--raised:#1B1E16;--line:#2A2E22;--line2:#1F2319;
+  --text:#F3F5EC;--muted:#A0A592;--dim:#6E7362;--acc:#B7F04A;--acc2:#FF6A3D;--on:#0B0C0A;
+  --fd:"HelveticaNeue-CondensedBlack","Helvetica Neue","Arial Narrow",Impact,system-ui,sans-serif;
+  --fb:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --fm:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --pad:clamp(18px,5vw,64px);--maxw:1200px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--ink);color:var(--text);font-family:var(--fb);font-size:17px;line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img,video{max-width:100%;display:block}
+h1,h2{font-family:var(--fd);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;line-height:.92;margin:0;text-wrap:balance}
+h1{font-size:clamp(40px,7.5vw,100px)}
+h2{font-size:clamp(30px,5vw,62px)}
+h3{font-size:19px;font-weight:700;margin:0 0 6px;line-height:1.25}
+p{margin:0 0 14px}
+.lede{font-size:clamp(17px,2.1vw,22px);line-height:1.45;max-width:58ch}
+.muted{color:var(--muted)}
+.acc{color:var(--acc)}
+.wrap{max-width:var(--maxw);margin:0 auto;position:relative;z-index:1}
+section{padding:clamp(56px,8vw,110px) var(--pad);border-top:1px solid var(--line2);position:relative}
+.k{font-family:var(--fm);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:14px;display:flex;gap:10px;align-items:center}
+.k::before{content:"";width:22px;height:2px;background:var(--acc)}
+
+/* hero */
+#hero{border-top:0;min-height:min(92svh,900px);display:flex;align-items:flex-end;padding-top:clamp(56px,8vw,96px);overflow:hidden}
+.wall{position:absolute;inset:-8% -3%;z-index:0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;opacity:.2;filter:saturate(.6);pointer-events:none;
+ -webkit-mask-image:radial-gradient(130% 85% at 70% 5%,#000 0%,rgba(0,0,0,.4) 50%,transparent 85%);mask-image:radial-gradient(130% 85% at 70% 5%,#000 0%,rgba(0,0,0,.4) 50%,transparent 85%)}
+@media(min-width:800px){.wall{grid-template-columns:repeat(6,1fr);gap:16px}}
+.wall .col{display:grid;gap:12px;align-content:start;animation:drift 70s linear infinite}
+.wall .col:nth-child(even){animation-duration:90s;animation-direction:reverse}
+.wall img{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:6px}
+@keyframes drift{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+@media(prefers-reduced-motion:reduce){.wall .col{animation:none}}
+.hero-grid{display:grid;gap:28px}
+@media(min-width:900px){.hero-grid{grid-template-columns:1.25fr .75fr;align-items:end}}
+.hero-video{position:relative;border-radius:12px;overflow:hidden;background:#000;border:1px solid var(--line);aspect-ratio:9/16;max-width:360px;justify-self:end;width:100%}
+.hero-video video{width:100%;height:100%;object-fit:cover}
+.hero-video .cap{position:absolute;left:0;right:0;bottom:0;padding:12px 14px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);pointer-events:none}
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:34px}
+@media(min-width:800px){.facts{grid-template-columns:repeat(5,1fr)}}
+.facts div{background:var(--surface);padding:16px 18px}
+.facts b{display:block;font-family:var(--fd);font-size:34px;line-height:1;letter-spacing:-.02em}
+.facts span{font-size:13px;color:var(--muted);line-height:1.3;display:block;margin-top:6px}
+
+/* grid of works */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr);gap:16px}}
+@media(min-width:1000px){.grid{grid-template-columns:repeat(4,1fr)}}
+.card{position:relative;border-radius:10px;overflow:hidden;background:var(--surface);border:1px solid var(--line);cursor:pointer;aspect-ratio:9/16}
+.card img,.card video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.card video{opacity:0;transition:opacity .25s}
+.card.playing video{opacity:1}
+.card .tag{position:absolute;top:10px;left:10px;font-family:var(--fm);font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:5px 8px;border-radius:4px;background:rgba(11,12,10,.78);color:var(--text);backdrop-filter:blur(6px)}
+.card .tag.real{background:var(--acc);color:var(--on)}
+.card .meta{position:absolute;left:0;right:0;bottom:0;padding:38px 12px 12px;background:linear-gradient(transparent,rgba(0,0,0,.85));pointer-events:none}
+.card .meta b{display:block;font-size:14px;line-height:1.25}
+.card .meta span{font-family:var(--fm);font-size:10px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+.card .play{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.card .play i{width:54px;height:54px;border-radius:50%;background:rgba(11,12,10,.6);border:1px solid rgba(255,255,255,.35);display:grid;place-items:center;backdrop-filter:blur(6px)}
+.card .play i::after{content:"";border-left:16px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px}
+.card.playing .play{display:none}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 22px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+
+/* series */
+.series{display:grid;gap:14px}
+@media(min-width:800px){.series{grid-template-columns:repeat(4,1fr)}}
+.ser{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px}
+.ser b{font-family:var(--fd);font-size:54px;line-height:1;display:block;letter-spacing:-.02em;color:var(--acc)}
+.ser h3{margin-top:8px}
+.ser p{font-size:14px;color:var(--muted);margin:0}
+.brands{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.brands span{font-family:var(--fm);font-size:12px;letter-spacing:.06em;padding:7px 11px;border:1px solid var(--line);border-radius:999px;color:var(--text)}
+
+/* reviews */
+.rev{display:grid;gap:14px}
+@media(min-width:800px){.rev{grid-template-columns:1fr 1fr}}
+.voice{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:12px}
+.voice .who{display:flex;align-items:center;gap:12px}
+.voice .who i{width:40px;height:40px;border-radius:50%;background:var(--acc);color:var(--on);display:grid;place-items:center;font-family:var(--fd);font-size:18px}
+.voice .who b{display:block;font-size:15px}
+.voice .who span{font-size:13px;color:var(--muted)}
+.voice q{display:block;font-size:17px;line-height:1.45;quotes:"«" "»"}
+.voice audio{width:100%;filter:invert(1) hue-rotate(180deg) brightness(.85)}
+
+/* steps */
+.steps{display:grid;gap:12px;counter-reset:s}
+@media(min-width:800px){.steps{grid-template-columns:repeat(4,1fr)}}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 20px 18px;position:relative}
+.step::before{counter-increment:s;content:"0" counter(s);font-family:var(--fm);font-size:11px;letter-spacing:.14em;color:var(--acc);display:block;margin-bottom:10px}
+.step p{font-size:14px;color:var(--muted);margin:0}
+.rules{display:grid;gap:10px;margin-top:22px}
+@media(min-width:800px){.rules{grid-template-columns:repeat(3,1fr)}}
+.rules div{border-left:2px solid var(--acc2);padding:4px 0 4px 14px;font-size:15px}
+
+/* terms */
+.terms{display:grid;gap:14px}
+@media(min-width:900px){.terms{grid-template-columns:1.1fr .9fr .9fr}}
+.term{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px}
+.term.hot{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.term.hot .muted{color:#3d4a1e}
+.term .kk{font-family:var(--fm);font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.8;margin-bottom:10px}
+.term .big{font-family:var(--fd);font-size:clamp(34px,4vw,52px);line-height:1;letter-spacing:-.02em;margin-bottom:10px}
+.term ul{margin:10px 0 0;padding-left:18px;font-size:15px;line-height:1.5}
+.term li{margin-bottom:4px}
+.date{font-family:var(--fm);font-size:11px;color:var(--dim);letter-spacing:.08em;margin-top:18px}
+
+/* final */
+#need{background:var(--surface)}
+.need{display:grid;gap:14px;margin-top:20px}
+@media(min-width:800px){.need{grid-template-columns:repeat(3,1fr)}}
+.need div{background:var(--raised);border:1px solid var(--line);border-radius:10px;padding:18px;font-size:15px}
+.need b{display:block;font-family:var(--fd);font-size:22px;letter-spacing:-.01em;margin-bottom:6px;text-transform:uppercase}
+footer{padding:24px var(--pad);font-family:var(--fm);font-size:11px;color:var(--dim);letter-spacing:.08em;border-top:1px solid var(--line2)}
+</style>
+</head>
+<body>
+
+<section id="hero">
+ <div class="wall" id="wall" aria-hidden="true"></div>
+ <div class="wrap hero-grid">
+  <div>
+   <div class="k">Контент-завод · для агентств</div>
+   <h1>Рилсы для ваших клиентов. <span class="acc">Под вашим именем.</span></h1>
+   <p class="lede" style="margin-top:22px">Вы ведёте клиента и пишете ТЗ. Я отдаю готовый ролик за 48 часов, с озвучкой, звуком и обложкой. Ваш логотип на ролике, моего нет.</p>
+   <div class="facts">
+    <div><b>11</b><span>брендов в работе: клиники, школы, завод, приложения</span></div>
+    <div><b>48 ч</b><span>от ТЗ до мастера</span></div>
+    <div><b>1 день</b><span>любая правка: цифра, цвет, язык</span></div>
+    <div><b>4</b><span>языка: русский, казахский, английский, арабский</span></div>
+    <div><b>3+1</b><span>форматы 9:16, 4:5, 1:1 и обложка</span></div>
+   </div>
+  </div>
+  <div class="hero-video" id="heroBox">
+   <video id="heroV" playsinline preload="metadata" poster="media/vizitka.jpg" controls src="media/vizitka.mp4"></video>
+   <div class="cap">визитка · 11 клиентов · 1:37</div>
+  </div>
+ </div>
+</section>
+
+<section id="works">
+ <div class="wrap">
+  <div class="k">Работы</div>
+  <h2>Сделано для клиентов</h2>
+  <div class="legend"><span><i style="background:var(--acc)"></i>клиент</span><span><i style="background:#444"></i>тестовая сборка</span><span>нажмите — играет со звуком</span></div>
+  <div class="grid" id="grid"></div>
+ </div>
+</section>
+
+<section id="series">
+ <div class="wrap">
+  <div class="k">Серии</div>
+  <h2>Один клиент — это серия, не ролик</h2>
+  <p class="lede muted" style="margin-top:18px">Рубрика × выпуски. Чем длиннее серия, тем дешевле и быстрее каждый следующий ролик: бренд-слой, голос и приёмы уже собраны.</p>
+  <div class="series" style="margin-top:26px">
+   <div class="ser"><b>25</b><h3>I-CON</h3><p>маркетинг для клиник · 23 ролика + 4 урока · графика, 3D, живой спикер</p></div>
+   <div class="ser"><b>21</b><h3>Медресе</h3><p>Туркестан · на казахском · стройка, садака, живая съёмка</p></div>
+   <div class="ser"><b>19</b><h3>1English</h3><p>английский для казахоязычных · экраны приложения, журнальные вырезки</p></div>
+   <div class="ser"><b>15</b><h3>Zawajy</h3><p>приложение для никяха · спикер, анкеты, motion</p></div>
+  </div>
+  <div class="brands">
+   <span>I-CON</span><span>Zawajy</span><span>Медресе</span><span>1English</span><span>Buhari School</span><span>WEST HIM</span><span>seanomen</span><span>Medina</span><span>StudyOn</span><span>Vicco</span><span>Голос стройки</span><span class="muted">в работе · FRAGRANCIA</span>
+  </div>
+ </div>
+</section>
+
+<section id="reviews">
+ <div class="wrap">
+  <div class="k">Голосовые от клиентов</div>
+  <h2>Как отвечают на сдачу</h2>
+  <div class="rev" style="margin-top:26px">
+   <div class="voice">
+    <div class="who"><i>А</i><div><b>Абубакир · I-CON</b><span>маркетинговое агентство для клиник, после последней партии</span></div></div>
+    <q>Вам спасибо большое. Последние видео вообще шикарно получились. Мне очень понравилось.</q>
+    <audio controls preload="none" src="media/rev_abu.mp3"></audio>
+   </div>
+   <div class="voice">
+    <div class="who"><i>Р</i><div><b>Рахат · WEST HIM</b><span>завод бытовой химии, Актау. Был на съёмке, посмотрел серию</span></div></div>
+    <q>Очень интересно. Как будто я там не присутствовал, как будто первый раз вижу. Прям так интересно получилось.</q>
+    <audio controls preload="none" src="media/rev_rah.mp3"></audio>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="how">
+ <div class="wrap">
+  <div class="k">Как это работает для агентства</div>
+  <h2>Ваш клиент вас не теряет</h2>
+  <div class="steps" style="margin-top:26px">
+   <div class="step"><h3>ТЗ от вас</h3><p>Тема или сценарий, ссылка на аккаунт клиента, съёмка если есть. Съёмки нет — ролик собирается без неё.</p></div>
+   <div class="step"><h3>Первый вариант за сутки</h3><p>Черновик показываю в первые часы, мастер отдаю в течение 48 часов. Бренд-слой берётся с сайта и ленты клиента.</p></div>
+   <div class="step"><h3>Правка в тот же день</h3><p>Цифра, цвет, реплика, язык. Правки входят в цену, ролик от них не разваливается.</p></div>
+   <div class="step"><h3>Мастер во всех форматах</h3><p>9:16, 4:5, 1:1, обложка. −14 LUFS, проверено на телефоне. Вы публикуете как своё.</p></div>
+  </div>
+  <div class="rules">
+   <div>С вашим клиентом не общаюсь. Все вопросы через вас.</div>
+   <div>Моего имени и водяных знаков на ролике нет.</div>
+   <div>Цифры и факты в кадре только из вашего ТЗ. Выдуманной статистики и отзывов не будет.</div>
+  </div>
+ </div>
+</section>
+
+<section id="terms">
+ <div class="wrap">
+  <div class="k">Условия для агентств</div>
+  <h2>Сначала тест на вашем клиенте</h2>
+  <div class="terms" style="margin-top:26px">
+   <div class="term hot">
+    <div class="kk">Тест · бесплатно</div>
+    <div class="big">3 ролика</div>
+    <p>На вашем живом клиенте, по вашему ТЗ, за 48 часов. Вы смотрите, показываете клиенту, решаете.</p>
+    <ul><li>Без обязательств и без предоплаты</li><li>Можно на трёх разных клиентах</li><li>Со съёмкой или без</li></ul>
+   </div>
+   <div class="term">
+    <div class="kk">Поштучно</div>
+    <div class="big">12 000 ₸</div>
+    <p class="muted">за ролик при заказе от 10 в месяц. Вы ставите свою наценку.</p>
+    <ul><li>Озвучка, звук, обложка включены</li><li>Правки включены</li><li>Три формата + обложка</li></ul>
+   </div>
+   <div class="term">
+    <div class="kk">Абонемент</div>
+    <div class="big">30 / мес</div>
+    <p class="muted">фикс за месяц, приоритет в очереди, один канал связи.</p>
+    <ul><li>Несколько клиентов агентства в одной очереди</li><li>Сроки и объём в договоре</li><li>Отчёт по каждому ролику</li></ul>
+   </div>
+  </div>
+  <div class="date">цены проверены 13.09.2026</div>
+ </div>
+</section>
+
+<section id="need">
+ <div class="wrap">
+  <div class="k">Что нужно для теста</div>
+  <h2>Три вещи</h2>
+  <div class="need">
+   <div><b>Тема или ТЗ</b>Одна фраза тоже подходит: «стоматология, акция на имплант, казахский».</div>
+   <div><b>Ссылка на клиента</b>Instagram или сайт. Оттуда беру цвета, шрифты и тон.</div>
+   <div><b>Съёмка, если есть</b>Сырьё любого качества. Нет съёмки — не проблема.</div>
+  </div>
+  <p class="lede muted" style="margin-top:26px">Первый ролик из трёх — в течение суток после ТЗ.</p>
+ </div>
+</section>
+
+<footer>контент-завод · алматы · 2026</footer>
+
+<script>
+const WORKS=[
+ ['icon_kupil','I-CON','маркетинг для клиник · графика + 3D · ru',1],
+ ['medrese_sebepker','Медресе','живая съёмка спикера · kk',1],
+ ['zawajy_avtopodbor','Zawajy','спикер + экраны приложения',1],
+ ['westhim_aqtau','WEST HIM','серия с завода · 2 мин',1],
+ ['1english_zoom','1English','motion без съёмки',1],
+ ['zawajy_motion','Zawajy','motion · розовый мир',1],
+ ['vicco_sloya','Vicco','детская обувь · товар в кадре',1],
+ ['fragrancia_flakon','FRAGRANCIA','путь флакона · zoom',1],
+ ['fragrancia_karta','FRAGRANCIA','тот же сценарий · инфографика',1],
+ ['seanomen_screening','seanomen','интервью с событий',1],
+ ['studyon_zanyatie','StudyOn','школа · Атырау',1],
+ ['golos_doverie','Голос стройки','экспертная рубрика',1],
+ ['medina_qara','Medina','kk · товар',1],
+ ['buhari_lesson','Buhari School','урок 5 мин · фрагмент',1],
+ ['face_montazh','монтаж поверх съёмки','ваш дубль → ролик',0],
+ ['board_wtg_nedelya','настольная игра','объяснялка по шагам',0],
+ ['three_milton_salary','3D · Three.js','слово в объёме',0],
+ ['dorogoy_montazh','приёмы монтажа','dolly, фокус, bloom',0],
+ ['ag_dvadcat','для агентств','20 рилсов в месяц при одном монтажёре',0],
+ ['ag_nechego','для агентств','клиенты, которых нельзя снимать',0],
+ ['ag_pravka','для агентств','правка в 23:40',0],
+];
+const g=document.getElementById('grid');
+WORKS.forEach(([id,who,what,real])=>{
+ const c=document.createElement('div');c.className='card';
+ c.innerHTML=`<img src="media/${id}.jpg" alt="" loading="lazy"><video playsinline preload="none" poster="media/${id}.jpg" src="media/${id}.mp4"></video><span class="tag ${real?'real':''}">${real?'клиент':'тест'}</span><div class="play"><i></i></div><div class="meta"><b>${who}</b><span>${what}</span></div>`;
+ g.appendChild(c);
+ const v=c.querySelector('video');
+ c.addEventListener('click',()=>{
+  if(c.classList.contains('playing')){v.pause();c.classList.remove('playing');return}
+  document.querySelectorAll('.card.playing').forEach(o=>{o.querySelector('video').pause();o.classList.remove('playing')});
+  const h=document.getElementById('heroV');if(h&&!h.paused)h.pause();
+  v.currentTime=0;v.muted=false;v.play();c.classList.add('playing');
+ });
+ v.addEventListener('ended',()=>c.classList.remove('playing'));
+});
+const heroV=document.getElementById('heroV');
+heroV.addEventListener('play',()=>document.querySelectorAll('.card.playing').forEach(o=>{o.querySelector('video').pause();o.classList.remove('playing')}));
+const wall=document.getElementById('wall');const ids=WORKS.map(w=>w[0]);
+for(let i=0;i<6;i++){const col=document.createElement('div');col.className='col';for(let j=0;j<8;j++){const im=document.createElement('img');im.src=`media/${ids[(i*3+j)%ids.length]}.jpg`;im.alt='';col.appendChild(im)}wall.appendChild(col)}
+</script>
+</body>
+</html>
