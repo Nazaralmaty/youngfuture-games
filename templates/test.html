@@ -9,151 +9,189 @@
 <body>
 <div id="ev">
 <style>
-  #ev{--navy:#0f2a55;--navy2:#1b4a8f;--accent:#e0214c;--gold:#d9a534;
-      --bg:#eef1f6;--card:#fff;--text:#111a2b;--muted:#67748c;--line:#dde3ec;
-      --shadow:0 2px 8px rgba(16,30,54,.06),0 12px 32px rgba(16,30,54,.08);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
-      color:var(--text);background:var(--bg);min-height:100svh;-webkit-font-smoothing:antialiased;line-height:1.45}
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+  #ev{--blue:#2563eb;--blue2:#1d4ed8;--blue-soft:#eef3ff;--lime:#a3e635;--lime2:#c6f16a;
+      --ink:#0b1220;--muted:#5b6b84;--line:#e7ecf4;--card:#fff;--bg:#fff;
+      --shadow:0 2px 6px rgba(16,30,54,.05),0 14px 34px rgba(16,30,54,.09);
+      font-family:Nunito,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      color:var(--ink);background:var(--bg);min-height:100svh;-webkit-font-smoothing:antialiased;line-height:1.45}
   #ev *{box-sizing:border-box;margin:0;padding:0}
   #ev button{font-family:inherit}
-  #ev .wrap{max-width:560px;margin:0 auto;padding:14px 16px 40px;display:flex;flex-direction:column;min-height:100svh}
+  #ev .wrap{max-width:1120px;margin:0 auto;padding:14px 18px 40px;display:flex;flex-direction:column;min-height:100svh}
 
-  #ev .brand{display:flex;align-items:center;gap:9px;padding:4px 0 14px}
-  #ev .brand .lg{width:30px;height:30px;border-radius:9px;background:var(--navy);display:flex;align-items:center;justify-content:center;flex:0 0 30px}
-  #ev .brand .lg svg{width:18px;height:18px}
-  #ev .brand b{font-size:15px;font-weight:700;color:var(--navy);letter-spacing:-.2px}
-  #ev .brand b span{color:var(--accent)}
+  /* TOP BAR */
+  #ev .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0 18px}
+  #ev .logo{font-size:21px;font-weight:900;letter-spacing:-.8px;color:var(--ink)}
+  #ev .logo span{color:var(--blue)}
+  #ev .timepill{display:inline-flex;align-items:center;gap:6px;background:var(--blue-soft);color:var(--blue2);
+      border-radius:999px;padding:8px 14px;font-size:13px;font-weight:800;white-space:nowrap}
 
   #ev .screen{display:none} #ev .screen.active{display:block;animation:evf .28s ease}
   @keyframes evf{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes evbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 
   /* LANDING */
-  #ev .hero{border-radius:18px;overflow:hidden;background:var(--card);box-shadow:var(--shadow)}
-  #ev .heropic{aspect-ratio:16/9;background:#0b1a33 center/cover no-repeat;position:relative}
-  #ev .schooltag{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.92);color:var(--navy);
-      padding:5px 11px;border-radius:8px;font-size:12px;font-weight:700}
-  #ev .herobody{padding:20px 18px 22px}
-  #ev .kick{display:inline-block;color:var(--accent);font-weight:700;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:9px}
-  #ev h1{font-size:26px;line-height:1.18;font-weight:800;letter-spacing:-.6px;color:var(--navy);margin-bottom:9px}
-  #ev .lead{font-size:15px;color:var(--muted)}
-
-  #ev .facts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
-  #ev .fact{background:var(--card);border-radius:14px;padding:14px 10px;text-align:center;box-shadow:var(--shadow)}
-  #ev .fact b{display:block;font-size:19px;color:var(--navy);font-weight:800}
-  #ev .fact small{font-size:11.5px;color:var(--muted);display:block;margin-top:2px}
-
-  #ev .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;cursor:pointer;
-      font-weight:700;font-size:17px;color:#fff;background:var(--accent);padding:17px 22px;border-radius:14px;
-      margin-top:14px;transition:filter .15s,transform .1s;min-height:56px}
+  #ev .hero{display:flex;flex-direction:column;gap:6px}
+  #ev .kick{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#8a99b3;margin-bottom:12px}
+  #ev h1{font-size:34px;line-height:1.16;font-weight:900;letter-spacing:-1px;color:var(--ink);margin-bottom:16px}
+  #ev .uline{background:linear-gradient(transparent 74%,var(--lime) 74%,var(--lime) 92%,transparent 92%)}
+  #ev .heroart{margin:6px 0 10px;text-align:center}
+  #ev .hero>.heroart{display:none}
+  #ev .heroart img{width:100%;max-width:460px;animation:evbob 5s ease-in-out infinite}
+  #ev .heroart img,#ev .card .pic img,#ev .finpic img,#ev .qmas{mix-blend-mode:multiply}
+  #ev .lead{font-size:17px;color:var(--muted);font-weight:600;max-width:460px}
+  #ev .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;border:0;cursor:pointer;
+      font-weight:800;font-size:17px;color:#fff;background:var(--blue);padding:18px 26px;border-radius:999px;
+      margin-top:18px;transition:filter .15s,transform .1s;min-height:58px;box-shadow:0 10px 22px rgba(37,99,235,.25)}
   #ev .btn:hover{filter:brightness(1.07)} #ev .btn:active{transform:scale(.99)}
-  #ev .btn[disabled]{background:var(--line);color:var(--muted);cursor:default}
-  #ev .btn.ghost{background:transparent;color:var(--navy);border:1.5px solid var(--line);font-size:15.5px;min-height:50px}
-  #ev .note{font-size:12.5px;color:var(--muted);text-align:center;margin-top:11px}
+  #ev .btn[disabled]{background:#dde4ee;color:#93a1b8;box-shadow:none;cursor:default}
+  #ev .btn.lime{background:var(--lime);color:#1b2a06;box-shadow:0 10px 22px rgba(163,230,53,.35)}
+  #ev .btn.ghost{background:#fff;color:var(--blue2);border:2px solid var(--line);box-shadow:none;font-size:16px;min-height:52px}
+  #ev .btn .arr{font-size:20px;line-height:1}
+  #ev .note{display:flex;align-items:center;gap:7px;font-size:13px;color:#8a99b3;font-weight:600;margin-top:12px}
+
+  /* FEATURES */
+  #ev .feats{display:grid;gap:10px;margin-top:26px;border-top:1px solid var(--line);padding-top:20px}
+  #ev .feat{display:flex;align-items:center;gap:12px}
+  #ev .feat .ic{flex:0 0 44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  #ev .feat .ic svg{width:21px;height:21px}
+  #ev .feat.a .ic{background:#f2fbdd} #ev .feat.b .ic{background:var(--blue-soft)} #ev .feat.c .ic{background:#f2fbdd}
+  #ev .feat b{display:block;font-size:16px;font-weight:800;color:var(--ink)}
+  #ev .feat small{font-size:13px;color:var(--muted);font-weight:600}
 
   /* CARD / FORM */
-  #ev .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:22px 18px}
-  #ev .card h2{font-size:20px;color:var(--navy);font-weight:800;margin-bottom:4px;letter-spacing:-.3px}
-  #ev .card .sub{font-size:14px;color:var(--muted);margin-bottom:18px}
+  #ev .card{background:var(--card);border:1.5px solid var(--line);border-radius:24px;padding:24px 20px;max-width:520px;margin:0 auto}
+  #ev .card .pic{text-align:center;margin:-6px 0 6px} #ev .card .pic img{width:130px}
+  #ev .card h2{font-size:23px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;text-align:center}
+  #ev .card .sub{font-size:15px;color:var(--muted);font-weight:600;margin-bottom:20px;text-align:center}
   #ev .field{margin-bottom:14px}
-  #ev .field label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px}
-  #ev .field input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:15px 14px;font-size:16px;
-      font-family:inherit;color:var(--text);background:#fbfcfe;min-height:52px}
-  #ev .field input:focus{outline:none;border-color:var(--navy2);background:#fff}
-  #ev .field.bad input{border-color:var(--accent)}
-  #ev .err{color:var(--accent);font-size:13px;min-height:18px;margin-top:4px}
+  #ev .field label{display:block;font-size:13.5px;font-weight:800;color:var(--ink);margin-bottom:6px}
+  #ev .field input{width:100%;border:2px solid var(--line);border-radius:16px;padding:15px 16px;font-size:16px;
+      font-family:inherit;font-weight:600;color:var(--ink);background:#fafbfe;min-height:54px}
+  #ev .field input:focus{outline:none;border-color:var(--blue);background:#fff}
+  #ev .field.bad input{border-color:#ef4444}
+  #ev .err{color:#ef4444;font-size:13.5px;font-weight:700;min-height:18px;margin-top:4px}
 
   /* TEST */
-  #ev .top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-  #ev .bar{flex:1;height:6px;border-radius:99px;background:#dfe4ed;overflow:hidden}
-  #ev .bar i{display:block;height:100%;width:100%;background:var(--accent);border-radius:99px;
+  #ev .test{max-width:620px;margin:0 auto;width:100%}
+  #ev .top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  #ev .bar{flex:1;height:10px;border-radius:99px;background:#eef1f6;overflow:hidden}
+  #ev .bar i{display:block;height:100%;width:100%;background:var(--blue);border-radius:99px;
       transform:scaleX(0);transform-origin:left;transition:transform .3s}
-  #ev .count{font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
-  #ev .qcard{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:22px 18px}
-  #ev .qtag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;
-      color:var(--muted);margin-bottom:10px}
-  #ev .passage{background:#f4f7fc;border-radius:12px;padding:14px;font-size:15px;line-height:1.6;color:#243a5e;margin-bottom:14px}
-  #ev .qtext{font-size:20px;font-weight:700;line-height:1.35;color:var(--navy);letter-spacing:-.3px}
-  #ev .qhint{font-size:13.5px;color:var(--muted);margin-top:6px}
-  #ev .opts{display:grid;gap:9px;margin-top:18px}
-  #ev .opt{display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);border-radius:13px;
-      padding:14px 15px;font-size:16.5px;font-weight:500;cursor:pointer;background:#fff;text-align:left;
-      color:var(--text);transition:border-color .12s,background .12s;min-height:56px}
-  #ev .opt:hover{border-color:var(--navy2);background:#f8fafd}
-  #ev .opt .key{flex:0 0 26px;height:26px;border-radius:8px;background:#eef2f8;color:var(--navy);
-      display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
-  #ev .opt.pick{border-color:var(--navy);background:#eef2f8}
-  #ev .opt.pick .key{background:var(--navy);color:#fff}
+  #ev .count{font-size:14px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+  #ev .qcard{background:var(--card);border:1.5px solid var(--line);border-radius:24px;padding:22px 20px;position:relative}
+  #ev .qtag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
+      color:var(--blue2);background:var(--blue-soft);border-radius:999px;padding:5px 12px;margin-bottom:12px}
+  #ev .qmas{position:absolute;right:14px;top:10px;width:56px;opacity:.95}
+  #ev .passage{background:#f7f9fd;border-left:5px solid var(--lime);border-radius:14px;padding:14px;
+      font-size:15.5px;line-height:1.6;color:#33445f;font-weight:600;margin-bottom:14px}
+  #ev .qtext{font-size:21px;font-weight:800;line-height:1.32;letter-spacing:-.4px;padding-right:52px}
+  #ev .qhint{font-size:14px;color:var(--muted);font-weight:600;margin-top:6px}
+  #ev .opts{display:grid;gap:10px;margin-top:18px}
+  #ev .opt{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:16px;
+      padding:14px 16px;font-size:17px;font-weight:700;cursor:pointer;background:#fff;text-align:left;
+      color:var(--ink);transition:border-color .12s,background .12s;min-height:58px}
+  #ev .opt:hover{border-color:var(--blue);background:var(--blue-soft)}
+  #ev .opt .key{flex:0 0 30px;height:30px;border-radius:10px;background:#f1f4fa;color:var(--muted);
+      display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px}
+  #ev .opt.pick{border-color:var(--blue);background:var(--blue-soft)}
+  #ev .opt.pick .key{background:var(--blue);color:#fff}
   #ev .opts.lock .opt{pointer-events:none}
-  #ev .tin{width:100%;border:1.5px solid var(--line);border-radius:13px;padding:15px;font-size:18px;
-      text-align:center;font-weight:600;font-family:inherit;color:var(--text);background:#fbfcfe;margin-top:18px;min-height:56px}
-  #ev .tin:focus{outline:none;border-color:var(--navy2);background:#fff}
-  #ev .line{min-height:56px;border:1.5px dashed var(--line);border-radius:13px;padding:9px;display:flex;
-      flex-wrap:wrap;gap:7px;align-content:flex-start;margin-top:18px;background:#fbfcfe}
-  #ev .bank{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
-  #ev .chip{background:#fff;border:1.5px solid var(--navy2);color:var(--navy);border-radius:10px;
-      padding:10px 13px;font-size:16px;font-weight:600;cursor:pointer;user-select:none;min-height:42px}
-  #ev .chip.used{opacity:.25;pointer-events:none}
-  #ev .chip.inline{background:#eef2f8;border-color:transparent}
+  #ev .tin{width:100%;border:2px solid var(--line);border-radius:16px;padding:16px;font-size:19px;
+      text-align:center;font-weight:800;font-family:inherit;color:var(--ink);background:#fafbfe;margin-top:18px;min-height:58px}
+  #ev .tin:focus{outline:none;border-color:var(--blue);background:#fff}
+  #ev .line{min-height:58px;border:2px dashed #d8e0ed;border-radius:16px;padding:9px;display:flex;
+      flex-wrap:wrap;gap:8px;align-content:flex-start;margin-top:18px;background:#fafbfe}
+  #ev .bank{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  #ev .chip{background:#fff;border:2px solid var(--blue);color:var(--blue2);border-radius:14px;
+      padding:10px 14px;font-size:16px;font-weight:800;cursor:pointer;user-select:none;min-height:44px}
+  #ev .chip.used{opacity:.22;pointer-events:none}
+  #ev .chip.inline{background:var(--blue);border-color:var(--blue);color:#fff}
 
   /* FINISH */
-  #ev .lvl{background:var(--navy);color:#fff;border-radius:18px;padding:26px 20px;text-align:center}
-  #ev .lvl small{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#9fb2d6;font-weight:700}
-  #ev .lvl b{display:block;font-size:30px;font-weight:800;letter-spacing:-.6px;margin:8px 0 10px}
-  #ev .lvl p{font-size:14.5px;color:#cfd9ea;line-height:1.55}
+  #ev .fin{max-width:620px;margin:0 auto;width:100%}
+  #ev .finpic{text-align:center} #ev .finpic img{width:190px;margin-bottom:-6px}
+  #ev .lvl{background:var(--blue);color:#fff;border-radius:26px;padding:24px 22px 26px;text-align:center}
+  #ev .lvl small{display:block;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#bcd0ff;font-weight:800}
+  #ev .lvl b{display:block;font-size:29px;font-weight:900;letter-spacing:-.8px;margin:8px 0 10px}
+  #ev .lvl p{font-size:15px;color:#dbe6ff;font-weight:600;line-height:1.55}
   #ev .scores{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
-  #ev .sc{background:var(--card);border-radius:12px;padding:12px 6px;text-align:center;box-shadow:var(--shadow)}
-  #ev .sc b{display:block;font-size:17px;color:var(--navy);font-weight:800}
-  #ev .sc small{font-size:10.5px;color:var(--muted)}
-  #ev .next{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:20px 18px;margin-top:12px}
-  #ev .next h3{font-size:17px;color:var(--navy);margin-bottom:6px}
-  #ev .next p{font-size:14px;color:var(--muted)}
+  #ev .sc{background:#f7f9fd;border-radius:16px;padding:13px 6px;text-align:center}
+  #ev .sc b{display:block;font-size:18px;font-weight:900;color:var(--blue2)}
+  #ev .sc small{font-size:10.5px;color:var(--muted);font-weight:700}
+  #ev .next{background:#fff;border:1.5px solid var(--line);border-radius:24px;padding:20px;margin-top:12px}
+  #ev .next h3{font-size:19px;font-weight:900;margin-bottom:6px}
+  #ev .next p{font-size:15px;color:var(--muted);font-weight:600}
 
-  #ev .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,140px);background:var(--navy);color:#fff;
-      padding:13px 20px;border-radius:12px;font-weight:600;font-size:14.5px;transition:transform .3s;z-index:70;max-width:90vw;text-align:center}
-  #ev .toast.show{transform:translate(-50%,0)}
-  #ev .foot{text-align:center;color:#8d99ae;font-size:12px;margin-top:auto;padding-top:22px}
+  #ev .roundn{text-align:center;font-size:12px;font-weight:800;letter-spacing:2px;color:var(--blue);
+      text-transform:uppercase;margin-bottom:6px}
+  #ev .match{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+  #ev .mcol{display:grid;gap:10px;align-content:start}
+  #ev .mbtn{border:2px solid var(--line);border-radius:14px;padding:14px 10px;font-size:15.5px;font-weight:800;
+      background:#fff;cursor:pointer;font-family:inherit;color:var(--ink);min-height:54px}
+  #ev .mbtn.sel{border-color:var(--blue);background:var(--blue-soft)}
+  #ev .mbtn.paired{border-color:var(--lime);background:#f5fce4;pointer-events:none}
+  #ev .slot{color:var(--blue2);font-weight:900;border-bottom:3px solid var(--lime);padding:0 4px}
+  #ev .listen{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;border:0;
+      border-radius:999px;padding:13px 22px;font-size:15.5px;font-weight:800;cursor:pointer;
+      font-family:inherit;margin-top:16px;min-height:50px}
+  #ev .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,140px);background:var(--ink);color:#fff;
+      padding:14px 20px;border-radius:14px;font-weight:700;font-size:14.5px;transition:transform .3s,opacity .3s;
+      opacity:0;pointer-events:none;z-index:70;max-width:90vw;text-align:center}
+  #ev .toast.show{transform:translate(-50%,0);opacity:1}
+  #ev .foot{text-align:center;color:#a6b0c2;font-size:12.5px;font-weight:600;margin-top:auto;padding-top:26px}
 
-  @media(min-width:600px){
-    #ev .wrap{max-width:640px;padding:22px 24px 50px}
-    #ev h1{font-size:31px} #ev .qtext{font-size:22px} #ev .herobody{padding:26px 24px 28px}
-    #ev .card,#ev .qcard{padding:26px 24px}
+  @media(min-width:700px){
+    #ev .wrap{padding:20px 28px 50px}
+    #ev h1{font-size:44px;margin-bottom:20px} #ev .lead{font-size:18px}
+    #ev .heroart img{max-width:520px}
+    #ev .feats{grid-template-columns:1fr 1fr 1fr;gap:0}
+    #ev .feat{padding:0 22px;border-left:1px solid var(--line)}
+    #ev .feat:first-child{padding-left:0;border-left:0}
+    #ev .card,#ev .qcard{padding:28px 26px}
   }
-  @media(min-width:1024px){
-    #ev .wrap{max-width:720px;padding:34px 24px 60px}
-    #ev h1{font-size:34px} #ev .opt{font-size:17px}
+  @media(min-width:980px){
+    #ev .hero{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:40px;padding:20px 0 10px}
+    #ev .herotext{order:1} #ev .heroart{order:2;margin:0}
+    #ev .hero>.heroart{display:block} #ev .heroart.mob{display:none}
+    #ev .heroart img{max-width:100%}
+    #ev h1{font-size:52px;letter-spacing:-1.6px}
+    #ev .btn{width:auto;padding:18px 34px}
+    #ev .feats{margin-top:34px}
   }
 </style>
 
 <div class="wrap">
-  <div class="brand">
-    <div class="lg"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="26" r="12" fill="#e0214c"/><rect x="43" y="44" width="11" height="40" rx="4" fill="#fff"/></svg></div>
-    <b>1english<span>.kz</span></b>
+  <div class="topbar">
+    <div class="logo">1english<span>.kz</span></div>
+    <span class="timepill">⏱ ~7 мин</span>
   </div>
 
   <!-- 1. LANDING -->
   <section class="screen active" id="ev-landing">
     <div class="hero">
-      <div class="heropic" id="heroPic"><div class="schooltag" id="schoolTag" style="display:none"></div></div>
-      <div class="herobody">
-        <span class="kick">Деңгейді анықтау</span>
-        <h1>Ағылшын тіліндегі деңгейіңді 7 минутта біл</h1>
-        <p class="lead">15 сұрақ: грамматика, сөздік қор және оқылым. Нәтижесінде нақты деңгейің мен келесі қадам.</p>
+      <div class="herotext">
+        <div class="kick" id="kickText">Жаңа оқу жылы — жаңа мүмкіндік</div>
+        <h1>Ағылшыннан <span class="uline">жаңа деңгей</span>!</h1>
+        <div class="heroart mob"><img id="heroImg2" alt=""></div>
+        <p class="lead">15 сұрақ, 7 минут. Грамматика, сөздік қор және оқылым — соңында нақты деңгейің мен келесі қадам.</p>
+        <button class="btn" id="go-form">Тестті бастау <span class="arr">→</span></button>
+        <p class="note">🔒 Нәтиже тек оқу деңгейін талдау үшін қолданылады.</p>
       </div>
+      <div class="heroart"><img id="heroImg" alt=""></div>
     </div>
 
-    <div class="facts">
-      <div class="fact"><b>15</b><small>сұрақ</small></div>
-      <div class="fact"><b>~7</b><small>минут</small></div>
-      <div class="fact"><b>150+</b><small>сұрақ базасы</small></div>
+    <div class="feats">
+      <div class="feat a"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#7cb518" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div><div><b>15 сұрақ</b><small>деңгей бойынша</small></div></div>
+      <div class="feat b"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h4l4 10h6"/><path d="M3 17h4l4-10h6"/><path d="M18 4l3 3-3 3"/><path d="M18 14l3 3-3 3"/></svg></div><div><b>170+ база</b><small>әркімге басқа сұрақ</small></div></div>
+      <div class="feat c"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#7cb518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M5 15l4-5 3 3 5-7"/></svg></div><div><b>Нақты нәтиже</b><small>деңгей мен кеңес</small></div></div>
     </div>
-
-    <button class="btn" id="go-form">Тестті бастау</button>
-    <p class="note">Әр адамға сұрақтар кездейсоқ таңдалады — қайталанбайды.</p>
   </section>
 
   <!-- 2. FORM -->
   <section class="screen" id="ev-form">
     <div class="card">
+      <div class="pic"><img id="formImg" alt=""></div>
       <h2>Өзің туралы</h2>
       <p class="sub">Нәтижені саған жіберу үшін ғана керек.</p>
       <div class="field" id="f-name">
@@ -165,13 +203,12 @@
         <input id="in-cls" type="text" placeholder="9А" autocomplete="off">
       </div>
       <div class="err" id="formErr"></div>
-      <button class="btn" id="go-test">Бастау</button>
+      <button class="btn" id="go-test">Бастау <span class="arr">→</span></button>
     </div>
-    <p class="note">🔒 Деректер тек оқу деңгейін талдауға қолданылады.</p>
   </section>
 
   <!-- 3. TEST -->
-  <section class="screen" id="ev-test">
+  <section class="screen test" id="ev-test">
     <div class="top">
       <div class="bar"><i id="h-bar"></i></div>
       <span class="count" id="h-count">1 / 15</span>
@@ -179,8 +216,20 @@
     <div class="qcard" id="qcard"></div>
   </section>
 
+  <!-- 3b. РАУНД АРАСЫ -->
+  <section class="screen" id="ev-round">
+    <div class="card">
+      <div class="pic"><img id="roundImg" alt=""></div>
+      <div class="roundn" id="roundN">2 / 3</div>
+      <h2 id="roundT">Келесі раунд</h2>
+      <p class="sub" id="roundP"></p>
+      <button class="btn" id="go-round">Жалғастыру <span class="arr">→</span></button>
+    </div>
+  </section>
+
   <!-- 4. FINISH -->
-  <section class="screen" id="ev-finish">
+  <section class="screen fin" id="ev-finish">
+    <div class="finpic"><img id="finImg" alt=""></div>
     <div class="lvl">
       <small>Сенің деңгейің</small>
       <b id="f-level">—</b>
@@ -202,7 +251,11 @@
   var CONFIG = {
     APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycby6B4sJ4Jcx3ZgAhAUj4jn8fPhCMAb6JrJ-RkQNDDt1XyvV7AItD9eM8pUctS__VDPN/exec",
     SUBJECT: "English",
-    HERO: "https://nazaralmaty.github.io/youngfuture-games/assets/test_hero.png",
+    ART: {
+      hero:  "https://nazaralmaty.github.io/youngfuture-games/assets/hero_mascot.png",
+      think: "https://nazaralmaty.github.io/youngfuture-games/assets/think_mascot.png",
+      win:   "https://nazaralmaty.github.io/youngfuture-games/assets/finish_mascot.png"
+    },
     PICK: {1:4, 2:4, 3:4, 4:3},              // қай деңгейден нешеу алынады
     ADVANCED_URL: ""                          // Intermediate+ тесті дайын болғанда сілтеме
   };
@@ -377,18 +430,64 @@
    q:'What does the writer say usually happens?',o:['Neither the fears nor the promises come true','Teachers are replaced','Education is destroyed','The tool is forgotten'],c:0}
   ];
 
+  /* ===== ҚОСЫМША ФОРМАТТАР: жұп табу, мәтінді толтыру, тыңдалым ===== */
+  var EXTRA = [
+  {d:1,sk:'vocab',type:'match',q:'Жұбын тап:',pairs:[['Dog','Ит'],['Book','Кітап'],['Sun','Күн'],['Red','Қызыл']]},
+  {d:1,sk:'vocab',type:'match',q:'Жұбын тап:',pairs:[['Mother','Ана'],['Water','Су'],['House','Үй'],['Green','Жасыл']]},
+  {d:2,sk:'vocab',type:'match',q:'Жұбын тап:',pairs:[['Buy','Сатып алу'],['Sell','Сату'],['Find','Табу'],['Lose','Жоғалту']]},
+  {d:2,sk:'vocab',type:'match',q:'Жұбын тап:',pairs:[['Cheap','Арзан'],['Expensive','Қымбат'],['Early','Ерте'],['Late','Кеш']]},
+  {d:3,sk:'vocab',type:'match',q:'Жұбын тап:',pairs:[['Advice','Кеңес'],['Experience','Тәжірибе'],['Decision','Шешім'],['Reason','Себеп']]},
+  {d:3,sk:'vocab',type:'match',q:'Фразалық етістіктің жұбын тап:',pairs:[['Give up','Тастау'],['Look for','Іздеу'],['Turn off','Өшіру'],['Find out','Білу']]},
+  {d:4,sk:'vocab',type:'match',q:'Жұбын тап:',pairs:[['Admit','Мойындау'],['Deny','Жоққа шығару'],['Doubt','Күмәндану'],['Avoid','Аулақ болу']]},
+
+  {d:2,sk:'grammar',type:'cloze',q:'Мәтінді толтыр:',passage:'Last weekend we ___ to the mountains and ___ many photos.',
+   blanks:[{o:['went','go','goes'],c:0},{o:['took','take','taked'],c:0}]},
+  {d:2,sk:'grammar',type:'cloze',q:'Мәтінді толтыр:',passage:'My sister ___ at school now. She ___ a teacher.',
+   blanks:[{o:['works','work','working'],c:0},{o:['is','are','be'],c:0}]},
+  {d:3,sk:'grammar',type:'cloze',q:'Мәтінді толтыр:',passage:'I ___ never ___ to Italy, but I want to go next year.',
+   blanks:[{o:['have','has','am'],c:0},{o:['been','be','was'],c:0}]},
+  {d:3,sk:'grammar',type:'cloze',q:'Мәтінді толтыр:',passage:'If you ___ early, you ___ the train.',
+   blanks:[{o:['leave','will leave','left'],c:0},{o:['will catch','catch','caught'],c:0}]},
+  {d:4,sk:'grammar',type:'cloze',q:'Мәтінді толтыр:',passage:'The house ___ built in 1990 and ___ been empty since 2015.',
+   blanks:[{o:['was','is','has'],c:0},{o:['has','have','was'],c:0}]},
+  {d:4,sk:'grammar',type:'cloze',q:'Мәтінді толтыр:',passage:'If I ___ known about the meeting, I ___ have come.',
+   blanks:[{o:['had','have','would'],c:0},{o:['would','will','had'],c:0}]},
+
+  {d:1,sk:'listening',type:'listen',audio:'My brother is a doctor.',q:'Тыңда: ағасы кім?',o:['a doctor','a teacher','a driver','a cook'],c:0},
+  {d:1,sk:'listening',type:'listen',audio:'I have two cats and one dog.',q:'Тыңда: неше мысық бар?',o:['two','one','three','four'],c:0},
+  {d:2,sk:'listening',type:'listen',audio:'The train leaves at half past seven.',q:'Тыңда: пойыз қашан жүреді?',o:['7:30','7:15','6:30','8:30'],c:0},
+  {d:2,sk:'listening',type:'listen',audio:'She usually goes to the gym on Tuesday and Friday.',q:'Тыңда: қай күндері?',o:['Tuesday and Friday','Monday and Friday','Tuesday and Sunday','Every day'],c:0},
+  {d:3,sk:'listening',type:'listen',audio:'I have been learning English for about three years.',q:'Тыңда: қанша уақыт үйреніп жүр?',o:['about three years','three months','thirteen years','since school'],c:0},
+  {d:3,sk:'listening',type:'listen',audio:'We were going to fly, but in the end we took the bus.',q:'Тыңда: немен жүрді?',o:['by bus','by plane','by train','by car'],c:0},
+  {d:4,sk:'listening',type:'listen',audio:'If the weather had been better, we would have stayed another night.',q:'Тыңда: олар не істеді?',o:['They left earlier','They stayed one more night','They changed the hotel','They cancelled the trip'],c:0},
+  {d:4,sk:'listening',type:'listen',audio:'The report should have been sent by Friday at the latest.',q:'Тыңда: есеп қашан жіберілуі керек еді?',o:['by Friday','on Monday','next week','it was sent'],c:0}
+  ];
+  BANK = BANK.concat(EXTRA);
+  BANK.forEach(function(x,ix){x._id=ix;});   // тұрақты id — таңдалғанды қайта бермеу үшін
+
   var LEVELS = {
-    beginner:{name:'Beginner (A1)',desc:'Негізгі сөздер мен қарапайым сөйлемдерді танисың. Бастапқы деңгейден жүйелі бастау керек — бұл қалыпты жағдай.'},
+    beginner:{name:'Beginner (A1)',desc:'Негізгі сөздер мен қарапайым сөйлемдерді танисың. Бастапқы деңгейден жүйелі бастаған дұрыс — бұл қалыпты жағдай.'},
     elementary:{name:'Elementary (A2)',desc:'Күнделікті тақырыптарда қарапайым сөйлемдер құрасың. Өткен шақ пен сұрақ құрылымдары әлі тұрақсыз.'},
     pre:{name:'Pre-Intermediate (A2+/B1)',desc:'Күнделікті жағдайда еркін түсінесің және жауап бересің. Present Perfect, шартты сөйлемдер мен уақыт формаларын бекіту керек.'},
-    above:{name:'Pre-Intermediate-тен жоғары',desc:'Бұл тест сенің деңгейіңді дәл өлшей алмайды — ол Beginner мен Pre-Intermediate аралығына арналған. Нақты деңгей үшін кеңейтілген тест керек.'}
+    above:{name:'Pre-Intermediate-тен жоғары',desc:'Бұл тест сенің деңгейіңді дәл өлшей алмайды — ол Beginner мен Pre-Intermediate аралығына арналған. Нақты баға үшін кеңейтілген тест керек.'}
+  };
+  var TRACKS = {                      // раундтағы сұрақтардың қиындығы
+    easy:[1,1,2,2,2], core:[2,2,3,3,3], hard:[3,3,4,4,4], start:[1,2,2,3,3]
+  };
+  var ROUND_TITLE = {
+    easy:{t:'2-раунд · негіз',p:'Базаны бекітеміз. Асықпай оқы.'},
+    core:{t:'Келесі раунд',p:'Сұрақтар сәл қиындайды.'},
+    hard:{t:'Күшті раунд',p:'Сен жақсы бастадың — енді шынымен қиын сұрақтар.'}
   };
 
   var $=function(id){return document.getElementById(id);};
   var P=new URLSearchParams(location.search), SCHOOL=P.get('school')||'';
+  var TTS=('speechSynthesis' in window);
   var lead={id:null,name:'',cls:''}, seq=[], i=0, answers=[], startedAt=null, locked=false;
+  var used={}, track='start', tracks=['start'], roundNo=0;
   var band={1:{c:0,t:0},2:{c:0,t:0},3:{c:0,t:0},4:{c:0,t:0}};
   var BNAME={1:'Beginner',2:'Elementary',3:'Pre-Intermediate',4:'Жоғары деңгей'};
+  var PER=5, ROUNDS=3, TOTAL=PER*ROUNDS;
 
   function show(n){
     var s=document.querySelectorAll('#ev .screen');
@@ -400,31 +499,49 @@
   function norm(s){return (s||'').toString().toLowerCase().replace(/[.,!?'’]/g,'').replace(/\s+/g,' ').trim();}
   function shuffle(a){for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var t=a[k];a[k]=a[j];a[j]=t;}return a;}
   function send(p){try{fetch(CONFIG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});}catch(e){}}
+  function speak(t){if(!TTS)return;try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.9;window.speechSynthesis.speak(u);}catch(e){}}
 
-  /* ===== СҰРАҚТАРДЫ ТАҢДАУ: әр деңгейден кездейсоқ ===== */
-  function pickQuestions(){
-    var out=[];
-    [1,2,3,4].forEach(function(d){
-      var pool=shuffle(BANK.filter(function(x){return x.d===d;}));
-      out=out.concat(pool.slice(0,CONFIG.PICK[d]||0));
-    });
-    return out.map(prepare);
+  /* ===== СҰРАҚТЫ ТАҢДАУ: қиындығы бойынша, формат қайталанбауға тырысады ===== */
+  function takeOne(d,usedTypes){
+    var pool=BANK.filter(function(x){return x.d===d && !used[x._id] && (TTS||x.type!=='listen');});
+    if(!pool.length)pool=BANK.filter(function(x){return x.d===d && (TTS||x.type!=='listen');});
+    var fresh=pool.filter(function(x){return usedTypes.indexOf(x.type||'mcq')<0;});
+    var src=fresh.length?fresh:pool;
+    var raw=src[Math.floor(Math.random()*src.length)];
+    used[raw._id]=1;
+    usedTypes.push(raw.type||'mcq');
+    return prepare(raw);
+  }
+  function buildRound(name){
+    var usedTypes=[];
+    return TRACKS[name].map(function(d){return takeOne(d,usedTypes);});
   }
   function prepare(raw){
     var it={};for(var k in raw)if(raw.hasOwnProperty(k))it[k]=raw[k];
     if(!it.type)it.type='mcq';
-    if(it.type==='mcq'&&it.o){
+    if((it.type==='mcq'||it.type==='listen')&&it.o){
       var ans=it.o[it.c];
       it.o=shuffle(it.o.slice());
       it.c=it.o.indexOf(ans);
     }
     if(it.type==='order')it.words=shuffle(String(it.a).split(/\s+/));
+    if(it.type==='match')it.pairs=it.pairs.slice();
     return it;
+  }
+  /* раунд нәтижесі бойынша келесі раундтың қиындығы */
+  function nextTrack(){
+    var pts=0,max=0;
+    answers.forEach(function(a){max+=a.d;if(a.ok)pts+=a.d;});
+    var r=max?pts/max:0;
+    if(r>=0.75)return 'hard';
+    if(r>=0.45)return 'core';
+    return 'easy';
   }
 
   /* ===== LANDING ===== */
-  if(CONFIG.HERO)$('heroPic').style.backgroundImage='url('+CONFIG.HERO+')';
-  if(SCHOOL){var st=$('schoolTag');st.style.display='block';st.textContent=SCHOOL;}
+  $('heroImg').src=$('heroImg2').src=CONFIG.ART.hero; $('formImg').src=CONFIG.ART.think; $('finImg').src=CONFIG.ART.win;
+  $('roundImg').src=CONFIG.ART.think;
+  if(SCHOOL)$('kickText').textContent=SCHOOL;
   $('go-form').addEventListener('click',function(){show('form');setTimeout(function(){try{$('in-name').focus();}catch(e){}},300);});
 
   /* ===== FORM ===== */
@@ -446,21 +563,36 @@
 
   /* ===== ТЕСТ ===== */
   function startTest(){
-    seq=pickQuestions();i=0;answers=[];
+    used={};answers=[];i=0;roundNo=0;track='start';tracks=['start'];
     band={1:{c:0,t:0},2:{c:0,t:0},3:{c:0,t:0},4:{c:0,t:0}};
+    seq=buildRound('start');roundNo=1;
     show('test');render();
   }
+  function nextRound(){
+    track=nextTrack();tracks.push(track);
+    seq=seq.concat(buildRound(track));roundNo++;
+    var r=ROUND_TITLE[track];
+    $('roundN').textContent=roundNo+' / '+ROUNDS;
+    $('roundT').textContent=r.t;
+    $('roundP').textContent=r.p;
+    show('round');
+  }
+  $('go-round').addEventListener('click',function(){show('test');render();});
+
   function hud(){
-    $('h-count').textContent=(i+1)+' / '+seq.length;
-    $('h-bar').style.transform='scaleX('+(i/seq.length)+')';
+    $('h-count').textContent=(i+1)+' / '+TOTAL;
+    $('h-bar').style.transform='scaleX('+(i/TOTAL)+')';
   }
   var KEYS=['A','B','C','D'];
   function render(){
-    if(i>=seq.length){finish();return;}
+    if(i>=TOTAL){finish();return;}
+    if(i>=seq.length){nextRound();return;}
     locked=false;hud();
     var it=seq[i], c=$('qcard'), h='';
-    h+='<div class="qtag">'+(i+1)+'-сұрақ · '+(it.sk==='vocab'?'сөздік қор':it.sk==='reading'?'оқылым':'грамматика')+'</div>';
-    if(it.passage)h+='<div class="passage">'+it.passage+'</div>';
+    var skName=it.sk==='vocab'?'сөздік қор':it.sk==='reading'?'оқылым':it.sk==='listening'?'тыңдалым':'грамматика';
+    h+='<img class="qmas" src="'+CONFIG.ART.think+'" alt="">';
+    h+='<div class="qtag">'+(i+1)+'-сұрақ · '+skName+'</div>';
+    if(it.passage&&it.type!=='cloze')h+='<div class="passage">'+it.passage+'</div>';
     h+='<div class="qtext">'+it.q+'</div>';
 
     if(it.type==='gap'){
@@ -487,12 +619,12 @@
       function redraw(){
         var al=$('aline');al.innerHTML='';
         picked.forEach(function(p,idx){
-          var s=document.createElement('div');s.className='chip inline';s.textContent=p.w;
-          s.addEventListener('click',function(){
+          var sp=document.createElement('div');sp.className='chip inline';sp.textContent=p.w;
+          sp.addEventListener('click',function(){
             var b=bankEl.querySelector('.chip[data-id="'+p.id+'"]');if(b)b.classList.remove('used');
             picked.splice(idx,1);redraw();
           });
-          al.appendChild(s);
+          al.appendChild(sp);
         });
         $('bdone').disabled=picked.length!==it.words.length;
       }
@@ -502,11 +634,68 @@
         record(it,norm(got)===norm(it.a),got);
       });
     }
+    else if(it.type==='match'){
+      h+='<div class="qhint">Сол жақтағы сөзді оң жақтағы аудармасымен қос.</div>';
+      h+='<div class="match"><div class="mcol" id="mL"></div><div class="mcol" id="mR"></div></div>';
+      c.innerHTML=h;
+      var L=shuffle(it.pairs.map(function(p,ix){return {t:p[0],id:ix};}));
+      var R=shuffle(it.pairs.map(function(p,ix){return {t:p[1],id:ix};}));
+      L.forEach(function(o){var b=document.createElement('button');b.className='mbtn';b.textContent=o.t;b.dataset.id=o.id;b.dataset.s='L';$('mL').appendChild(b);});
+      R.forEach(function(o){var b=document.createElement('button');b.className='mbtn';b.textContent=o.t;b.dataset.id=o.id;b.dataset.s='R';$('mR').appendChild(b);});
+      var selL=null,done=0,right=0;
+      c.querySelectorAll('.mbtn').forEach(function(b){
+        b.addEventListener('click',function(){
+          if(b.classList.contains('paired'))return;
+          if(b.dataset.s==='L'){
+            c.querySelectorAll('#mL .mbtn').forEach(function(x){x.classList.remove('sel');});
+            b.classList.add('sel');selL=b;return;
+          }
+          if(!selL)return;
+          if(selL.dataset.id===b.dataset.id)right++;
+          selL.classList.remove('sel');selL.classList.add('paired');b.classList.add('paired');
+          selL=null;done++;
+          if(done===it.pairs.length)setTimeout(function(){record(it,right===it.pairs.length,'match '+right+'/'+it.pairs.length);},300);
+        });
+      });
+    }
+    else if(it.type==='cloze'){
+      var parts=it.passage.split('___'), txt='';
+      for(var bi=0;bi<parts.length;bi++){txt+=parts[bi];if(bi<it.blanks.length)txt+='<b class="slot" id="cz'+bi+'">___</b>';}
+      h+='<div class="passage">'+txt+'</div><div id="clozeOpts"></div>';
+      h+='<button class="btn" id="czdone" disabled>Жауап беру</button>';
+      c.innerHTML=h;
+      var picks=new Array(it.blanks.length), oc=$('clozeOpts');
+      it.blanks.forEach(function(bl,bx){
+        var row=document.createElement('div');row.className='opts';row.style.margin='12px 0 0';
+        bl.o.forEach(function(opt,k){
+          var btn=document.createElement('button');btn.className='opt';btn.style.minHeight='50px';
+          btn.innerHTML='<span class="key">'+(bx+1)+'</span><span>'+opt+'</span>';
+          btn.addEventListener('click',function(){
+            picks[bx]=k;var sl=$('cz'+bx);if(sl)sl.textContent=opt;
+            row.querySelectorAll('.opt').forEach(function(x){x.classList.remove('pick');});
+            btn.classList.add('pick');
+            $('czdone').disabled=picks.filter(function(x){return x!=null;}).length<it.blanks.length;
+          });
+          row.appendChild(btn);
+        });
+        oc.appendChild(row);
+      });
+      $('czdone').addEventListener('click',function(){
+        if(locked)return;
+        var cc=0;it.blanks.forEach(function(bl,bx){if(picks[bx]===bl.c)cc++;});
+        record(it,cc===it.blanks.length,'cloze '+cc+'/'+it.blanks.length);
+      });
+    }
     else{
+      if(it.type==='listen')h+='<button class="listen" id="lbtn">🔊 Тағы тыңдау</button>';
       h+='<div class="opts" id="opts">';
       it.o.forEach(function(t,k){h+='<button class="opt" data-k="'+k+'"><span class="key">'+KEYS[k]+'</span><span>'+t+'</span></button>';});
       h+='</div>';
       c.innerHTML=h;
+      if(it.type==='listen'){
+        $('lbtn').addEventListener('click',function(){speak(it.audio);});
+        setTimeout(function(){speak(it.audio);},400);
+      }
       c.querySelectorAll('.opt').forEach(function(b){
         b.addEventListener('click',function(){
           if(locked)return;locked=true;
@@ -526,6 +715,7 @@
   }
   function record(it,ok,chosen){
     locked=true;
+    if(TTS)try{window.speechSynthesis.cancel();}catch(e){}
     band[it.d].t++; if(ok)band[it.d].c++;
     answers.push({n:answers.length+1,d:it.d,level:BNAME[it.d],sk:it.sk,type:it.type,q:it.q,chosen:chosen,ok:ok});
     i++;render();
@@ -533,29 +723,30 @@
 
   /* ===== НӘТИЖЕ ===== */
   function pct(b){return b.t?Math.round(b.c/b.t*100):0;}
-  function levelOf(p1,p2,p3,p4){
-    if(p4>=67&&p3>=75&&p2>=75)return 'above';
-    if(p3>=60&&p2>=60)return 'pre';
-    if(p2>=60||p3>=50)return 'elementary';
+  function levelOf(p1,p2,p3,p4,t4,t3,t2){
+    // деңгей = ең жоғары жолақ, онда кемі 2 сұрақ және 60%+ дұрыс
+    if(t4>=2&&p4>=60)return 'above';
+    if(t3>=2&&p3>=60)return 'pre';
+    if(t2>=2&&p2>=60)return 'elementary';
     return 'beginner';
   }
   function finish(){
     $('h-bar').style.transform='scaleX(1)';
     var p=[0,pct(band[1]),pct(band[2]),pct(band[3]),pct(band[4])];
-    var key=levelOf(p[1],p[2],p[3],p[4]), L=LEVELS[key];
-    var correct=band[1].c+band[2].c+band[3].c+band[4].c, total=seq.length;
+    var key=levelOf(p[1],p[2],p[3],p[4],band[4].t,band[3].t,band[2].t), L=LEVELS[key];
+    var correct=band[1].c+band[2].c+band[3].c+band[4].c;
 
     $('f-level').textContent=L.name;
     $('f-desc').textContent=L.desc;
     $('f-scores').innerHTML=[1,2,3,4].map(function(d){
-      return '<div class="sc"><b>'+band[d].c+'/'+band[d].t+'</b><small>'+
+      return '<div class="sc"><b>'+(band[d].t?band[d].c+'/'+band[d].t:'—')+'</b><small>'+
         (d===1?'Beginner':d===2?'Elementary':d===3?'Pre-Int':'Жоғары')+'</small></div>';
     }).join('');
 
     var nx='';
     if(key==='above'){
       nx='<h3>Кеңейтілген тест</h3><p>Intermediate деңгейінен жоғары сұрақтар, дәлірек баға. Жақын арада ашылады.</p>'+
-         '<button class="btn" id="f-adv" style="margin-top:14px">Кеңейтілген тестті өту</button>';
+         '<button class="btn" id="f-adv" style="margin-top:16px">Кеңейтілген тестті өту <span class="arr">→</span></button>';
     } else {
       nx='<h3>Келесі қадам</h3><p>Нәтижең мұғаліміңе жіберілді. Келесі сабақта қай тақырыптан бастау керегін талдайсыңдар.</p>';
     }
@@ -569,18 +760,19 @@
 
     send({action:'result',leadId:lead.id,school:SCHOOL,subject:CONFIG.SUBJECT,name:lead.name,class:lead.cls,
       startedAt:startedAt,finishedAt:new Date().toISOString(),
-      score:correct,total:total,level:L.name,levelKey:key,
+      score:correct,total:TOTAL,level:L.name,levelKey:key,path:tracks.join('>'),
       a1_pct:p[1],a2_pct:p[2],b1_pct:p[3],b2_pct:p[4],
       a1:band[1].c+'/'+band[1].t,a2:band[2].c+'/'+band[2].t,b1:band[3].c+'/'+band[3].t,b2:band[4].c+'/'+band[4].t,
-      answersSummary:answers.map(function(x){return x.n+'. ['+x.level+'/'+x.sk+'] '+x.chosen+(x.ok?' ✓':' ✗');}).join('\n'),
+      answersSummary:answers.map(function(x){return x.n+'. ['+x.level+'/'+x.sk+'/'+x.type+'] '+x.chosen+(x.ok?' ✓':' ✗');}).join('\n'),
       answersJson:JSON.stringify(answers),testUrl:location.href});
 
     show('finish');
   }
   $('f-again').addEventListener('click',function(){show('landing');});
 
-  window.__EVTEST__={BANK:BANK,pickQuestions:pickQuestions,levelOf:levelOf,
-    get seq(){return seq;},get answers(){return answers;},get band(){return band;},CONFIG:CONFIG};
+  window.__EVTEST__={BANK:BANK,buildRound:buildRound,nextTrack:nextTrack,levelOf:levelOf,TRACKS:TRACKS,
+    get seq(){return seq;},get answers(){return answers;},get band(){return band;},
+    set answers(a){answers=a;},resetUsed:function(){used={};},CONFIG:CONFIG,TTS:TTS};
 })();
 </script>
 </body>
