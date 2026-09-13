@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <title>Контент-завод — производство рилсов для агентств</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Производство вертикальных роликов под вашим именем: вы ведёте клиента и пишете ТЗ, я отдаю готовый ролик за 48 часов.">
+<meta name="description" content="Производство вертикальных роликов под вашим именем: вы ведёте клиента и пишете ТЗ, до 10 роликов отдаю за 24 часа.">
 <meta property="og:title" content="Контент-завод — рилсы для вашего агентства">
-<meta property="og:description" content="11 брендов, серии по 15–25 роликов, 48 часов на ролик, правка в тот же день. Ваше имя на ролике, моего нет.">
+<meta property="og:description" content="11 брендов, серии по 15–25 роликов, до 10 роликов за 24 часа, правка за 6–12 часов. Ваше имя на ролике, моего нет.">
 <meta property="og:image" content="https://nazaralmaty.github.io/youngfuture-games/zavod/media/vizitka.jpg">
 <style>
 :root{
@@ -50,7 +50,7 @@ section{padding:clamp(56px,8vw,110px) var(--pad);border-top:1px solid var(--line
 .hero-video video{width:100%;height:100%;object-fit:cover}
 .hero-video .cap{position:absolute;left:0;right:0;bottom:0;padding:12px 14px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);pointer-events:none}
 .facts{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:34px}
-@media(min-width:800px){.facts{grid-template-columns:repeat(5,1fr)}}
+@media(min-width:800px){.facts{grid-template-columns:repeat(4,1fr)}}
 .facts div{background:var(--surface);padding:16px 18px}
 .facts b{display:block;font-family:var(--fd);font-size:34px;line-height:1;letter-spacing:-.02em}
 .facts span{font-size:13px;color:var(--muted);line-height:1.3;display:block;margin-top:6px}
@@ -98,7 +98,7 @@ section{padding:clamp(56px,8vw,110px) var(--pad);border-top:1px solid var(--line
 
 /* steps */
 .steps{display:grid;gap:12px;counter-reset:s}
-@media(min-width:800px){.steps{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:800px){.steps{grid-template-columns:repeat(3,1fr)}}
 .step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 20px 18px;position:relative}
 .step::before{counter-increment:s;content:"0" counter(s);font-family:var(--fm);font-size:11px;letter-spacing:.14em;color:var(--acc);display:block;margin-bottom:10px}
 .step p{font-size:14px;color:var(--muted);margin:0}
@@ -135,13 +135,12 @@ footer{padding:24px var(--pad);font-family:var(--fm);font-size:11px;color:var(--
   <div>
    <div class="k">Контент-завод · для агентств</div>
    <h1>Рилсы для ваших клиентов. <span class="acc">Под вашим именем.</span></h1>
-   <p class="lede" style="margin-top:22px">Вы ведёте клиента и пишете ТЗ. Я отдаю готовый ролик за 48 часов, с озвучкой, звуком и обложкой. Ваш логотип на ролике, моего нет.</p>
+   <p class="lede" style="margin-top:22px">Вы ведёте клиента и пишете ТЗ. До 10 роликов отдаю за 24 часа, с озвучкой, звуком и обложкой. Ваш логотип на ролике, моего нет.</p>
    <div class="facts">
     <div><b>11</b><span>брендов в работе: клиники, школы, завод, приложения</span></div>
-    <div><b>48 ч</b><span>от ТЗ до мастера</span></div>
-    <div><b>1 день</b><span>любая правка: цифра, цвет, язык</span></div>
+    <div><b>24 ч</b><span>до 10 роликов от ТЗ до готовых</span></div>
+    <div><b>6–12 ч</b><span>любая правка: цифра, цвет, язык</span></div>
     <div><b>4</b><span>языка: русский, казахский, английский, арабский</span></div>
-    <div><b>3+1</b><span>форматы 9:16, 4:5, 1:1 и обложка</span></div>
    </div>
   </div>
   <div class="hero-video" id="heroBox">
@@ -202,9 +201,8 @@ footer{padding:24px var(--pad);font-family:var(--fm);font-size:11px;color:var(--
   <h2>Ваш клиент вас не теряет</h2>
   <div class="steps" style="margin-top:26px">
    <div class="step"><h3>ТЗ от вас</h3><p>Тема или сценарий, ссылка на аккаунт клиента, съёмка если есть. Съёмки нет — ролик собирается без неё.</p></div>
-   <div class="step"><h3>Первый вариант за сутки</h3><p>Черновик показываю в первые часы, мастер отдаю в течение 48 часов. Бренд-слой берётся с сайта и ленты клиента.</p></div>
-   <div class="step"><h3>Правка в тот же день</h3><p>Цифра, цвет, реплика, язык. Правки входят в цену, ролик от них не разваливается.</p></div>
-   <div class="step"><h3>Мастер во всех форматах</h3><p>9:16, 4:5, 1:1, обложка. −14 LUFS, проверено на телефоне. Вы публикуете как своё.</p></div>
+   <div class="step"><h3>До 10 роликов за 24 часа</h3><p>Черновик показываю в первые часы, готовые ролики отдаю в течение суток. Бренд-слой берётся с сайта и ленты клиента.</p></div>
+   <div class="step"><h3>Правка за 6–12 часов</h3><p>Цифра, цвет, реплика, язык. Правки входят в цену, ролик от них не разваливается.</p></div>
   </div>
   <div class="rules">
    <div>С вашим клиентом не общаюсь. Все вопросы через вас.</div>
@@ -222,14 +220,14 @@ footer{padding:24px var(--pad);font-family:var(--fm);font-size:11px;color:var(--
    <div class="term hot">
     <div class="kk">Тест · бесплатно</div>
     <div class="big">3 ролика</div>
-    <p>На вашем живом клиенте, по вашему ТЗ, за 48 часов. Вы смотрите, показываете клиенту, решаете.</p>
+    <p>На вашем живом клиенте, по вашему ТЗ, за 24 часа. Вы смотрите, показываете клиенту, решаете.</p>
     <ul><li>Без обязательств и без предоплаты</li><li>Можно на трёх разных клиентах</li><li>Со съёмкой или без</li></ul>
    </div>
    <div class="term">
     <div class="kk">Поштучно</div>
-    <div class="big">12 000 ₸</div>
-    <p class="muted">за ролик при заказе от 10 в месяц. Вы ставите свою наценку.</p>
-    <ul><li>Озвучка, звук, обложка включены</li><li>Правки включены</li><li>Три формата + обложка</li></ul>
+    <div class="big">7 000 ₸</div>
+    <p class="muted">за ролик при заказе от 10 роликов. Вы ставите свою наценку.</p>
+    <ul><li>Озвучка, звук, обложка включены</li><li>Правки включены</li></ul>
    </div>
    <div class="term">
     <div class="kk">Абонемент</div>
@@ -251,7 +249,7 @@ footer{padding:24px var(--pad);font-family:var(--fm);font-size:11px;color:var(--
    <div><b>Ссылка на клиента</b>Instagram или сайт. Оттуда беру цвета, шрифты и тон.</div>
    <div><b>Съёмка, если есть</b>Сырьё любого качества. Нет съёмки — не проблема.</div>
   </div>
-  <p class="lede muted" style="margin-top:26px">Первый ролик из трёх — в течение суток после ТЗ.</p>
+  <p class="lede muted" style="margin-top:26px">Все три ролика — в течение суток после ТЗ.</p>
  </div>
 </section>
 
@@ -261,22 +259,14 @@ footer{padding:24px var(--pad);font-family:var(--fm);font-size:11px;color:var(--
 const WORKS=[
  ['icon_kupil','I-CON','маркетинг для клиник · графика + 3D · ru',1],
  ['medrese_sebepker','Медресе','живая съёмка спикера · kk',1],
- ['zawajy_avtopodbor','Zawajy','спикер + экраны приложения',1],
- ['westhim_aqtau','WEST HIM','серия с завода · 2 мин',1],
- ['1english_zoom','1English','motion без съёмки',1],
- ['zawajy_motion','Zawajy','motion · розовый мир',1],
+ ['zawajy_statham','Zawajy','спикер · Jason Statham подал заявку',1],
+ ['zawajy_reel005','Zawajy','съёмка на море · спикер + инфографика',1],
  ['vicco_sloya','Vicco','детская обувь · товар в кадре',1],
  ['fragrancia_flakon','FRAGRANCIA','путь флакона · zoom',1],
- ['fragrancia_karta','FRAGRANCIA','тот же сценарий · инфографика',1],
  ['seanomen_screening','seanomen','интервью с событий',1],
- ['studyon_zanyatie','StudyOn','школа · Атырау',1],
  ['golos_doverie','Голос стройки','экспертная рубрика',1],
- ['medina_qara','Medina','kk · товар',1],
- ['buhari_lesson','Buhari School','урок 5 мин · фрагмент',1],
  ['face_montazh','монтаж поверх съёмки','ваш дубль → ролик',0],
- ['board_wtg_nedelya','настольная игра','объяснялка по шагам',0],
  ['three_milton_salary','3D · Three.js','слово в объёме',0],
- ['dorogoy_montazh','приёмы монтажа','dolly, фокус, bloom',0],
  ['ag_dvadcat','для агентств','20 рилсов в месяц при одном монтажёре',0],
  ['ag_nechego','для агентств','клиенты, которых нельзя снимать',0],
  ['ag_pravka','для агентств','правка в 23:40',0],
