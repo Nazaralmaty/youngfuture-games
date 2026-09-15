@@ -92,3 +92,9 @@ assert.strictEqual(T.levelOf(100, 33, 62, 0, 0, 8, 6), 'beginner', 'төменг
 
 console.log(`OK · банк ${B.length} (d1 ${by(1).length}/d2 ${by(2).length}/d3 ${by(3).length}/d4 ${by(4).length}), ` +
   `форматтар: ${[...types].join(', ')}, 3 раунд × 5, екі өтуде ортақ ${same}/15`);
+
+// 7. телефон нөмірі
+['+7 777 123 45 67', '87771234567', '7771234567', '8 (777) 123-45-67'].forEach(v =>
+  assert.strictEqual(T.normPhone(v), '+77771234567', 'дұрыс нөмір: ' + v));
+['', '777123456', '+1 202 555 0143', 'абв'].forEach(v =>
+  assert.strictEqual(T.normPhone(v), '', 'қате нөмір өтпеуі керек: ' + v));

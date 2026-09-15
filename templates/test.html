@@ -202,6 +202,10 @@
         <label for="in-cls">Сынып немесе топ</label>
         <input id="in-cls" type="text" placeholder="9А" autocomplete="off">
       </div>
+      <div class="field" id="f-phone">
+        <label for="in-phone">Ата-анаңның телефоны</label>
+        <input id="in-phone" type="tel" inputmode="tel" placeholder="+7 777 123 45 67" autocomplete="tel">
+      </div>
       <div class="err" id="formErr"></div>
       <button class="btn" id="go-test">Бастау <span class="arr">→</span></button>
     </div>
@@ -483,7 +487,7 @@
   var $=function(id){return document.getElementById(id);};
   var P=new URLSearchParams(location.search), SCHOOL=P.get('school')||'';
   var TTS=('speechSynthesis' in window);
-  var lead={id:null,name:'',cls:''}, seq=[], i=0, answers=[], startedAt=null, locked=false;
+  var lead={id:null,name:'',cls:'',phone:''}, seq=[], i=0, answers=[], startedAt=null, locked=false;
   var used={}, track='start', tracks=['start'], roundNo=0;
   var band={1:{c:0,t:0},2:{c:0,t:0},3:{c:0,t:0},4:{c:0,t:0}};
   var BNAME={1:'Beginner',2:'Elementary',3:'Pre-Intermediate',4:'Жоғары деңгей'};
@@ -547,19 +551,28 @@
   $('go-form').addEventListener('click',function(){show('form');setTimeout(function(){try{$('in-name').focus();}catch(e){}},300);});
 
   /* ===== FORM ===== */
+  // +7XXXXXXXXXX или '' если номер не похож на казахстанский
+  function normPhone(v){
+    var d=(v||'').replace(/\D/g,'');
+    if(d.length===10&&d[0]==='7')d='7'+d;          // 777 123 45 67
+    if(d.length===11&&d[0]==='8')d='7'+d.slice(1); // 8 777 ...
+    return (d.length===11&&d[0]==='7')?'+'+d:'';
+  }
   function submitForm(){
-    var n=$('in-name').value.trim(), c=$('in-cls').value.trim();
+    var n=$('in-name').value.trim(), c=$('in-cls').value.trim(), p=normPhone($('in-phone').value);
     $('f-name').classList.toggle('bad',!n);
     $('f-cls').classList.toggle('bad',!c);
-    if(!n||!c){$('formErr').textContent='Екі өрісті де толтыр.';return;}
+    $('f-phone').classList.toggle('bad',!p);
+    if(!n||!c){$('formErr').textContent='Барлық өрісті толтыр.';return;}
+    if(!p){$('formErr').textContent='Телефон нөмірін толық жаз: +7 777 123 45 67';return;}
     $('formErr').textContent='';
     lead.id='ev_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
-    lead.name=n;lead.cls=c;startedAt=new Date().toISOString();
-    send({action:'lead',leadId:lead.id,school:SCHOOL,subject:CONFIG.SUBJECT,name:n,class:c,startedAt:startedAt,testUrl:location.href});
+    lead.name=n;lead.cls=c;lead.phone=p;startedAt=new Date().toISOString();
+    send({action:'lead',leadId:lead.id,school:SCHOOL,subject:CONFIG.SUBJECT,name:n,class:c,phone:p,startedAt:startedAt,testUrl:location.href});
     startTest();
   }
   $('go-test').addEventListener('click',submitForm);
-  ['in-name','in-cls'].forEach(function(id){
+  ['in-name','in-cls','in-phone'].forEach(function(id){
     $(id).addEventListener('keydown',function(e){if(e.key==='Enter')submitForm();});
   });
 
@@ -762,7 +775,7 @@
       });
     }
 
-    send({action:'result',leadId:lead.id,school:SCHOOL,subject:CONFIG.SUBJECT,name:lead.name,class:lead.cls,
+    send({action:'result',leadId:lead.id,school:SCHOOL,subject:CONFIG.SUBJECT,name:lead.name,class:lead.cls,phone:lead.phone,
       startedAt:startedAt,finishedAt:new Date().toISOString(),
       score:correct,total:TOTAL,level:L.name,levelKey:key,path:tracks.join('>'),
       a1_pct:p[1],a2_pct:p[2],b1_pct:p[3],b2_pct:p[4],
@@ -774,7 +787,7 @@
   }
   $('f-again').addEventListener('click',function(){show('landing');});
 
-  window.__EVTEST__={BANK:BANK,buildRound:buildRound,nextTrack:nextTrack,levelOf:levelOf,TRACKS:TRACKS,
+  window.__EVTEST__={BANK:BANK,buildRound:buildRound,nextTrack:nextTrack,levelOf:levelOf,TRACKS:TRACKS,normPhone:normPhone,
     get seq(){return seq;},get answers(){return answers;},get band(){return band;},
     set answers(a){answers=a;},resetUsed:function(){used={};},CONFIG:CONFIG,TTS:TTS};
 })();
