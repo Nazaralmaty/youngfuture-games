@@ -1,3 +1,5 @@
+> **Устарел:** шаблон проекта HyperFrames. Рилсы собираются через `/master-pack` и `~/.claude/engine`.
+
 # HyperFrames Composition Project
 
 ## Skills — USE THESE FIRST
