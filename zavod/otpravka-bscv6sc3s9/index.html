@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>Отправка</title>
+<!--
+THESIS: стол отправки демо выглядит как «Сообщения» на iPhone: свежий лид сверху, каждое демо — уже набранное исходящее сообщение. Отказ от таблицы лидов и CRM-карточек.
+OWN-WORLD: системный шрифт Apple, белый (чёрный в тёмной теме) лист, синий пузырь с хвостом, карточка-превью ссылки с серым подвалом, плитки действий как в «Контактах» (WhatsApp зелёный, Почта синяя, Instagram малиновый), волосяные разделители с отступом от аватара.
+STORY: Элжан открывает страницу, видит новое демо первым, жмёт плитку — открывается WhatsApp, почта или директ с готовым текстом и ссылкой на рилс.
+FIRST VIEWPORT: крупный заголовок «Отправка», под ним счётчик; строки-треды: синяя точка, аватар канала, имя, дата, две строки текста, три круглые кнопки каналов.
+FORM: закреплено брифом (iOS Messages), без броска. Телефон — список → тред сдвигом; от 760 px — две колонки как Messages на Mac, клавиши ↑↓ W E I C.
+-->
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#fff; --bg2:#F2F2F7; --fill:#E9E9EB;
+  --label:#000; --label2:#6C6C70; --label3:#8E8E93;
+  --sep:rgba(60,60,67,.2);
+  --blue:#006FF0; --bubble:#006FF0;
+  --wa:#0B7A3B; --wa-bg:#DCF5E6;
+  --mail:#0062D6; --mail-bg:#E1ECFD;
+  --ig:#B3135F; --ig-bg:#FBE4EF;
+  --bar:rgba(249,249,249,.84);
+  --ease:cubic-bezier(.32,.72,0,1);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#000; --bg2:#1C1C1E; --fill:#262628;
+    --label:#fff; --label2:#AEAEB2; --label3:#8E8E93;
+    --sep:rgba(84,84,88,.62);
+    --blue:#0A84FF;
+    --wa:#4ADE80; --wa-bg:rgba(37,211,102,.15);
+    --mail:#6AB0FF; --mail-bg:rgba(10,132,255,.17);
+    --ig:#FF7DB8; --ig-bg:rgba(225,48,108,.19);
+    --bar:rgba(22,22,24,.84);
+  }
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--label);font:17px/1.29 var(--font);letter-spacing:-.016em;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:12px}
+
+/* ── каркас: телефон — два экрана со сдвигом, Mac — две колонки ── */
+.app{position:relative;height:100vh;height:100dvh;overflow:hidden}
+.pane{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);transition:transform .52s var(--ease),filter .52s var(--ease)}
+.thread{transform:translateX(100%);box-shadow:-10px 0 28px rgba(0,0,0,.14);overflow-y:auto;overscroll-behavior:contain}
+.app[data-view=thread] .thread{transform:none}
+.app[data-view=thread] .list{transform:translateX(-26%);filter:brightness(.9)}
+.scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+@media (min-width:760px){
+  .app{display:grid;grid-template-columns:minmax(330px,390px) 1fr}
+  .pane{position:relative;inset:auto;transform:none!important;filter:none!important;box-shadow:none;min-height:0}
+  .list{border-right:.5px solid var(--sep);background:var(--bg)}
+  .back{visibility:hidden}
+}
+@media (prefers-reduced-motion:reduce){.pane{transition:none}}
+
+/* ── список ── */
+.list-head{padding:calc(env(safe-area-inset-top) + 44px) 16px 6px}
+.list-head h1{margin:0;font-size:34px;line-height:41px;font-weight:700;letter-spacing:.012em}
+.tally{margin:2px 0 0;color:var(--label2);font-size:15px;line-height:20px}
+.keys{display:none;margin:6px 0 0;color:var(--label3);font-size:13px;line-height:18px}
+.keys kbd,.tile kbd{font:600 11px/1 var(--font);padding:2px 5px;border-radius:5px;border:.5px solid var(--sep);background:var(--bg2);color:var(--label2)}
+@media (hover:hover) and (pointer:fine){.keys{display:block}}
+
+.rows{list-style:none;margin:6px 0 0;padding:0 0 calc(env(safe-area-inset-bottom) + 24px)}
+.row{position:relative}
+.row::after{content:"";position:absolute;left:84px;right:0;bottom:0;border-bottom:.5px solid var(--sep)}
+.row:last-child::after{display:none}
+.row-main{display:flex;gap:12px;padding:11px 16px 6px 20px;position:relative}
+.row-main:active,.row[aria-current=true] .row-main{background:var(--bg2)}
+@media (min-width:760px){
+  .row[aria-current=true]{background:var(--blue)}
+  .row[aria-current=true] .row-main{background:none}
+  .row[aria-current=true] :is(.nm,.pv,time,.chev){color:#fff}
+  .row[aria-current=true] .dot{background:#fff}
+  .row[aria-current=true] .receipt-mini{color:rgba(255,255,255,.85)}
+  .row[aria-current=true]::after{display:none}
+}
+.dot{position:absolute;left:5px;top:31px;width:10px;height:10px;border-radius:50%;background:var(--blue)}
+.row[data-opened] .dot{display:none}
+.av{flex:none;width:52px;height:52px;border-radius:50%;object-fit:cover;outline:.5px solid var(--sep);outline-offset:-.5px;background:linear-gradient(#A5A9B5,#878B97);display:grid;place-items:center;color:#fff;font-weight:600;font-size:20px}
+.row-body{flex:1;min-width:0}
+.row-top{display:flex;align-items:baseline;gap:6px}
+.nm{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-top time{color:var(--label2);font-size:15px;white-space:nowrap}
+.chev{width:8px;height:13px;color:var(--label3);align-self:center;flex:none}
+.pv{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:1px;color:var(--label2);font-size:15px;line-height:20px}
+.chips{display:flex;align-items:center;gap:10px;padding:2px 16px 12px 84px}
+.chip{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;transition:transform .2s var(--ease),opacity .2s}
+.chip svg{width:21px;height:21px}
+.chip:active{transform:scale(.88)}
+.receipt-mini{margin-left:auto;color:var(--label2);font-size:13px;line-height:16px;text-align:right}
+
+/* каналы: одинаковая раскраска в чипах и плитках */
+.wa{color:var(--wa);background:var(--wa-bg)}
+.mail{color:var(--mail);background:var(--mail-bg)}
+.ig{color:var(--ig);background:var(--ig-bg)}
+.off{color:var(--label3);background:var(--bg2);cursor:not-allowed}
+.chip.off{opacity:.55}
+
+.empty{padding:48px 32px;text-align:center;color:var(--label2);font-size:15px;line-height:20px}
+
+/* ── тред ── */
+.th-head{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:88px 1fr 88px;align-items:end;padding:calc(env(safe-area-inset-top) + 8px) 8px 8px;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--sep)}
+.back{display:flex;align-items:center;gap:4px;height:44px;padding:0 8px;color:var(--blue);font-size:17px;align-self:start}
+.back svg{width:12px;height:21px}
+.who{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;text-align:center}
+.who .av{width:44px;height:44px;font-size:17px}
+.who b{font-size:13px;line-height:16px;font-weight:600;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who span{font-size:11px;line-height:13px;color:var(--label2);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.th-body{flex:1 0 auto;display:flex;flex-direction:column;padding:14px 16px 16px}
+.th-body>*{flex-shrink:0}
+.th-body>:first-child{margin-top:auto}
+.stamp{align-self:center;margin:4px 0 10px;color:var(--label2);font-size:12px;line-height:16px}
+.stamp b{font-weight:600}
+.sys{align-self:center;max-width:34em;margin:0 0 8px;color:var(--label2);font-size:13px;line-height:18px;text-align:center;text-wrap:pretty}
+.sys a{color:var(--blue)}
+.sys.check{margin-bottom:16px}
+.sys.check b{color:var(--label);font-weight:600}
+
+.card{align-self:flex-end;position:relative;width:min(220px,58vw);margin:0 4px 4px 0;border-radius:18px;overflow:hidden;background:var(--fill);transition:transform .25s var(--ease)}
+.card:active{transform:scale(.97)}
+.card img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;object-position:50% 30%;background:#222}
+.play{position:absolute;left:50%;top:40%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.42);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.play svg{width:20px;height:20px;margin-left:3px;color:#fff}
+.card-foot{display:block;padding:8px 12px 10px}
+.card-foot b{display:block;font-size:15px;line-height:19px;font-weight:600}
+.card-foot span{display:block;font-size:13px;line-height:17px;color:var(--label2)}
+.card.pending img{filter:grayscale(1) brightness(.75)}
+
+.bubble{align-self:flex-end;position:relative;max-width:min(78%,34em);margin:2px 10px 0 0;padding:7px 13px 8px;border-radius:18px;background:var(--bubble);color:#fff;white-space:pre-wrap;overflow-wrap:anywhere;text-wrap:pretty}
+.bubble::before{content:"";position:absolute;bottom:0;right:-7px;width:20px;height:20px;background:var(--bubble);border-bottom-left-radius:16px 14px}
+.bubble::after{content:"";position:absolute;bottom:0;right:-10px;width:10px;height:20px;background:var(--bg);border-bottom-left-radius:10px}
+.bubble a{color:#fff;text-decoration:underline;text-underline-offset:2px}
+.bubble i{opacity:.8}
+.receipt{align-self:flex-end;margin:4px 12px 0 0;color:var(--label2);font-size:11px;line-height:13px;font-weight:600}
+.receipt.ok{color:var(--label2)}
+
+.composer{position:sticky;bottom:0;z-index:2;padding:10px 16px calc(env(safe-area-inset-bottom) + 10px);background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--sep)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:60px;padding:8px 4px;border-radius:14px;font-size:13px;line-height:16px;font-weight:600;text-align:center;transition:transform .2s var(--ease)}
+.tile svg{width:24px;height:24px}
+.tile small{font-size:11px;line-height:13px;font-weight:500;opacity:.85}
+.tile:active{transform:scale(.95)}
+.tile kbd{display:none;position:absolute;top:6px;right:6px}
+@media (hover:hover) and (pointer:fine){.tile kbd{display:block}.tile:not(.off):hover{filter:brightness(.97) saturate(1.1)}}
+.copy{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:44px;margin-top:6px;border:0;background:none;color:var(--blue);font:17px var(--font);letter-spacing:-.016em;cursor:pointer}
+.copy:disabled{color:var(--label3);cursor:not-allowed}
+.copy kbd{display:none}
+@media (hover:hover) and (pointer:fine){.copy kbd{display:inline;font:600 11px/1 var(--font);padding:2px 5px;border-radius:5px;border:.5px solid var(--sep);background:var(--bg2);color:var(--label2)}}
+.src{margin:2px 0 0;color:var(--label2);font-size:12px;line-height:16px;text-align:center;text-wrap:pretty}
+
+.hud{position:fixed;left:50%;top:42%;z-index:9;min-width:180px;padding:18px 22px;border-radius:16px;background:rgba(30,30,32,.86);color:#fff;font-size:15px;line-height:20px;text-align:center;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transform:translate(-50%,-50%) scale(.92);opacity:0;pointer-events:none;transition:opacity .22s,transform .3s var(--ease)}
+.hud.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.hud svg{display:block;width:34px;height:34px;margin:0 auto 6px}
+</style>
+</head>
+<body>
+<div class="app" id="app" data-view="list">
+  <section class="pane list" aria-label="Демо на отправку">
+    <div class="scroll">
+      <header class="list-head">
+        <h1>Отправка</h1>
+        <p class="tally" id="tally"></p>
+        <p class="keys"><kbd>↑</kbd><kbd>↓</kbd> выбрать демо, <kbd>W</kbd> WhatsApp, <kbd>E</kbd> почта, <kbd>I</kbd> Instagram, <kbd>C</kbd> копировать текст</p>
+      </header>
+      <ol class="rows" id="rows"></ol>
+    </div>
+  </section>
+  <section class="pane thread" id="thread" aria-label="Сообщение"></section>
+</div>
+<div class="hud" id="hud" role="status" aria-live="polite"></div>
+
+<script src="leads.js"></script>
+<script>
+const ICON = {
+  wa: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>',
+  ig: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>',
+  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.6"/><path d="m3.5 6.5 8.5 6.6 8.5-6.6"/></svg>',
+  chev: '<svg class="chev" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m1.5 1.5 5 5-5 5"/></svg>',
+  back: '<svg viewBox="0 0 12 21" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2 2 10.5 10 19"/></svg>',
+  play: '<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M4 2.6v14.8c0 .8.9 1.3 1.6.9l12-7.4c.6-.4.6-1.4 0-1.8l-12-7.4C4.9 1.3 4 1.8 4 2.6Z"/></svg>',
+  ok: '<svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 17.5 6 6L26 11"/></svg>'
+};
+const CH = { wa: 'WhatsApp', mail: 'Почта', ig: 'Instagram' };
+const KEY = { wa: 'W', mail: 'E', ig: 'I' };
+const SIGN = '\n\nЭлжан';
+const STORE = 'zavod-otpravka-opened';
+
+const app = document.getElementById('app');
+const rowsEl = document.getElementById('rows');
+const threadEl = document.getElementById('thread');
+const wide = matchMedia('(min-width:760px)');
+
+const leads = (Array.isArray(window.LEADS) ? window.LEADS : [])
+  .map((l, i) => ({ ...l, i }))
+  .sort((a, b) => (b.date || '').localeCompare(a.date || '') || a.i - b.i);
+
+let opened = {};
+try { opened = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (e) {}
+const saveOpened = () => { try { localStorage.setItem(STORE, JSON.stringify(opened)); } catch (e) {} };
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const body = l => l.text.replace('{reel}', l.reel) + SIGN;
+const initials = n => n.replace(/[«»"]/g, '').split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
+
+function day(iso, long) {
+  const d = new Date(iso + 'T12:00:00');
+  const t = new Date(); t.setHours(12, 0, 0, 0);
+  const diff = Math.round((t - d) / 864e5);
+  if (long) {
+    const s = d.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
+    return (diff === 0 ? 'Сегодня, ' : diff === 1 ? 'Вчера, ' : '') + (diff < 2 ? s.replace(/^[^,]+,\s*/, '') : s[0].toUpperCase() + s.slice(1));
+  }
+  if (diff === 0) return 'сегодня';
+  if (diff === 1) return 'вчера';
+  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+}
+const clock = ts => new Date(ts).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+// Куда ведёт канал: href, копировать ли текст (когда приложение не принимает готовый текст), почему недоступен.
+function route(l, ch) {
+  if (!l.reel) return { off: 'рилс не выложен' };
+  if (ch === 'wa') {
+    if (!l.wa) return { off: 'нет номера' };
+    if (/^https?:/.test(l.wa)) return { href: l.wa, copy: body(l), blank: true };
+    return { href: 'https://wa.me/' + l.wa.replace(/\D/g, '') + '?text=' + encodeURIComponent(body(l)), blank: true };
+  }
+  if (ch === 'mail') {
+    if (!l.email) return { off: 'нет почты' };
+    return { href: 'mailto:' + l.email + '?subject=' + encodeURIComponent(l.subject || '') + '&body=' + encodeURIComponent(body(l)) };
+  }
+  if (!l.ig) return { off: 'нет аккаунта' };
+  return { href: 'https://ig.me/m/' + l.ig.replace(/^@/, ''), copy: body(l), blank: true };
+}
+
+function action(l, ch, kind) {
+  const r = route(l, ch);
+  const cls = kind + ' ' + (r.off ? 'off' : ch);
+  const sub = r.off || (r.copy ? 'текст скопируется' : '');
+  const label = kind === 'tile' ? `<span>${CH[ch]}</span>${sub ? `<small>${esc(sub)}</small>` : ''}<kbd>${KEY[ch]}</kbd>` : '';
+  const aria = r.off ? `${CH[ch]}: ${r.off}` : `${CH[ch]}: открыть с готовым текстом${r.copy ? ', текст скопируется' : ''}`;
+  if (r.off) return `<span class="${cls}" role="link" aria-disabled="true" aria-label="${esc(aria)}" title="${esc(aria)}">${ICON[ch]}${label}</span>`;
+  return `<a class="${cls}" href="${esc(r.href)}"${r.blank ? ' target="_blank" rel="noopener"' : ''} data-id="${esc(l.id)}" data-ch="${ch}" aria-label="${esc(aria)}" title="${esc(aria)}">${ICON[ch]}${label}</a>`;
+}
+
+const receiptText = l => opened[l.id] ? `Открыт ${CH[opened[l.id].ch]}, ${clock(opened[l.id].at)}` : '';
+
+function avatarImg(l) {
+  return l.avatar
+    ? `<img class="av" src="${esc(l.avatar)}" alt="" data-ini="${esc(initials(l.name))}">`
+    : `<span class="av" aria-hidden="true">${esc(initials(l.name))}</span>`;
+}
+// Аватар не загрузился — инициалы на сером, как контакт без фото.
+document.addEventListener('error', e => {
+  const t = e.target;
+  if (t.matches && t.matches('img.av')) { const s = document.createElement('span'); s.className = 'av'; s.textContent = t.dataset.ini; t.replaceWith(s); }
+}, true);
+
+function renderList(current) {
+  const n = leads.length, o = leads.filter(l => opened[l.id]).length;
+  document.getElementById('tally').textContent = n ? `${n} демо · открыто ${o} из ${n}` : '';
+  if (!Array.isArray(window.LEADS)) { rowsEl.innerHTML = '<li class="empty">Не загрузился leads.js — он должен лежать рядом с этой страницей.</li>'; return; }
+  if (!n) { rowsEl.innerHTML = '<li class="empty">Пока пусто. После каждого пилота новое демо появится здесь сверху.</li>'; return; }
+  rowsEl.innerHTML = leads.map(l => `
+    <li class="row" data-id="${esc(l.id)}"${opened[l.id] ? ' data-opened' : ''}${l.id === current ? ' aria-current="true"' : ''}>
+      <a class="row-main" href="#${esc(l.id)}">
+        <span class="dot" aria-hidden="true"></span>
+        ${avatarImg(l)}
+        <span class="row-body">
+          <span class="row-top"><b class="nm">${esc(l.name)}</b><time datetime="${esc(l.date)}">${day(l.date)}</time>${ICON.chev}</span>
+          <span class="pv">${esc(l.reel ? body(l) : l.text.replace('{reel}', '…'))}</span>
+        </span>
+      </a>
+      <div class="chips">${['wa', 'mail', 'ig'].map(ch => action(l, ch, 'chip')).join('')}<span class="receipt-mini">${esc(receiptText(l))}</span></div>
+    </li>`).join('');
+}
+
+function renderThread(l) {
+  if (!l) { threadEl.innerHTML = '<div class="empty" style="margin:auto">Выбери демо слева.</div>'; return; }
+  const lang = { ru: 'рус.', kk: 'каз.' }[l.lang] || '';
+  const text = esc(l.text).replace('{reel}', l.reel ? `<a href="${esc(l.reel)}" target="_blank" rel="noopener">${esc(l.reel)}</a>` : '<i>ссылка появится после публикации</i>');
+  threadEl.innerHTML = `
+    <header class="th-head">
+      <a class="back" href="#" id="back">${ICON.back}Все</a>
+      <div class="who">${avatarImg(l)}<b>${esc(l.name)}</b><span>${esc([l.sub, lang].filter(Boolean).join(' · '))}</span></div>
+    </header>
+    <div class="th-body">
+      <p class="stamp"><b>${esc(day(l.date, true))}</b></p>
+      <p class="sys">${esc(l.clip)}${l.episode ? ` · <a href="${esc(l.episode)}" target="_blank" rel="noopener">выпуск на YouTube</a>` : ''}</p>
+      ${l.check ? `<p class="sys check"><b>Проверить до отправки.</b> ${esc(l.check)}</p>` : ''}
+      <a class="card${l.reel ? '' : ' pending'}" ${l.reel ? `href="${esc(l.reel)}" target="_blank" rel="noopener"` : 'aria-disabled="true"'}>
+        <img src="${esc(l.poster || '')}" alt="Кадр клипа">
+        <span class="play">${ICON.play}</span>
+        <span class="card-foot"><b>${l.reel ? 'Рилс в портфолио' : 'Рилс ещё не выложен'}</b><span>instagram.com</span></span>
+      </a>
+      <div class="bubble">${text}${esc(SIGN)}</div>
+      <p class="receipt" id="receipt">${esc(receiptText(l) || 'Не отправлено')}</p>
+    </div>
+    <footer class="composer">
+      <div class="tiles">${['wa', 'mail', 'ig'].map(ch => action(l, ch, 'tile')).join('')}</div>
+      <button class="copy" type="button" data-copy-id="${esc(l.id)}"${l.reel ? '' : ' disabled'}>Скопировать текст <kbd>C</kbd></button>
+      ${l.src ? `<p class="src">${esc(l.src)}</p>` : ''}
+    </footer>`;
+  threadEl.scrollTop = 0;
+}
+
+let current = null, fromList = false;
+function show() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  let l = leads.find(x => x.id === id);
+  if (!l && wide.matches && leads.length) { l = leads[0]; history.replaceState(null, '', '#' + l.id); }
+  current = l ? l.id : null;
+  renderList(current);
+  if (l || wide.matches) renderThread(l);
+  app.dataset.view = l && !wide.matches ? 'thread' : 'list';
+  if (!wide.matches && !l) document.title = 'Отправка';
+  if (l) document.title = l.name + ' — Отправка';
+  rowsEl.querySelector('[aria-current=true]')?.scrollIntoView({ block: 'nearest' });
+}
+
+const hud = document.getElementById('hud');
+let hudT;
+function flash(msg) {
+  hud.innerHTML = ICON.ok + esc(msg);
+  hud.classList.add('on');
+  clearTimeout(hudT); hudT = setTimeout(() => hud.classList.remove('on'), 1500);
+}
+
+function copy(text) {
+  const fallback = () => {
+    const t = document.createElement('textarea');
+    t.value = text; t.setAttribute('readonly', ''); t.style.cssText = 'position:fixed;opacity:0;font-size:16px';
+    document.body.appendChild(t); t.select(); t.setSelectionRange(0, text.length);
+    try { document.execCommand('copy'); } catch (e) {}
+    t.remove();
+  };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).catch(fallback);
+  else fallback();
+}
+
+document.addEventListener('click', e => {
+  if (e.target.closest('#back')) {
+    e.preventDefault();
+    if (fromList) history.back(); else location.hash = '';
+    return;
+  }
+  const c = e.target.closest('[data-copy-id]');
+  if (c) { const l = leads.find(x => x.id === c.dataset.copyId); copy(body(l)); flash('Текст скопирован'); return; }
+  const a = e.target.closest('a[data-ch]');
+  if (!a) return;
+  const l = leads.find(x => x.id === a.dataset.id);
+  const r = route(l, a.dataset.ch);
+  if (r.copy) { copy(r.copy); flash('Текст скопирован — вставь в чат'); }
+  opened[l.id] = { ch: a.dataset.ch, at: Date.now() };
+  saveOpened();
+  setTimeout(() => { renderList(current); const rc = document.getElementById('receipt'); if (rc && current === l.id) rc.textContent = receiptText(l); }, 400);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey || /input|textarea/i.test(e.target.tagName)) return;
+  const k = e.key.toLowerCase();
+  const i = leads.findIndex(x => x.id === current);
+  if (k === 'arrowdown' || k === 'arrowup' || k === 'j' || k === 'k') {
+    if (!leads.length) return;
+    e.preventDefault();
+    const n = (k === 'arrowdown' || k === 'j') ? Math.min(i + 1, leads.length - 1) : Math.max(i - 1, 0);
+    location.hash = leads[n < 0 ? 0 : n].id;
+    return;
+  }
+  const ch = { w: 'wa', 'ц': 'wa', e: 'mail', 'у': 'mail', i: 'ig', 'ш': 'ig' }[k];
+  if (ch) { threadEl.querySelector(`.tile[data-ch="${ch}"]`)?.click(); return; }
+  if (k === 'c' || k === 'с') threadEl.querySelector('.copy')?.click();
+  if (k === 'escape' && !wide.matches) location.hash = '';
+});
+
+addEventListener('hashchange', e => { fromList = !new URL(e.oldURL).hash; show(); });
+wide.addEventListener('change', show);
+show();
+</script>
+</body>
+</html>
