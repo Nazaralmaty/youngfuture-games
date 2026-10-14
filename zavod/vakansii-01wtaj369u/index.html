@@ -104,7 +104,7 @@ const JOBS = Array.isArray(window.JOBS) ? window.JOBS : [], REELS = window.REELS
 const STORE = 'zavod-vakansii-opened';
 const TYPE = { reels: 'Reels / Shorts', podcast: 'Подкасты', motion: 'Моушн', ads: 'Реклама', ai: 'ИИ-видео', youtube: 'YouTube' };
 const LANG = { ru: 'рус.', kk: 'каз.', en: 'англ.' };
-const SIGN = { ru: 'Элжан', kk: 'Элжан', en: 'Elzhan' };
+const SIGN = { ru: 'Елжан', kk: 'Елжан', en: 'Elzhan' };
 const SUBJ = { ru: t => `Отклик на вакансию «${t}»`, kk: t => `«${t}» вакансиясы бойынша`, en: t => `Re: ${t}` };
 let opened = {}; try { opened = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (e) {}
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
