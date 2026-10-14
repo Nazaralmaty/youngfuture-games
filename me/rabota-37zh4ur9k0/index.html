@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Работа для Елжана</title>
+<style>
+:root{--ink:#0b1437;--muted:#5b6382;--line:#e3e6ef;--bg:#f6f7fb;--card:#fff;--accent:#6d4bff;--ok:#1f8a5b;--okbg:#e6f5ee;--mid:#9a6400;--midbg:#fff4dd}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+main{max-width:760px;margin:0 auto;padding:16px 14px 64px}
+h1{font-size:22px;margin:4px 0 4px}
+.meta{color:var(--muted);font-size:13px;margin:0 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:2}
+.chip{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:22px;background:#fff;color:var(--ink);font:inherit;font-size:15px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;overflow-wrap:anywhere}
+.top{display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+.card h2{font-size:18px;line-height:1.3;margin:0}
+.co{color:var(--muted);margin:2px 0 10px;font-size:15px}
+.fit{flex:none;font-size:12px;font-weight:600;padding:4px 10px;border-radius:12px;white-space:nowrap}
+.fit.ok{background:var(--okbg);color:var(--ok)}.fit.mid{background:var(--midbg);color:var(--mid)}
+.pay{font-weight:600;font-size:16px}.kzt{color:var(--muted);font-size:14px}
+dl{margin:10px 0;display:grid;grid-template-columns:96px 1fr;gap:6px 10px;font-size:14px}
+dt{color:var(--muted)}dd{margin:0}
+ul{margin:8px 0 12px;padding-left:20px;font-size:15px}li{margin:3px 0}
+.why{font-size:14px;background:var(--bg);border-radius:10px;padding:8px 10px;margin:8px 0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.btn{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);color:var(--ink);text-decoration:none;font-size:15px;background:#fff;cursor:pointer;font-family:inherit}
+.btn.main{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.src{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+details{margin-top:12px;border-top:1px solid var(--line);padding-top:8px}
+summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-size:15px;color:var(--accent)}
+.letter{white-space:pre-wrap;font-size:15px;background:var(--bg);border-radius:10px;padding:12px;margin:6px 0 8px}
+.new h2{font-size:18px;margin:26px 0 8px}
+.row{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0 0 8px;font-size:14px}
+.row a{color:var(--ink)}
+.empty{color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>Работа: ИИ-автоматизация, удалённо и Алматы</h1>
+<p class="meta" id="meta"></p>
+<div class="chips" role="group" aria-label="Фильтр">
+  <button class="chip" data-f="all" aria-pressed="true">Все</button>
+  <button class="chip" data-f="remote" aria-pressed="false">Удалёнка</button>
+  <button class="chip" data-f="almaty" aria-pressed="false">Алматы</button>
+  <button class="chip" data-f="ok" aria-pressed="false">Только «подходит»</button>
+</div>
+<div id="list"></div>
+<section class="new"><h2>Новые, ещё не проверены</h2><div id="newc"></div></section>
+</main>
+<script src="jobs.js"></script>
+<script>
+const $ = s => document.querySelector(s)
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))
+const day = s => s ? new Date(s).toLocaleDateString('ru-RU', {day:'numeric', month:'long'}) : ''
+const href = c => c.type === 'tg' ? 'https://t.me/' + c.value : c.type === 'email' ? 'mailto:' + c.value
+  : c.type === 'wa' ? 'https://wa.me/' + c.value : c.value
+const label = c => ({tg:'Telegram @', email:'Почта ', wa:'WhatsApp +'}[c.type] || '') + c.value
+const host = u => { try { return new URL(u).hostname.replace('www.', '') } catch { return u } }
+
+const R = META.rates
+$('#meta').textContent = `${JOBS.length} вакансий, проверены вручную. Обновлено ${day(META.built)}. ` +
+  `Курс для пересчёта: 1 $ = ${R.USD} ₸, 1 € = ${R.EUR} ₸, 1 ₽ = ${R.RUB} ₸.`
+
+function card(j) {
+  const ok = j.fit === 'подходит'
+  const contacts = (j.contacts || []).map(c =>
+    `<a class="btn" href="${esc(href(c))}" target="_blank" rel="noopener">${esc(label(c))}<span class="src">&nbsp;из ${esc(host(c.src))}</span></a>`).join('')
+  return `<article class="card" data-place="${j.place}" data-ok="${ok}">
+  <div class="top"><h2>${esc(j.title)}</h2><span class="fit ${ok ? 'ok' : 'mid'}">${esc(j.fit)}</span></div>
+  <p class="co">${esc(j.company)}</p>
+  <div class="pay">${esc(j.pay)}</div>${j.pay_kzt ? `<div class="kzt">${esc(j.pay_kzt)}</div>` : ''}
+  <div class="why">${esc(j.why)}</div>
+  <dl><dt>Формат</dt><dd>${esc(j.mode)}</dd><dt>Халяль</dt><dd>${esc(j.halal)}</dd>
+  <dt>Английский</dt><dd>${esc(j.english)}</dd><dt>Дата</dt><dd>${day(j.posted)}</dd></dl>
+  <ul>${j.bullets.map(b => `<li>${esc(b)}</li>`).join('')}</ul>
+  <div class="btns"><a class="btn main" href="${esc(j.apply)}" target="_blank" rel="noopener">Откликнуться</a>${contacts}
+  <a class="btn" href="${esc(j.url)}" target="_blank" rel="noopener">Оригинал (${esc(host(j.url))})</a></div>
+  <details><summary>Сопроводительное письмо (${j.lang === 'en' ? 'English' : 'русский'})</summary>
+  <div class="letter">${esc(j.letter)}</div><button class="btn" data-copy>Скопировать</button></details>
+</article>`
+}
+$('#list').innerHTML = JOBS.slice().sort((a, b) => a.rank - b.rank).map(card).join('')
+$('#newc').innerHTML = NEWC.length ? NEWC.map(n => `<div class="row"><a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a>
+  <br>${esc(n.company)} · ${n.remote ? 'удалённо' : 'Алматы'} · ${n.pay ? Math.round(n.pay / 1000) + ' тыс ₸/мес' : 'зп не указана'} · ${day(n.posted)} · ${esc(n.src)}</div>`).join('')
+  : '<p class="empty">Пусто: всё, что нашёл сборщик, разобрано выше или отклонено.</p>'
+
+document.querySelectorAll('.chip').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', x === b))
+  const f = b.dataset.f
+  document.querySelectorAll('.card').forEach(c => c.hidden =
+    f === 'remote' ? c.dataset.place !== 'remote' : f === 'almaty' ? c.dataset.place !== 'almaty' : f === 'ok' ? c.dataset.ok !== 'true' : false)
+})
+document.addEventListener('click', e => {
+  if (!e.target.matches('[data-copy]')) return
+  navigator.clipboard.writeText(e.target.previousElementSibling.textContent)
+  e.target.textContent = 'Скопировано'
+})
+</script>
+</body>
+</html>
