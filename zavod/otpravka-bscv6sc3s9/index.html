@@ -70,6 +70,14 @@ a{color:inherit;text-decoration:none}
 .keys kbd,.tile kbd{font:600 11px/1 var(--font);padding:2px 5px;border-radius:5px;border:.5px solid var(--sep);background:var(--bg2);color:var(--label2)}
 @media (hover:hover) and (pointer:fine){.keys{display:block}}
 
+/* вкладки: одна воронка — одна вкладка, чтобы не путать адресатов */
+.tabs{display:flex;gap:8px;margin:12px -16px 0;padding:0 16px 2px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;min-height:36px;padding:0 14px;border:0;border-radius:18px;background:var(--bg2);color:var(--label);font:600 15px/36px var(--font);letter-spacing:-.01em;cursor:pointer}
+.tab small{margin-left:6px;color:var(--label2);font-weight:400;font-size:13px}
+.tab[aria-selected=true]{background:var(--blue);color:#fff}
+.tab[aria-selected=true] small{color:rgba(255,255,255,.8)}
+
 .rows{list-style:none;margin:6px 0 0;padding:0 0 calc(env(safe-area-inset-bottom) + 24px)}
 .row{position:relative}
 .row::after{content:"";position:absolute;left:84px;right:0;bottom:0;border-bottom:.5px solid var(--sep)}
@@ -172,6 +180,7 @@ a{color:inherit;text-decoration:none}
         <h1>Отправка</h1>
         <p class="tally" id="tally"></p>
         <p class="keys"><kbd>↑</kbd><kbd>↓</kbd> выбрать демо, <kbd>W</kbd> WhatsApp, <kbd>E</kbd> почта, <kbd>I</kbd> Instagram, <kbd>C</kbd> копировать текст</p>
+        <nav class="tabs" id="tabs" role="tablist" aria-label="Воронки"></nav>
       </header>
       <ol class="rows" id="rows"></ol>
     </div>
@@ -195,6 +204,8 @@ const CH = { wa: 'WhatsApp', mail: 'Почта', ig: 'Instagram' };
 const KEY = { wa: 'W', mail: 'E', ig: 'I' };
 const SIGN = '\n\nЕлжан';
 const STORE = 'zavod-otpravka-opened';
+const TABS = { pod: 'Подкасты', mk: 'Маркетологи', uc: 'Учителя', ps: 'Студии', vs: 'Школы' };  // префикс id → вкладка; без префикса — демо /zavod-sales
+const tabOf = l => { const p = l.id.split('-')[0]; return p !== l.id && TABS[p] ? p : 'pod'; };
 
 const app = document.getElementById('app');
 const rowsEl = document.getElementById('rows');
@@ -204,6 +215,9 @@ const wide = matchMedia('(min-width:760px)');
 const leads = (Array.isArray(window.LEADS) ? window.LEADS : [])
   .map((l, i) => ({ ...l, i }))
   .sort((a, b) => (b.date || '').localeCompare(a.date || '') || a.i - b.i);
+
+let tab = localStorage.getItem('zavod-otpravka-tab');
+const inTab = () => leads.filter(l => tabOf(l) === tab);
 
 let opened = {};
 try { opened = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (e) {}
@@ -266,12 +280,25 @@ document.addEventListener('error', e => {
   if (t.matches && t.matches('img.av')) { const s = document.createElement('span'); s.className = 'av'; s.textContent = t.dataset.ini; t.replaceWith(s); }
 }, true);
 
+function renderTabs() {
+  document.getElementById('tabs').innerHTML = Object.keys(TABS).map(k => {
+    const all = leads.filter(l => tabOf(l) === k);
+    if (!all.length) return '';
+    const left = all.filter(l => !opened[l.id]).length;
+    return `<button class="tab" type="button" role="tab" data-tab="${k}" aria-selected="${k === tab}">${TABS[k]}<small>${left}</small></button>`;
+  }).join('');
+  const on = document.querySelector('.tab[aria-selected=true]'), bar = on && on.parentNode;  // на 375 px вкладки шире экрана: выбранную держим в кадре
+  if (on && (on.offsetLeft < bar.scrollLeft || on.offsetLeft + on.offsetWidth > bar.scrollLeft + bar.clientWidth)) bar.scrollLeft = on.offsetLeft - 16;
+}
+
 function renderList(current) {
-  const n = leads.length, o = leads.filter(l => opened[l.id]).length;
+  renderTabs();
+  const list = inTab();
+  const n = list.length, o = list.filter(l => opened[l.id]).length;
   document.getElementById('tally').textContent = n ? `${n} демо · открыто ${o} из ${n}` : '';
   if (!Array.isArray(window.LEADS)) { rowsEl.innerHTML = '<li class="empty">Не загрузился leads.js — он должен лежать рядом с этой страницей.</li>'; return; }
   if (!n) { rowsEl.innerHTML = '<li class="empty">Пока пусто. После каждого пилота новое демо появится здесь сверху.</li>'; return; }
-  rowsEl.innerHTML = leads.map(l => `
+  rowsEl.innerHTML = list.map(l => `
     <li class="row" data-id="${esc(l.id)}"${opened[l.id] ? ' data-opened' : ''}${l.id === current ? ' aria-current="true"' : ''}>
       <a class="row-main" href="#${esc(l.id)}">
         <span class="dot" aria-hidden="true"></span>
@@ -301,7 +328,7 @@ function renderThread(l) {
       <a class="card${l.reel ? '' : ' pending'}" ${l.reel ? `href="${esc(l.reel)}" target="_blank" rel="noopener"` : 'aria-disabled="true"'}>
         <img src="${esc(l.poster || '')}" alt="Кадр клипа">
         <span class="play">${ICON.play}</span>
-        <span class="card-foot"><b>${l.reel ? 'Рилс в портфолио' : 'Рилс ещё не выложен'}</b><span>instagram.com</span></span>
+        <span class="card-foot"><b>${!l.reel ? 'Рилс ещё не выложен' : /instagram\.com/.test(l.reel) ? 'Рилс в портфолио' : 'Демо-страница'}</b><span>${esc(l.reel ? new URL(l.reel).hostname : 'instagram.com')}</span></span>
       </a>
       <div class="bubble">${text}${esc(SIGN)}</div>
       <p class="receipt" id="receipt">${esc(receiptText(l) || 'Не отправлено')}</p>
@@ -318,7 +345,10 @@ let current = null, fromList = false;
 function show() {
   const id = decodeURIComponent(location.hash.slice(1));
   let l = leads.find(x => x.id === id);
-  if (!l && wide.matches && leads.length) { l = leads[0]; history.replaceState(null, '', '#' + l.id); }
+  if (l) tab = tabOf(l);
+  if (!TABS[tab] || !inTab().length) tab = leads.length ? tabOf(leads[0]) : 'pod';
+  try { localStorage.setItem('zavod-otpravka-tab', tab); } catch (e) {}
+  if (!l && wide.matches && inTab().length) { l = inTab()[0]; history.replaceState(null, '', '#' + l.id); }
   current = l ? l.id : null;
   renderList(current);
   if (l || wide.matches) renderThread(l);
@@ -349,6 +379,14 @@ function copy(text) {
 }
 
 document.addEventListener('click', e => {
+  const t = e.target.closest('[data-tab]');
+  if (t) {
+    tab = t.dataset.tab;
+    try { localStorage.setItem('zavod-otpravka-tab', tab); } catch (e) {}
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    show();
+    return;
+  }
   if (e.target.closest('#back')) {
     e.preventDefault();
     if (fromList) history.back(); else location.hash = '';
@@ -369,12 +407,12 @@ document.addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey || /input|textarea/i.test(e.target.tagName)) return;
   const k = e.key.toLowerCase();
-  const i = leads.findIndex(x => x.id === current);
+  const list = inTab(), i = list.findIndex(x => x.id === current);
   if (k === 'arrowdown' || k === 'arrowup' || k === 'j' || k === 'k') {
-    if (!leads.length) return;
+    if (!list.length) return;
     e.preventDefault();
-    const n = (k === 'arrowdown' || k === 'j') ? Math.min(i + 1, leads.length - 1) : Math.max(i - 1, 0);
-    location.hash = leads[n < 0 ? 0 : n].id;
+    const n = (k === 'arrowdown' || k === 'j') ? Math.min(i + 1, list.length - 1) : Math.max(i - 1, 0);
+    location.hash = list[n < 0 ? 0 : n].id;
     return;
   }
   const ch = { w: 'wa', 'ц': 'wa', e: 'mail', 'у': 'mail', i: 'ig', 'ш': 'ig' }[k];
