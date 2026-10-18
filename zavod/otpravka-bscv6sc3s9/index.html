@@ -204,7 +204,7 @@ const CH = { wa: 'WhatsApp', mail: 'Почта', ig: 'Instagram' };
 const KEY = { wa: 'W', mail: 'E', ig: 'I' };
 const SIGN = '\n\nЕлжан';
 const STORE = 'zavod-otpravka-opened';
-const TABS = { pod: 'Подкасты', mk: 'Маркетологи', uc: 'Учителя', ps: 'Студии', vs: 'Школы' };  // префикс id → вкладка; без префикса — демо /zavod-sales
+const TABS = { pod: 'Подкасты', gs: 'Гости', mk: 'Маркетологи', uc: 'Учителя', ps: 'Студии', vs: 'Школы' };  // префикс id → вкладка; без префикса — демо /zavod-sales
 const tabOf = l => { const p = l.id.split('-')[0]; return p !== l.id && TABS[p] ? p : 'pod'; };
 
 const app = document.getElementById('app');
