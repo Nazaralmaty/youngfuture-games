@@ -221,6 +221,7 @@ const inTab = () => leads.filter(l => tabOf(l) === tab);
 
 let opened = {};
 try { opened = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (e) {}
+const ok = l => l.touch ? l.id + '#' + l.touch : l.id;  // второе касание отмечается заново, отметка первого письма его не гасит
 const saveOpened = () => { try { localStorage.setItem(STORE, JSON.stringify(opened)); } catch (e) {} };
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -267,7 +268,7 @@ function action(l, ch, kind) {
   return `<a class="${cls}" href="${esc(r.href)}"${r.blank ? ' target="_blank" rel="noopener"' : ''} data-id="${esc(l.id)}" data-ch="${ch}" aria-label="${esc(aria)}" title="${esc(aria)}">${ICON[ch]}${label}</a>`;
 }
 
-const receiptText = l => opened[l.id] ? `Открыт ${CH[opened[l.id].ch]}, ${clock(opened[l.id].at)}` : '';
+const receiptText = l => opened[ok(l)] ? `Открыт ${CH[opened[ok(l)].ch]}, ${clock(opened[ok(l)].at)}` : '';
 
 function avatarImg(l) {
   return l.avatar
@@ -284,7 +285,7 @@ function renderTabs() {
   document.getElementById('tabs').innerHTML = Object.keys(TABS).map(k => {
     const all = leads.filter(l => tabOf(l) === k);
     if (!all.length) return '';
-    const left = all.filter(l => !opened[l.id]).length;
+    const left = all.filter(l => !opened[ok(l)]).length;
     return `<button class="tab" type="button" role="tab" data-tab="${k}" aria-selected="${k === tab}">${TABS[k]}<small>${left}</small></button>`;
   }).join('');
   const on = document.querySelector('.tab[aria-selected=true]'), bar = on && on.parentNode;  // на 375 px вкладки шире экрана: выбранную держим в кадре
@@ -294,12 +295,12 @@ function renderTabs() {
 function renderList(current) {
   renderTabs();
   const list = inTab();
-  const n = list.length, o = list.filter(l => opened[l.id]).length;
+  const n = list.length, o = list.filter(l => opened[ok(l)]).length;
   document.getElementById('tally').textContent = n ? `${n} демо · открыто ${o} из ${n}` : '';
   if (!Array.isArray(window.LEADS)) { rowsEl.innerHTML = '<li class="empty">Не загрузился leads.js — он должен лежать рядом с этой страницей.</li>'; return; }
   if (!n) { rowsEl.innerHTML = '<li class="empty">Пока пусто. После каждого пилота новое демо появится здесь сверху.</li>'; return; }
   rowsEl.innerHTML = list.map(l => `
-    <li class="row" data-id="${esc(l.id)}"${opened[l.id] ? ' data-opened' : ''}${l.id === current ? ' aria-current="true"' : ''}>
+    <li class="row" data-id="${esc(l.id)}"${opened[ok(l)] ? ' data-opened' : ''}${l.id === current ? ' aria-current="true"' : ''}>
       <a class="row-main" href="#${esc(l.id)}">
         <span class="dot" aria-hidden="true"></span>
         ${avatarImg(l)}
@@ -399,7 +400,7 @@ document.addEventListener('click', e => {
   const l = leads.find(x => x.id === a.dataset.id);
   const r = route(l, a.dataset.ch);
   if (r.copy) { copy(r.copy); flash('Текст скопирован — вставь в чат'); }
-  opened[l.id] = { ch: a.dataset.ch, at: Date.now() };
+  opened[ok(l)] = { ch: a.dataset.ch, at: Date.now() };
   saveOpened();
   setTimeout(() => { renderList(current); const rc = document.getElementById('receipt'); if (rc && current === l.id) rc.textContent = receiptText(l); }, 400);
 });
