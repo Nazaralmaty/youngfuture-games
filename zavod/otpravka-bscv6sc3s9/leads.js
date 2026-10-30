@@ -4,6 +4,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "profitday",
+  "date": "2026-10-31",
+  "lang": "ru",
+  "reel": "https://www.instagram.com/reel/DfIp1yikka2/",
+  "clip": "Profit Education Day · Аружан Саин · «учитель химии из Ютуба» · 6:21:56–6:23:18 · 38 с",
+  "episode": "https://www.youtube.com/watch?v=7OHfEDax9MQ",
+  "name": "Profit Kazakhstan",
+  "sub": "организатор ИТ-конференций Profit Day, стрим-сервис Profit Live · Алматы",
+  "avatar": "img/a_profitday.jpg",
+  "poster": "img/profitday.jpg",
+  "wa": "",
+  "email": "partner@profit.kz",
+  "ig": "profit.kazakhstan",
+  "src": "Организатор, не спикер: ТОО «Profit Events», Алматы, https://profitday.kz/ и https://profitlive.kz/; запись 7OHfEDax9MQ «Profit Education Day 2026 — запись конференции» (YouTube @ProfitKazakhstan, 30.10.2026, 6:57:45); спикер клипа — Аружан Саин, автор проекта Mektep Online (список глав описания, плашка на экране 6:03:25). Email partner@profit.kz — описание видео («Вопросы — partner@profit.kz, +7 727 390 32 21») и https://profitday.kz/. Instagram profit.kazakhstan — 842 подписчика, последний пост 2026-10-30 (Graph API business_discovery, верификатор 31.10). WhatsApp: нет (мобильные +7 700 836 94 24 на profitday.kz и +7 700 836 94 20 на profitlive.kz не помечены как WhatsApp). N = 6 мест — по тексту автосубтитров, таймкоды в CLAUDE.md рилса.",
+  "check": "Рез не слушан Елжаном (П1 пропущен), «ээ» машиной не проверены (Scribe 402). Письмо организатору, не спикеру: согласия Profit Events и Аружан Саин на публикацию на нашем аккаунте нет. WhatsApp нет: две мобильные с сайтов не помечены как WhatsApp, проверить вручную. N = 6 по тексту субтитров, кадр (спикер или слайды) проверен только в докладе Саин. Медаль «11» — её слово «одиннадцатой»; на её слайде (6:07:32) «вошла в ТОП-50 Global Teacher Prize», число не сверено, название конкурса на экране не печатается. Имени адресата нет: письмо «Команда Profit Kazakhstan».",
+  "subject": "Клип из записи Profit Education Day 2026: Аружан Саин",
+  "text": "Команда Profit Kazakhstan, здравствуйте! Собрал клип из записи вашей конференции «Profit Education Day 2026»: Аружан Саин рассказывает, как учительницу химии узнали на остановке в Минске. 38 секунд, слова спикера, я ничего не дописывал.\n\nКлип: {reel}\n\nВ записи ещё 6 мест на такой клип. Прислать ещё один? Бесплатно."
+},
+{
  "id": "belimbay",
  "touch": 1,
  "date": "2026-10-31",
