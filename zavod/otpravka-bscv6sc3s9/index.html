@@ -152,6 +152,7 @@ a{color:inherit;text-decoration:none}
 .bubble i{opacity:.8}
 .receipt{align-self:flex-end;margin:4px 12px 0 0;color:var(--label2);font-size:11px;line-height:13px;font-weight:600}
 .receipt.ok{color:var(--label2)}
+.mark{align-self:flex-end;margin:6px 12px 0 0;padding:4px 10px;border:0;border-radius:12px;background:transparent;color:var(--label2);font:inherit;font-size:12px;text-decoration:underline;cursor:pointer}
 
 .composer{position:sticky;bottom:0;z-index:2;padding:10px 16px calc(env(safe-area-inset-bottom) + 10px);background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--sep)}
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -223,6 +224,14 @@ let opened = {};
 try { opened = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (e) {}
 const ok = l => l.touch ? l.id + '#' + l.touch : l.id;  // второе касание отмечается заново, отметка первого письма его не гасит
 const saveOpened = () => { try { localStorage.setItem(STORE, JSON.stringify(opened)); } catch (e) {} };
+/* Отметки дублируются в Supabase (таблица zavod_sent в проекте 1English), чтобы их видели телефон, Pro, Air
+   и мод «касания» в Claude Code. state: sent — нажат канал, dropped — «не отправлю» с причиной.
+   ponytail: отметка, нажатая без сети, остаётся только в этом браузере и при следующей загрузке теряется. */
+const SB = 'https://ckayydaqncvnbecjlltf.supabase.co/rest/v1/zavod_sent';
+const SBK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrYXl5ZGFxbmN2bmJlY2psbHRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2ODE1MjUsImV4cCI6MjA3NTI1NzUyNX0.o_7QJTdpkl14axm8vDfVH7NahbTvJreHAuI62dYG6U8';
+const sb = (q, opt = {}) => fetch(SB + q, { ...opt, headers: { apikey: SBK, Authorization: 'Bearer ' + SBK, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' } });
+const push = (k, m) => sb('', { method: 'POST', body: JSON.stringify({ lead_id: k, state: m.state || 'sent', ch: m.ch || null, reason: m.reason || null, at: new Date(m.at).toISOString() }) }).catch(() => {});
+const unpush = k => sb('?lead_id=eq.' + encodeURIComponent(k), { method: 'DELETE' }).catch(() => {});
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const body = l => l.text.replace('{reel}', l.reel) + SIGN;
@@ -268,7 +277,7 @@ function action(l, ch, kind) {
   return `<a class="${cls}" href="${esc(r.href)}"${r.blank ? ' target="_blank" rel="noopener"' : ''} data-id="${esc(l.id)}" data-ch="${ch}" aria-label="${esc(aria)}" title="${esc(aria)}">${ICON[ch]}${label}</a>`;
 }
 
-const receiptText = l => opened[ok(l)] ? `Открыт ${CH[opened[ok(l)].ch]}, ${clock(opened[ok(l)].at)}` : '';
+const receiptText = l => { const m = opened[ok(l)]; return !m ? '' : m.state === 'dropped' ? `Снято: ${m.reason || 'без причины'}` : `Открыт ${CH[m.ch] || m.ch}, ${clock(m.at)}`; };
 
 function avatarImg(l) {
   return l.avatar
@@ -333,6 +342,7 @@ function renderThread(l) {
       </a>
       <div class="bubble">${text}${esc(SIGN)}</div>
       <p class="receipt" id="receipt">${esc(receiptText(l) || 'Не отправлено')}</p>
+      <button class="mark" type="button" ${opened[ok(l)] ? `data-undo-id="${esc(l.id)}">Вернуть в неотправленные` : `data-drop-id="${esc(l.id)}">Не отправлю`}</button>
     </div>
     <footer class="composer">
       <div class="tiles">${['wa', 'mail', 'ig'].map(ch => action(l, ch, 'tile')).join('')}</div>
@@ -395,12 +405,25 @@ document.addEventListener('click', e => {
   }
   const c = e.target.closest('[data-copy-id]');
   if (c) { const l = leads.find(x => x.id === c.dataset.copyId); copy(body(l)); flash('Текст скопирован'); return; }
+  const dr = e.target.closest('[data-drop-id]'), un = e.target.closest('[data-undo-id]');
+  if (dr || un) {
+    const l = leads.find(x => x.id === (dr || un).dataset[dr ? 'dropId' : 'undoId']);
+    if (dr) {
+      const reason = prompt('Почему не отправляешь?', '');
+      if (reason === null) return;
+      opened[ok(l)] = { state: 'dropped', reason: reason.trim(), at: Date.now() };
+      push(ok(l), opened[ok(l)]);
+    } else { delete opened[ok(l)]; unpush(ok(l)); }
+    saveOpened(); renderList(current); renderThread(l);
+    return;
+  }
   const a = e.target.closest('a[data-ch]');
   if (!a) return;
   const l = leads.find(x => x.id === a.dataset.id);
   const r = route(l, a.dataset.ch);
   if (r.copy) { copy(r.copy); flash('Текст скопирован — вставь в чат'); }
   opened[ok(l)] = { ch: a.dataset.ch, at: Date.now() };
+  push(ok(l), opened[ok(l)]);
   saveOpened();
   setTimeout(() => { renderList(current); const rc = document.getElementById('receipt'); if (rc && current === l.id) rc.textContent = receiptText(l); }, 400);
 });
@@ -425,6 +448,17 @@ document.addEventListener('keydown', e => {
 addEventListener('hashchange', e => { fromList = !new URL(e.oldURL).hash; show(); });
 wide.addEventListener('change', show);
 show();
+// База — правда для всех устройств. Первый раз отметки этого браузера, которых там нет, уходят в базу.
+sb('?select=*').then(r => r.ok ? r.json() : Promise.reject(r.status)).then(rows => {
+  const remote = {};
+  rows.forEach(x => { remote[x.lead_id] = { ch: x.ch, at: Date.parse(x.at), state: x.state, reason: x.reason }; });
+  if (!localStorage.getItem(STORE + '-synced')) {
+    Object.keys(opened).forEach(k => { if (!remote[k]) push(k, opened[k]); });
+    opened = { ...opened, ...remote };
+    try { localStorage.setItem(STORE + '-synced', '1'); } catch (e) {}
+  } else opened = remote;
+  saveOpened(); show();
+}).catch(() => {});
 </script>
 </body>
 </html>
