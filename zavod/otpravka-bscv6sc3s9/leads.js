@@ -4,6 +4,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "zerdeli",
+  "date": "2026-11-02",
+  "lang": "ru",
+  "name": "Zerdeli Online",
+  "sub": "онлайн-школа олимпиадной математики и подготовки в НИШ, БИЛ, РФМШ · YouTube «Zerdeli Online мектебі», 62,7 тыс., 155 Shorts",
+  "avatar": "img/a_zerdeli.jpg",
+  "poster": "img/zerdeli.jpg",
+  "reel": "https://www.instagram.com/reel/DfN3W7QCbW_/",
+  "clip": "семинар «ZERDELI Семинар-2026» · задачи по темам, а сборников для начальной школы нет · 21:41–23:15 · 31 с",
+  "episode": "https://www.youtube.com/watch?v=KIO9VGJMJhI",
+  "wa": "77761091111",
+  "email": "",
+  "ig": "zerdeli.online",
+  "src": "Семинар KIO9VGJMJhI «ZERDELI Семинар-2026», 26.08.2026, 2:00:52, канал Zerdeli Online мектебі (@zerdelikz, 62,7 тыс., «О канале» https://www.youtube.com/@zerdelikz/about: Instagram zerdeli.online, taplink, t.me/zerdeliOnline). WhatsApp 77761091111 — https://zerdelionline.taplink.kz/ (кнопки wa.me «Хочу узнать подробнее о ваших онлайн курсах»). Почты нет ни на таплинке, ни на zerdeli.app / info.zerdeli.app. 155 Shorts — yt-dlp --flat-playlist /shorts 02.11. N = 7 мест — список с таймкодами в CLAUDE.md рилса.",
+  "check": "Начните с WhatsApp: это линия продаж курсов с таплинка, не личный номер; почты нет; Instagram zerdeli.online. Рез не слушан Елжаном (П1 пропущен): швов с предупреждением 0, p1check 0; послушать 16,1 с («технику | И») и 28,0 с (вырезано тихое «к сожалению»). Имя спикера не подтверждено (ASR «Аспар Альжан» / whisper «Аскар Энжер») — в письме и подписи его нет. Согласия школы на публикацию нет.",
+  "subject": "Клип из «ZERDELI Семинар-2026»: задачи по темам, 31 секунда",
+  "text": "Здравствуйте, команда Zerdeli! Собрал клип из вашего семинара «ZERDELI Семинар-2026»: почему олимпиадные задачи лучше решать по темам, а не вразнобой. 31 секунда, слова преподавателя, я ничего не дописывал.\n\nКлип: {reel}\n\nВ записи ещё 7 мест на такой клип. Прислать ещё один? Бесплатно."
+},
+{
   "id": "tomiris",
   "date": "2026-11-02",
   "lang": "ru",
