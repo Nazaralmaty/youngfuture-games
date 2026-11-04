@@ -4,6 +4,26 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-mimioriki",
+  "date": "2026-11-04",
+  "lang": "ru",
+  "name": "Инна Апенко · Mimioriki",
+  "sub": "Основатель Mimioriki: детская одежда 0–13 лет, дизайн и производство в Казахстане, Алматы. @inna.apenko 11 090 подписчиков, @mimioriki 42 240",
+  "avatar": "",
+  "poster": "img/ms-mimioriki.jpg",
+  "reel": "https://nazaralmaty.github.io/youngfuture-games/zavod/ms-mimioriki-3vfbmf8p/",
+  "video": "../ms-mimioriki-3vfbmf8p/reel.mp4",
+  "clip": "Молния решает срок вещи · 40 с · abat-canvas",
+  "episode": "https://www.instagram.com/mimioriki/",
+  "wa": "77011028056",
+  "email": "",
+  "ig": "inna.apenko",
+  "src": "Основатель: био https://www.instagram.com/inna.apenko/ · бренд и слоган: https://www.instagram.com/mimioriki/ · молнии YKK, «месяц или год», этикетка: https://www.instagram.com/p/DcRA9ZGNjyV/ · «невозможно остановить»: https://www.instagram.com/p/DasmkrNjZY4/ · овершот вместо пиджака: https://www.instagram.com/p/DclUJy3jZvF/ · спортсмены на международных соревнованиях, её пост: https://www.instagram.com/p/DalA_nXmFd1/ · магазины: https://www.instagram.com/p/DfMCV5TjXpd/ · фото ребёнка на лазалке: https://www.instagram.com/p/DZfBCyyDdeu/ · контакт: wa.me/77011028056 в профиле @mimioriki, общая линия заказов, не личный; Instagram личный @inna.apenko",
+  "check": "Голос не слушан: синтез Kore, TEMPO 1.12, послушать «Мимиорики», «вай-кей-кей» и строку «Утром молния» (whisper слышит «в IKK», «утро молнии»; Scribe не вызывался). Финальный all.sh --final не запускался, он платный. Слабое: дальний верх кадра пустой; ситуация «куртке три дня» придумана как типовая, про чужую вещь, не про их клиента. Спорное: в кадре медаль на ребёнке рядом со строкой про спортсменов, их слоган «будущие чемпионы», побед не заявляем. Рисованный герой: их клиента играет абатовская фигура, реальные дети только с их опубликованных фото. Цены и цифры не озвучены. Сайт mimioriki.kz старый и часто не отвечает, факты только из Instagram.",
+  "subject": "Моушн-ролик про Mimioriki",
+  "text": "Инна, добрый день! Сделал моушн-ролик про Mimioriki: как молния на детской куртке решает, прослужит вещь месяц или год. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под коллекцию СЫҢҒЫР. Бесплатно."
+},
+{
   "id": "ms-astradent",
   "date": "2026-11-04",
   "lang": "ru",
