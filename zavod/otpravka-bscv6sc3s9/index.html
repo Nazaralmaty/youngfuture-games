@@ -259,6 +259,8 @@ const clock = ts => new Date(ts).toLocaleString('ru-RU', { day: 'numeric', month
 // Куда ведёт канал: href, копировать ли текст (когда приложение не принимает готовый текст), почему недоступен.
 function route(l, ch) {
   if (!l.reel && !l.video) return { off: 'рилс не выложен' };
+  // Елжан 04.11.2026: видео клиенту только через Instagram, файлом в WhatsApp или ссылкой YouTube. Другая ссылка в тексте не уходит.
+  if (ch !== 'vid' && l.reel && l.text.includes('{reel}') && !/^https:\/\/(www\.)?(instagram\.com|youtube\.com|youtu\.be)\//.test(l.reel)) return { off: 'ссылка на сторонний сайт' };
   if (ch === 'vid') return { href: l.video };
   if (ch === 'wa') {
     if (!l.wa) return { off: 'нет номера' };
