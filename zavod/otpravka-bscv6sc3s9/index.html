@@ -210,7 +210,7 @@ const VID = {};  // файл качается при открытии строк
 const loadVid = l => { if (l.video && !VID[l.id]) VID[l.id] = fetch(l.video).then(r => r.blob()).then(b => { VID[l.id] = new File([b], l.id + '.mp4', { type: 'video/mp4' }); }); };
 const SIGN = '\n\nЕлжан';
 const STORE = 'zavod-otpravka-opened';
-const TABS = { pod: 'Подкасты', gs: 'Гости', mk: 'Маркетологи', uc: 'Учителя', ps: 'Студии', vs: 'Школы', ml: 'Мультики', ms: 'Моушн' };  // префикс id → вкладка; без префикса — демо /zavod-sales
+const TABS = { pod: 'Подкасты', gs: 'Гости', mk: 'Маркетологи', uc: 'Учителя', ps: 'Студии', vs: 'Школы', ml: 'Мультики', ms: 'Моушн', md: 'Демо маркетологам' };  // префикс id → вкладка; без префикса — демо /zavod-sales
 const tabOf = l => { const p = l.id.split('-')[0]; return p !== l.id && TABS[p] ? p : 'pod'; };
 
 const app = document.getElementById('app');
