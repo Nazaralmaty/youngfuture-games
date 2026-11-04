@@ -32,7 +32,7 @@ window.LEADS = [
   "sub": "Запускал Daryn Online вместе с Айбеком Куатбаевым (онлайн-подготовка к ҰБТ, 7 лет, Алматы), в Forbes.kz гендиректор; личный Instagram @askar_maksat 7542 подписчика, @daryn.online 36 тыс.",
   "avatar": "",
   "poster": "img/ms-daryn.jpg",
-  "reel": "https://www.instagram.com/reel/DfUFAb0nKL2/",
+  "reel": "https://www.instagram.com/reel/DfUKEGdiD-q/",
   "clip": "Анаң сұрайды: қанша балл? · 38 с · nonstop-motion",
   "episode": "https://course.daryn.online/darynonline",
   "wa": "77782580717",
