@@ -4,6 +4,26 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-cremative",
+  "date": "2026-11-04",
+  "lang": "ru",
+  "name": "Светлана Казгулова · Cremative",
+  "sub": "Основатель и технолог Cremative: чистый уход, свой цех в Алматы, 50+ средств; @svetlanakazgulova, 28 106 подписчиков",
+  "avatar": "",
+  "poster": "img/ms-cremative.jpg",
+  "reel": "https://nazaralmaty.github.io/youngfuture-games/zavod/ms-cremative-pjb4cm1m/",
+  "video": "../ms-cremative-pjb4cm1m/reel.mp4",
+  "clip": "что в банке · 40 с · rezh-motion",
+  "episode": "https://cremative.kz",
+  "wa": "77017223336",
+  "email": "",
+  "ig": "svetlanakazgulova",
+  "src": "Роль и факты: https://alataucitybank.kz/business/osim/articles/kak-ya-postroila-brend-ukhoda-za-kozhey-s-proizvodstvom-v-kazakhstane ; https://cremative.kz/aboutme ; https://cremative.kz/aboutcremative ; https://cremative.kz ; https://kapital.kz/business/62437/kak-dorogoye-khobbi-prevratit-v-semeynyy-biznes.html . Instagram: https://www.instagram.com/svetlanakazgulova/ (ссылка с cremative.kz/aboutme; ig_check api из pool.jsonl, 28 106, пост 03.11.2026). WhatsApp: +7 701 722 33 36 с cremative.kz, общая линия подбора ухода, не личный; личного не найдено. Фото Светланы и банки с cremative.kz, лицо сверено с плашкой в их видео и аватаром Instagram.",
+  "check": "Голос и музыку не слышал, только whisper: послушать ударения «Кремати́в», «Казгу́лова», стык «крем Крематив» (whisper слил) и BASF как «БАСФ». Гейт musicsync в --final красный (25 % в сетке, 4 % ударов с ответом): мягкие посадки на слова, 6 из 10 смен миров на доле; порог не трогал, out/reel.FAILED.txt от него. Смотреть глазами: в кадре «двое» из её же интервью, ей может не понравиться. «Kaspi 5,0», «третий раз» взяты с их сайта, на самом Kaspi не проверял. Логотипы поставщиков с сайта 300 px, чуть мягкие. Ролик не заказан, голос синтетический; публиковать нельзя, только приватная страница.",
+  "subject": "Моушн-ролик про Cremative: что в банке",
+  "text": "Светлана, добрый день! Сделал моушн-ролик про Cremative: про банку, о которой известно, кто её сделал, из чего и когда. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под ваши сезонные подборки. Бесплатно."
+},
+{
   "id": "ml-goluboy_parus",
   "date": "2026-11-04",
   "name": "Голубой парус · Алматы",
