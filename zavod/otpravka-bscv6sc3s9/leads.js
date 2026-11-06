@@ -5,6 +5,26 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "md-alltoo",
+  "date": "2026-11-06",
+  "lang": "ru",
+  "name": "All Too Creative · клиент All Too Creative",
+  "sub": "All Too Creative Agency (@alltoo.creative, 77 подписчиков), креативное агентство Астана/Алматы: маркетинг, SMM, event, продакшн, брендинг; кейсы Coventry University Kazakhstan, Ardingly Astana, KGIR 2026 · второе сообщение, больше не писать",
+  "avatar": "",
+  "poster": "img/md-alltoo.jpg",
+  "reel": "https://www.instagram.com/reel/DfYuoL8jPYd/",
+  "clip": "Серая 3D-модель стала рюкзаком в ТРЦ · 35 с · nonstop-motion",
+  "episode": "https://alltoocreative.kz",
+  "wa": "77055388462",
+  "email": "",
+  "ig": "alltoo.creative",
+  "src": "Контакт: WhatsApp +7 705 538 84 62 — линия компании (wa.me/77055388462 и телефон в шапке сайта https://alltoocreative.kz), Instagram @alltoo.creative. Факты ролика: рюкзак Ardingly Astana в MEGA Silkway, серая 3D-модель, «От идеи и дизайна до производства и монтажа всё реализовала команда AllTooCreative» https://www.instagram.com/reel/DcI1_3eirVh/ ; «Продвижение британской школы в Казахстане» https://alltoocreative.kz/#projects ; пеликан «за несколько дней», Abu Dhabi Plaza https://www.instagram.com/reel/Dbpc2YbCHf-/ ; «сильный маркетинг без расширения штата» https://www.instagram.com/p/Db5FSJqgkuI/ ; фото команды https://alltoocreative.kz/#team . Прочитано 06.11.2026 (Graph API 05.11 + сайт), копии в alltoo/_src/.",
+  "check": "1) Голос не слышал никто: на слух «Ол Ту Криэйтив» (whisper услышал «All to Creative», так и задумано), «три-дэ художника», строка 5 плотная. Музыка (expert_synth_drop, дроп на «Но здесь всё сделала одна команда») и эффекты проверены только замерами. 2) Халяль агентства: клиентов с алкоголем, кальяном, МФО, ставками нет; но в ленте отраслей сайта есть «HoReCa» без названного клиента, в био сотрудников — «ресторанные сети», Hardee's, Esentai Gourmet (до агентства), карусель 12.10 https://www.instagram.com/p/DeYoQkAAuzM/ — дайджест чужих кампаний, видел только первый слайд. Решить, достаточно ли этого для отказа. 3) В ролике их видео и фото без разрешения: рюкзак, 3D-модель, пеликан, фасад MEGA Silkway, 7 портретов команды с сайта; лиц клиентов и детей нет. 4) «Обычно ищут дизайнера, 3D-художника, цех и монтажников» — наша формулировка убеждения, не их цитата. 5) Финал 27,6–30 с: видео ТЦ за рюкзаком с чёрными полями сверху и снизу. Статика в бумажных сценах (0–3 и 11–15 с) выше 5 % по секундам, в целом 4,2 %. 6) preflight и overlap не запускаются (у nonstop нет index.html), поэтому build.sh кончается кодом 1 и лежит out/reel.FAILED.txt; края проверены глазами.",
+  "subject": "Моушн-ролик про All Too Creative",
+  "text": "Добрый день! Собрал моушн-ролик про All Too Creative по вашим кейсам из ленты: как серая 3D-модель рюкзака для Ardingly Astana доехала до торгового центра. Никто не заказывал, голос синтезированный.\nПосмотрите: {reel}\nМонтирую так для клиентов маркетологов, моего имени на роликах нет. Какому клиенту сейчас не хватает креативов?",
+  "touch": 2
+},
+{
   "id": "md-metadoctor",
   "date": "2026-11-06",
   "lang": "ru",
