@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "knus",
+  "date": "2026-11-07",
+  "lang": "ru",
+  "name": "KNUS · Нурасыл Медеу, основатель",
+  "sub": "Kazakh National University of Sports (Астана): YouTube @knus.sporteducation, Instagram knus.kz (33 тыс.); интервью основателя от 09.10.2026",
+  "avatar": "img/a_knus.jpg",
+  "poster": "img/knus.jpg",
+  "reel": "https://www.instagram.com/reel/Dfc0aGxCOj8/",
+  "clip": "«Life Chance Grant: не на оценки, а на стремление» · ep 19:58–21:07 (по частям) · 40 с",
+  "episode": "https://www.youtube.com/watch?v=M0xHjJ6XKlk",
+  "wa": "77009570061",
+  "email": "press@knus.edu.kz",
+  "ig": "knus.kz",
+  "subject": "Клип из интервью Нурасыла Медеу: Life Chance Grant",
+  "src": "Выпуск M0xHjJ6XKlk «Основатель KNUS и QAIRU ответил на слухи, раскрыл доли и бизнес» (09.10.2026, 35 мин), канал Kazakh National University of Sports (@knus.sporteducation): ведущий Виктор Кириллюк представляет учредителя университета (0:11–0:31); имя «Нурасыл Медеу» — knus.edu.kz/ru/news/osnovatel-knus-nurasyl-medeu-peredal-universitet-v-dar-gosudarstvu. knus.edu.kz/ru/contacts (07.11): Приемная комиссия +7 (700) 957 00 61, admission@knus.edu.kz; Пресс-служба press@knus.edu.kz. Instagram knus.kz (Graph API 07.11): «📞 +7 700 957 00 61», «Деканат: +7 700 957 00 60», 33 064 подписчика. YouTube «О канале»: knus.edu.kz/ru, instagram.com/knus.kz, tiktok @knus_tiktok. Shorts на канале: 2 (yt-dlp 07.11).",
+  "check": "Покупатель — сам университет (канал его). Номер +7 700 957 00 61 — приёмная комиссия, есть ли на нём WhatsApp, не проверено; почта — пресс-служба (адресат по контенту). Интервью снято с логотипом QAZSPORT (в 16:9-карточках клипа он виден в углу); основатель — родственник президента, выпуск отвечает на слухи — фрагмент взят про грант, без этой темы. Рез не слушан Елжаном (П1 пропущен), «ээ» машиной не проверены. Монтаж на /rezh-podcast (жанр v4, вердикт ждёт). Хмыканья ведущего («угу», «мм») вырезаны по замеру, на слух не проверены. Согласен ли университет, что фрагмент выйдет на нашем аккаунте?",
+  "text": "Здравствуйте! Собрал клип из интервью Нурасыла Медеу на вашем YouTube-канале: про Life Chance Grant — его дают ребятам из сельской местности и смотрят не столько на оценки, сколько на стремление. 40 секунд, слова из выпуска, я ничего не дописывал.\n\nКлип: {reel}\n\nВ интервью ещё пять таких мест. Прислать ещё одно? Бесплатно."
+},
+{
   "id": "zhemchuzhina",
   "date": "2026-11-07",
   "lang": "ru",
