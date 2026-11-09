@@ -5,6 +5,34 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-almatysoul",
+  "date": "2026-11-10",
+  "lang": "ru",
+  "name": "Индира Хаметчина · Almaty Soul",
+  "sub": "основатель Almaty Soul: алматинский мерч и сувениры со своими рисунками (худи, термокружки, подарочные боксы); у компании 30 237 подписчиков, у неё 2790",
+  "avatar": "",
+  "poster": "img/ms-almatysoul.jpg",
+  "reel": "https://www.instagram.com/reel/DfiNyjqihi1/",
+  "clip": "Горы Алматы в кружке · 33 с · nonstop-motion",
+  "episode": "https://www.instagram.com/almaty.soul/",
+  "wa": "77084823282",
+  "email": "",
+  "ig": "indira_khm",
+  "src": [
+    "роль и связь: https://www.instagram.com/indira_khm/ (био «Основатель алматинского мерча @almaty.soul») и https://www.instagram.com/almaty.soul/ (био «Основатель проекта @indira_khm»), профили называют друг друга",
+    "WhatsApp 77084823282: wa.me в профиле @almaty.soul и в её личном профиле, в каждой подписи «пишите по номеру +7 708 482 3282»: линия компании и её контакт",
+    "надпись и рисунок «Счастье не за горами, оно здесь!» с горами и телебашней: https://www.instagram.com/p/DeQ5WixNvKl/ (шопер), вырезаны из их фото",
+    "термокружка 450 мл, «держит температуру до 6 часов»: https://www.instagram.com/p/DedxVy2tkMR/ ; чай в кружке, их руки: https://www.instagram.com/reel/DfUQg5gNJOe/",
+    "худи «100% хлопок»: https://www.instagram.com/p/Dfg-UO8Dbtb/ , https://www.instagram.com/p/De_XOz0t7s-/",
+    "волк с петроглифа Ешкиолмес: https://www.instagram.com/p/DegRxBPNFcq/ ; Апорт: https://www.instagram.com/reel/DetWoAINmhi/",
+    "бокс «под ваш запрос и бюджет»: https://www.instagram.com/reel/DfBt8yJNddC/ , https://www.instagram.com/p/DfPJubxjRs0/ ; их руки собирают бокс: https://www.instagram.com/reel/De_U76nNSB_/",
+    "«Сувениры с душой города Алматы», «Наши рисунки защищены законом»: био https://www.instagram.com/almaty.soul/ (Graph, 10.11.2026)"
+  ],
+  "check": "Голос не слушан ухом: whisper услышал «Ну почему» вместо «Но почему» (строка 4), «худе» (7) и «Алматы Сол» в CTA (10); ударение «Апо́рт» задано, не проверено. Один сильный удар музыки (27.67) без ответа в картинке: он внутри паузы после выстрела ружья. preflight и overlap не запускаются (у жанра нет index.html), края кадра проверены глазами по листу 3 fps. Чемодан сгенерирован FLUX, всё остальное их фото и видео, лиц нет.",
+  "subject": "Моушн-ролик про Almaty Soul: горы Алматы в кружке",
+  "text": "Индира, добрый день! Сделал моушн-ролик про Almaty Soul: как подарить человеку горы Алматы, если в чемодан они не влезут. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один к Новому году. Бесплатно."
+},
+{
   "id": "md-diskurs",
   "date": "2026-11-10",
   "lang": "ru",
