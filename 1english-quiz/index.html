@@ -25,7 +25,7 @@ FORM: surface candidate 5 of 7 (answer sheet), seed 91af30fb, staging: one quest
   --ease:cubic-bezier(.16,1,.3,1);
   font-family:'Golos Text',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   color:var(--ink);background:var(--navy);min-height:100svh;display:flex;justify-content:center;
-  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;scroll-margin-top:70px}
 #oe-quiz *,#oe-quiz *::before,#oe-quiz *::after{box-sizing:border-box;font-family:inherit;margin:0}
 #oe-quiz button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 
@@ -40,11 +40,12 @@ FORM: surface candidate 5 of 7 (answer sheet), seed 91af30fb, staging: one quest
 
 /* printed header block */
 #oe-quiz .oe-head{background:var(--navy);color:#fff;padding:calc(16px + env(safe-area-inset-top)) 20px 18px 24px;position:relative}
+#oe-quiz .oe-head::after{content:"";position:absolute;right:14px;top:calc(14px + env(safe-area-inset-top));width:12px;height:12px;background:#fff}
 #oe-quiz .oe-brand{display:flex;align-items:center;gap:10px}
 #oe-quiz .oe-logo{width:30px;height:30px;flex:none;background:#fff;border-radius:8px;display:grid;place-items:center}
 #oe-quiz .oe-logo svg{height:22px;width:auto}
 #oe-quiz .oe-name{font-weight:800;font-size:18px;letter-spacing:-.01em}
-#oe-quiz .oe-doc{margin-left:auto;font-size:12px;font-weight:600;color:#C9D6EA;text-align:right;line-height:1.25}
+#oe-quiz .oe-doc{margin:0 18px 0 auto;font-size:12px;font-weight:600;color:#C9D6EA;text-align:right;line-height:1.25}
 #oe-quiz .oe-grid{display:flex;flex-wrap:wrap;gap:6px 8px;margin:14px 0 0 -6px;align-items:center}
 #oe-quiz .oe-g{display:flex;align-items:center;gap:4px;padding:5px 6px;border-radius:6px;transition:background .3s}
 #oe-quiz .oe-g.is-now{background:rgba(255,255,255,.12)}
@@ -96,7 +97,8 @@ FORM: surface candidate 5 of 7 (answer sheet), seed 91af30fb, staging: one quest
 #oe-quiz .oe-field{display:block;margin-bottom:18px}
 #oe-quiz .oe-field span{display:block;font-size:14px;font-weight:600;color:var(--navy-soft);margin-bottom:6px}
 #oe-quiz .oe-field input{width:100%;height:56px;padding:0 14px;border:2px solid var(--drop);border-radius:0;background:#fff;
-  font-size:18px;font-weight:600;color:var(--ink);transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+  font-size:18px;font-weight:600;color:var(--ink);transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;
+  background:#fff repeating-linear-gradient(90deg,transparent 0 23px,var(--rule) 23px 24px) left 13px bottom 0/calc(100% - 26px) 9px no-repeat}
 #oe-quiz .oe-field input::placeholder{color:#7D8CA3;font-weight:500}
 #oe-quiz .oe-field input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(10,49,97,.15)}
 #oe-quiz .oe-field.is-bad input{border-color:var(--crimson)}
@@ -198,6 +200,8 @@ FORM: surface candidate 5 of 7 (answer sheet), seed 91af30fb, staging: one quest
       a: ['Иә, дәл қазір бастаймын', 'Иә, бірақ күмәнім бар', 'Жоқ, мен өмірімде өзгеріс қаламаймын'] }
   ];
   var LETTERS = 'ABCDE';
+  if (!SHEET_URL && !/github\.io$|^localhost$|^$/.test(location.hostname))
+    console.error('[1English quiz] SHEET_URL is empty: leads are NOT saved. Paste the Apps Script /exec URL.');
 
   // ---- Meta Pixel: skip init if the page (Tilda) already loaded it ----
   if (!window.fbq) {
@@ -247,8 +251,8 @@ FORM: surface candidate 5 of 7 (answer sheet), seed 91af30fb, staging: one quest
       setTimeout(function () { out.classList.remove('is-out'); }, 320);
     }
     next.classList.add('is-on'); current = next;
-    [].forEach.call(grid.children, function (g, i) { g.classList.toggle('is-now', String(i) === String(step)); });
-    if (step !== 0) root.scrollIntoView({ block: 'start' });
+    [].forEach.call(grid.children, function (g, i) { g.classList.toggle('is-now', String(i) === String(step)); });  // endings match nothing
+    if (step !== 0 && root.getBoundingClientRect().top < 0) root.scrollIntoView({ block: 'start' });
     var focusable = next.querySelector('.oe-opt, input');
     if (focusable && step !== 0) setTimeout(function () { focusable.focus({ preventScroll: true }); }, 340);
   }
@@ -264,7 +268,7 @@ FORM: surface candidate 5 of 7 (answer sheet), seed 91af30fb, staging: one quest
     answers[Q.key] = Q.a[j];
     setTimeout(function () {
       delete body.dataset.busy;
-      if (Q.stop && Q.stop.indexOf(j) > -1) { grid.style.visibility = 'hidden'; return show('stop'); }
+      if (Q.stop && Q.stop.indexOf(j) > -1) return show('stop');
       show(i + 1 < QUESTIONS.length ? i + 1 : 'form');
     }, 420);
   }
@@ -324,7 +328,6 @@ FORM: surface candidate 5 of 7 (answer sheet), seed 91af30fb, staging: one quest
     send(data).then(function () {
       if (SHEET_URL && window.fbq) fbq('track', 'Lead');
       if (!SHEET_URL) root.querySelector('.oe-test').hidden = false;
-      grid.querySelectorAll('.oe-g').forEach(function (g) { g.classList.remove('is-now'); });
       show('done');
     }).catch(function () {
       btn.disabled = false; btn.textContent = 'Қайта жіберу';
@@ -334,7 +337,8 @@ FORM: surface candidate 5 of 7 (answer sheet), seed 91af30fb, staging: one quest
 
   function send(data) {
     if (!SHEET_URL) { console.warn('[1English quiz] test mode, not sent:', data); return new Promise(function (r) { setTimeout(r, 600); }); }
-    return fetch(SHEET_URL, { method: 'POST', body: new URLSearchParams(data) })
+    var ctl = new AbortController(); setTimeout(function () { ctl.abort(); }, 15000);
+    return fetch(SHEET_URL, { method: 'POST', body: new URLSearchParams(data), signal: ctl.signal })
       .then(function (r) { return r.json(); })
       .then(function (j) { if (!j.ok) throw new Error(j.error || 'not ok'); });
   }
