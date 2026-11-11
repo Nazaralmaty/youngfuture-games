@@ -1,0 +1,336 @@
+<!-- ===== TILDA START: everything from here to TILDA END is the T123 block ===== -->
+<!--
+THESIS: the quiz is an exam answer sheet (ҰБТ-style OMR form); every tap fills a bubble with the crimson dot of the 1English «i». Refuses the card-per-answer quiz with a progress bar.
+OWN-WORLD: cool-white sheet, navy printed header block, dropout-blue rules and bubbles, black timing marks down the edge, corner registration squares; crimson only for filled marks. Golos Text.
+STORY: a phone visitor from an ad sees one question, taps, watches the sheet fill row by row, writes name and number into the sheet's own fields, hands it in.
+FIRST VIEWPORT: navy header (logo, «Жауап парағы», the 4-row mini answer grid as progress) over question 1 at 26px with five bubble rows below; no intro screen.
+FORM: surface candidate 5 of 7 (answer sheet), seed 91af30fb, staging: one question per screen, sheet feeds upward.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+#oe-quiz{--navy:#0A3161;--navy-deep:#061C3A;--navy-soft:#173F73;--crimson:#B31942;--crimson-lite:#E8536F;
+  --sheet:#FBFCFE;--ink:#0E1B2E;--muted:#4A5B74;--drop:#6F8BB3;--rule:#D6E0EE;--tint:#EEF3FA;
+  --ease:cubic-bezier(.16,1,.3,1);
+  font-family:'Golos Text',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  color:var(--ink);background:var(--navy);min-height:100svh;display:flex;justify-content:center;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+#oe-quiz *,#oe-quiz *::before,#oe-quiz *::after{box-sizing:border-box;font-family:inherit;margin:0}
+#oe-quiz button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+
+/* the sheet */
+#oe-quiz .oe-sheet{position:relative;width:100%;max-width:600px;min-height:100svh;background:var(--sheet);
+  display:flex;flex-direction:column;overflow:hidden}
+/* timing marks down the left edge, as on a machine-read form */
+#oe-quiz .oe-sheet::before{content:"";position:absolute;left:0;top:132px;bottom:28px;width:9px;
+  background:repeating-linear-gradient(to bottom,var(--navy-deep) 0 5px,transparent 5px 26px);opacity:.85;pointer-events:none}
+/* registration squares */
+#oe-quiz .oe-sheet::after{content:"";position:absolute;right:14px;bottom:14px;width:12px;height:12px;background:var(--navy-deep)}
+
+/* printed header block */
+#oe-quiz .oe-head{background:var(--navy);color:#fff;padding:calc(16px + env(safe-area-inset-top)) 20px 18px 24px;position:relative}
+#oe-quiz .oe-brand{display:flex;align-items:center;gap:10px}
+#oe-quiz .oe-logo{width:30px;height:30px;flex:none;background:#fff;border-radius:8px;display:grid;place-items:center}
+#oe-quiz .oe-logo svg{height:22px;width:auto}
+#oe-quiz .oe-name{font-weight:800;font-size:18px;letter-spacing:-.01em}
+#oe-quiz .oe-doc{margin-left:auto;font-size:12px;font-weight:600;color:#C9D6EA;text-align:right;line-height:1.25}
+#oe-quiz .oe-grid{display:flex;flex-wrap:wrap;gap:6px 8px;margin:14px 0 0 -6px;align-items:center}
+#oe-quiz .oe-g{display:flex;align-items:center;gap:4px;padding:5px 6px;border-radius:6px;transition:background .3s}
+#oe-quiz .oe-g.is-now{background:rgba(255,255,255,.12)}
+#oe-quiz .oe-g b{font-size:11px;font-weight:700;color:#C9D6EA;width:10px}
+#oe-quiz .oe-g i{width:9px;height:9px;border-radius:50%;border:1.5px solid #8EA6C9;transition:background .35s var(--ease),border-color .35s,transform .35s var(--ease)}
+#oe-quiz .oe-g i.on{background:var(--crimson-lite);border-color:var(--crimson-lite);transform:scale(1.15)}
+
+/* body */
+#oe-quiz .oe-body{position:relative;flex:1;display:grid}
+#oe-quiz .oe-step{grid-area:1/1;padding:26px 22px 40px 32px;display:none}
+#oe-quiz .oe-step.is-on{display:block;animation:oe-in .55s var(--ease) both}
+#oe-quiz .oe-step.is-out{display:block;animation:oe-out .32s ease-in both;pointer-events:none}
+@keyframes oe-in{from{opacity:0;transform:translateY(28px)}}
+@keyframes oe-out{to{opacity:0;transform:translateY(-36px)}}
+
+#oe-quiz .oe-qtop{display:flex;align-items:center;justify-content:space-between;min-height:44px;margin-bottom:10px}
+#oe-quiz .oe-num{display:flex;align-items:baseline;gap:2px;font-weight:800;color:var(--navy)}
+#oe-quiz .oe-num span{display:grid;place-items:center;width:34px;height:34px;border:2px solid var(--navy);font-size:19px}
+#oe-quiz .oe-num small{font-size:14px;color:var(--muted);font-weight:600;margin-left:6px}
+#oe-quiz .oe-last{font-size:15px;font-weight:700;color:var(--navy)}
+#oe-quiz .oe-back{min-height:44px;padding:0 6px;font-size:15px;font-weight:600;color:var(--navy-soft);border-radius:8px}
+@media (hover:hover){#oe-quiz .oe-back:hover{background:var(--tint)}}
+#oe-quiz .oe-q{font-size:clamp(24px,6.6vw,30px);line-height:1.15;font-weight:700;letter-spacing:-.02em;color:var(--ink);
+  text-wrap:balance;margin-bottom:22px}
+
+/* answer rows: printed bubbles on ruled lines */
+#oe-quiz .oe-opts{list-style:none;padding:0;border-top:1px solid var(--rule)}
+#oe-quiz .oe-opt{width:100%;display:flex;align-items:center;gap:14px;text-align:left;min-height:60px;padding:12px 6px 12px 2px;
+  border-bottom:1px solid var(--rule);font-size:17px;line-height:1.3;font-weight:500;border-radius:0;transition:background .2s}
+@media (hover:hover){#oe-quiz .oe-opt:hover{background:var(--tint)}
+#oe-quiz .oe-opt:hover .oe-bub{border-color:var(--navy)}
+#oe-quiz .oe-send:hover{background:#9E1439}}
+#oe-quiz .oe-opt:focus-visible{outline:3px solid var(--navy);outline-offset:-3px}
+#oe-quiz .oe-bub{position:relative;flex:none;width:32px;height:32px;border-radius:50%;border:2px solid var(--drop);
+  display:grid;place-items:center;font-size:14px;font-weight:700;color:var(--navy-soft);transition:border-color .2s}
+#oe-quiz .oe-bub::after{content:"";position:absolute;inset:-2px;border-radius:50%;background:var(--crimson);transform:scale(0);
+  transition:transform .42s var(--ease)}
+#oe-quiz .oe-bub em{position:relative;z-index:1;font-style:normal;transition:color .2s .08s}
+#oe-quiz .oe-opt.is-picked .oe-bub{border-color:var(--crimson)}
+#oe-quiz .oe-opt.is-picked .oe-bub::after{transform:scale(1)}
+#oe-quiz .oe-opt.is-picked .oe-bub em{color:#fff}
+#oe-quiz .oe-opt.is-picked .oe-t{color:var(--navy);font-weight:700}
+#oe-quiz .oe-t b{font-weight:700;color:var(--navy)}
+#oe-quiz .oe-t small{display:block;font-size:15px;color:var(--muted);font-weight:400;margin-top:2px}
+#oe-quiz .oe-opt.is-picked .oe-t small{color:var(--navy-soft)}
+
+/* form: the sheet's own candidate fields */
+#oe-quiz .oe-lead{font-size:17px;line-height:1.45;color:var(--muted);margin:-8px 0 24px;max-width:34ch}
+#oe-quiz .oe-field{display:block;margin-bottom:18px}
+#oe-quiz .oe-field span{display:block;font-size:14px;font-weight:600;color:var(--navy-soft);margin-bottom:6px}
+#oe-quiz .oe-field input{width:100%;height:56px;padding:0 14px;border:2px solid var(--drop);border-radius:0;background:#fff;
+  font-size:18px;font-weight:600;color:var(--ink);transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+#oe-quiz .oe-field input::placeholder{color:#7D8CA3;font-weight:500}
+#oe-quiz .oe-field input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(10,49,97,.15)}
+#oe-quiz .oe-field.is-bad input{border-color:var(--crimson)}
+#oe-quiz .oe-err{min-height:20px;font-size:14px;color:var(--crimson);font-weight:600;margin-top:6px}
+#oe-quiz .oe-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+#oe-quiz .oe-send{width:100%;min-height:60px;margin-top:6px;background:var(--crimson);color:#fff;font-size:19px;font-weight:700;
+  border-radius:0;display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 6px 0 var(--navy-deep);transition:transform .12s,box-shadow .12s,opacity .2s}
+#oe-quiz .oe-send:active{transform:translateY(4px);box-shadow:0 2px 0 var(--navy-deep)}
+#oe-quiz .oe-send:disabled{opacity:.7;cursor:progress}
+#oe-quiz .oe-send:focus-visible{outline:3px solid var(--navy);outline-offset:3px}
+#oe-quiz .oe-formerr{margin-top:16px;font-size:15px;line-height:1.4;color:var(--crimson);font-weight:600}
+
+/* endings */
+#oe-quiz .oe-end{text-align:left;padding-top:20px}
+#oe-quiz .oe-stamp{width:96px;height:96px;border-radius:50%;background:var(--crimson);margin-bottom:28px;display:grid;place-items:center;
+  animation:oe-stamp .7s var(--ease) both .1s}
+#oe-quiz .oe-stamp svg{width:44px;height:44px}
+#oe-quiz .oe-stamp.is-plain{background:var(--navy)}
+@keyframes oe-stamp{from{transform:scale(.2);opacity:0}}
+#oe-quiz .oe-end h2{font-size:clamp(28px,8vw,36px);line-height:1.1;font-weight:800;letter-spacing:-.02em;margin-bottom:12px}
+#oe-quiz .oe-end p{font-size:17px;line-height:1.45;color:var(--muted);max-width:32ch}
+#oe-quiz .oe-test{margin-top:20px;font-size:13px;color:var(--muted);border:1px dashed var(--drop);padding:8px 10px;display:inline-block}
+
+@media (min-width:640px){
+  #oe-quiz{padding:40px 20px;align-items:flex-start}
+  #oe-quiz .oe-sheet{min-height:0;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+  #oe-quiz .oe-head{padding:24px 32px 22px 36px}
+  #oe-quiz .oe-step{padding:36px 40px 52px 48px}
+  #oe-quiz .oe-body{min-height:560px}
+}
+@media (prefers-reduced-motion:reduce){
+  #oe-quiz *,#oe-quiz *::before,#oe-quiz *::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+
+<div id="oe-quiz">
+  <div class="oe-sheet">
+    <header class="oe-head">
+      <div class="oe-brand">
+        <span class="oe-logo" aria-hidden="true"><svg viewBox="320 215 315 645"><circle cx="551" cy="297" r="75" fill="#B31942"/><path fill="#0A3161" d="M326 402H476A150 150 0 0 1 626 552V852A150 150 0 0 1 476 702V552A150 150 0 0 1 326 402Z"/></svg></span>
+        <span class="oe-name">1English</span>
+        <span class="oe-doc">Жауап парағы<br>4 сұрақ</span>
+      </div>
+      <div class="oe-grid" aria-hidden="true"></div>
+    </header>
+
+    <main class="oe-body" aria-live="polite">
+      <!-- question steps are built from QUESTIONS below -->
+      <section class="oe-step" data-step="form">
+        <div class="oe-qtop"><div class="oe-last">Соңғы қадам</div><button type="button" class="oe-back" data-back>← Артқа</button></div>
+        <h2 class="oe-q">Сұрақтарға жауап бергеніңізге рақмет!</h2>
+        <p class="oe-lead">Енді өз деңгейіңізді анықтайтын пробный сабаққа қатысу үшін нөміріңізді қалдырыңыз.</p>
+        <form novalidate>
+          <label class="oe-field" data-f="name"><span>Аты</span>
+            <input name="name" autocomplete="given-name" placeholder="Атыңыз" maxlength="60" required>
+            <div class="oe-err"></div></label>
+          <label class="oe-field" data-f="phone"><span>Телефон нөмірі</span>
+            <input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 (7__) ___-__-__" required>
+            <div class="oe-err"></div></label>
+          <input class="oe-hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <button class="oe-send" type="submit">Жіберу</button>
+          <p class="oe-formerr" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <section class="oe-step oe-end" data-step="done">
+        <div class="oe-stamp"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <h2>Өтінішіңіз қабылданды</h2>
+        <p>Рақмет! Жақын арада хабарласамыз.</p>
+        <p class="oe-test" hidden>Тест-режим: таблица ещё не подключена, заявка никуда не ушла.</p>
+      </section>
+
+      <section class="oe-step oe-end" data-step="stop">
+        <div class="oe-stamp is-plain"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <h2>Рақмет!</h2>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ---- settings: the only lines to edit ----
+  var SHEET_URL = '';                 // Apps Script web app URL (…/exec). Empty = test mode, nothing is sent.
+  var PIXEL_ID = '2168758820343543';
+
+  var QUESTIONS = [
+    { key: 'age', q: 'Жасыңыз нешеде?', stop: [0, 4],
+      a: ['18 жасқа дейін', '18–25 жас', '26–35 жас', '36–50 жас', '50 жастан жоғары'] },
+    { key: 'goal', q: 'Ағылшын тілін не үшін үйренгіңіз келеді?',
+      a: ['Жоғары табыс', 'Шетелде жұмыс', 'Еркін саяхаттау'] },
+    { key: 'level', q: 'Ағылшын тілін қаншалықты білесіз?',
+      a: ['Beginner (A0) – Тілді мүлде білмеймін, енді бастадым.',
+          'Elementary (A1) – Қарапайым сөздерді түсінемін, сөйлеу қиын.',
+          'Pre-Intermediate (A2) – Түсінемін, бірақ еркін сөйлей алмаймын.',
+          'Intermediate (B1) – Сөйлеймін, бірақ әлі де қателіктер жіберемін.'] },
+    { key: 'ready', q: 'Сізге ағылшын тілі 2 айда нақты нәтиже беретінін дәлелдеп берсек, дайынсыз ба?',
+      a: ['Иә, дәл қазір бастаймын', 'Иә, бірақ күмәнім бар', 'Жоқ, мен өмірімде өзгеріс қаламаймын'] }
+  ];
+  var LETTERS = 'ABCDE';
+
+  // ---- Meta Pixel: skip init if the page (Tilda) already loaded it ----
+  if (!window.fbq) {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;
+    s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', PIXEL_ID);
+    fbq('track', 'PageView');
+  }
+
+  var root = document.getElementById('oe-quiz');
+  var body = root.querySelector('.oe-body');
+  var grid = root.querySelector('.oe-grid');
+  var answers = {};
+  var current = null;
+
+  function el(tag, cls, html) { var n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; }
+  function esc(s) { return s.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+  // "Beginner (A0) – rest" → bold level + description line
+  function label(t) { var m = t.split(' – '); return m.length > 1 ? '<b>' + esc(m[0]) + '</b><small>' + esc(m[1]) + '</small>' : esc(t); }
+
+  // build question steps and the mini answer grid
+  var formStep = body.querySelector('[data-step="form"]');
+  QUESTIONS.forEach(function (Q, i) {
+    var s = el('section', 'oe-step'); s.dataset.step = i;
+    s.innerHTML = '<div class="oe-qtop"><div class="oe-num"><span>' + (i + 1) + '</span><small>/ ' + QUESTIONS.length + '</small></div>' +
+      (i ? '<button type="button" class="oe-back" data-back>← Артқа</button>' : '') + '</div>' +
+      '<h2 class="oe-q" id="oe-q' + i + '">' + esc(Q.q) + '</h2>';
+    var ul = el('ul', 'oe-opts'); ul.setAttribute('role', 'list'); ul.setAttribute('aria-labelledby', 'oe-q' + i);
+    Q.a.forEach(function (text, j) {
+      var li = el('li'), b = el('button', 'oe-opt');
+      b.type = 'button';
+      b.innerHTML = '<span class="oe-bub" aria-hidden="true"><em>' + LETTERS[j] + '</em></span><span class="oe-t">' + label(text) + '</span>';
+      b.onclick = function () { pick(i, j, b); };
+      li.appendChild(b); ul.appendChild(li);
+    });
+    s.appendChild(ul);
+    body.insertBefore(s, formStep);
+    var g = el('span', 'oe-g', '<b>' + (i + 1) + '</b>' + Q.a.map(function () { return '<i></i>'; }).join(''));
+    grid.appendChild(g);
+  });
+
+  function show(step) {
+    var next = body.querySelector('[data-step="' + step + '"]');
+    if (current && current !== next) {
+      var out = current; out.classList.remove('is-on'); out.classList.add('is-out');
+      setTimeout(function () { out.classList.remove('is-out'); }, 320);
+    }
+    next.classList.add('is-on'); current = next;
+    [].forEach.call(grid.children, function (g, i) { g.classList.toggle('is-now', String(i) === String(step)); });
+    if (step !== 0) root.scrollIntoView({ block: 'start' });
+    var focusable = next.querySelector('.oe-opt, input');
+    if (focusable && step !== 0) setTimeout(function () { focusable.focus({ preventScroll: true }); }, 340);
+  }
+
+  function pick(i, j, btn) {
+    if (body.dataset.busy) return;
+    body.dataset.busy = 1;
+    var Q = QUESTIONS[i];
+    current.querySelectorAll('.oe-opt').forEach(function (b) { b.classList.remove('is-picked'); });
+    btn.classList.add('is-picked');
+    var minis = grid.children[i].querySelectorAll('i');
+    minis.forEach(function (m, k) { m.classList.toggle('on', k === j); });
+    answers[Q.key] = Q.a[j];
+    setTimeout(function () {
+      delete body.dataset.busy;
+      if (Q.stop && Q.stop.indexOf(j) > -1) { grid.style.visibility = 'hidden'; return show('stop'); }
+      show(i + 1 < QUESTIONS.length ? i + 1 : 'form');
+    }, 420);
+  }
+
+  body.addEventListener('click', function (e) {
+    if (!e.target.closest('[data-back]')) return;
+    var s = current.dataset.step;
+    show(s === 'form' ? QUESTIONS.length - 1 : Number(s) - 1);
+  });
+
+  // ---- phone mask: +7 (7XX) XXX-XX-XX ----
+  var form = formStep.querySelector('form');
+  var phone = form.elements.phone, nameI = form.elements.name;
+  // "+7 (701) 123-45-67", "87011234567", "+77011234567" → "7011234567"
+  function digits(v) { var d = v.replace(/^\+7/, '').replace(/\D/g, ''); if (d.length > 10 && (d[0] === '7' || d[0] === '8')) d = d.slice(1); return d.slice(0, 10); }
+  function fmt(d) {
+    var o = '+7';
+    if (d.length) o += ' (' + d.slice(0, 3);
+    if (d.length >= 3) o += ')';
+    if (d.length > 3) o += ' ' + d.slice(3, 6);
+    if (d.length > 6) o += '-' + d.slice(6, 8);
+    if (d.length > 8) o += '-' + d.slice(8, 10);
+    return o;
+  }
+  phone.addEventListener('focus', function () { if (!phone.value) phone.value = '+7 ('; });
+  phone.addEventListener('blur', function () { if (!digits(phone.value)) phone.value = ''; });
+  var prevDigits = '';
+  phone.addEventListener('input', function (e) {
+    var d = digits(phone.value);
+    // backspace over ")", " " or "-" removes the digit before it instead of being re-added by the mask
+    if (e.inputType === 'deleteContentBackward' && d === prevDigits) d = d.slice(0, -1);
+    phone.value = fmt(prevDigits = d);
+    setErr('phone', '');
+  });
+  nameI.addEventListener('input', function () { setErr('name', ''); });
+
+  function setErr(f, msg) {
+    var box = form.querySelector('[data-f="' + f + '"]');
+    box.classList.toggle('is-bad', !!msg); box.querySelector('.oe-err').textContent = msg;
+  }
+
+  var utm = {};
+  new URLSearchParams(location.search).forEach(function (v, k) { if (/^utm_|^fbclid$/.test(k)) utm[k] = v.slice(0, 200); });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = nameI.value.trim(), d = digits(phone.value);
+    var ok = true;
+    if (name.length < 2) { setErr('name', 'Атыңызды жазыңыз'); ok = false; }
+    if (d.length !== 10) { setErr('phone', 'Нөмірді толық жазыңыз: +7 және 10 сан'); ok = false; }
+    if (!ok) return (name.length < 2 ? nameI : phone).focus();
+
+    var btn = form.querySelector('.oe-send'), err = form.querySelector('.oe-formerr');
+    btn.disabled = true; btn.textContent = 'Жіберілуде…'; err.hidden = true;
+    var data = Object.assign({ name: name, phone: '7' + d, website: form.elements.website.value, page: location.href.split('?')[0] }, answers, utm);
+
+    send(data).then(function () {
+      if (SHEET_URL && window.fbq) fbq('track', 'Lead');
+      if (!SHEET_URL) root.querySelector('.oe-test').hidden = false;
+      grid.querySelectorAll('.oe-g').forEach(function (g) { g.classList.remove('is-now'); });
+      show('done');
+    }).catch(function () {
+      btn.disabled = false; btn.textContent = 'Қайта жіберу';
+      err.textContent = 'Жіберілмеді. Интернетті тексеріп, қайта басыңыз.'; err.hidden = false;
+    });
+  });
+
+  function send(data) {
+    if (!SHEET_URL) { console.warn('[1English quiz] test mode, not sent:', data); return new Promise(function (r) { setTimeout(r, 600); }); }
+    return fetch(SHEET_URL, { method: 'POST', body: new URLSearchParams(data) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (!j.ok) throw new Error(j.error || 'not ok'); });
+  }
+
+  show(0);
+})();
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2168758820343543&ev=PageView&noscript=1" alt=""></noscript>
+<!-- ===== TILDA END ===== -->
