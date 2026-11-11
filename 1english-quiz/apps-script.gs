@@ -6,7 +6,7 @@
 var SHEET_NAME = 'Лиды';
 var COLUMNS = [
   ['ts', 'Дата'], ['name', 'Имя'], ['phone', 'Телефон'],
-  ['age', 'Возраст'], ['goal', 'Цель'], ['level', 'Уровень'], ['ready', 'Готовность'],
+  ['age', 'Возраст'], ['goal', 'Цель'], ['level', 'Уровень'], ['since', 'Сколько учит'], ['ready', 'Готовность'],
   ['utm_source', 'utm_source'], ['utm_medium', 'utm_medium'], ['utm_campaign', 'utm_campaign'],
   ['utm_content', 'utm_content'], ['utm_term', 'utm_term'], ['fbclid', 'fbclid'], ['page', 'Страница']
 ];
@@ -51,5 +51,5 @@ function json(o) {
 /** Run once from the editor to check the sheet write without the site. */
 function testPost() {
   Logger.log(doPost({ parameter: { name: 'Тест', phone: '77011234567', age: '26–35 жас',
-    goal: 'Шетелде жұмыс', level: 'Beginner (A0) – Тілді мүлде білмеймін, енді бастадым.', ready: 'Иә, дәл қазір бастаймын' } }).getContent());
+    goal: 'Шетелде жұмыс', level: 'Beginner (A0) – Тілді мүлде білмеймін, енді бастадым.', since: 'Әлі бастамадым.', ready: 'Иә, дәл қазір бастаймын' } }).getContent());
 }

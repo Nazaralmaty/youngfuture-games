@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Рақмет! — 1English</title>
+<link rel="icon" href="https://static.tildacdn.pro/tild3164-3539-4365-b034-396235646463/pfp_1_1.png">
+<link rel="stylesheet" href="https://static.tildacdn.pro/css/fonts-tildasans.css">
+<style>
+  /* Same look as the quiz (Tilda t1040 on 1eng.kz/quiznew): white, TildaSans, #313f53 text, blue gradient pill */
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; background: #fff;
+         font-family: 'TildaSans', Arial, sans-serif; color: #313f53; }
+  header { position: relative; display: flex; align-items: center; justify-content: center; padding: 26px 20px; }
+  header img { position: absolute; left: 20px; height: 40px; }
+  header b { font-size: 32px; color: #0f4a92; }
+  .bar { height: 5px; background: #7eb3ff; }
+  main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+         padding: 40px 20px 60px; max-width: 640px; margin: 0 auto; }
+  .ok { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 24px;
+        background: linear-gradient(0.25turn, #7eb3ff, #4f85d4); }
+  h1 { margin: 0 0 16px; font-size: 30px; line-height: 1.2; font-weight: 600; }
+  p { margin: 0 0 32px; font-size: 18px; line-height: 1.55; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 30px; border-radius: 40px;
+         color: #fff; font-size: 16px; font-weight: 600; text-decoration: none;
+         background: linear-gradient(0.25turn, #7eb3ff, #4f85d4); transition: opacity .2s; }
+  .btn:hover { opacity: .9; }
+  .btn:focus-visible { outline: 3px solid #0f4a92; outline-offset: 3px; }
+  .test { margin-top: 28px; font-size: 14px; color: #b31942; }
+  @media (max-width: 480px) { h1 { font-size: 24px; } p { font-size: 16px; } header b { font-size: 26px; } }
+</style>
+</head>
+<body>
+<header>
+  <img src="https://static.tildacdn.pro/tild3135-6432-4537-a233-306232336166/Group_33.png" alt="1English">
+  <b>Ағылшын тілі</b>
+</header>
+<div class="bar"></div>
+<main>
+  <div class="ok" aria-hidden="true">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <h1>Рақмет! Өтінішіңіз қабылданды</h1>
+  <p>Қазақстандықтардың көбі ағылшын тілін үйренуді кейінге қалдырады. Бірақ дәл қазір бастайтындар ғана жеңіске жетеді!</p>
+  <a class="btn" href="https://www.instagram.com/1eng.kz/">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#fff" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.2" fill="#fff"/></svg>
+    Instagram-ға өту
+  </a>
+  <div class="test" hidden>Тест-режим: таблица қосылмаған, өтініш ешқайда жіберілмеді.</div>
+</main>
+<script>if (/[?&]test=1/.test(location.search)) document.querySelector('.test').hidden = false;</script>
+</body>
+</html>
