@@ -272,7 +272,7 @@ function route(l, ch) {
     return { href: 'mailto:' + l.email + '?subject=' + encodeURIComponent(l.subject || '') + '&body=' + encodeURIComponent(body(l)) };
   }
   if (!l.ig) return { off: 'нет аккаунта' };
-  return { href: 'https://ig.me/m/' + l.ig.replace(/^@/, ''), copy: body(l), blank: true };
+  return { href: 'https://www.instagram.com/' + l.ig.replace(/^@/, '') + '/', copy: body(l), blank: true };
 }
 
 function action(l, ch, kind) {
