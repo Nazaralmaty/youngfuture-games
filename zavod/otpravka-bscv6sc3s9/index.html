@@ -272,7 +272,8 @@ function route(l, ch) {
     return { href: 'mailto:' + l.email + '?subject=' + encodeURIComponent(l.subject || '') + '&body=' + encodeURIComponent(body(l)) };
   }
   if (!l.ig) return { off: 'нет аккаунта' };
-  return { href: 'https://www.instagram.com/' + l.ig.replace(/^@/, '') + '/', copy: body(l), blank: true };
+  // Елжан 14.11.2026: значок Instagram открывает директ (ig.me/m/), не профиль. Гейт: zavod-sales/check_len.js.
+  return { href: 'https://ig.me/m/' + l.ig.replace(/^@/, '').replace(/\/+$/, ''), copy: body(l), blank: true };
 }
 
 function action(l, ch, kind) {
