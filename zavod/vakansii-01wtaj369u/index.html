@@ -124,7 +124,7 @@ function route(j, c) {  // href + whether the text goes to the clipboard (the ap
     case 'tg': return { href: 'https://t.me/' + v, label: 'Telegram @' + v, copy: true };
     case 'wa': return { href: 'https://wa.me/' + v + '?text=' + encodeURIComponent(t), label: 'WhatsApp +' + v };
     case 'email': return { href: 'mailto:' + v + '?subject=' + encodeURIComponent((SUBJ[j.lang] || SUBJ.ru)(j.title)) + '&body=' + encodeURIComponent(t), label: 'Почта', self: true };
-    case 'ig': return { href: 'https://ig.me/m/' + v, label: 'Instagram @' + v, copy: true };
+    case 'ig': return { href: 'https://www.instagram.com/m/' + v, label: 'Instagram @' + v, copy: true };
     case 'reddit': return { href: 'https://www.reddit.com/message/compose/?to=' + encodeURIComponent(v) + '&subject=' + encodeURIComponent(j.title.slice(0, 90)) + '&message=' + encodeURIComponent(t), label: 'Reddit u/' + v };
     default: return { href: v, label: { hh: 'Отклик на hh', kwork: 'Отклик на Kwork', telegram: 'Пост в канале', instagram: 'Пост в Instagram' }[j.src] || 'Отклик на сайте', copy: true };
   }

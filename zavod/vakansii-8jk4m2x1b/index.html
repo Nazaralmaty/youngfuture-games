@@ -216,7 +216,7 @@ function route(j, c) {
     case 'tg': return { href: 'https://t.me/' + c.value, label: 'Telegram', copy: true };
     case 'wa': return { href: 'https://wa.me/' + c.value + '?text=' + encodeURIComponent(t), label: 'WhatsApp', copy: false };
     case 'email': return { href: 'mailto:' + c.value + '?subject=' + encodeURIComponent((SUBJ[j.lang] || SUBJ.ru)(j.title)) + '&body=' + encodeURIComponent(t), label: 'На почту', self: true };
-    case 'ig': return { href: 'https://ig.me/m/' + c.value, label: 'Instagram', copy: true };
+    case 'ig': return { href: 'https://www.instagram.com/m/' + c.value, label: 'Instagram', copy: true };
     case 'reddit': return { href: 'https://www.reddit.com/message/compose/?to=' + encodeURIComponent(c.value) + '&subject=' + encodeURIComponent(j.title.slice(0, 80)) + '&message=' + encodeURIComponent(t), label: 'Reddit ЛС', copy: false };
     case 'apply': return { href: c.value, label: 'Отклик через сайт', copy: true };
     default: return { href: j.url, label: 'Первоисточник', copy: true };
