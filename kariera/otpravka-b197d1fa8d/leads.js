@@ -4,6 +4,40 @@
 // wa: цифры номера; ig: аккаунт без @. У каждой школы есть хотя бы одно из двух.
 window.LEADS = [
   {
+    "id": "vs-aiproschool",
+    "date": "2026-11-16",
+    "name": "AI Pro School",
+    "sub": "школа ИИ-креаторов, Astana Hub",
+    "lang": "ru",
+    "poster": "img/vs_aiproschool.jpg",
+    "reel": "https://nazaralmaty.github.io/youngfuture-games/kariera/kanal-aiproschool-348392e1/",
+    "clip": "Канал вакансий для AI Pro School",
+    "wa": "77005066001",
+    "email": "",
+    "ig": "ai_pro_school",
+    "src": "Цитата «От первых шагов в искусственном интеллекте до первых заказов и реальных результатов» — https://www.instagram.com/reel/Dfl0LDhIyGl/. https://ai-pro-school.kz https://www.instagram.com/reel/DfXtkjuiAQY/ https://www.instagram.com/reel/DfmmyqaozKN/ Контакты (с сайта школы) — https://ai-pro-school.kz. Instagram @ai_pro_school: подписчиков 99 209, последний пост 14.11 (Graph API 16.11).",
+    "check": "Школа ИИ-креаторов и вайбкодинга, резидент Astana Hub, 99 тыс. подписчиков, пост 14.11, 4500+ учеников. Основатель Надира Батырбаева (owner-run). Обещание: на практикуме учат искать клиентов и дают готовые сообщения (пост 05.11, https://www.instagram.com/p/DfXtkjuiAQY/). WhatsApp с сайта школы; в bio другой номер 77765066001.",
+    "subject": "Канал вакансий для ваших выпускников",
+    "text": "Здравствуйте! В вашем Instagram: «От первых шагов в искусственном интеллекте до первых заказов и реальных результатов».\nСобрал канал вакансий для ваших выпускников: монтаж, дизайн, маркетинг по Казахстану, 40 за две недели с hh.kz, Enbek, LinkedIn и Telegram-каналов, каждый день новые.\n{reel}\nПодключу такой в ваш Telegram под вашим брендом.\nГде сейчас ваши выпускники ищут работу?"
+  },
+  {
+    "id": "vs-rizatdd",
+    "date": "2026-11-16",
+    "name": "Rizat — обучение таргету",
+    "sub": "наставник по таргету, Астана",
+    "lang": "ru",
+    "poster": "img/vs_rizatdd.jpg",
+    "reel": "https://nazaralmaty.github.io/youngfuture-games/kariera/kanal-rizatdd-d64974b6/",
+    "clip": "Канал вакансий для Rizat — обучение таргету",
+    "wa": "",
+    "email": "",
+    "ig": "rizat_dd",
+    "src": "Цитата «Помогаю новичкам освоить таргет с 0 и получить первых клиентов» — https://www.instagram.com/rizat_dd/. https://wa.me/message/R5E6CUP6V6MHK1 Контакты (с сайта школы) — https://www.instagram.com/rizat_dd/. Instagram @rizat_dd: подписчиков 2 737, последний пост 10.11 (Graph API 16.11).",
+    "check": "Таргетолог-наставник из Астаны (владелец аккаунта, owner-run), 2,7 тыс. подписчиков, пост 10.11. Обещание — в bio: помогает новичкам получить первых клиентов. Связь: ссылка WhatsApp в bio https://wa.me/message/R5E6CUP6V6MHK1 (это ссылка-чат, не номер) и директ Instagram; поле wa пустое. Имя не названо в bio.",
+    "subject": "Канал вакансий для ваших выпускников",
+    "text": "Здравствуйте! В вашем Instagram: «Помогаю новичкам освоить таргет с 0 и получить первых клиентов».\nСобрал канал вакансий для ваших выпускников: таргет, SMM, маркетинг по Казахстану, 40 за две недели с hh.kz, Enbek, LinkedIn и Telegram-каналов, каждый день новые.\n{reel}\nПодключу такой в ваш Telegram под вашим брендом.\nГде сейчас ваши выпускники ищут работу?"
+  },
+  {
     "id": "vs-adsmedia",
     "date": "2026-11-16",
     "name": "ADS Media",
