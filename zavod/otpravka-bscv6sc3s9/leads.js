@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-laura_zackarya",
+  "date": "2026-11-23",
+  "lang": "ru",
+  "name": "Лаура Галиева · Laura Zackarya",
+  "sub": "Основательница и формулятор космецевтики LAURA ZACKARYA (PROSTO COSMETICS): пигментация, SPF, пептиды; бренд 71,4K в Instagram, свой магазин в тенге",
+  "avatar": "",
+  "poster": "img/ms-laura_zackarya.jpg",
+  "reel": "https://www.instagram.com/reel/DgEiIl6Ekp8/",
+  "clip": "Пятно под консилером · 38 с · nonstop-motion",
+  "episode": "https://kz.laurazackarya.com",
+  "wa": "77710858989",
+  "email": "",
+  "ig": "laura.zackarya",
+  "src": "IG основательницы instagram.com/laura.zackarya (био «Founder of @laurazackarya.cosmetics», ig_check api); бренд instagram.com/laurazackarya.cosmetics (Graph 23.11, био: 50+ формул, 80 000+ клиентов за 7+ лет); интервью youtube.com/watch?v=pLiPyMSFE5k; WhatsApp +77710858989 — линия компании (wa.me на kz.laurazackarya.com); цены kz.laurazackarya.com/collection/all.json (ABVC+ 27 590 ₸, DD-крем SPF50 15 799 ₸, набор 39 390 ₸); доставка kz.laurazackarya.com/page/delivery; их YouTube-шортсы со страниц товаров (руки с ампулой, логотип); карточка «От основателя» со страницы товара",
+  "check": "Голос один дубль Kore, не прослушан ухом (whisper услышал все слова). Флакон консилера сгенерирован (локальный FLUX, без бренда), это не их товар. Лицо только у основательницы на её карточке «От основателя» из их магазина. Фон под строкой про бренд — их ролик с руками, сильно увеличен и мягкий. Фраза «И пятно больше не прячешь» — сюжетная, результат не обещан цифрой. Бренд продаётся и в РФ (WB/OZON), основательница живёт в Дубае.",
+  "subject": "Ролик про Laura Zackarya",
+  "text": "Лаура, добрый день! Сделал моушн-ролик про Laura Zackarya: как перестать прятать пятно под консилером. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под новогодние наборы. Бесплатно."
+},
+{
   "id": "ms-arnau_group",
   "date": "2026-11-23",
   "lang": "ru",
