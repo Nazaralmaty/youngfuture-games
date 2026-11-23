@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-omir_collection",
+  "date": "2026-11-24",
+  "lang": "ru",
+  "name": "Акбаян Омир · Omir Collection",
+  "sub": "Предприниматель, её фамилия = имя бренда; Omir Collection: вечерние платья и двойки, 4 магазина (Алматы, Астана, Шымкент, Атырау), 460 тыс. подписчиков",
+  "avatar": "",
+  "poster": "img/ms-omir_collection.jpg",
+  "reel": "https://www.instagram.com/reel/DgGHkKDFPq9/",
+  "clip": "Юбка без пары · 37 с · nonstop-motion",
+  "episode": "https://omir-collection.taplink.ws",
+  "wa": "77082867133",
+  "email": "",
+  "ig": "akbayan.omir",
+  "src": "Её IG @akbayan.omir («Акбаян Омир / Предприниматель», ig_check route page; пост 23.11 https://www.instagram.com/reel/DgEy22RzxZL/ «Жаңа жылдық образдар @omir_collection»). Бренд: Graph business_discovery @omir_collection 23.11 (459 972 подписчика, адреса в био и в каждой подписи); shop.omircollection.kz (380 моделей, «покажем, что есть в вашем городе», доставка из другого города по Казахстану и в Россию); omir-collection.taplink.ws. Цены: 24 500 тг https://www.instagram.com/reel/Df1ksaXtBOL/ (17.11), 19 990 тг https://www.instagram.com/reel/Df7YvuLNWwc/ (19.11), 27 500 тг https://www.instagram.com/reel/Df1IYWvJHuw/ (17.11). WhatsApp в ролике +7 777 588 27 73: линия компании «подобрать образ» с taplink. WhatsApp в строке 77082867133: линия компании (Алматы) из профиля TikTok @omir_colletion.",
+  "check": "Связь Акбаян с брендом держится на фамилии = имени бренда и её постах с @omir_collection, слово «основательница» нигде не написано (~75 %). Не слышал голос: whisper записал «Омир Коллекшн» как «омер коллекшн», проверь на слух строку 7; строка 12 «Пятница. Тот же шкаф.» прочитана медленно, tts.sh пометил её по темпу, whisper слышит четыре верных слова. Сгенерирована только терракотовая юбка на вешалке (локальный FLUX), не их товар. Модели из их съёмок, все кадры обрезаны ниже подбородка, лиц нет (faces clean). Логотипа у бренда не нашёл (аватар taplink с брендом Sia), имя написано шрифтом.",
+  "subject": "Ролик про Omir Collection",
+  "text": "Акбаян, добрый день! Сделал моушн-ролик про Omir Collection: юбка без пары висит месяцами, а двойку надевают сразу. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под новогодние образы. Бесплатно."
+},
+{
   "id": "ms-oppein_kz",
   "date": "2026-11-24",
   "lang": "ru",
