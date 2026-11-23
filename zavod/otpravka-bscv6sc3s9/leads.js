@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-malli",
+  "date": "2026-11-23",
+  "lang": "ru",
+  "name": "Маншук Карим · Malli",
+  "sub": "Основательница Malli, премиальные платья, костюмы и пальто, шоурумы в Алматы и Астане, своё ателье; 279 тыс. подписчиков у бренда, 82 тыс. у неё",
+  "avatar": "",
+  "poster": "img/ms-malli.jpg",
+  "reel": "https://www.instagram.com/reel/DgFghoao-jI/",
+  "clip": "Платье давит за столом · 40 с · nonstop-motion",
+  "episode": "https://mallishowroom.taplink.ws",
+  "wa": "77752140423",
+  "email": "",
+  "ig": "malli_malli",
+  "src": "Роль: weproject.media/articles/detail/10-predprinimateley-iz-kazakhstana-kotorye-sozdali-uznavaemye-silnye-brendy/ и /8-kreativnykh-predprinimateley-almaty-kotorye-sozdayut-sovremennyy-gorod/; её Instagram malli_malli, био «Founder @malli_showroom» (ig_check api). WhatsApp 77752140423: кнопка «whatsapp atelier» на mallishowroom.taplink.ws, линия ателье, не личный (линия шоурума Алматы 7005554173, она же в ролике). Цены: instagram.com/p/DfmqRrijOzE (Monceau 150 000), /p/DfrtLLijNOL (Diamond 210 000), /p/DfUkWI6jFsY (Fatality 240 000); «Примерка в цехе»: instagram.com/reel/DfOsfhHMCBm; пошив по меркам, адреса: FAQ и карты на taplink.",
+  "check": "Послушай строку 7: whisper услышал «Молист» вместо «Малли с» (тот же звук, скорее всего норма) и «Монсо» как «Мансо». Адрес шоурума Алматы: на карте taplink Кабанбай батыра, 81, в FAQ там же 104, в ролике 81. Фигура Monceau вырезана без головы, подъюбник при вырезке ушёл. В CTA справа пусто: фигура закрывала текст, убрал. Номер в ролике: шоурум Алматы, в row: линия ателье. static 4,8 % при пороге 5 %.",
+  "subject": "Моушн-ролик про Malli",
+  "text": "Маншук, добрый день! Сделал моушн-ролик про Malli: почему платье из примерочной давит за столом и при чём тут ваша «Примерка в цехе». Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под новогоднюю коллекцию La Nuit Enchantée. Бесплатно."
+},
+{
   "id": "ms-aye_shoes",
   "date": "2026-11-23",
   "lang": "ru",
