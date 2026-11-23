@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-living_atmosphere",
+  "date": "2026-11-24",
+  "lang": "ru",
+  "name": "Лаура Адамова · Living Atmosphere",
+  "sub": "основатель Living Atmosphere (livingatmosphere.kz): итальянская мебель премиум, кухни Cesar, гардеробные и мебель Lema, двери Lualdi; шоурумы в Астане и Алматы; 6,6 тыс. подписчиков у компании, 1,9 тыс. у неё",
+  "avatar": "",
+  "poster": "img/ms-living_atmosphere.jpg",
+  "reel": "https://www.instagram.com/reel/DgGh5OomeKE/",
+  "clip": "гостиная, где мебель не кричит · 40 с · nonstop-motion",
+  "episode": "https://livingatmosphere.kz",
+  "wa": "77758887108",
+  "email": "",
+  "ig": "laura.adamova_",
+  "src": "роль: био https://www.instagram.com/laura.adamova_/ («Founder @livingatmosphere.kz») и https://www.instagram.com/livingatmosphere.kz/ («Owner @laura.adamova_»); WhatsApp wa.me/77758887108 с сайта https://livingatmosphere.kz/ (кнопка на каждой странице, на /multi «WhatsApp Астана»), линия компании, личного номера нет; вторая линия компании +7 701 222 37 79 «WhatsApp Алматы» https://livingatmosphere.kz/multi; 11 лет, с 2015 года, прямые поставки с фабрик Италии, срок от 2,5 до 4 месяцев с фиксацией в договоре, доставка и сборка на них, цитата «Мебель не должна кричать» (Лаура Адамова, основатель): https://livingatmosphere.kz/; кресло Claire от Lema, 4 925 €: https://www.instagram.com/p/DThvSckCAUy/; кухни Cesar: https://www.instagram.com/reel/Ded9UYQodp5/; гардеробные Lema и «покажем образцы и посчитаем ваш проект»: https://www.instagram.com/reel/DfmA5OWIuJV/; переезд на Токпанова 18: https://www.instagram.com/reel/Dejm73oI3yQ/; адреса Астана и Алматы: https://livingatmosphere.kz/multi",
+  "check": "Голос (Kore) человек не слушал: проверь «Living Atmosphere», «Cesar», «Lema», «Claire». Розовое кресло в золоте сгенерировано (FLUX) как образ «кричащей» мебели, их товаром оно не названо. Цитата «Мебель не должна кричать» взята с сайта livingatmosphere.kz, там она подписана Лаурой. На 32–34 с в их ролике о переезде мелькает девушка в профиль, лица не видно. Гейт flicker не проверен (нет кадров work/fr). В pool.jsonl WhatsApp пустой, номер 77758887108 найден на сайте позже: это линия компании, не Лауры.",
+  "subject": "Моушн-ролик про Living Atmosphere",
+  "text": "Лаура, добрый день! Сделал моушн-ролик про Living Atmosphere: в какой гостиной захочется сидеть, если мебель в ней не кричит. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один про новый шоурум на Токпанова. Бесплатно."
+},
+{
   "id": "ms-laula_shop",
   "date": "2026-11-24",
   "lang": "ru",
