@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-kampit",
+  "date": "2026-11-23",
+  "lang": "ru",
+  "name": "Алия Оскенбаева · Kámpit",
+  "sub": "основательница Kámpit: шоколадные конфеты и драже своего производства, бутик в Алматы; бренд 30 тыс. подписчиков, её личный Instagram 1,2 тыс.",
+  "avatar": "",
+  "poster": "img/ms-kampit.jpg",
+  "reel": "https://www.instagram.com/reel/DgFHG58DD7b/",
+  "clip": "коробка, которую оставят · 36 с · nonstop-motion",
+  "episode": "https://kampitco.kz/",
+  "wa": "",
+  "email": "",
+  "ig": "aliyummmy",
+  "src": "Роль и связь: OYLAOUT Podcast 25.12.2025 https://www.youtube.com/watch?v=ieyln0kN3qU («Алия Оскенбаева (Стамбекова), основательница Kampit», в описании instagram.com/aliyummmy и instagram.com/kampit.co); её Instagram https://www.instagram.com/aliyummmy/ (био «@kampit.co», 1 202 подписчика, последний пост 20.09.2026). Факты: Instagram kampit.co — Jewelry Box 65 500 тг и «коробка превращается в шкатулку» https://www.instagram.com/p/DdvZafYgi9C/ ; Brown box 75 000 тг https://www.instagram.com/reel/DdB2h0kqdnw/ ; курт https://www.instagram.com/reel/DXde2pBAmuh/ ; жент https://www.instagram.com/reel/Df95PHhilXO/ ; адрес, часы, заказ онлайн https://www.instagram.com/p/DfM_E1yAmOp/ и био бренда. WhatsApp не нашёл (био, подписи; сайт kampitco.kz не открылся по сертификату).",
+  "check": "Голос не слушал: whisper при озвучке услышал «Дрожжи» вместо «Драже» (строка 11), «жен» вместо «жент» (строка 8) и «Платформа Эй» (строка 14) — проверь на слух 17–19 с, 25–28 с и 31–34 с. Коробка с пуговицами в начале сгенерирована (FLUX), это не их товар. Личный аккаунт основательницы маленький и молчит с 20.09, контакт только Instagram. Цены из постов сентября, могли измениться. Женщина в их ролике про курт вырезана, лиц в ролике нет.",
+  "subject": "Моушн-ролик про Kámpit",
+  "text": "Алия, добрый день! Сделал моушн-ролик про Kámpit: как коробка конфет становится шкатулкой, которую хранят годами. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под Новый год. Бесплатно."
+},
+{
   "id": "ms-ayashka",
   "date": "2026-11-23",
   "lang": "ru",
