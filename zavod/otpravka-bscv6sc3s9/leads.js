@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-bekbota",
+  "date": "2026-11-23",
+  "lang": "ru",
+  "name": "Нурбол Бекботаев · Бекбота Ет",
+  "sub": "основатель мясного бутика и ресторана «Бекбота Ет» (Алматы, Таугуль-2): личный инстаграм 101K, компания 63.9K",
+  "avatar": "",
+  "poster": "img/ms-bekbota.jpg",
+  "reel": "https://www.instagram.com/reel/DgEuUoAkurp/",
+  "clip": "за мясом без будильника · 33.5 с · nonstop-motion",
+  "episode": "https://bekbota-et.kamiqr.com/menu/delivery",
+  "wa": "77475008808",
+  "email": "",
+  "ig": "bekbota_et",
+  "src": "person/role: youtube.com/watch?v=6g7jdNX_aWU, youtube.com/watch?v=cXWrXrBnrUE, youtube.com/watch?v=CaQsR6bggB0; personal IG bekbota_et (ig_check api, bio links bekbota.group); WhatsApp +7 747 500 88 08 = company line from bekbota-et.kamiqr.com/menu/delivery (api.whatsapp.com/send?phone=77475008808), personal number hidden behind wa.me/message/DHIRRX42PSAEP1; facts: bio bekbota.group (охлаждённое мясо каждый день, Таугуль 2, 4А), site (10:00–22:00), reels DfodLHUsfTG 12.11 (стейки 6 000 ₸), DejmjGQspJs 16.10 (сырой или готовый, цена одна), DaAdrkZsSDw 25.06 (казы и жая 12 100 ₸/кг), DYg8donsb_p 19.05 (бокс 30/50/100 тыс., доставка), DZFJ3EKsi3b (пельмени 2 390 ₸), DWOELCjDHpa (DRY AGER); logo «EST. 2013 · Ваш надежный мясной партнер»",
+  "check": "Будильник на 6:00 сгенерирован (kie flare 1K, одна картинка), всё мясо, коробки и витрина из их постов. Стейк в финале вырезан вручную по цвету из их ролика: на краю остался маленький коричневый край, посмотреть 26–34 с. Голос Achird на темпе 1.13, чуть быстрее обычного; «Бекбота Ет» whisper слышал как «Бектофьед», ухом не проверено. Цены 12 100 ₸/кг (июнь) и «от 30 000 ₸» (май) старые, на текущие не сверял. Карточки айсберга (стейк, казы, пельмени) мелкие, это шаблон.",
+  "subject": "Моушн-ролик про Бекбота Ет",
+  "text": "Нурбол, добрый день! Сделал моушн-ролик про Бекбота Ет: как взять хороший кусок мяса без будильника на базар к шести утра. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал. Можете выложить у себя.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под новогодние стейки. Бесплатно."
+},
+{
   "id": "ms-bayandarova_clinic",
   "date": "2026-11-23",
   "lang": "ru",
