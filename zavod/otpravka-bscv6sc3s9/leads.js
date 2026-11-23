@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-kaidarova",
+  "date": "2026-11-24",
+  "lang": "ru",
+  "name": "Нагима Кайдарова · KAIDAROVA",
+  "sub": "Основательница этно-бренда KAIDAROVA (одежда, украшения, декор KAIDAROVA HOME), Астана, шоурум на Сығанақ 15, 161 тыс. подписчиков",
+  "avatar": "",
+  "poster": "img/ms-kaidarova.jpg",
+  "reel": "https://www.instagram.com/reel/DgGOr6Giu8C/",
+  "clip": "Свеча BAURSAQ: запах дома за границей · 39 с · nonstop-motion",
+  "episode": "https://wa.me/77760355999",
+  "wa": "77760355999",
+  "email": "",
+  "ig": "nagima_kaidarova",
+  "src": "Роль: https://weproject.media/articles/detail/4-istorii-predprinimateley-kotorye-sozdayut-sobstvennye-proekty-i-menyayut-gorodskuyu-zhizn/ («Нагима Кайдарова … основательница @kaidarova.ethnic», 08.04.2022). Личный Instagram: instagram.com/nagima_kaidarova (ig_check api 23.11, био «СТИЛИЗУЮ ЭТНИКУ … @kaidarova.ethnic», 10 080 подписчиков, пост 09.11). WhatsApp 77760355999: wa.me в био @kaidarova.ethnic, линия бренда, не личный. Факты: свеча BAURSAQ 18 000 / 24 000 ₸, коробка и поднос в комплекте, доставка по всему миру https://www.instagram.com/reel/Dfqm1nQTDpa/ (13.11); QURT, первая партия распродана, следующая в начале декабря https://www.instagram.com/p/DgEkqeCCh0E/ (23.11); ёлочные игрушки 5 500 ₸ https://www.instagram.com/reel/DfhDBBLKs91/ (09.11); адрес и часы https://www.instagram.com/reel/DfOcpc3KuQ4/.",
+  "check": "Голос целиком ушами не слушал. 1) Строку 1 переозвучил одним платным дублем 24.11: whisper на новом дубле и на мастере слышит «Первая зима в Сеуле», старый дубль давал «жима». 2) «Kaidarova HOME» whisper слышит как «Кайдара Вахом», послушать. 3) Ролик про свечи KAIDAROVA HOME, а основное у бренда одежда; кадр «Новая придёт к декабрю» тёмный (открытая коробка изнутри). Язык русский: в ленте больше казахского, но у большинства постов есть русская половина. WhatsApp из био компании, это линия бренда, не личный номер.",
+  "subject": "Моушн-ролик про свечу BAURSAQ",
+  "text": "Нагима, добрый день! Сделал моушн-ролик про Kaidarova HOME: как свеча BAURSAQ делает съёмную комнату за границей домом. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал. Можете выложить у себя.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под ваши новогодние игрушки. Бесплатно."
+},
+{
   "id": "ms-ast_group",
   "date": "2026-11-24",
   "lang": "ru",
