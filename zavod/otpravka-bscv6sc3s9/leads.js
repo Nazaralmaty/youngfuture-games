@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-qazaq_sumka",
+  "date": "2026-11-23",
+  "lang": "ru",
+  "name": "Думан Дәулетбек · Qazaq Sumka",
+  "sub": "Основатель Qazaq Sumka: чемоданы и сумки своего производства, опт и розница, магазины в Алматы; бренд 114.6K в Instagram, личный 1.3K",
+  "avatar": "",
+  "poster": "img/ms-qazaq_sumka.jpg",
+  "reel": "https://www.instagram.com/reel/DgEluULD4ia/",
+  "clip": "чемодан без колеса на ленте выдачи · 34 с · nonstop-motion",
+  "episode": "https://taplink.cc/qazaqsumka1",
+  "wa": "77787685588",
+  "email": "",
+  "ig": "duman_dauletbek",
+  "src": "Основатель: био @duman_dauletbek «Основатель @qazaq_sumka @davidjones_kz» (ig_check api, 23.11); ролик Даму 02.06.2023 https://www.youtube.com/watch?v=5SQzUQoqcOE «Компанияның негізін қалаған Думан Дәулетбек». WhatsApp 77787685588 — линия компании (wa.me на https://taplink.cc/qazaqsumka1 из био @qazaq_sumka, номер в подписи https://www.instagram.com/reel/De9xdneoaHZ/), не личный. Цены: чемодан-самокат 45 000 ₸ https://www.instagram.com/reel/DfFqunuo_mS/; комплект 3 в 1 25 000 ₸ https://www.instagram.com/reel/DecOxUboacm/. Поликарбонат M и L https://www.instagram.com/reel/DfAbMWJIk_T/; полипропилен/поликарбонат https://www.instagram.com/reel/DfxY56ooVbL/; своё производство https://www.instagram.com/reel/DePejmaobyV/, https://www.instagram.com/reel/Df5LPqrtk6-/; тест броском и «Неубиваемые чемоданы» https://www.instagram.com/reel/DeKMWTQoNZX/; из перепродажи китайских чемоданов в производителя — описание ролика Даму; адреса — taplink (2GIS); рассрочка Kaspi — био.",
+  "check": "Голос не слушан ушами: whisper услышал «и Ак Булак» как «як Булак» (не перезаписывал), строку 11 перезаписал один раз — первый дубль whisper услышал как «собирает». Сломанный чемодан — FLUX, не их товар; колесо стёрто вручную, на маленьком экране «без колеса» читается слабо. Цены только на две модели, поликарбонат без ценника. Карточка «3 в 1» попадает на коричневый комплект (у них ролик меняет цвета). Аудитория бренда говорит по-казахски, ролик на русском (русские подписи у них тоже есть). WhatsApp — линия компании, не Думана.",
+  "subject": "Моушн-ролик про Qazaq Sumka",
+  "text": "Думан, добрый день! Сделал моушн-ролик про Qazaq Sumka: почему чемодан, который бросали до продажи, доезжает на всех колёсах. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под оптовых покупателей. Бесплатно."
+},
+{
   "id": "ms-balnur_clinic",
   "date": "2026-11-23",
   "lang": "ru",
