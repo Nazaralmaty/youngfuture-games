@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-dimash_silver",
+  "date": "2026-11-23",
+  "lang": "ru",
+  "name": "Алтынай Аширбаева · Dimash Silver",
+  "sub": "Основательница ювелирного дома Dimash Silver: серебро 925 с муассанитом и перламутром, авторские коллекции, Алматы и Астана; @dimashsilver_collection 49 682 подписчика",
+  "avatar": "",
+  "poster": "img/ms-dimash_silver.jpg",
+  "reel": "https://www.instagram.com/reel/DgF7_0VHGRr/",
+  "clip": "Серьги ждут свадьбы, а сегодня вторник · 40 с · nonstop-motion",
+  "episode": "http://taplink.cc/dimashsilver_official",
+  "wa": "77021004050",
+  "email": "",
+  "ig": "altynay_dimashsilver",
+  "src": "Контакт: био @dimashsilver_collection «FOUNDER @altynay_dimashsilver», био @altynay_dimashsilver, weproject.media/articles/detail/tsel-a-ne-mechta-sozdat-yuvelirnyy-dom-v-kazakhstane-s-mirovym-imenem/. WhatsApp 77021004050 с taplink.cc/dimashsilver_official, кнопка «Сотрудничество / Manager», линия компании (номер из подписей постов +77781251177 в ролике как их номер для заказа, в сообщение не идёт). Цены из подписей, сверены 23.11.2026: пусеты 26000-15%=22 100 тг (instagram.com/reel/DeKEYMai8t6/, 06.10), кольцо дорожка 28000-15%=23 800 тг (instagram.com/reel/De9CE-yC7K9/, 26.10), набор 60000-15%=51 000 тг (instagram.com/reel/DgCxx0pxAzu/, 22.11). Кадры: рилсы @dimashsilver_collection. Адреса: био (Atakent Mall, Хан Шатыр).",
+  "check": "Голос слушал только whisper, по одному дублю; пусеты озвучены как «пуссеты» по версии whisper, строку 8 и строки 1, 2 переозвучены (гейты темпа и тайминга). Послушать название бренда и «Атакент Мол». Сюжет про шкатулку и вторник мой вывод, не цитата. Какое кольцо и какие пусеты в кадре, с ценником какого поста совпадают, глазами не сверял: кадры взяты из их рилсов, цена идёт как справка. Лиц в кадре нет (faces.py чист); в начале и на финале стойка с чёрной перчаткой. Static на пределе (4.9 %), открытие и возврат довольно статичные. Целиком на 1× со звуком никто не смотрел.",
+  "subject": "Моушн-ролик про Dimash Silver",
+  "text": "Алтынай, добрый день! Сделал моушн-ролик про Dimash Silver: серьги с муассанитом ждут свадьбы в шкатулке, а носить их можно в обычный вторник. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один про кольцо. Бесплатно."
+},
+{
   "id": "ms-ivory_astana",
   "date": "2026-11-23",
   "lang": "ru",
