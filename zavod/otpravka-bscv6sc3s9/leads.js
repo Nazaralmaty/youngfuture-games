@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-zakazbuketov",
+  "date": "2026-11-23",
+  "lang": "ru",
+  "name": "Айжан Сулейменова · ZakazBuketov",
+  "sub": "Основатель и владелица ZakazBuketov.kz: доставка цветов по Алматы 24/7, первая цветочная франшиза Казахстана; живёт в Дубае, 114 тыс. в личном Instagram, у компании 52 тыс.",
+  "avatar": "",
+  "poster": "img/ms-zakazbuketov.jpg",
+  "reel": "https://www.instagram.com/reel/DgEHCo7AhSM/",
+  "clip": "Букет маме из другой страны, фото до отправки · 36 с · nonstop-motion",
+  "episode": "https://zakazbuketov.kz",
+  "wa": "77775724444",
+  "email": "",
+  "ig": "aizhan.posh",
+  "src": "Контакт: instagram.com/aizhan.posh (био «Founder & owner @zakazbuketovkz | @infinityflowersdubai…», сайт zakazbuketov.kz, ig_check api, 114 355, пост 12.11.2026); Digital Business 06.03.2026 digitalbusiness.kz/2026-03-06/kazahstanka-otkazalas-ot-kareri-top-menedzhera-vneftegaze-i-postroila-tsvetochnuyu-kompaniyu/ называет её основательницей; её YouTube youtube.com/watch?v=R4RbcVc8WSw даёт ссылку на aizhan.posh. WhatsApp 77775724444 — общая линия компании (кнопка WhatsApp и tel: на zakazbuketov.kz, «WhatsApp 8 777 572 4444» в подписях instagram.com/p/DfzNnLOiDdd), не личный номер. Факты: zakazbuketov.kz (11 лет, с 2015 года, первая цветочная франшиза Казахстана, 24/7, доставка 90 минут, к точному времени и к 00:00, «фото перед отправкой по просьбе, заменим букет, если не понравится», оплата из другой страны, мкр Керемет 5, к13); instagram.com/reel/Df7Bp29I8GO (фото перед отправкой и фотоотчёт о вручении, доставка к 00:00); цены instagram.com/reel/DfzIWAWo8Qc (Лавандовое кружево 24 900), instagram.com/p/DgCqnJ3iBe8 (ранункулюсы 56 725), instagram.com/p/DgAMFK4CDuj (Тёплое утро 202 465); цитата instagram.com/p/DfzNnLOiDdd (16.11). Кадры: их посты Df4mXZciBUU (белые розы), DgCqnJ3iBe8, DgAMFK4CDuj, DgC9Zc8CM3Q, Df2ErZlI32F, DgCbN1BCOIk, DfzNnLOiDdd, рилсы DgAMdqnIWnb, Df1NM9uoWlM, DfzIWAWo8Qc, DfuWEaloj3Y (только руки флористов), логотип zakazbuketov.kz/logo.svg. Повод: предзаказ новогодних корпоративных заказов, instagram.com/reel/Df9fbROIkO7 (20.11).",
+  "check": "Голос синтезированный, на слух не проверен; whisper услышал все слова как в тексте («Заказ Букетов», «ранункулюсы», «Керемет»). Герой в Дубае — образ, не их клиент: на сайте сказано, что оплатить можно из другой страны; сама Айжан живёт в Дубае, это может прочитаться как намёк на неё. Фото перед отправкой у них «по просьбе», поэтому в ролике «Попросить фото». Строка «На нём твой букет, уже у мамы» опирается на «фотоотчёт о вручении» из их рилса Df7Bp29I8GO, на сайте этого нет. «15 000 отзывов» из био не взял: на сайте другое число (8 000 оценок). Первая секунда блока «Заменят» идёт на размытой зелени (кадр их рилса). Белый букет, который размножается в начале, это их же букет. WhatsApp — общая линия компании, личного номера не нашёл. Гейты зелёные, static 2.4 %.",
+  "subject": "Моушн-ролик про ZakazBuketov",
+  "text": "Айжан, добрый день! Сделал моушн-ролик про ZakazBuketov: букет маме в Алматы, когда сам в Дубае, и фото до отправки. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под новогодние корпоративные заказы. Бесплатно."
+},
+{
   "id": "ms-ccs_edil",
   "date": "2026-11-23",
   "lang": "ru",
