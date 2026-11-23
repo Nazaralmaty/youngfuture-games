@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-victoria_style",
+  "date": "2026-11-24",
+  "lang": "ru",
+  "name": "Виктория Гезденюк · Victoria Style Shop",
+  "sub": "основательница магазинов женской одежды и обуви Victoria Style в Алматы и Астане, 253 671 подписчик, посты с ценой каждый день",
+  "avatar": "",
+  "poster": "img/ms-victoria_style.jpg",
+  "reel": "https://www.instagram.com/reel/DgGHwIBCDeZ/",
+  "clip": "Куртка, на которой от снега проявляется леопард · 38 с · nonstop-motion",
+  "episode": "https://victoriastyle.mssg.me",
+  "wa": "77476777805",
+  "email": "",
+  "ig": "vika_gezdenuk",
+  "src": "контакт: био @victoria_style_shop_almaty «Founder:@vika_gezdenuk», био @vika_gezdenuk «Founder : @victoria_style_shop_almaty @victoria_style_shop.astana» (ig_check api, 23.11.2026); WhatsApp 77476777805 = линия магазина (био бренда и victoriastyle.mssg.me), не личный. Факты: куртка с принтом 41 500 ₸ https://www.instagram.com/reel/DgEu0omKLfq/ (23.11) и https://www.instagram.com/p/DgCONlgDFmZ/ (22.11); Moon boot 45 500 ₸ https://www.instagram.com/p/DgEs5xlHEnP/ (23.11); комбинезон 65 500 ₸ https://www.instagram.com/p/Df9CDLcjHSF/ (20.11); адреса, часы, Kaspi Red: подпись https://www.instagram.com/reel/DgE8gVqMm1z/ (23.11); магазин: https://www.instagram.com/reel/Df_jsdYMDJK/; пакет: https://www.instagram.com/reel/DgCM3fKsb6L/",
+  "check": "Послушать голос: реплика «Сухо. Дождь. Снег. Одна куртка.» прочитана рублено и задела автоматический датчик повтора (3.0 слога/с), whisper услышал её дословно, повтора нет; в «Такая есть в Victoria Style» whisper не расслышал предлог «в» (слился). Фамилия «Гезденюк» выведена из ника vika_gezdenuk, в профиле только «Виктория». Слабое место: в кульминации их куртка вырезана из фото в снегу ниже капюшона (лицо модели убрано), поэтому сверху ровный срез, а леопард на ней виден слабо; крупно принт показан раньше, в кадрах из их рилса с распылителем. Чёрный пуховик в начале сгенерирован локально (FLUX), это не их товар. Цены с датой поста: куртка 41 500 и Moon boot 45 500 (23.11), комбинезон 65 500 (20.11), без скидок. Static ровно на пороге (4.9 % при лимите 5 %).",
+  "subject": "Ролик про Victoria Style: леопард, которому нужен снег",
+  "text": "Виктория, добрый день! Сделал моушн-ролик про Victoria Style: про куртку, на которой от снега проявляется леопард. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал. Можете выложить у себя.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под новогодние образы. Бесплатно."
+},
+{
   "id": "ms-omir_collection",
   "date": "2026-11-24",
   "lang": "ru",
