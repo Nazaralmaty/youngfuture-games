@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-jops_optics",
+  "date": "2026-11-23",
+  "lang": "ru",
+  "name": "Данияр Шайкемелов · JOPS optic",
+  "sub": "Сооснователь и CEO сети оптик JOPS (BRO Glasses): 40 салонов в Казахстане, Кыргызстане и Узбекистане, очки пакетом по одной цене; Forbes 30u30 2019; личный Instagram daniyarshaikemelov 8 123, компания jops.optics 34 035",
+  "avatar": "",
+  "poster": "img/ms-jops_optics.jpg",
+  "reel": "https://www.instagram.com/reel/DgE5_8VGXVi/",
+  "clip": "Ценник на оправе и сумма на кассе · 35 с · nonstop-motion",
+  "episode": "https://jopsoptics.com",
+  "wa": "",
+  "email": "",
+  "ig": "daniyarshaikemelov",
+  "src": "Связь: его био «Forbes 30u30… CEO @jops.optics, 40+ оптик в KZ KG UZ» (ig_check: api); Forbes «30 до 30», 2019: основатели BRO eyewear и JOPS https://forbes.kz/articles/30_moloje_30_-_jurnal_oktyabr_2019 ; YouTube 16.02.2024 «один из основателей и CEO компании BRO Glasses… более 40 точек» https://www.youtube.com/watch?v=N9fbH_Fx8EY . WhatsApp не найден: ни в био, ни на сайте номера нет (запись через https://jopsoptics.com/onlineAppointment). Факты: «JOPS — Just One Price Shop», пакеты Эконом 13 900 ₸, Стандарт 26 900 ₸ (линзы против бликов), Премиум 39 900 ₸, в цене проверка зрения, оправа, линзы, работа мастера, футляр, «без доплат по ходу», проверка зрения бесплатная и без предоплаты, 40 салонов, 16 городов, 3 страны, с 2015 года из Костаная, свои оправы с 2018: https://jopsoptics.com/ (23.11.2026). Цена пакета на табличке над полкой: https://www.instagram.com/reel/Df63vS8Ozp8/ . Кадры: их рилсы https://www.instagram.com/reel/Df9ih_Lu65t/ , https://www.instagram.com/reel/Dfo-djxOptT/ , https://www.instagram.com/reel/DfrAViuOnm4/ , https://www.instagram.com/reel/DfcH0iWOyGq/ , https://www.instagram.com/reel/De1YhMPO3gC/ , https://www.instagram.com/reel/DfFHmwSBOqH/ ; фото https://www.instagram.com/p/Df4UMRmDibt/ , https://www.instagram.com/p/DfB7oFZu0_H/ . Музыка Sports Highlights, Ahjay Stelino, Mixkit Free License.",
+  "check": "1) Голос никто не слушал ушами. Whisper делит «Оправу» в первой строке на «а праву» (аканье): проверить, что слово слышно. Строки 1, 2, 4 переозвучены один раз после правки текста. «Just One Price Shop» голос читает по-английски. 2) Главное утверждение «сумма та же, что на полке» опирается на сайт («всегда в одной цене, без доплат по ходу») и таблички пакетов над полками в их рилсе; на том же сайте оговорка: особые линзы мастер считает отдельно, в ролике про них ничего нет. 3) Чёрная оправа в завязке из их поста бренда 6Q, не JOPS; в развязке оправа JOPS. Стёкла в вырезках белёсые, оправы в «стене» (8–10 с) мелкие. 4) Шрифты сайта (Geologica, TT Hoves) в библиотеке нет, взят Nunito. Лиц нет (faces чистые), все гейты зелёные. ig.mp4 6,5 МБ, 37,7 с с нашей карточкой; копия лиду ig_clean.mp4 35,2 с. WhatsApp не найден, пишем в Instagram.",
+  "subject": "Моушн-ролик про JOPS",
+  "text": "Данияр, добрый день! Сделал моушн-ролик про JOPS: почему сумма на кассе та же, что на полке. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал. Можете выложить у себя.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под новогодний сезон. Бесплатно."
+},
+{
   "id": "ms-laroush_v2",
   "date": "2026-11-23",
   "lang": "ru",
