@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-laula_shop",
+  "date": "2026-11-24",
+  "lang": "ru",
+  "name": "Амина Илесова · LAULA",
+  "sub": "основатель LAULA (laula.shop.kz): вечерние платья из Турции, бутик в ТД «Fashion House», Астана; 83 тыс. подписчиков у магазина, 1,4 тыс. у неё",
+  "avatar": "",
+  "poster": "img/ms-laula_shop.jpg",
+  "reel": "https://www.instagram.com/reel/DgGhupFHGfN/",
+  "clip": "чёрное платье на общем фото · 38 с · nonstop-motion",
+  "episode": "https://www.instagram.com/laula.shop.kz/",
+  "wa": "77024143565",
+  "email": "",
+  "ig": "ilessova.amina",
+  "src": "роль: био https://www.instagram.com/ilessova.amina/ («founder: @laula.shop.kz») и https://www.instagram.com/laula.shop.kz/ («founder: @ilessova.amina»); WhatsApp wa.me/77024143565 из профиля магазина, линия компании; цены и адрес: https://www.instagram.com/reel/DgC54l0INez/ (22.11), https://www.instagram.com/reel/DfcXN0ioQnY/ (23 990), https://www.instagram.com/reel/DerbyNEI-R-/ (26 990), https://www.instagram.com/reel/De3rCttIudV/ (25 990, «с корсетом и без»); доставка день в день: био и https://www.instagram.com/reel/Df95EEfIQfR/",
+  "check": "Голос не прослушан: whisper услышал «Чёрная не виновата», «Лаола», «платье» вместо «платья», «Носись корсетом»: скорее всего безударные гласные, но нужно ухо. «Привезут сегодня» — это их «доставка по городу день в день», только Астана. Манекен с гладким платьем в начале сгенерирован (FLUX), не их товар. Модель в их роликах без лица: лицо закрыто телефоном или обрезано. Совпадение имени с клиентом «laula» (Laula Academy) проверяла главная сессия.",
+  "subject": "Моушн-ролик про LAULA",
+  "text": "Амина, добрый день! Сделал моушн-ролик про LAULA: как найти себя на общем фото, если все в чёрном. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под новогоднюю коллекцию. Бесплатно."
+},
+{
   "id": "ms-zufa",
   "date": "2026-11-24",
   "lang": "ru",
