@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-actual_optic",
+  "date": "2026-11-23",
+  "lang": "ru",
+  "name": "Анна Яковлева · Actual Optic",
+  "sub": "совладелец и CEO Actual Optic: сеть оптик и Центр оптометрии с 1998 года, Алматы и салоны по Казахстану; бренд 11,3 тыс. подписчиков, у неё 44,7 тыс.",
+  "avatar": "",
+  "poster": "img/ms-actual_optic.jpg",
+  "reel": "https://www.instagram.com/reel/DgFCyvuk8go/",
+  "clip": "одни очки вместо двух пар · 38 с · nonstop-motion",
+  "episode": "https://actualoptic.kz/",
+  "wa": "77018134331",
+  "email": "",
+  "ig": "anna_v_yakovleva",
+  "src": "роль: https://www.youtube.com/watch?v=8Z7416FDLkQ (BBDO CA, «совладелец и CEO»), https://weproject.media/articles/detail/sovladelitsa-i-generalnyy-direktor-actual-optic-o-puti-v-biznese-i-dele-zhizni/ ; её Instagram anna_v_yakovleva (био «Совладелец @actualoptic_kz», ig_check api); WhatsApp 77018134331 личный, из её био (wa.me); WhatsApp компании 77759263058 с https://actualoptic.kz/ ; факты: https://www.instagram.com/reel/Dfhal-bIsyo/ (прогрессивные линзы, 09.11), https://www.instagram.com/reel/De1ODZlojj0/ («раньше приходилось менять две пары», 23.10), https://www.instagram.com/reel/DfPfM1hIG3-/ (13 этапов), https://www.instagram.com/reel/DdqxjaPoX3z/ (VR-шлем), https://www.instagram.com/reel/DfrsN12oVei/ (адаптация), https://www.instagram.com/reel/DfZZ5ROIYlP/ (оправа Actual Club 0 ₸ при линзах Novax, до конца ноября), баннер сайта «Novax RX от 80 000 тг», https://actualoptic.kz/salonyi (ТРЦ Forum, G11A)",
+  "check": "Голос не прослушан ухом: whisper услышал строки как написаны (в строке 10 «движение глаз» вместо «движения»). Пары-«боль» и оправа на выстреле взяты из их каталога shop.actualoptic.kz (готовые очки AC102 и оправа TOM FORD FT6138), это не Actual Club; карточка «0 ₸» стоит на их видео с полкой Actual Club. «Novax RX от 80 000 ₸» с баннера сайта (условие акции «оправа в подарок»), акция до конца ноября: после 30.11 ролик устареет. Медицинских обещаний нет; про привыкание сказано «помогут» по их подписи 13.11, не «мгновенно». faces.py на мастере дал ложное срабатывание в 9.33 с на силуэт очков, отменено через face_ok_master с причиной, кадр проверен глазами. Слабое: в начале очки маленькие внизу кадра, середина пустая; на выстреле пустой контур второй пары плохо виден на бирюзовом. Писать лучше Анне в личный WhatsApp из её био; линия компании 77759263058.",
+  "subject": "Моушн-ролик про Actual Optic",
+  "text": "Анна, добрый день! Сделал моушн-ролик про Actual Optic: одни очки вместо двух пар, для дали и для чтения. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один про Центр оптометрии в Forum. Бесплатно."
+},
+{
   "id": "ms-margo_flowers",
   "date": "2026-11-23",
   "lang": "ru",
