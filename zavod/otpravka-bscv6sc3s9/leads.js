@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-twig_eyewear",
+  "date": "2026-11-24",
+  "lang": "ru",
+  "name": "Азиза Айбадуллина · TWIG x F/L",
+  "sub": "со-основатель TWIG x F/L, очки, магазины в Алматы и Астане, 20 тыс. подписчиков",
+  "avatar": "",
+  "poster": "img/ms-twig_eyewear.jpg",
+  "reel": "https://www.instagram.com/reel/DgGrmngjhZY/",
+  "clip": "какая форма очков твоя · 36 с · nonstop-motion",
+  "episode": "https://twigxfl.kz/",
+  "wa": "77780005971",
+  "email": "",
+  "ig": "twigbyzeezoo",
+  "src": "роль: bio @twigbyzeezoo «Со-основатель @twigxfl | @twigproduction», bio @twigxfl «Коллаборация @twigbyzeezoo x @fashionlab.kz»; WhatsApp +7 778 000 59 71 — линия компании из каждого поста (https://www.instagram.com/p/DfzA_dxscVt/), личный номер в её bio +77064136622 — рекламный; факты и цены: https://twigxfl.kz/ , https://twigxfl.kz/about , https://twigxfl.kz/information , посты DfCjqufjEeL, De4CqXXM8nH, Dd1jrevDMzW, DdO-GQ9DKyQ, Dfr6p2tjAPE, DehPT_FsmWL, DfUg8pdMqZU",
+  "check": "Голос не прослушан ухом: whisper узнал все 15 строк, строку «Твиг икс Эф-Эл» услышал как «Twig XFL» (0.67), проверь, как звучит название. Цены NICE 55 000 и NIKKI 45 000 ₸ взяты из карточек товара на twigxfl.kz; в списке на главной рядом стоит «ASCOT 59.000 ₸ 55.000 ₸», так что одну цену стоит сверить. Чёрная пара-двойник в начале сгенерирована (kie, одна генерация), это не их товар. Задник адресов (вывеска магазина из их рилса) мутный. Акция −50 % на вторую пару закончилась 23.11, в ролике её нет. Писать Азизе: она со-основатель по своему bio, WhatsApp в строке — линия компании.",
+  "subject": "Моушн-ролик про TWIG x F/L",
+  "text": "Азиза, добрый день! Сделал моушн-ролик про TWIG x F/L: как найти форму очков, которая идёт. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под новогодние подарки. Бесплатно."
+},
+{
   "id": "kl-biodetox",
   "date": "2026-11-24",
   "lang": "ru",
