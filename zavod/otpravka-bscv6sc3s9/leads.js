@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "gs-hub-china",
+  "date": "2026-11-27",
+  "lang": "ru",
+  "name": "Канат Кельдибеков",
+  "sub": "гость Hub Talks «Китай для стартапов» (канал Astana Hub) · основатель и CEO ApartX — ИИ-система для арендного жилья (на их сайте 6 200 объектов в 5 странах), @apart.x выпускает рилсы с октября",
+  "avatar": "",
+  "poster": "img/gs-hub-china.jpg",
+  "reel": "https://www.instagram.com/reel/DgOGPMNtfwa/",
+  "clip": "базар электроники в Шэньчжэне: у нас девайс собирают 3–4 месяца, может, полгода, в Китае — за день · с 38:07 · 44 с",
+  "episode": "https://www.youtube.com/watch?v=rw9EmthA7NQ",
+  "wa": "",
+  "email": "",
+  "ig": "keldibekov",
+  "src": "Выпуск https://www.youtube.com/watch?v=rw9EmthA7NQ (Astana Hub, 28.10.2026, 81 мин; в описании «Канат Кельдибеков, CEO и основатель стартапа ApartX», linkedin.com/in/keldibekov). Instagram keldibekov — Graph API business_discovery 27.11: «KANAT KELDIBEKOV | APARTX», био «Founder & CEO | @apart.x · Startup of the year, 21», сайт apartx.co, 931 подписчик, последний пост 30.05.2023 (https://www.instagram.com/p/Cs3NgZyLyMH/ — ApartX привлёк $250K от Big Sky Capital и Activat VC). Instagram apart.x — Graph 27.11: 2 740 подписчиков, рилсы 07.10, 12.10, 14.10.2026. Сайт https://apartx.co (apartx.kz ведёт туда): «B2B AI operating system for rental property management», 150K+ users, 6 200 properties, 5 countries, в команде «Kanat Keldibekov — Основатель и CEO». WhatsApp и email не найдены: нет в описании выпуска, на apartx.co, apartx.space и в обоих био.",
+  "check": "П1 Елжан не слушал (mp3 в партия_2026-11-27_zavod/П1/). Только Instagram: WhatsApp и email не нашлись; личный @keldibekov молчит с 2023, запасной — аккаунт компании @apart.x. «она раз — зашла в приложение» (34.8–35.3 с): машина трижды слышит «разошла», написано по смыслу — послушать. «Хуацянбэй» он говорит быстро, написано стандартно (华强北). Филлеры и вдохи машиной не проверены. Astana Hub — госфонд, ему не пишем. Гейт плавности зума красный на всех трёх рендерах (в последнем одно место, 41.2 с, внутри карточки прототипа) — отдан как есть по правилу «не перерендеривать».",
+  "subject": "Клип с вами из Hub Talks «Китай для стартапов»",
+  "text": "Канат, здравствуйте. Посмотрел Hub Talks «Китай для стартапов» и собрал клип с вами: базар в Шэньчжэне, где девайс собирают за день, а у нас на это уходят месяцы. С 38:07, 44 секунды. Слова ваши, я ничего не дописывал.\n\nКлип: {reel}\n\nСделать из этого выпуска ещё пару клипов с вами? Бесплатно."
+},
+{
   "id": "gs-spirin",
   "date": "2026-11-25",
   "lang": "ru",
