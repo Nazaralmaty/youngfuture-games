@@ -1,6 +1,6 @@
-// Walks the Tilda-copy quiz in headless Chrome: age stop shows «жарамайсыз» and the quiz can't go on (also after reload),
+// Walks the Tilda-copy quiz in headless Chrome: age stop shows a polite «Қызығушылығыңызға рақмет!» and the quiz can't go on (also after reload),
 // full path sends every answer, Pixel Lead after the sheet says ok, redirect to thanks.html, the same device then sees
-// «Өтінішіңіз бізде бар», a phone the sheet already has gets no second row and no Lead, failed send shows an error.
+// «Өтінішіңіз қабылданды» (also in a tab left open), a phone the sheet already has gets no second row and no Lead, failed send shows an error.
 // Then runs apps-script.gs on a fake sheet: the second lead with the same phone is refused.
 // node check.mjs            — asserts only
 // SHOTS=/some/dir node check.mjs — also saves screenshots
@@ -62,20 +62,20 @@ const h = await p.$$eval('.t-step-form__step_active label', ls => Math.min(...ls
 assert(h >= 44, `age answers ≥ 44 px tall (${h.toFixed(0)})`);
 const lockKind = p => p.$eval('#quiz-lock', e => e.dataset.kind + ' | ' + e.innerText.replace(/\s+/g, ' ')).catch(() => null);
 await tap(p, 0);
-assert((await lockKind(p))?.startsWith('stop | Рақмет! Бірақ сіз бізге жарамайсыз'), 'under 18: «Рақмет! Бірақ сіз бізге жарамайсыз»');
+assert((await lockKind(p))?.startsWith('stop | Қызығушылығыңызға рақмет! Өкінішке қарай'), 'under 18: «Қызығушылығыңызға рақмет! Өкінішке қарай…»');
 assert(await active(p) === '0' && p.posts.length === 0, 'under 18: quiz did not move on, nothing sent');
 assert(await p.evaluate(() => { const r = document.querySelector('.t-step-form__step_active label').getBoundingClientRect();
   return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2).closest('#quiz-lock') !== null; }), 'under 18: quiz is covered, nothing to tap');
 await shot(p, '01b_stop');
 await p.reload({ waitUntil: 'networkidle0' }); await wait(500);
 assert((await lockKind(p))?.startsWith('stop'), 'under 18: reload keeps the stop screen');
-await p.goto(p.url() + '?reset=1', { waitUntil: 'networkidle0' }); await wait(500);
-assert(await lockKind(p) === null, '?reset=1 opens the quiz again');
 p = await open(); await tap(p, 4);
 assert((await lockKind(p))?.startsWith('stop') && p.posts.length === 0, 'over 50: stop screen, nothing sent');
 
-// 2. full path
+// 2. full path (a second tab of the same browser is open at the form, to check it can't send again)
 p = await open();
+const tab2 = await open(375, p.browserContext());
+await p.bringToFront();
 await tap(p, 2);                               // 26–35
 assert(await active(p) === '1', 'adult age moves to «не үшін»');
 await shot(p, '02_goal');
@@ -97,13 +97,20 @@ assert(sent.get('age') === '26–35 жас' && sent.get('goal') === 'Шетел�
   'all answers, name and phone in the lead: ' + [...sent].map(x => x.join('=')).join(' | '));
 assert(p.url().endsWith('/thanks.html'), 'redirect to thanks.html');
 const ctx1 = p.browserContext();
+assert(await tab2.evaluate(() => document.getElementById('quiz-lock')?.dataset.kind) === 'sent', 'tab opened before the lead closes itself after the lead');
+await tab2.bringToFront();                    // a background tab is throttled, puppeteer calls hang
+await tab2.evaluate(() => document.getElementById('quiz-lock').remove());   // even with the screen torn off, no second send
+for (const i of [1, 0, 0, 0, 0]) await tap(tab2, i);
+await tab2.type('[name="Name"]', 'Тест'); await tab2.type('.t-input-phonemask', '7019998877');
+await tab2.click('.t-quiz__btn_submit'); await wait(1500);
+assert(tab2.posts.length === 0 && (await lockKind(tab2))?.startsWith('sent'), 'same browser, second submit: nothing sent, «қабылданды» back');
 await shot(p, '05_thanks');
 assert(await p.$eval('a.btn', a => a.href) === 'https://www.instagram.com/1eng.kz/', 'thank-you links to Instagram @1eng.kz');
 assert(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'thanks: no horizontal scroll');
 
 // same device comes back: no second lead
 let back = await open(375, ctx1);
-assert((await lockKind(back))?.startsWith('sent | Өтінішіңіз бізде бар'), 'same device after a lead: «Өтінішіңіз бізде бар», quiz closed');
+assert((await lockKind(back))?.startsWith('sent | Рақмет! Өтінішіңіз қабылданды'), 'same browser after a lead: «Өтінішіңіз қабылданды», quiz closed');
 await shot(back, '05b_sent');
 
 // another device, phone already in the sheet: no thanks, no Lead, «бізде бар»
@@ -111,7 +118,7 @@ p = await open(); p.dup = true;
 for (const i of [1, 0, 0, 0, 0]) await tap(p, i);
 await p.type('[name="Name"]', 'Тест'); await p.type('.t-input-phonemask', '7011234567');
 await p.click('.t-quiz__btn_submit'); await wait(1500);
-assert(!p.url().includes('thanks') && await leads(p) === 0 && (await lockKind(p))?.startsWith('sent'), 'duplicate phone: «бізде бар», no thanks, no Lead');
+assert(!p.url().includes('thanks') && await leads(p) === 0 && (await lockKind(p))?.startsWith('sent'), 'duplicate phone: «қабылданды» screen, no thanks, no Lead');
 
 // 3. failed send: error, no Lead, stays on the form
 p = await open(); p.fail = true;

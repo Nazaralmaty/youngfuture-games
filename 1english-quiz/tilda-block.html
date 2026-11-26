@@ -1,17 +1,17 @@
 <!-- ===== TILDA START ===== -->
 <script>
-/* 1English quiz lock. «18 жасқа дейін» / «50 жастан жоғары» → a full-screen «Рақмет! Бірақ сіз бізге жарамайсыз»,
+/* 1English quiz lock. «18 жасқа дейін» / «50 жастан жоғары» → a full-screen polite «Қызығушылығыңызға рақмет!»,
    the quiz can't be continued, nothing is sent, no Pixel Lead. After a lead (quizLock('sent')) the same device sees
-   «Өтінішіңіз бізде бар» instead of the quiz. The state lives in localStorage, so a reload keeps it; ?reset=1 clears it
-   (for testing). Same block works on the Tilda page (T123) once the age question has these exact answers. */
+   «Өтінішіңіз қабылданды» instead of the quiz: the browser remembers it (localStorage), reloads and other open tabs
+   included. To test again use an incognito window. Same block works on the Tilda page (T123) once the age question has these exact answers. */
 (function () {
   var KEY = '1eng_quiz_lock';
   var STOP = ['18 жасқа дейін', '50 жастан жоғары'];
   var TEXT = {
-    stop: ['Рақмет! Бірақ сіз бізге жарамайсыз', 'Біздің курстар 18–50 жас аралығындағы ересектерге арналған.'],
-    sent: ['Өтінішіңіз бізде бар', 'Өтінішті бір рет қана жіберуге болады. Менеджеріміз сізге жақында хабарласады.']
+    stop: ['Қызығушылығыңызға рақмет!', 'Өкінішке қарай, біздің курстар тек 18–50 жас аралығындағы ересектерге арналған. Сізге сәттілік тілейміз.'],
+    sent: ['Рақмет! Өтінішіңіз қабылданды', 'Менеджеріміз сізбен жақын арада байланысады.']
   };
-  function store(v) { try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch (e) {} }
+  function store(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
   function read() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
 
   window.quizLock = function (kind) {
@@ -30,9 +30,9 @@
     document.body.appendChild(d);
   };
 
-  if (/[?&]reset=1/.test(location.search)) store(null);
   var was = read();
   if (TEXT[was]) window.quizLock(was);
+  window.addEventListener('storage', function (e) { if (e.key === KEY && TEXT[e.newValue]) window.quizLock(e.newValue); });  // other open tabs
 
   document.addEventListener('change', function (e) {
     var t = e.target;
