@@ -217,16 +217,45 @@ src="https://www.facebook.com/tr?id=2168758820343543&ev=PageView&noscript=1"
 /></noscript> <!-- End Meta Pixel Code --> <!-- nominify end --> </div> </div> </div> </div> </div> <!--/allrecords-->  
 <!-- ===== TILDA START ===== -->
 <script>
-/* 1English quiz: «18 жасқа дейін» / «50 жастан жоғары» closes the page; nothing is sent, no Pixel Lead.
-   Same block works on the Tilda page (T123) once the age question is added there with these exact answers. */
+/* 1English quiz lock. «18 жасқа дейін» / «50 жастан жоғары» → a full-screen «Рақмет! Бірақ сіз бізге жарамайсыз»,
+   the quiz can't be continued, nothing is sent, no Pixel Lead. After a lead (quizLock('sent')) the same device sees
+   «Өтінішіңіз бізде бар» instead of the quiz. The state lives in localStorage, so a reload keeps it; ?reset=1 clears it
+   (for testing). Same block works on the Tilda page (T123) once the age question has these exact answers. */
 (function () {
+  var KEY = '1eng_quiz_lock';
   var STOP = ['18 жасқа дейін', '50 жастан жоғары'];
+  var TEXT = {
+    stop: ['Рақмет! Бірақ сіз бізге жарамайсыз', 'Біздің курстар 18–50 жас аралығындағы ересектерге арналған.'],
+    sent: ['Өтінішіңіз бізде бар', 'Өтінішті бір рет қана жіберуге болады. Менеджеріміз сізге жақында хабарласады.']
+  };
+  function store(v) { try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch (e) {} }
+  function read() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+
+  window.quizLock = function (kind) {
+    store(kind);
+    if (document.getElementById('quiz-lock')) return;
+    var d = document.createElement('div');
+    d.id = 'quiz-lock'; d.setAttribute('role', 'alert'); d.dataset.kind = kind;
+    d.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:#fff;display:flex;flex-direction:column;'
+      + 'align-items:center;justify-content:center;text-align:center;padding:24px;font-family:TildaSans,Arial,sans-serif;color:#313f53;';
+    d.innerHTML = '<img alt="1English" style="height:40px;margin-bottom:32px" src="https://static.tildacdn.pro/tild3135-6432-4537-a233-306232336166/Group_33.png">'
+      + '<h1 style="margin:0 0 16px;font-size:26px;line-height:1.25;font-weight:600;max-width:560px"></h1>'
+      + '<p style="margin:0;font-size:17px;line-height:1.55;max-width:560px"></p>';
+    d.querySelector('h1').textContent = TEXT[kind][0];
+    d.querySelector('p').textContent = TEXT[kind][1];
+    document.documentElement.style.overflow = 'hidden';
+    document.body.appendChild(d);
+  };
+
+  if (/[?&]reset=1/.test(location.search)) store(null);
+  var was = read();
+  if (TEXT[was]) window.quizLock(was);
+
   document.addEventListener('change', function (e) {
     var t = e.target;
     if (t.type !== 'radio' || STOP.indexOf(t.value.trim()) < 0) return;
     e.stopImmediatePropagation();                                   // the quiz must not move on
-    window.close();                                                 // works only where the browser allows it
-    setTimeout(function () { location.replace('about:blank'); }, 150);  // otherwise: blank page, Back can't return
+    window.quizLock('stop');
   }, true);
 })();
 </script>
@@ -261,6 +290,7 @@ src="https://www.facebook.com/tr?id=2168758820343543&ev=PageView&noscript=1"
     new URLSearchParams(location.search).forEach(function (v, k) { if (/^utm_|^fbclid$/.test(k)) data[k] = v.slice(0, 200); });
 
     function done() {
+      try { localStorage.setItem('1eng_quiz_lock', 'sent'); } catch (e) {}   // next visit from this device: «Өтінішіңіз бізде бар»
       if (SHEET_URL && window.fbq) fbq('track', 'Lead');
       setTimeout(function () { location.href = THANKS + (SHEET_URL ? '' : '?test=1'); }, SHEET_URL ? 500 : 0);  // let the Pixel beacon leave
     }
@@ -275,7 +305,10 @@ src="https://www.facebook.com/tr?id=2168758820343543&ev=PageView&noscript=1"
     var ctl = new AbortController(); setTimeout(function () { ctl.abort(); }, 15000);
     fetch(SHEET_URL, { method: 'POST', body: new URLSearchParams(data), signal: ctl.signal })
       .then(function (r) { return r.json(); })
-      .then(function (j) { if (!j.ok) throw new Error(j.error); done(); })
+      .then(function (j) {
+        if (j.error === 'duplicate') return window.quizLock('sent');   // this phone already left a lead: no second row, no Lead
+        if (!j.ok) throw new Error(j.error); done();
+      })
       .catch(fail);
   }
 })();

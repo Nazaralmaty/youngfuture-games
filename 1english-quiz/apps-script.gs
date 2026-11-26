@@ -21,19 +21,35 @@ function doPost(e) {
   if (name.length < 2 || !/^7\d{10}$/.test(phone)) return json({ ok: false, error: 'bad_input' });
   if (LEAD_AGES.indexOf(p.age) === -1) return json({ ok: false, error: 'not_lead' });
 
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sh = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
-  if (sh.getLastRow() === 0) {
-    sh.appendRow(COLUMNS.map(function (c) { return c[1]; }));
-    sh.setFrozenRows(1);
-  }
+  var lock = LockService.getScriptLock();                          // two taps at once must not both pass the check
+  lock.waitLock(20000);
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sh = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
+    if (sh.getLastRow() === 0) {
+      sh.appendRow(COLUMNS.map(function (c) { return c[1]; }));
+      sh.setFrozenRows(1);
+    }
+    if (hasPhone(sh, phone)) return json({ ok: false, error: 'duplicate' });   // one number = one lead
+    append(sh, p, phone);
+  } finally { lock.releaseLock(); }
+  return json({ ok: true });
+}
+
+function hasPhone(sh, phone) {
+  var n = sh.getLastRow() - 1;
+  if (n < 1) return false;
+  var col = COLUMNS.map(function (c) { return c[0]; }).indexOf('phone') + 1;
+  return sh.getRange(2, col, n, 1).getValues().some(function (r) { return String(r[0]).replace(/\D/g, '') === phone; });
+}
+
+function append(sh, p, phone) {
   sh.appendRow(COLUMNS.map(function (c) {
     var k = c[0];
     if (k === 'ts') return new Date();
     if (k === 'phone') return "'+" + phone;                         // keep as text, not a number
     return safe(p[k]);
   }));
-  return json({ ok: true });
 }
 
 function doGet() { return json({ ok: true, hint: 'POST only' }); }

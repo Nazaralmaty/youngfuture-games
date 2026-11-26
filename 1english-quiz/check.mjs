@@ -1,5 +1,7 @@
-// Walks the Tilda-copy quiz in headless Chrome: age stop closes the page, full path sends every answer,
-// Pixel Lead after the sheet says ok, redirect to thanks.html, failed send shows an error and no Lead.
+// Walks the Tilda-copy quiz in headless Chrome: age stop shows «жарамайсыз» and the quiz can't go on (also after reload),
+// full path sends every answer, Pixel Lead after the sheet says ok, redirect to thanks.html, the same device then sees
+// «Өтінішіңіз бізде бар», a phone the sheet already has gets no second row and no Lead, failed send shows an error.
+// Then runs apps-script.gs on a fake sheet: the second lead with the same phone is refused.
 // node check.mjs            — asserts only
 // SHOTS=/some/dir node check.mjs — also saves screenshots
 import { createRequire } from 'module';
@@ -17,8 +19,8 @@ const assert = (c, m) => { if (!c) { console.error('FAIL', m); process.exitCode 
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
 const browser = await puppeteer.launch({ headless: 'new', executablePath: process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' });
-async function open(width = 375) {
-  const page = await browser.newPage();
+async function open(width = 375, ctx) {            // own context per visitor = own localStorage
+  const page = await (ctx || await browser.createBrowserContext()).newPage();
   await page.setViewport({ width, height: 812, deviceScaleFactor: 2 });
   page.errors = []; page.posts = [];
   page.on('pageerror', e => page.errors.push(e.message));
@@ -28,7 +30,7 @@ async function open(width = 375) {
     const u = r.url();
     if (u.startsWith('https://script.google.com')) {
       page.posts.push(r.postData());
-      return r.respond({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: page.fail ? 'oops' : '{"ok":true}' });
+      return r.respond({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: page.fail ? 'oops' : page.dup ? '{"ok":false,"error":"duplicate"}' : '{"ok":true}' });
     }
     if (/tildaapi|forms\.tilda/.test(u)) { page.posts.push('TILDA ' + u); return r.abort(); }   // must never happen
     if (u.includes('facebook')) return r.respond({ status: 200, contentType: 'text/javascript', body: '' });
@@ -58,11 +60,19 @@ assert(await active(p) === '0', 'first screen is the age question');
 assert(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), '375 px: no horizontal scroll');
 const h = await p.$$eval('.t-step-form__step_active label', ls => Math.min(...ls.map(l => l.getBoundingClientRect().height)));
 assert(h >= 44, `age answers ≥ 44 px tall (${h.toFixed(0)})`);
+const lockKind = p => p.$eval('#quiz-lock', e => e.dataset.kind + ' | ' + e.innerText.replace(/\s+/g, ' ')).catch(() => null);
 await tap(p, 0);
-assert(p.url() === 'about:blank', 'under 18 closes the page');
-assert(p.posts.length === 0, 'under 18: nothing sent');
+assert((await lockKind(p))?.startsWith('stop | Рақмет! Бірақ сіз бізге жарамайсыз'), 'under 18: «Рақмет! Бірақ сіз бізге жарамайсыз»');
+assert(await active(p) === '0' && p.posts.length === 0, 'under 18: quiz did not move on, nothing sent');
+assert(await p.evaluate(() => { const r = document.querySelector('.t-step-form__step_active label').getBoundingClientRect();
+  return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2).closest('#quiz-lock') !== null; }), 'under 18: quiz is covered, nothing to tap');
+await shot(p, '01b_stop');
+await p.reload({ waitUntil: 'networkidle0' }); await wait(500);
+assert((await lockKind(p))?.startsWith('stop'), 'under 18: reload keeps the stop screen');
+await p.goto(p.url() + '?reset=1', { waitUntil: 'networkidle0' }); await wait(500);
+assert(await lockKind(p) === null, '?reset=1 opens the quiz again');
 p = await open(); await tap(p, 4);
-assert(p.url() === 'about:blank', 'over 50 closes the page');
+assert((await lockKind(p))?.startsWith('stop') && p.posts.length === 0, 'over 50: stop screen, nothing sent');
 
 // 2. full path
 p = await open();
@@ -86,9 +96,22 @@ assert(sent.get('age') === '26–35 жас' && sent.get('goal') === 'Шетел�
   && sent.get('since') === 'Әлі бастамадым.' && sent.get('ready') === 'Иә, дәл қазір бастаймын' && sent.get('name') === 'Тест Тестов' && sent.get('phone') === '77011234567',
   'all answers, name and phone in the lead: ' + [...sent].map(x => x.join('=')).join(' | '));
 assert(p.url().endsWith('/thanks.html'), 'redirect to thanks.html');
+const ctx1 = p.browserContext();
 await shot(p, '05_thanks');
 assert(await p.$eval('a.btn', a => a.href) === 'https://www.instagram.com/1eng.kz/', 'thank-you links to Instagram @1eng.kz');
 assert(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'thanks: no horizontal scroll');
+
+// same device comes back: no second lead
+let back = await open(375, ctx1);
+assert((await lockKind(back))?.startsWith('sent | Өтінішіңіз бізде бар'), 'same device after a lead: «Өтінішіңіз бізде бар», quiz closed');
+await shot(back, '05b_sent');
+
+// another device, phone already in the sheet: no thanks, no Lead, «бізде бар»
+p = await open(); p.dup = true;
+for (const i of [1, 0, 0, 0, 0]) await tap(p, i);
+await p.type('[name="Name"]', 'Тест'); await p.type('.t-input-phonemask', '7011234567');
+await p.click('.t-quiz__btn_submit'); await wait(1500);
+assert(!p.url().includes('thanks') && await leads(p) === 0 && (await lockKind(p))?.startsWith('sent'), 'duplicate phone: «бізде бар», no thanks, no Lead');
 
 // 3. failed send: error, no Lead, stays on the form
 p = await open(); p.fail = true;
@@ -102,3 +125,21 @@ await shot(p, '06_fail');
 const errs = p.errors.filter(e => !/favicon|ERR_FAILED|net::/.test(e));
 assert(errs.length === 0, 'no console errors ' + errs.join(' | '));
 await browser.close();
+
+// 4. apps-script.gs on a fake sheet
+{
+  const rows = [];
+  const sh = { getLastRow: () => rows.length, appendRow: r => rows.push(r), setFrozenRows() {},
+    getRange: (r, c, n) => ({ getValues: () => rows.slice(r - 1, r - 1 + n).map(x => [String(x[c - 1]).replace(/^'/, '')]) }) };
+  let locked = 0;
+  const gas = new Function('SpreadsheetApp', 'LockService', 'ContentService', fs.readFileSync(new URL('apps-script.gs', dir), 'utf8') + '; return doPost;')(
+    { getActiveSpreadsheet: () => ({ getSheetByName: () => sh }) },
+    { getScriptLock: () => ({ waitLock() { locked++; }, releaseLock() { locked--; } }) },
+    { MimeType: {}, createTextOutput: t => ({ setMimeType() { return JSON.parse(t); } }) });
+  const lead = (phone, age = '26–35 жас') => gas({ parameter: { name: 'Тест', phone, age } });
+  assert(lead('77011234567').ok === true && rows.length === 2, 'sheet: first lead written');
+  assert(lead('77011234567').error === 'duplicate' && rows.length === 2, 'sheet: same phone again refused, no second row');
+  assert(lead('77019998877').ok === true && rows.length === 3, 'sheet: another phone written');
+  assert(lead('77010000000', '18 жасқа дейін').error === 'not_lead' && rows.length === 3, 'sheet: under 18 refused even when posted directly');
+  assert(locked === 0, 'sheet: lock always released');
+}
