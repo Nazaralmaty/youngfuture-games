@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-tumar_carpets",
+  "date": "2026-11-28",
+  "lang": "ru",
+  "name": "Tumar Carpets · Астана",
+  "sub": "Галерея ковров ручной работы в Астане и Алматы, около 1 000 изделий, 165 тыс. подписчиков в Instagram",
+  "avatar": "",
+  "poster": "img/ms-tumar_carpets.jpg",
+  "reel": "https://www.instagram.com/reel/DgQhjOQg3oy/",
+  "clip": "шёлк на ярлыке и 7 лет · 32 с · ui",
+  "episode": "https://tumar-carpets.kz/",
+  "wa": "77001782626",
+  "email": "",
+  "ig": "tumar.carpets",
+  "src": "контакт: компания, Instagram tumar.carpets (https://www.instagram.com/tumar.carpets/); WhatsApp 77001782626 — линия компании (сайт https://tumar-carpets.kz/ wa.me/+77001782626, taplink https://tumar-carpets.taplink.kz); факты: https://www.instagram.com/reel/DgJk5Qmtq0R/ (160 000 узлов на м², арт-шёлк 5–7 лет, мягче с каждым годом), https://www.instagram.com/reel/DgH53sKtv8D/ (замер и примерка дома, бесплатный выезд), https://www.instagram.com/reel/DgNAIvvNf_6/ (бесплатная примерка дома), https://www.instagram.com/reel/Df7KuzuNrbI/ (напишите нам, выезд с замером), https://tumar-carpets.kz/page/about-us (около 1 000 изделий, Астана и Алматы); кадры из их рилсов Dft8jxwofC2, DgJk5Qmtq0R, DfrReKXNHNL; логотип с сайта",
+  "check": "Основатель не подтверждён: в ролике, сообщении и name человека нет, пишем компании (директ или WhatsApp компании). Не слушано ухом: синтез говорит «Тумар Карпетс», whisper слышит «Карпец / Корпец»; «назначьте» whisper слышит как «назначите». В хуке слева их ковёр, справа нейтральная карточка-текстура «шёлк»? (не их товар), она сереет на «отслужит»; из-за этого «блестят одинаково» в кадре читается слабее. В кадрах их рилсов есть их вшитые субтитры (мелко, внутри телефона).",
+  "subject": "Моушн-ролик про Tumar Carpets",
+  "text": "Добрый день! Сделал моушн-ролик про Tumar Carpets: как по составу и узлам выбрать ковёр, который через семь лет станет мягче. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под коллекцию килимов. Бесплатно."
+},
+{
   "id": "ms-rooms_mebel",
   "date": "2026-11-28",
   "lang": "ru",
