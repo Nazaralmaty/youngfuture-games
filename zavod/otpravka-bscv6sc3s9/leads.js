@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-naomi_home_textile",
+  "date": "2026-11-27",
+  "lang": "ru",
+  "name": "Naomi Home Textile · Караганда",
+  "sub": "магазин домашнего текстиля в Караганде (Бухар Жырау 60): постельное, пледы, одеяла, ковры, доставка по Казахстану; Instagram 410,5 тыс.",
+  "avatar": "",
+  "poster": "img/ms-naomi_home_textile.jpg",
+  "reel": "https://www.instagram.com/reel/DgQCzz3RLUQ/",
+  "clip": "ковёр, на который детям нельзя → можно · ~30 с · nonstop-motion ui",
+  "episode": "https://www.instagram.com/naomi_home_textile/",
+  "wa": "77074283390",
+  "email": "",
+  "ig": "naomi_home_textile",
+  "src": "Instagram @naomi_home_textile (Graph business_discovery 27.11.2026, _src/ig.json): bio (Караганда, Бухар Жырау 60, доставка по РК); микрофибра: https://www.instagram.com/reel/DgOwpXYIBuy/ и https://www.instagram.com/reel/DgJnzeDBGGk/ (не скользит, пылесос не задирает, стирка в машине, не линяет, 120×120, 150×150), https://www.instagram.com/p/DgMRYlXgtBq/ (50×70, 80×120), https://www.instagram.com/reel/DgKLrP7IOQz/ (для семей с детками или животными), https://www.instagram.com/reel/DgJ2eDZsLub/ (кофейни), https://www.instagram.com/reel/DgK8WkUony6/ («Для заказа напишите нам в WhatsApp»). Кадры: их рилсы DgJ2eDZsLub (детская, основа, стакан, машинки, футбол) и DgKkFC1oQnl (вывеска, полки). WhatsApp 77074283390 = линия заказов компании (taplink.cc/naomi_home_textile «Онлайн заказ, Доставка по всему Казахстану»).",
+  "check": "Контакт = линия заказов компании, основатель не найден (Gate 1 снят Елжаном 27.11), человек нигде не назван. Голос Kore через OpenRouter (kie не отвечал), на слух не проверен: «Ждать» в строке 2 первый whisper услышал как «Штать», второй — верно; «Наоми Хоум» читается по-русски. Цен в ролике нет: у них скидки до 29.11. Лица сотрудников и детей из их видео обрезаны (faces.py clips чисто).",
+  "subject": "Моушн-ролик про Naomi Home",
+  "text": "Добрый день! Сделал моушн-ролик про Naomi Home: новый ковёр, на который детям нельзя, и почему с микрофиброй можно. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под новогодние корпоративные заказы. Бесплатно."
+},
+{
   "id": "ms-atasu_group",
   "date": "2026-11-27",
   "lang": "ru",
