@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "gs-gitelman-interiors",
+  "date": "2026-11-27",
+  "lang": "ru",
+  "name": "Бермет Акназарова",
+  "sub": "гостья выпуска у Павла Гительмана (21.11.2026, 87,5 тыс. подписчиков) · Sarketch Group — архитектура и интерьеры, Бишкек и Дубай; @bermetaknazarova 101 910 в Instagram",
+  "avatar": "",
+  "poster": "img/gs-gitelman-interiors.jpg",
+  "reel": "https://www.instagram.com/reel/DgOe0k9oBBJ/",
+  "clip": "200 долларов взаймы на первый лэптоп, офис в кофейне → 30 человек в 30 м² · с 13:24 · 50 с",
+  "episode": "https://www.youtube.com/watch?v=pMob4BHvYts",
+  "wa": "996888811811",
+  "email": "info@sarketch.com",
+  "ig": "bermetaknazarova",
+  "src": "Выпуск https://www.youtube.com/watch?v=pMob4BHvYts (21.11.2026, 93:15; канал «Павел Гительман | Бизнес», 87 500 подписчиков, yt-dlp 27.11); фрагмент 13:24–14:07 и 39:03–39:21. Кто есть кто: «У нас с Айсулу…» (12:58) говорит светловолосая сестра — Бермет; её фото профиля совпадает. Instagram bermetaknazarova — Graph API business_discovery 27.11: «Bermet Aknazarova», 101 910 подписчиков, 881 публикация, «Entrepreneur • Luxury • Design»; сестра пишет ей «Love you aisuluuaknazarova» в посте https://www.instagram.com/reel/DWnsvuxAnbY/. Компания: @aisuluuaknazarova (112 254) — «Co-founder of Sarketch Group @sarketch_designgroup», сайт https://www.sarketchgroup.com. WhatsApp 996888811811 — кнопка «Start a new project!» (wa.me) в шапке https://www.sarketchgroup.com; info@sarketch.com — подвал того же сайта («165 Panfilov Street, Bishkek»). @sarketch_designgroup (9 765) ведёт рубрику «Дневники из офиса Sarketch» (18.11.2026).",
+  "check": "П1 Елжан не слушал (mp3 в партия_2026-11-27_zavod2/П1/). Филлеры и вдохи машиной не проверены (Scribe закрыт); два «э» вырезаны вручную по карте энергии — послушать 3.9 с («долларов | для того») и 32.6 с («чтобы | обустроить»). Клип склеен из двух мест выпуска с разницей 25 минут (интервью в студии 13:24–14:07 и проход по офису 39:03–39:21): на 34.3 с меняются место и громкость. WhatsApp и почта — общие линии компании с сайта sarketchgroup.com, не её личные; лично ей — Instagram. Пишем Бермет, не Гительману: ему демо уже уходило.",
+  "subject": "Клип с вами из выпуска у Павла Гительмана",
+  "text": "Бермет, здравствуйте. Посмотрел выпуск у Павла Гительмана и собрал клип с вами: 200 долларов взаймы на первый лэптоп, кофейня вместо офиса и 30 человек в 30 квадратах. Слова ваши, я ничего не дописывал.\n\nКлип: {reel}\n\nВ выпуске есть ещё 5 таких мест. Сделать из них клипы? Бесплатно."
+},
+{
   "id": "zs-nikitin-sport",
   "date": "2026-11-27",
   "lang": "ru",
