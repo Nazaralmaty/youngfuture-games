@@ -5,6 +5,32 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-prostretching",
+  "date": "2026-11-27",
+  "lang": "ru",
+  "name": "PROSTRETCHING · Алматы",
+  "sub": "Женская фитнес-студия: стретчинг, аэростретчинг, пилатес, functional; 8 направлений, 3 филиала в Алматы, 66,8 тыс. подписчиков",
+  "avatar": "",
+  "poster": "img/ms-prostretching.jpg",
+  "reel": "https://www.instagram.com/reel/DgP-wNhxpNR/",
+  "clip": "До пола не хватает ладони · 31 с · nonstop-motion ui",
+  "episode": "https://www.instagram.com/prostretching/",
+  "wa": "77059660090",
+  "email": "",
+  "ig": "prostretching",
+  "src": [
+    "https://www.instagram.com/prostretching/ (bio: 8 направлений, 3 филиала, wa.me/7059660090)",
+    "https://www.instagram.com/reel/DeJ3Isyoqd1/ (более 40 000 учениц, телефон для записи)",
+    "https://www.instagram.com/reel/DgPb_yuPiKU/ (разогрев → растяжка, продольный / поперечный шпагат, «начать можно с любым уровнем гибкости», CTA)",
+    "https://www.instagram.com/reel/DdTnzUAoYHj/ (надпись #ШПАГАТВСЕМ на стене студии)",
+    "https://www.instagram.com/reel/DegcOxtI9TA/ (адреса трёх филиалов)",
+    "https://www.instagram.com/reel/Dfjd10BuX4s/, https://www.instagram.com/reel/DeEa9pWIbkU/, https://www.instagram.com/reel/DcdXQTpIoZp/, https://www.instagram.com/reel/DcGSihaou7o/ (названия направлений)"
+  ],
+  "check": "Контакт — сама студия (директ и WhatsApp студии из био), основатель не найден, имя человека в ролике и сообщении не названо. Из 8 направлений в постах названы 7, на экране только эти 7. Лица клиенток вырезаны: кадры занятий взяты только там, где лиц нет (faces.py чисто). Логотип набран шрифтом DIN Condensed, похожим на их вывеску, а не вырезан из файла. Голос синтезированный (OpenRouter, один дубль), на слух не проверен: в первой строке whisper услышал «ладоней» вместо «ладони», и «Pro Stretching» читается раздельно.",
+  "subject": "Моушн-ролик про PROSTRETCHING",
+  "text": "Добрый день! Сделал моушн-ролик про PROSTRETCHING: про ту, кому до пола не хватает ладони и кто откладывает растяжку на потом. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под следующую серию «Направлений». Бесплатно."
+},
+{
   "id": "ms-royal_club_shymkent",
   "date": "2026-11-27",
   "lang": "ru",
