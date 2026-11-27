@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-rauan_ranch",
+  "date": "2026-11-27",
+  "lang": "ru",
+  "name": "Rauan Ranch · Шымкент",
+  "sub": "семейная зона отдыха в Шымкенте: рыбалка, аквазона, коттеджи, боулинг, зал торжеств; Instagram 48,6 тыс.",
+  "avatar": "",
+  "poster": "img/ms-rauan_ranch.jpg",
+  "reel": "https://www.instagram.com/reel/DgP9yl_hEJQ/",
+  "clip": "рыбалка, боулинг и выспаться: уступать никому · ~31 с · nonstop-motion ui",
+  "episode": "https://rauan-ranch.kz",
+  "wa": "77012227563",
+  "email": "",
+  "ig": "rauan_ranch",
+  "src": "Instagram @rauan_ranch (Graph business_discovery 27.11.2026, _src/ig.json): bio, посты https://www.instagram.com/reel/Dfb976VRCGw/ (спортивная рыбалка 24/7), https://www.instagram.com/p/DfRWaqMRZXM/ (финский домик на 2 семьи + 4 завтрака + 1 час боулинга), https://www.instagram.com/p/Del9137xObm/ (CTA «Бронируйте отдых в Rauan Ranch!»); WhatsApp 77012227563 = линия бронирования компании (bio wa.me + https://www.instagram.com/reel/DfZIt_cxCDB/). Сайт rauan-ranch.kz из строки не открывается.",
+  "check": "Контакт = линия бронирования компании, основатель не найден (Gate 1 снят Елжаном 27.11), имя из строки скаута не проверено и нигде не названо. Озвучки нет: kie TTS трижды отдал timeout 27.11, ролик собран на тихой заглушке, мастера нет. Акция домика по их постеру действует в будни до конца ноября: в ролике без цены и без дат, но к декабрю может кончиться. Лица гостей вырезаны (faces.py clips чисто).",
+  "subject": "Моушн-ролик про Rauan Ranch",
+  "text": "Добрый день! Сделал моушн-ролик про Rauan Ranch: папа хочет на рыбалку, дети в боулинг, мама выспаться, и уступать никому не надо. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под новогодние корпоративы. Бесплатно."
+},
+{
   "id": "gs-gitelman-interiors",
   "date": "2026-11-27",
   "lang": "ru",
