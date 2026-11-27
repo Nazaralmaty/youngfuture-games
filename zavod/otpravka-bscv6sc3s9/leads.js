@@ -5,6 +5,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-diamantnoir_astana",
+  "date": "2026-11-27",
+  "lang": "ru",
+  "name": "Diamant Noir · Астана",
+  "sub": "ювелирные салоны в Астане: золото с бриллиантами и камнями ручной работы, «от производителя», три салона (ТЦ Евразия, ТЦ Жаннур, Radisson); Instagram 14,7 тыс.",
+  "avatar": "",
+  "poster": "img/ms-diamantnoir_astana.jpg",
+  "reel": "https://www.instagram.com/reel/DgQD2Lzwox1/",
+  "clip": "кольцо без цепочки чужих рук: от мастера до белой перчатки · 37 с · nonstop-motion ui",
+  "episode": "https://www.instagram.com/diamantnoir_astana/",
+  "wa": "",
+  "email": "",
+  "ig": "diamantnoir_astana",
+  "src": "Instagram @diamantnoir_astana (Graph business_discovery 27.11.2026, _src/ig.json): bio («Российское сырье, создано Армянскими ювелирными мастерами @matanijewelry», «Изделия из ЗОЛОТА с бриллиантами … от ПРОИЗВОДИТЕЛЯ»); https://www.instagram.com/p/DgPRy-bDglz/ (ручная работа, собственное производство, натуральные бриллианты напрямую от производителя, три салона, «Ждём вас в ювелирных салонах DIAMANT NOIR»); https://www.instagram.com/reel/DfuBTqVuG1Y/ (комплект: вес 8,04 гр, бриллиант 1,05 крт); клипы из https://www.instagram.com/reel/DgEl4FrIPpw/ , https://www.instagram.com/reel/DfZVJTOuTRd/ , https://www.instagram.com/reel/DgO8ByFO5yR/ , https://www.instagram.com/reel/Df6giGqOIzH/ , https://www.instagram.com/reel/DfwE7OPMnjW/ ; логотип с финального кадра их роликов. Сайта нет; WhatsApp в bio и подписях не найден.",
+  "check": "Контакт = компания, только директ Instagram (WhatsApp не найден; телефон из 2GIS в заметке скаута не проверен). Основатель не подтверждён (запись EXPONET армянского ИП), по правилу партии никто не назван, лиц нет: только руки, перчатки, коробки, витрина. Голос Kore через OpenRouter, один дубль: проверить ушами «Диамант Нуар», «Жаннур» (голос мог сказать «Жанур») и «Рэдиссон» (whisper: «Редисон»). «Без цепочки» и «последние чужие руки в белой перчатке» = драматизация их «напрямую от производителя», не их слова. Детектор лиц принял кулак в клипе кольца за лицо: клип ужат кропом, один кадр заменён соседним. Цены и Black Friday не звучат. Микс не слушан.",
+  "subject": "Моушн-ролик про Diamant Noir",
+  "text": "Добрый день! Сделал моушн-ролик про Diamant Noir: как кольцо идёт от армянских мастеров к руке покупательницы без цепочки посредников. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под новогодние подарки. Бесплатно."
+},
+{
   "id": "ms-naomi_home_textile",
   "date": "2026-11-27",
   "lang": "ru",
