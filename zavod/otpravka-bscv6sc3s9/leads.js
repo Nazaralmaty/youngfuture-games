@@ -6,6 +6,25 @@
 // wa: цифры номера (текст подставится сам) или ссылка wa.me/message/… (текст копируется).
 window.LEADS = [
 {
+  "id": "ms-main_almaty",
+  "date": "2026-11-28",
+  "lang": "ru",
+  "name": "MAIN beauty salon · Алматы",
+  "sub": "Сеть салонов красоты MAIN, 4 салона в Алматы, @main.almaty, 32 тыс. подписчиков",
+  "avatar": "",
+  "poster": "img/ms-main_almaty.jpg",
+  "reel": "https://www.instagram.com/reel/DgRDpO3NmSR/",
+  "clip": "запись на декабрь · 32 с · моушн ui",
+  "episode": "https://taplink.cc/main.almaty",
+  "wa": "77089000283",
+  "email": "",
+  "ig": "main.almaty",
+  "src": "instagram.com/main.almaty (био: 4 адреса, Direct 10:00-20:00); taplink.cc/main.almaty (wa.me/77089000283, запись ЖК Comfort City, номер компании); 2GIS (тот же номер, по скауту); instagram.com/reel/Df8705QAQyT (запись на декабрь открыта, 20.11); instagram.com/reel/Dfh2Y5bxRLZ (готова за два часа); instagram.com/reel/Df7QF6igwrt (мастер на WORLD WIDE HAIR TOUR 2026 Davines, Валенсия); instagram.com/p/DgNYfH6APkS (MAIN 7 лет, 7.12 −20 % на продукцию, 8.12 −20 % на услуги)",
+  "check": "Владелец не найден (ворота 1 сняты Елжаном 27.11): сообщение уходит компании, человек не назван. Номер wa — линия записи одного салона (ЖК Comfort City), не личный. «Давинес» в 4-й строке whisper услышал как «до Венес»: проверить ухом. Длительность после ускорения 1.2×, CTA быстрый. Музыка Cat Walk (Arulo, Mixkit).",
+  "subject": "Моушн-ролик про MAIN: запись на декабрь",
+  "text": "Добрый день! Сделал моушн-ролик про MAIN: как не остаться 31 декабря без записи на укладку. Без съёмки, собрал по вашим открытым материалам, голос синтезированный, никто не заказывал.\nПосмотрите: {reel}\nЕсли зайдёт, сделаю ещё один под ваш день рождения 7–8 декабря. Бесплатно."
+},
+{
   "id": "ms-luxor_wellness",
   "date": "2026-11-28",
   "lang": "ru",
